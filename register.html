@@ -122,12 +122,10 @@
   <a href="terms.html">Terms of Service</a>
   <a href="index.html">Home</a>
 </div>
-
 <script>
   const STRAVA_CLIENT_ID = '159703';
   const BACKEND_URL      = 'https://walkathon-backend-hv9j.onrender.com';
 
-  // Known events — add new events here
   const EVENTS = {
     'walkathon2026': 'Arcgate Walkathon 2026',
     'walkathon2027': 'Arcgate Walkathon 2027',
@@ -135,8 +133,11 @@
   };
 
   const params    = new URLSearchParams(window.location.search);
-  const eventCode = params.get('event');
   const authCode  = params.get('code');
+  const stateVal  = params.get('state');
+
+  // Event code comes from ?event= on first visit, or from state= on OAuth return
+  const eventCode = params.get('event') || stateVal;
 
   // Validate event code
   if (!eventCode || !EVENTS[eventCode]) {
@@ -145,23 +146,24 @@
     document.getElementById('valid-view').style.display = 'block';
 
     const eventName = EVENTS[eventCode];
-    document.getElementById('event-badge').textContent  = eventName;
+    document.getElementById('event-badge').textContent   = eventName;
     document.getElementById('success-event').textContent = eventName;
     document.title = eventName + ' — Register';
 
-    // Build Strava OAuth URL — preserve event code in redirect
-// Build Strava OAuth URL — clean redirect URI, pass event via state
+    // Clean redirect URI — no query string, Strava requires exact match
     const redirectURI = window.location.origin + window.location.pathname;
-    const authUrl = 'https://www.strava.com/oauth/authorize?client_id=' + STRAVA_CLIENT_ID
+
+    const authUrl = 'https://www.strava.com/oauth/authorize'
+      + '?client_id='    + STRAVA_CLIENT_ID
       + '&redirect_uri=' + encodeURIComponent(redirectURI)
-      + '&response_type=code&scope=read,activity:read'
-      + '&state=' + eventCode;
+      + '&response_type=code'
+      + '&scope=read,activity:read'
+      + '&state='        + eventCode;
+
     document.getElementById('strava-btn').href = authUrl;
 
-    // Handle OAuth callback
-    const params    = new URLSearchParams(window.location.search);
-  const eventCode = params.get('event');
-  const authCode  = params.get('code');
+    // Handle OAuth callback — Strava returns ?code=...&state=...
+    if (authCode) {
       document.getElementById('strava-btn').style.display = 'none';
       fetch(BACKEND_URL + '/register', {
         method:  'POST',
