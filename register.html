@@ -150,14 +150,18 @@
     document.title = eventName + ' — Register';
 
     // Build Strava OAuth URL — preserve event code in redirect
-    const redirectURI = window.location.origin + window.location.pathname + '?event=' + eventCode;
+// Build Strava OAuth URL — clean redirect URI, pass event via state
+    const redirectURI = window.location.origin + window.location.pathname;
     const authUrl = 'https://www.strava.com/oauth/authorize?client_id=' + STRAVA_CLIENT_ID
       + '&redirect_uri=' + encodeURIComponent(redirectURI)
-      + '&response_type=code&scope=read,activity:read';
+      + '&response_type=code&scope=read,activity:read'
+      + '&state=' + eventCode;
     document.getElementById('strava-btn').href = authUrl;
 
     // Handle OAuth callback
-    if (authCode) {
+    const params    = new URLSearchParams(window.location.search);
+  const eventCode = params.get('event');
+  const authCode  = params.get('code');
       document.getElementById('strava-btn').style.display = 'none';
       fetch(BACKEND_URL + '/register', {
         method:  'POST',
