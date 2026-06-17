@@ -127,7 +127,7 @@
           <thead><tr>
             <th>#</th><th>Athlete</th><th>Team</th><th>Activity</th><th>Type</th>
             <th>Date</th><th>Start time</th><th>Distance</th><th>Duration</th>
-            <th>Pace / Speed</th><th>Elevation</th><th>Steps</th><th>Calories</th><th>Heart rate</th>
+            <th>Pace / Speed</th><th>Elevation</th><th>Steps</th><th>Calories</th><th>Heart rate</th><th>Status</th>
           </tr></thead>
           <tbody id="activities-body"></tbody>
         </table>
@@ -228,6 +228,7 @@ async function loadActivities() {
           +'<td>'+(a.steps?a.steps.toLocaleString():'—')+'</td>'
           +'<td>'+(a.calories?a.calories.toFixed(0):'—')+'</td>'
           +'<td>'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—')+'</td>'
+          +'<td>'+(a.is_flagged?'<span style="display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;background:#ffebee;color:#c62828">🚩 '+( a.flag_reason||'Flagged')+' </span>':'<span style="display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;background:#e8f5e9;color:#2e7d32">✅ Valid</span>')+'</td>'
           +'</tr>';
       }).join('');
     }
