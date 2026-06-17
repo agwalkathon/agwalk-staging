@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Walkathon 2026 — Participants</title>
+  <title>Walkathon 2026 — Flagged Activities</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; }
@@ -12,54 +12,66 @@
     .back-btn { color: white; text-decoration: none; font-size: 13px; opacity: 0.7; }
     .back-btn:hover { opacity: 1; }
     .toolbar { background: white; border-bottom: 1px solid #eee; padding: 12px 28px; display: flex; gap: 12px; align-items: center; }
-    .search-box { padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; width: 260px; }
-    .search-box:focus { outline: none; border-color: #FC4C02; }
-    .count { font-size: 13px; color: #999; margin-left: auto; }
+    .tab-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 13px; cursor: pointer; background: white; color: #555; }
+    .tab-btn.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
     .content { padding: 24px 28px; }
-    .table-wrap { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #f8f8f8; padding: 12px 16px; text-align: left; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
-    td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+    .summary { border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; font-size: 14px; }
+    .summary.warn { background: #fff3e0; border: 1px solid #ffcc80; color: #e65100; }
+    .summary.ok   { background: #e8f5e9; border: 1px solid #a5d6a7; color: #2e7d32; }
+    .table-wrap { background: white; border-radius: 14px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { background: #f8f8f8; padding: 11px 14px; text-align: left; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #eee; white-space: nowrap; }
+    td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
+    tr.deleted-row td { opacity: 0.5; background: #fafafa; }
     .athlete-link { color: #FC4C02; text-decoration: none; font-weight: 500; }
     .athlete-link:hover { text-decoration: underline; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
-    .badge-active { background: #e8f5e9; color: #2e7d32; }
-    .badge-none   { background: #f5f5f5; color: #999; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+    .pill-walk { background: #e8f5e9; color: #2e7d32; }
+    .pill-run  { background: #e3f2fd; color: #1565c0; }
+    .pill-ride { background: #fff3e0; color: #e65100; }
+    .pill-hike { background: #f3e5f5; color: #6a1b9a; }
+    .pill-deleted { background: #f5f5f5; color: #999; }
+    .flag-reason { font-size: 12px; color: #e53935; }
+    .btn { padding: 5px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 4px; }
+    .btn-clear   { background: #e8f5e9; color: #2e7d32; }
+    .btn-delete  { background: #ffebee; color: #c62828; }
+    .btn-restore { background: #e3f2fd; color: #1565c0; }
     .loading { text-align: center; padding: 48px; color: #bbb; }
-    .mono { font-family: monospace; font-size: 12px; color: #999; }
+    .empty   { text-align: center; padding: 48px; color: #2e7d32; font-size: 15px; }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>👥 Participants</h1>
+  <h1>🚩 Flagged Activities</h1>
   <a href="admin.html" class="back-btn">← Back to dashboard</a>
 </div>
 
 <div class="toolbar">
-  <input class="search-box" type="text" id="search" placeholder="Search by name or email..." oninput="filterTable()">
-  <span class="count" id="count"></span>
+  <button class="tab-btn active" id="tab-flagged"  onclick="switchTab('flagged')">🚩 Flagged</button>
+  <button class="tab-btn"        id="tab-deleted"  onclick="switchTab('deleted')">🗑️ Deleted</button>
 </div>
 
 <div class="content">
+  <div class="summary warn" id="summary">Loading...</div>
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Strava profile</th>
-          <th>Registered</th>
-          <th>Activities</th>
-          <th>Total distance</th>
+          <th>Athlete</th>
+          <th>Activity</th>
+          <th>Type</th>
+          <th>Date & time</th>
+          <th>Distance</th>
+          <th>Avg speed</th>
+          <th>Flag reason</th>
           <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
-      <tbody id="participants-body">
-        <tr><td colspan="8" class="loading">Loading...</td></tr>
+      <tbody id="flagged-body">
+        <tr><td colspan="9" class="loading">Loading...</td></tr>
       </tbody>
     </table>
   </div>
@@ -76,72 +88,141 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
   const HEADERS = { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` };
 
-  let allRows = [];
+  let currentTab = 'flagged';
+  let regMap = {};
 
-  function fmtDate(d) {
-    return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+  function fmtTime(d) { return new Date(d).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12: true }); }
+  function fmtSpeed(ms) { return ms ? (ms * 3.6).toFixed(1) + ' km/h' : '—'; }
+  function pillClass(t) {
+    if (t==='Walk') return 'pill-walk';
+    if (t==='Run'||t==='VirtualRun') return 'pill-run';
+    if (t==='Ride') return 'pill-ride';
+    return 'pill-hike';
   }
 
-  function filterTable() {
-    const q = document.getElementById('search').value.toLowerCase();
-    const filtered = allRows.filter(r =>
-      r.name?.toLowerCase().includes(q) || r.email?.toLowerCase().includes(q)
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-flagged').classList.toggle('active', tab === 'flagged');
+    document.getElementById('tab-deleted').classList.toggle('active', tab === 'deleted');
+    loadData();
+  }
+
+  async function loadData() {
+    document.getElementById('flagged-body').innerHTML =
+      '<tr><td colspan="9" class="loading">Loading...</td></tr>';
+
+    // Load registrations for name lookup
+    const regRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/registration?select=strava_athlete_id,full_name`, { headers: HEADERS }
     );
-    document.getElementById('count').textContent = `${filtered.length} of ${allRows.length} participants`;
-    renderRows(filtered);
-  }
+    const regs = await regRes.json();
+    regs.forEach(r => regMap[r.strava_athlete_id] = r.full_name);
 
-  function renderRows(rows) {
-    document.getElementById('participants-body').innerHTML = rows.map((p, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td><strong>${p.name || '—'}</strong></td>
-        <td>${p.email || '—'}</td>
+    let url;
+    if (currentTab === 'flagged') {
+      url = `${SUPABASE_URL}/rest/v1/activities?is_flagged=eq.true&is_deleted=eq.false&order=activity_date.desc`;
+    } else {
+      url = `${SUPABASE_URL}/rest/v1/activities?is_deleted=eq.true&order=activity_date.desc`;
+    }
+
+    const actRes = await fetch(url, { headers: HEADERS });
+    const activities = await actRes.json();
+
+    // Update summary
+    const summaryEl = document.getElementById('summary');
+    if (currentTab === 'flagged') {
+      summaryEl.className = activities.length ? 'summary warn' : 'summary ok';
+      summaryEl.textContent = activities.length
+        ? `⚠️ ${activities.length} activit${activities.length===1?'y':'ies'} flagged for review`
+        : '✅ No flagged activities — everything looks clean!';
+    } else {
+      summaryEl.className = 'summary ok';
+      summaryEl.textContent = `🗑️ ${activities.length} deleted activit${activities.length===1?'y':'ies'} — can be restored anytime`;
+    }
+
+    if (!activities.length) {
+      document.getElementById('flagged-body').innerHTML =
+        `<tr><td colspan="9" class="${currentTab==='flagged'?'empty':'loading'}">
+          ${currentTab==='flagged' ? '🎉 No flagged activities!' : 'No deleted activities'}
+        </td></tr>`;
+      return;
+    }
+
+    document.getElementById('flagged-body').innerHTML = activities.map(a => `
+      <tr id="row-${a.id}" class="${a.is_deleted ? 'deleted-row' : ''}">
         <td>
-          <a href="https://www.strava.com/athletes/${p.strava_athlete_id}"
+          <a href="https://www.strava.com/athletes/${a.strava_athlete_id}"
              target="_blank" class="athlete-link">
-            View on Strava ↗
+            ${regMap[a.strava_athlete_id] || 'Unknown'}
           </a>
         </td>
-        <td>${fmtDate(p.registered_at)}</td>
-        <td>${p.activity_count || 0}</td>
-        <td>${p.total_distance ? (p.total_distance/1000).toFixed(2)+' km' : '—'}</td>
+        <td>${a.activity_name || '—'}</td>
+        <td><span class="pill ${a.is_deleted ? 'pill-deleted' : pillClass(a.sport_type)}">${a.sport_type||'—'}</span></td>
+        <td>${fmtDate(a.activity_date)} ${fmtTime(a.activity_date)}</td>
+        <td>${a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '—'}</td>
+        <td>${fmtSpeed(a.avg_speed)}</td>
+        <td><span class="flag-reason">${a.flag_reason || '—'}</span></td>
+        <td>${a.is_deleted
+          ? '<span style="color:#999;font-size:12px">🗑️ Deleted</span>'
+          : '<span style="color:#e53935;font-size:12px">🚩 Flagged</span>'}</td>
         <td>
-          <span class="badge ${p.activity_count > 0 ? 'badge-active' : 'badge-none'}">
-            ${p.activity_count > 0 ? '✅ Active' : 'No activities'}
-          </span>
+          ${currentTab === 'flagged' ? `
+            <button class="btn btn-clear"  onclick="clearFlag(${a.id})">✅ Clear flag</button>
+            <button class="btn btn-delete" onclick="softDelete(${a.id})">🗑️ Delete</button>
+          ` : `
+            <button class="btn btn-restore" onclick="restoreActivity(${a.id})">↩️ Restore</button>
+          `}
         </td>
       </tr>`).join('');
   }
 
-  async function loadParticipants() {
-    const [partRes, actRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/participants?select=strava_athlete_id,name,email,registered_at&order=registered_at.desc`, { headers: HEADERS }),
-      fetch(`${SUPABASE_URL}/rest/v1/activities?select=strava_athlete_id,distance_meters`, { headers: HEADERS })
-    ]);
-
-    const participants = await partRes.json();
-    const activities   = await actRes.json();
-
-    // Count activities and total distance per athlete
-    const actMap = {};
-    activities.forEach(a => {
-      if (!actMap[a.strava_athlete_id]) actMap[a.strava_athlete_id] = { count: 0, distance: 0 };
-      actMap[a.strava_athlete_id].count++;
-      actMap[a.strava_athlete_id].distance += a.distance_meters || 0;
+  async function clearFlag(id) {
+    await fetch(`${SUPABASE_URL}/rest/v1/activities?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_flagged: false, flag_reason: 'Manually cleared by admin' })
     });
-
-    allRows = participants.map(p => ({
-      ...p,
-      activity_count: actMap[p.strava_athlete_id]?.count    || 0,
-      total_distance: actMap[p.strava_athlete_id]?.distance || 0
-    }));
-
-    document.getElementById('count').textContent = `${allRows.length} participants`;
-    renderRows(allRows);
+    document.getElementById(`row-${id}`).remove();
+    updateSummaryCount(-1);
   }
 
-  loadParticipants();
+  async function softDelete(id) {
+    if (!confirm('Mark this activity as deleted? It will be hidden from leaderboards but can be restored later.')) return;
+    await fetch(`${SUPABASE_URL}/rest/v1/activities?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_deleted: true, deleted_reason: 'Deleted by admin' })
+    });
+    document.getElementById(`row-${id}`).remove();
+    updateSummaryCount(-1);
+  }
+
+  async function restoreActivity(id) {
+    await fetch(`${SUPABASE_URL}/rest/v1/activities?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_deleted: false, deleted_reason: null })
+    });
+    document.getElementById(`row-${id}`).remove();
+    updateSummaryCount(-1);
+  }
+
+  function updateSummaryCount(delta) {
+    const el = document.getElementById('summary');
+    const match = el.textContent.match(/\d+/);
+    if (match) {
+      const newCount = parseInt(match[0]) + delta;
+      if (newCount <= 0) {
+        el.className = 'summary ok';
+        el.textContent = currentTab === 'flagged'
+          ? '✅ All clear — no flagged activities!'
+          : '🗑️ No deleted activities';
+      }
+    }
+  }
+
+  loadData();
 </script>
 </body>
 </html>
