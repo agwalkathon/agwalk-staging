@@ -34,11 +34,11 @@
     .btn-strava svg { width: 22px; height: 22px; fill: white; }
     .success { display: none; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 10px; padding: 18px; margin-top: 18px; color: #2e7d32; font-size: 14px; line-height: 1.6; }
     .error { display: none; background: #ffebee; border: 1px solid #ef9a9a; border-radius: 10px; padding: 18px; margin-top: 18px; color: #c62828; font-size: 14px; }
-    .invalid { text-align: center; padding: 60px 24px; }
-    .invalid .icon { font-size: 48px; margin-bottom: 16px; }
-    .invalid h2 { font-size: 22px; color: #1A1A1A; margin-bottom: 12px; }
-    .invalid p { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 24px; }
-    .invalid a { color: #E8622A; text-decoration: none; font-weight: 500; }
+    .invalid-card { background: white; border-radius: 16px; padding: 48px 36px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center; }
+    .invalid-card .icon { font-size: 48px; margin-bottom: 16px; }
+    .invalid-card h2 { font-size: 22px; color: #1A1A1A; margin-bottom: 12px; }
+    .invalid-card p { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+    .invalid-card a.home-btn { display: inline-block; margin-top: 16px; padding: 12px 24px; background: #E8622A; color: white; border-radius: 8px; font-weight: 600; text-decoration: none; }
     .note { font-size: 12px; color: #bbb; text-align: center; margin-top: 16px; line-height: 1.9; }
     .note a { color: #E8622A; text-decoration: none; }
     .powered { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-size: 12px; color: #ccc; }
@@ -48,25 +48,29 @@
   </style>
 </head>
 <body>
+
 <div class="site-header">
   <img src="aw_logo.jpg" alt="Arcgate Walkathon 2026">
   <a href="index.html">← Back to home</a>
 </div>
 
+<!-- shown when no valid event code -->
 <div id="invalid-view" style="display:none">
+  <div class="hero" style="padding:40px 28px">
+    <h1>Registration Link Invalid</h1>
+  </div>
   <div class="main">
-    <div class="card">
-      <div class="invalid">
-        <div class="icon">🔗</div>
-        <h2>Invalid registration link</h2>
-        <p>This registration link is missing an event code. Please use the link provided by your event organizer.</p>
-        <p>If you are an Arcgate employee, contact <a href="mailto:prakash@arcgate.com">prakash@arcgate.com</a> for the correct link.</p>
-        <a href="index.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#E8622A;color:white;border-radius:8px;font-weight:600;text-decoration:none">Go to home page</a>
-      </div>
+    <div class="invalid-card">
+      <div class="icon">🔗</div>
+      <h2>Invalid registration link</h2>
+      <p>This link is missing a valid event code.</p>
+      <p>Please use the official link provided by your event organizer. If you are an Arcgate employee contact <strong>prakash@arcgate.com</strong> for the correct link.</p>
+      <a href="index.html" class="home-btn">Go to home page</a>
     </div>
   </div>
 </div>
 
+<!-- shown when valid event code -->
 <div id="valid-view" style="display:none">
   <div class="hero">
     <span class="event-badge" id="event-badge">Loading...</span>
@@ -88,7 +92,7 @@
     </div>
     <div class="card">
       <h2>Connect your Strava</h2>
-      <p class="sub">Authorize once — your walks, runs and hikes appear on the leaderboard automatically within seconds of saving on Strava.</p>
+      <p class="sub">Authorize once — your walks, runs and hikes appear on the leaderboard automatically within seconds.</p>
       <a id="strava-btn" href="#" class="btn-strava">
         <svg viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
         Connect with Strava
@@ -122,38 +126,42 @@
   <a href="terms.html">Terms of Service</a>
   <a href="index.html">Home</a>
 </div>
-<script>
-  const STRAVA_CLIENT_ID = '159703';
-  const BACKEND_URL      = 'https://walkathon-backend-hv9j.onrender.com';
 
-  const EVENTS = {
+<script>
+  var STRAVA_CLIENT_ID = '159703';
+  var BACKEND_URL      = 'https://walkathon-backend-hv9j.onrender.com';
+
+  var EVENTS = {
     'walkathon2026': 'Arcgate Walkathon 2026',
     'walkathon2027': 'Arcgate Walkathon 2027',
     'cycling2026':   'Arcgate Cycling Challenge 2026'
   };
 
-  const params    = new URLSearchParams(window.location.search);
-  const authCode  = params.get('code');
-  const stateVal  = params.get('state');
+  // Read URL params
+  var params   = new URLSearchParams(window.location.search);
+  var authCode = params.get('code');
+  var state    = params.get('state');
+  var evtParam = params.get('event');
 
-  // Event code comes from ?event= on first visit, or from state= on OAuth return
-  const eventCode = params.get('event') || stateVal;
+  // On first visit: event comes from ?event=
+  // On OAuth return: event comes from &state=
+  var eventCode = evtParam ? evtParam : state;
 
-  // Validate event code
   if (!eventCode || !EVENTS[eventCode]) {
+    // No valid event code — show error
     document.getElementById('invalid-view').style.display = 'block';
   } else {
+    // Valid event code — show registration
     document.getElementById('valid-view').style.display = 'block';
 
-    const eventName = EVENTS[eventCode];
+    var eventName = EVENTS[eventCode];
     document.getElementById('event-badge').textContent   = eventName;
     document.getElementById('success-event').textContent = eventName;
     document.title = eventName + ' — Register';
 
-    // Clean redirect URI — no query string, Strava requires exact match
-    const redirectURI = window.location.origin + window.location.pathname;
-
-    const authUrl = 'https://www.strava.com/oauth/authorize'
+    // Build OAuth URL — clean redirect, no query string
+    var redirectURI = window.location.origin + window.location.pathname;
+    var authUrl = 'https://www.strava.com/oauth/authorize'
       + '?client_id='    + STRAVA_CLIENT_ID
       + '&redirect_uri=' + encodeURIComponent(redirectURI)
       + '&response_type=code'
@@ -162,19 +170,19 @@
 
     document.getElementById('strava-btn').href = authUrl;
 
-    // Handle OAuth callback — Strava returns ?code=...&state=...
-    if (authCode) {
+    // Handle OAuth return — Strava sends ?code=...&state=...
+    if (authCode && eventCode) {
       document.getElementById('strava-btn').style.display = 'none';
       fetch(BACKEND_URL + '/register', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ code: authCode, event_code: eventCode })
       })
-      .then(r => r.json())
-      .then(d => {
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
         document.getElementById(d.success ? 'success-msg' : 'error-msg').style.display = 'block';
       })
-      .catch(() => {
+      .catch(function() {
         document.getElementById('error-msg').style.display = 'block';
       });
     }
