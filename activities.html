@@ -242,6 +242,27 @@ var SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var BACKEND_URL   = 'https://walkathon-backend-hv9j.onrender.com';
 var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer '+SUPABASE_ANON };
+
+// ── fetchAllRows: fetch ALL rows from Supabase with automatic pagination ──
+async function fetchAllRows(baseUrl, hdrs) {
+  var all = [];
+  var pageSize = 1000;
+  var from = 0;
+  while (true) {
+    var to = from + pageSize - 1;
+    var r = await fetch(baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'limit=' + pageSize + '&offset=' + from, {
+      headers: Object.assign({}, hdrs, { 'Range-Unit': 'items', 'Range': from + '-' + to })
+    });
+    if (!r.ok) { console.error('fetchAllRows error', r.status, baseUrl); break; }
+    var page = await r.json();
+    if (!Array.isArray(page) || page.length === 0) break;
+    all = all.concat(page);
+    if (page.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+
 function authGuard() { var s=JSON.parse(sessionStorage.getItem('wk_admin')||'{}'); if(!s.loggedIn||s.expires<Date.now()) window.location.href='admin-login.html'; }
 function logout() { sessionStorage.removeItem('wk_admin'); window.location.href='admin-login.html'; }
 function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
@@ -344,7 +365,7 @@ async function loadActivities() {
   var st=document.getElementById('status-filter').value;
   var fr=document.getElementById('flag-reason-filter').value;
 
-  var url=SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc&limit=2000';
+  var url=SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc';
   if(df) url+='&activity_date=gte.'+df+'T00:00:00.000Z';
   if(dt) url+='&activity_date=lte.'+dt+'T23:59:59.999Z';
   if(sp) url+='&sport_type=eq.'+sp;
@@ -353,13 +374,11 @@ async function loadActivities() {
   if(fr) url+='&flag_reason=ilike.%25'+fr.split(' ').join('%20')+'%25';
 
   try {
-    var results = await Promise.all([
-      fetch(url,{headers:{...HDR, 'Prefer':'count=none'}}),
-      fetch(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team',{headers:HDR})
+    var [acts, regs] = await Promise.all([
+      fetchAllRows(url, HDR),
+      fetch(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team',{headers:HDR}).then(function(r){return r.json();})
     ]);
-    var actsRaw=await results[0].json();
-    if (!Array.isArray(actsRaw)) { console.error('Activities fetch error:', actsRaw); actsRaw = []; }
-    var acts=actsRaw, regs=await results[1].json();
+    if (!Array.isArray(acts)) { console.error('Activities fetch error:', acts); acts = []; }
     var rm={}; regs.forEach(function(r){ rm[r.strava_athlete_id]=r; });
     if(nm) acts=acts.filter(function(a){ return (rm[a.strava_athlete_id]?.full_name||'').toLowerCase().includes(nm); });
     if(tm) acts=acts.filter(function(a){ return rm[a.strava_athlete_id]?.leaderboard_team===tm; });
