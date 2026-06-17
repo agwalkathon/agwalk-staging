@@ -97,11 +97,11 @@
 
   <!-- Board selector -->
   <div class="board-tabs">
-    <button class="board-tab active" id="tab-df" onclick="switchBoard('dayshift-female')">
-      👩 Dayshift — Female <span class="count" id="cnt-df">—</span>
-    </button>
-    <button class="board-tab" id="tab-dm" onclick="switchBoard('dayshift-male')">
+    <button class="board-tab active" id="tab-dm" onclick="switchBoard('dayshift-male')">
       👨 Dayshift — Male <span class="count" id="cnt-dm">—</span>
+    </button>
+    <button class="board-tab" id="tab-df" onclick="switchBoard('dayshift-female')">
+      👩 Dayshift — Female <span class="count" id="cnt-df">—</span>
     </button>
     <button class="board-tab" id="tab-ns" onclick="switchBoard('nightshift-all')">
       🌙 Nightshift — All <span class="count" id="cnt-ns">—</span>
@@ -168,15 +168,15 @@ function authGuard() { var s=JSON.parse(sessionStorage.getItem('wk_admin')||'{}'
 function logout() { sessionStorage.removeItem('wk_admin'); window.location.href='admin-login.html'; }
 authGuard();
 
-var currentBoard = 'dayshift-female';
+var currentBoard = 'dayshift-male';
 var CONFIG = { medals: { bronze:{male:125,female:100}, silver:{male:200,female:150}, gold:{male:300,female:250} }, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}], basePer_km: 1 };
 var CHALLENGES = [];
 var allData = {}; // cache {board: rows}
 
 function switchBoard(board) {
   currentBoard = board;
-  ['dayshift-female','dayshift-male','nightshift-all'].forEach(function(b) {
-    var key = b==='dayshift-female'?'df':b==='dayshift-male'?'dm':'ns';
+  ['dayshift-male','dayshift-female','nightshift-all'].forEach(function(b) {
+    var key = b==='dayshift-male'?'dm':b==='dayshift-female'?'df':'ns';
     document.getElementById('tab-'+key).classList.toggle('active', b===board);
   });
   if (allData[board]) renderBoard(allData[board], board);
@@ -286,23 +286,36 @@ function calcPoints(acts, athleteId, gender) {
   // Group by day
   var byDay = {};
   acts.filter(function(a){ return a.strava_athlete_id===athleteId; }).forEach(function(a) {
-    var d = a.activity_date.split('T')[0];
+    var d = (a.activity_date || '').split('T')[0];
+    if (!d) return;
     if (!byDay[d]) byDay[d] = [];
     byDay[d].push(a);
   });
 
-  var totalDistKm = 0, totalDistPts = 0, totalBonus = 0, totalChallenge = 0;
+  var totalDistKm = 0.0;
+  var totalDistPts = 0.0;
+  var totalBonus = 0;
+  var totalChallenge = 0;
   var challengeNames = [];
-  var earnedChallenges = new Set(); // one challenge bonus per challenge per participant
+  var earnedChallenges = new Set();
 
   Object.keys(byDay).forEach(function(day) {
     var dayActs = byDay[day];
-    var dayKm = dayActs.reduce(function(s,a){ return s+(Number(a.distance_meters)||0)/1000; }, 0);
-    totalDistKm = Number(totalDistKm) + Number(dayKm);
-    var distPts = Math.round(Number(dayKm) * Number(CONFIG.basePer_km) * 100) / 100;
+    var dayKm = 0.0;
+    dayActs.forEach(function(a) {
+      var dm = parseFloat(a.distance_meters) || 0;
+      dayKm += dm / 1000.0;
+    });
+    dayKm = parseFloat(dayKm.toFixed(4));
+    totalDistKm += dayKm;
+    var base = parseFloat(CONFIG.basePer_km) || 1;
+    var distPts = parseFloat((dayKm * base).toFixed(2));
     totalDistPts += distPts;
     totalBonus += calcBonus(dayKm);
   });
+
+  totalDistKm  = parseFloat(totalDistKm.toFixed(2));
+  totalDistPts = parseFloat(totalDistPts.toFixed(2));
 
   // Challenge bonus — check each activity
   acts.filter(function(a){ return a.strava_athlete_id===athleteId; }).forEach(function(a) {
@@ -371,11 +384,11 @@ function renderBoard(rows, board) {
       +'<td><span class="rank '+rankCls+'">'+medal_icon+'</span></td>'
       +'<td><strong>'+p.full_name+'</strong></td>'
       +'<td style="font-size:12px;color:#888">'+( p.leaderboard_team||'—')+'</td>'
-      +'<td><strong>'+pts.distKm.toFixed(2)+'</strong></td>'
-      +'<td><span class="pts">'+pts.distPts.toFixed ? pts.distPts.toFixed(2) : pts.distPts+'</span></td>'
-      +'<td><span class="pts">'+pts.bonusPts+'</span></td>'
+      +'<td><strong>'+(parseFloat(pts.distKm)||0).toFixed(2)+'</strong></td>'
+      +'<td><span class="pts">'+(parseFloat(pts.distPts)||0).toFixed(2)+'</span></td>'
+      +'<td><span class="pts">'+(parseInt(pts.bonusPts)||0)+'</span></td>'
       +'<td>'+chalHtml+'</td>'
-      +'<td><strong class="pts" style="font-size:15px">'+pts.totalPts+'</strong></td>'
+      +'<td><strong class="pts" style="font-size:15px">'+(parseFloat(pts.totalPts)||0).toFixed(2)+'</strong></td>'
       +'<td><span class="medal '+medal.cls+'">'+medal.label+'</span></td>'
       +'</tr>';
   }).join('');
