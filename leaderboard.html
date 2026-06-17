@@ -3,290 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Walkathon 2026 — Leaderboard</title>
+  <title>Leaderboard — Arcgate Walkathon 2026</title>
+  <link rel="stylesheet" href="_shared.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; }
-    .header { background: #1a1a2e; color: white; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 20px; font-weight: 500; }
-    .back-btn { color: white; text-decoration: none; font-size: 13px; opacity: 0.7; }
-    .back-btn:hover { opacity: 1; }
-
-    .tabs { background: white; border-bottom: 2px solid #f0f0f0; padding: 0 28px; display: flex; gap: 0; }
-    .tab { padding: 14px 20px; cursor: pointer; font-size: 14px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; }
-    .tab.active { color: #FC4C02; border-bottom-color: #FC4C02; font-weight: 500; }
-
-    .filters { background: white; border-bottom: 1px solid #eee; padding: 12px 28px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .filters label { font-size: 13px; color: #888; }
-    .filters input, .filters select { padding: 7px 11px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; }
-    .btn-search { padding: 7px 20px; background: #FC4C02; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
-    .btn-clear  { padding: 7px 14px; background: #f0f0f0; color: #555; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
-
-    .content { padding: 24px 28px; }
-    .table-wrap { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #f8f8f8; padding: 12px 16px; text-align: left; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; white-space: nowrap; }
-    td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
-
-    .rank { font-weight: 700; font-size: 18px; color: #ccc; width: 40px; }
-    .rank.r1 { color: #FFD700; }
-    .rank.r2 { color: #C0C0C0; }
-    .rank.r3 { color: #CD7F32; }
-    .athlete-link { color: #FC4C02; text-decoration: none; font-weight: 500; }
-    .athlete-link:hover { text-decoration: underline; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
-    .pill-walk { background: #e8f5e9; color: #2e7d32; }
-    .pill-run  { background: #e3f2fd; color: #1565c0; }
-    .pill-ride { background: #fff3e0; color: #e65100; }
-    .pill-hike { background: #f3e5f5; color: #6a1b9a; }
-    .medal { font-size: 20px; }
-    .loading { text-align: center; padding: 48px; color: #bbb; }
-    .result-info { font-size: 13px; color: #999; margin-bottom: 14px; }
+    .rank-num { font-weight:700; font-size:16px; color:#ccc; width:36px; }
+    .rank-num.r1{color:#FFD700}.rank-num.r2{color:#C0C0C0}.rank-num.r3{color:#CD7F32}
+    .result-info { font-size:13px; color:#888; margin-bottom:14px; }
   </style>
 </head>
 <body>
+<div class="site-header">
+  <img src="aw_logo.jpg" alt="Arcgate Walkathon 2026">
+  <nav>
+    <a href="admin.html">Dashboard</a>
+    <a href="activities.html">Activities</a>
+    <a href="leaderboard.html" class="active">Leaderboard</a>
+    <a href="flagged.html">Flagged</a>
+    <a href="participants.html">Participants</a>
+    <a href="#" onclick="logout();return false;">Sign out</a>
+  </nav>
+</div>
 
-<div class="header">
+<div class="page-bar">
   <h1>🏆 Leaderboard</h1>
-  <a href="admin.html" class="back-btn">← Back to dashboard</a>
-</div>
-
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('distance')">🏅 Distance</div>
-  <div class="tab" onclick="switchTab('activities')">📋 Most activities</div>
-  <div class="tab" onclick="switchTab('elevation')">⛰️ Elevation</div>
-  <div class="tab" onclick="switchTab('pace')">⚡ Best pace</div>
-  <div class="tab" onclick="switchTab('calories')">🔥 Calories</div>
-  <div class="tab" onclick="switchTab('steps')">👟 Steps</div>
-</div>
-
-<div class="filters">
-  <label>From:</label>
-  <input type="date" id="date-from">
-  <label>To:</label>
-  <input type="date" id="date-to">
-  <select id="sport-filter">
-    <option value="">All types</option>
-    <option value="Walk">Walk</option>
-    <option value="Run">Run</option>
-    <option value="Ride">Ride</option>
-    <option value="Hike">Hike</option>
-  </select>
-  <button class="btn-search" onclick="loadLeaderboard()">Apply</button>
-  <button class="btn-clear"  onclick="clearFilters()">Clear</button>
+  <a href="admin.html" class="back">← Dashboard</a>
 </div>
 
 <div class="content">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('distance')">🏅 Distance</div>
+    <div class="tab" onclick="switchTab('activities')">📋 Activities</div>
+    <div class="tab" onclick="switchTab('elevation')">⛰️ Elevation</div>
+    <div class="tab" onclick="switchTab('pace')">⚡ Pace</div>
+    <div class="tab" onclick="switchTab('calories')">🔥 Calories</div>
+    <div class="tab" onclick="switchTab('steps')">👟 Steps</div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-grid">
+      <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div>
+      <div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
+      <div class="filter-group"><label>Activity type</label>
+        <select id="sport-filter">
+          <option value="">All types</option>
+          <option value="Walk">Walk</option><option value="Run">Run</option>
+          <option value="Ride">Ride</option><option value="Hike">Hike</option>
+        </select>
+      </div>
+      <div class="filter-group"><label>Team</label>
+        <select id="team-filter">
+          <option value="">All teams</option>
+          <option>Team Seattle</option><option>Team San Francisco</option>
+          <option>Team Los Angeles</option><option>Team Chicago</option>
+          <option>Team Austin</option><option>Team New York</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="loadLeaderboard()">Apply</button>
+      <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
+    </div>
+  </div>
+
   <div class="result-info" id="result-info"></div>
-  <div class="table-wrap">
-    <table>
-      <thead id="table-head"></thead>
-      <tbody id="table-body">
-        <tr><td class="loading">Select filters and view rankings</td></tr>
-      </tbody>
-    </table>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead id="table-head"></thead>
+        <tbody id="table-body"><tr class="loading-row"><td>Use filters above and click Apply</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<div class="site-footer">
+  © 2026 Arcgate Walkathon &nbsp;·&nbsp;
+  <a href="privacy.html">Privacy Policy</a>
+  <a href="terms.html">Terms of Service</a>
+</div>
+
+<script src="_nav.js"></script>
 <script>
-  // ── Auth guard ───────────────────────────────────────────────
-  const session = JSON.parse(sessionStorage.getItem('wk_admin') || '{}');
-  if (!session.loggedIn || session.expires < Date.now()) {
-    window.location.href = 'admin-login.html';
-  }
-
-  const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-  const HEADERS = { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` };
-
-  let currentTab = 'distance';
-
-  function switchTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', ['distance','activities','elevation','pace','calories','steps'][i] === tab);
-    });
-    loadLeaderboard();
-  }
-
-  function clearFilters() {
-    document.getElementById('date-from').value    = '';
-    document.getElementById('date-to').value      = '';
-    document.getElementById('sport-filter').value = '';
-    loadLeaderboard();
-  }
-
-  function fmtPace(avgSpeedMs) {
-    if (!avgSpeedMs) return '—';
-    const paceSecPerKm = 1000 / avgSpeedMs;
-    const mins = Math.floor(paceSecPerKm / 60);
-    const secs = Math.round(paceSecPerKm % 60);
-    return `${mins}:${secs.toString().padStart(2,'0')} /km`;
-  }
-  function fmtSpeed(ms) { return ms ? (ms * 3.6).toFixed(1) + ' km/h' : '—'; }
-  function fmtDuration(s) {
-    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  }
-  function rankClass(i) {
-    if (i === 0) return 'r1'; if (i === 1) return 'r2'; if (i === 2) return 'r3'; return '';
-  }
-  function medal(i) {
-    if (i === 0) return '🥇'; if (i === 1) return '🥈'; if (i === 2) return '🥉'; return '';
-  }
-  function pillClass(t) {
-    if (t==='Walk') return 'pill-walk';
-    if (t==='Run'||t==='VirtualRun') return 'pill-run';
-    if (t==='Ride') return 'pill-ride';
-    return 'pill-hike';
-  }
-
-  async function loadLeaderboard() {
-    document.getElementById('table-body').innerHTML =
-      '<tr><td class="loading">⏳ Loading rankings...</td></tr>';
-
-    const dateFrom  = document.getElementById('date-from').value;
-    const dateTo    = document.getElementById('date-to').value;
-    const sportType = document.getElementById('sport-filter').value;
-
-    let url = `${SUPABASE_URL}/rest/v1/activities?is_flagged=eq.false&order=activity_date.desc`;
-    if (dateFrom)  url += `&activity_date=gte.${dateFrom}`;
-    if (dateTo)    url += `&activity_date=lte.${dateTo}T23:59:59`;
-    if (sportType) url += `&sport_type=eq.${sportType}`;
-
-    const [actRes, partRes] = await Promise.all([
-      fetch(url, { headers: HEADERS }),
-      fetch(`${SUPABASE_URL}/rest/v1/participants?select=strava_athlete_id,name`, { headers: HEADERS })
-    ]);
-
-    const activities   = await actRes.json();
-    const participants = await partRes.json();
-
-    const nameMap = {};
-    participants.forEach(p => nameMap[p.strava_athlete_id] = p.name);
-
-    // Aggregate by athlete
-    const athleteMap = {};
-    activities.forEach(a => {
-      const id = a.strava_athlete_id;
-      if (!athleteMap[id]) {
-        athleteMap[id] = {
-          id,
-          name:          nameMap[id] || 'Unknown',
-          activities:    0,
-          total_distance: 0,
-          total_elevation: 0,
-          total_calories: 0,
-          total_steps:   0,
-          total_moving:  0,
-          speed_sum:     0,
-          speed_count:   0,
-          types:         new Set()
-        };
-      }
-      const e = athleteMap[id];
-      e.activities++;
-      e.total_distance  += a.distance_meters  || 0;
-      e.total_elevation += a.elevation_gain   || 0;
-      e.total_calories  += a.calories         || 0;
-      e.total_steps     += a.steps            || 0;
-      e.total_moving    += a.moving_time_seconds || 0;
-      if (a.avg_speed) { e.speed_sum += a.avg_speed; e.speed_count++; }
-      if (a.sport_type) e.types.add(a.sport_type);
-    });
-
-    const athletes = Object.values(athleteMap);
-
-    // Sort based on current tab
-    if (currentTab === 'distance')   athletes.sort((a,b) => b.total_distance - a.total_distance);
-    if (currentTab === 'activities') athletes.sort((a,b) => b.activities - a.activities);
-    if (currentTab === 'elevation')  athletes.sort((a,b) => b.total_elevation - a.total_elevation);
-    if (currentTab === 'pace')       athletes.sort((a,b) => (b.speed_sum/b.speed_count||0) - (a.speed_sum/a.speed_count||0));
-    if (currentTab === 'calories')   athletes.sort((a,b) => b.total_calories - a.total_calories);
-    if (currentTab === 'steps')      athletes.sort((a,b) => b.total_steps - a.total_steps);
-
-    document.getElementById('result-info').textContent =
-      `${athletes.length} participants · ${activities.length} activities`;
-
-    // Render headers
-    const heads = {
-      distance:   ['Rank','Athlete','Activities','Total distance','Total time','Elevation','Types'],
-      activities: ['Rank','Athlete','Activities','Total distance','Total time','Calories','Types'],
-      elevation:  ['Rank','Athlete','Activities','Total elevation','Total distance','Types'],
-      pace:       ['Rank','Athlete','Activities','Avg pace / speed','Total distance','Types'],
-      calories:   ['Rank','Athlete','Activities','Total calories','Total distance','Types'],
-      steps:      ['Rank','Athlete','Activities','Total steps','Total distance','Types']
-    };
-    document.getElementById('table-head').innerHTML =
-      '<tr>' + heads[currentTab].map(h => `<th>${h}</th>`).join('') + '</tr>';
-
-    if (!athletes.length) {
-      document.getElementById('table-body').innerHTML =
-        '<tr><td colspan="7" class="loading">No data found</td></tr>';
-      return;
-    }
-
-    document.getElementById('table-body').innerHTML = athletes.map((a, i) => {
-      const avgSpeed = a.speed_count ? a.speed_sum / a.speed_count : 0;
-      const typeStr  = [...a.types].map(t =>
-        `<span class="pill ${pillClass(t)}">${t}</span>`).join(' ');
-
-      let cols = '';
-      if (currentTab === 'distance') {
-        cols = `
-          <td>${a.activities}</td>
-          <td><strong>${(a.total_distance/1000).toFixed(2)} km</strong></td>
-          <td>${fmtDuration(a.total_moving)}</td>
-          <td>${a.total_elevation.toFixed(0)} m</td>
-          <td>${typeStr}</td>`;
-      } else if (currentTab === 'activities') {
-        cols = `
-          <td><strong>${a.activities}</strong></td>
-          <td>${(a.total_distance/1000).toFixed(2)} km</td>
-          <td>${fmtDuration(a.total_moving)}</td>
-          <td>${a.total_calories.toFixed(0)} kcal</td>
-          <td>${typeStr}</td>`;
-      } else if (currentTab === 'elevation') {
-        cols = `
-          <td>${a.activities}</td>
-          <td><strong>${a.total_elevation.toFixed(0)} m</strong></td>
-          <td>${(a.total_distance/1000).toFixed(2)} km</td>
-          <td>${typeStr}</td>`;
-      } else if (currentTab === 'pace') {
-        cols = `
-          <td>${a.activities}</td>
-          <td><strong>${fmtPace(avgSpeed)}</strong> <span style="color:#aaa;font-size:12px">/ ${fmtSpeed(avgSpeed)}</span></td>
-          <td>${(a.total_distance/1000).toFixed(2)} km</td>
-          <td>${typeStr}</td>`;
-      } else if (currentTab === 'calories') {
-        cols = `
-          <td>${a.activities}</td>
-          <td><strong>${a.total_calories.toFixed(0)} kcal</strong></td>
-          <td>${(a.total_distance/1000).toFixed(2)} km</td>
-          <td>${typeStr}</td>`;
-      } else if (currentTab === 'steps') {
-        cols = `
-          <td>${a.activities}</td>
-          <td><strong>${a.total_steps.toLocaleString()} steps</strong></td>
-          <td>${(a.total_distance/1000).toFixed(2)} km</td>
-          <td>${typeStr}</td>`;
-      }
-
-      return `<tr>
-        <td><span class="rank ${rankClass(i)}">${medal(i) || '#'+(i+1)}</span></td>
-        <td>
-          <a href="https://www.strava.com/athletes/${a.id}"
-             target="_blank" class="athlete-link">${a.name}</a>
-        </td>
-        ${cols}
-      </tr>`;
-    }).join('');
-  }
-
-  // Load on open
+authGuard();
+let currentTab='distance';
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active',['distance','activities','elevation','pace','calories','steps'][i]===t);
+  });
   loadLeaderboard();
+}
+function clearFilters(){
+  ['date-from','date-to'].forEach(id=>document.getElementById(id).value='');
+  ['sport-filter','team-filter'].forEach(id=>document.getElementById(id).value='');
+  loadLeaderboard();
+}
+function fmtPace(ms){if(!ms)return'—';const p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return`${min}:${sec.toString().padStart(2,'0')} /km`;}
+function fmtSpeed(ms){return ms?(ms*3.6).toFixed(1)+' km/h':'—';}
+async function loadLeaderboard(){
+  document.getElementById('table-body').innerHTML='<tr class="loading-row"><td colspan="7">⏳ Loading rankings...</td></tr>';
+  const dateFrom=document.getElementById('date-from').value;
+  const dateTo=document.getElementById('date-to').value;
+  const sport=document.getElementById('sport-filter').value;
+  const team=document.getElementById('team-filter').value;
+  let url=`${SUPABASE_URL}/rest/v1/activities?is_flagged=eq.false&is_deleted=eq.false&order=activity_date.desc`;
+  if(dateFrom) url+=`&activity_date=gte.${dateFrom}`;
+  if(dateTo)   url+=`&activity_date=lte.${dateTo}T23:59:59`;
+  if(sport)    url+=`&sport_type=eq.${sport}`;
+  const [actRes,regRes]=await Promise.all([
+    fetch(url,{headers:HDR}),
+    fetch(`${SUPABASE_URL}/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team`,{headers:HDR})
+  ]);
+  let acts=await actRes.json();
+  const regs=await regRes.json();
+  const regMap={};
+  regs.forEach(r=>regMap[r.strava_athlete_id]=r);
+  if(team) acts=acts.filter(a=>regMap[a.strava_athlete_id]?.leaderboard_team===team);
+  const athMap={};
+  acts.forEach(a=>{
+    const id=a.strava_athlete_id;
+    if(!athMap[id]) athMap[id]={id,name:regMap[id]?.full_name||'Unknown',team:regMap[id]?.leaderboard_team||'—',activities:0,dist:0,elev:0,cals:0,steps:0,moving:0,speedSum:0,speedCnt:0,types:new Set()};
+    const e=athMap[id];
+    e.activities++; e.dist+=a.distance_meters||0; e.elev+=a.elevation_gain||0;
+    e.cals+=a.calories||0; e.steps+=a.steps||0; e.moving+=a.moving_time_seconds||0;
+    if(a.avg_speed){e.speedSum+=a.avg_speed;e.speedCnt++;}
+    if(a.sport_type) e.types.add(a.sport_type);
+  });
+  let aths=Object.values(athMap);
+  if(currentTab==='distance')   aths.sort((a,b)=>b.dist-a.dist);
+  if(currentTab==='activities') aths.sort((a,b)=>b.activities-a.activities);
+  if(currentTab==='elevation')  aths.sort((a,b)=>b.elev-a.elev);
+  if(currentTab==='pace')       aths.sort((a,b)=>(b.speedSum/b.speedCnt||0)-(a.speedSum/a.speedCnt||0));
+  if(currentTab==='calories')   aths.sort((a,b)=>b.cals-a.cals);
+  if(currentTab==='steps')      aths.sort((a,b)=>b.steps-a.steps);
+  document.getElementById('result-info').textContent=`${aths.length} participants · ${acts.length} activities`;
+  const heads={
+    distance:  ['Rank','Athlete','Team','Activities','Total distance','Total time','Elevation'],
+    activities:['Rank','Athlete','Team','Activities','Total distance','Calories','Types'],
+    elevation: ['Rank','Athlete','Team','Activities','Total elevation','Total distance','Types'],
+    pace:      ['Rank','Athlete','Team','Activities','Avg pace / speed','Total distance','Types'],
+    calories:  ['Rank','Athlete','Team','Activities','Total calories','Total distance','Types'],
+    steps:     ['Rank','Athlete','Team','Activities','Total steps','Total distance','Types']
+  };
+  document.getElementById('table-head').innerHTML='<tr>'+heads[currentTab].map(h=>`<th>${h}</th>`).join('')+'</tr>';
+  if(!aths.length){document.getElementById('table-body').innerHTML='<tr class="loading-row"><td colspan="7">No data found</td></tr>';return;}
+  document.getElementById('table-body').innerHTML=aths.map((a,i)=>{
+    const avgSpd=a.speedCnt?a.speedSum/a.speedCnt:0;
+    const typeStr=[...a.types].map(t=>`<span class="badge ${badgeClass(t)}">${t}</span>`).join(' ');
+    const rankCls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    let cols='';
+    if(currentTab==='distance')   cols=`<td>${a.activities}</td><td><strong>${(a.dist/1000).toFixed(2)} km</strong></td><td>${fmtDuration(a.moving)}</td><td>${a.elev.toFixed(0)} m</td>`;
+    if(currentTab==='activities') cols=`<td><strong>${a.activities}</strong></td><td>${(a.dist/1000).toFixed(2)} km</td><td>${a.cals.toFixed(0)} kcal</td><td>${typeStr}</td>`;
+    if(currentTab==='elevation')  cols=`<td>${a.activities}</td><td><strong>${a.elev.toFixed(0)} m</strong></td><td>${(a.dist/1000).toFixed(2)} km</td><td>${typeStr}</td>`;
+    if(currentTab==='pace')       cols=`<td>${a.activities}</td><td><strong>${fmtPace(avgSpd)}</strong> <span style="color:#aaa;font-size:12px">${fmtSpeed(avgSpd)}</span></td><td>${(a.dist/1000).toFixed(2)} km</td><td>${typeStr}</td>`;
+    if(currentTab==='calories')   cols=`<td>${a.activities}</td><td><strong>${a.cals.toFixed(0)} kcal</strong></td><td>${(a.dist/1000).toFixed(2)} km</td><td>${typeStr}</td>`;
+    if(currentTab==='steps')      cols=`<td>${a.activities}</td><td><strong>${a.steps.toLocaleString()} steps</strong></td><td>${(a.dist/1000).toFixed(2)} km</td><td>${typeStr}</td>`;
+    return`<tr><td><span class="rank-num ${rankCls}">${medal}</span></td><td><a href="https://www.strava.com/athletes/${a.id}" target="_blank" class="ath">${a.name}</a></td><td style="font-size:12px;color:#888">${a.team}</td>${cols}</tr>`;
+  }).join('');
+}
+loadLeaderboard();
 </script>
 </body>
 </html>

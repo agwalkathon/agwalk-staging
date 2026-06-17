@@ -3,273 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Walkathon 2026 — Activities</title>
+  <title>Search Activities — Arcgate Walkathon 2026</title>
+  <link rel="stylesheet" href="_shared.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; }
-    .header { background: #FC4C02; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 20px; font-weight: 500; }
-    .back-btn { color: white; text-decoration: none; font-size: 13px; opacity: 0.7; }
-    .back-btn:hover { opacity: 1; }
-    .filter-card { margin: 20px 24px; background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .filter-card h3 { font-size: 15px; color: #333; margin-bottom: 16px; }
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px; }
-    .filter-group label { display: block; font-size: 12px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .filter-group input, .filter-group select { width: 100%; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; color: #333; background: #fafafa; }
-    .filter-group input:focus, .filter-group select:focus { outline: none; border-color: #FC4C02; background: white; }
-    .filter-actions { display: flex; gap: 10px; }
-    .btn-search { padding: 10px 28px; background: #FC4C02; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
-    .btn-search:hover { background: #e04400; }
-    .btn-clear { padding: 10px 20px; background: #f0f0f0; color: #555; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
-    .stats { display: flex; gap: 12px; padding: 0 24px 16px; flex-wrap: wrap; }
-    .stat-card { background: white; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 130px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .stat-card .value { font-size: 22px; font-weight: 600; color: #FC4C02; }
-    .stat-card .label { font-size: 12px; color: #888; margin-top: 4px; }
-    .table-wrap { margin: 0 24px 24px; background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    table { width: 100%; border-collapse: collapse; min-width: 900px; }
-    th { background: #f8f8f8; padding: 11px 14px; text-align: left; font-size: 12px; color: #666; border-bottom: 1px solid #eee; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.4px; }
-    td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #f5f5f5; white-space: nowrap; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
-    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-    .badge-walk { background: #e8f5e9; color: #2e7d32; }
-    .badge-run  { background: #e3f2fd; color: #1565c0; }
-    .badge-ride { background: #fff3e0; color: #e65100; }
-    .badge-hike { background: #f3e5f5; color: #6a1b9a; }
-    .athlete-link { color: #FC4C02; text-decoration: none; font-weight: 500; }
-    .athlete-link:hover { text-decoration: underline; }
-    .placeholder { text-align: center; padding: 60px 24px; color: #aaa; }
-    .placeholder .icon { font-size: 40px; margin-bottom: 12px; }
     .result-count { padding: 10px 16px; font-size: 13px; color: #888; border-bottom: 1px solid #f0f0f0; }
-    .loading { text-align: center; padding: 48px; color: #bbb; }
   </style>
 </head>
 <body>
+<div class="site-header">
+  <img src="aw_logo.jpg" alt="Arcgate Walkathon 2026">
+  <nav>
+    <a href="admin.html">Dashboard</a>
+    <a href="activities.html" class="active">Activities</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="flagged.html">Flagged</a>
+    <a href="participants.html">Participants</a>
+    <a href="#" onclick="logout();return false;">Sign out</a>
+  </nav>
+</div>
 
-<div class="header">
+<div class="page-bar">
   <h1>🔍 Search Activities</h1>
-  <a href="admin.html" class="back-btn">← Back to dashboard</a>
+  <a href="admin.html" class="back">← Dashboard</a>
 </div>
 
-<div class="filter-card">
-  <h3>Filter Activities</h3>
-  <div class="filter-grid">
-    <div class="filter-group">
-      <label>From date</label>
-      <input type="date" id="date-from">
+<div class="content">
+  <div class="filter-bar">
+    <h3>Filter activities</h3>
+    <div class="filter-grid">
+      <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div>
+      <div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
+      <div class="filter-group"><label>Activity type</label>
+        <select id="sport-filter">
+          <option value="">All types</option>
+          <option value="Walk">Walk</option>
+          <option value="Run">Run</option>
+          <option value="Ride">Ride</option>
+          <option value="Hike">Hike</option>
+          <option value="VirtualRun">Virtual Run</option>
+        </select>
+      </div>
+      <div class="filter-group"><label>Athlete name</label><input type="text" id="athlete-name" placeholder="e.g. Rahul"></div>
+      <div class="filter-group"><label>Team</label>
+        <select id="team-filter">
+          <option value="">All teams</option>
+          <option>Team Seattle</option><option>Team San Francisco</option>
+          <option>Team Los Angeles</option><option>Team Chicago</option>
+          <option>Team Austin</option><option>Team New York</option>
+        </select>
+      </div>
     </div>
-    <div class="filter-group">
-      <label>To date</label>
-      <input type="date" id="date-to">
-    </div>
-    <div class="filter-group">
-      <label>Activity type</label>
-      <select id="sport-filter">
-        <option value="">All types</option>
-        <option value="Walk">Walk</option>
-        <option value="Run">Run</option>
-        <option value="Ride">Ride</option>
-        <option value="Hike">Hike</option>
-        <option value="VirtualRun">Virtual Run</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Athlete name</label>
-      <input type="text" id="athlete-name" placeholder="e.g. Rahul">
-    </div>
-    <div class="filter-group">
-      <label>Team</label>
-      <select id="team-filter">
-        <option value="">All teams</option>
-        <option value="Team Seattle">Team Seattle</option>
-        <option value="Team San Francisco">Team San Francisco</option>
-        <option value="Team Los Angeles">Team Los Angeles</option>
-        <option value="Team Chicago">Team Chicago</option>
-        <option value="Team Austin">Team Austin</option>
-        <option value="Team New York">Team New York</option>
-      </select>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="loadActivities()">Search</button>
+      <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
     </div>
   </div>
-  <div class="filter-actions">
-    <button class="btn-search" onclick="loadActivities()">Search</button>
-    <button class="btn-clear" onclick="clearFilters()">Clear</button>
-  </div>
-</div>
 
-<div class="stats" id="stats-row" style="display:none">
-  <div class="stat-card"><div class="value" id="total-activities">—</div><div class="label">Activities found</div></div>
-  <div class="stat-card"><div class="value" id="total-distance">—</div><div class="label">Total km</div></div>
-  <div class="stat-card"><div class="value" id="total-participants">—</div><div class="label">Participants</div></div>
-  <div class="stat-card"><div class="value" id="total-steps">—</div><div class="label">Total steps</div></div>
-  <div class="stat-card"><div class="value" id="avg-distance">—</div><div class="label">Avg km / activity</div></div>
-</div>
-
-<div class="table-wrap">
-  <div id="placeholder" class="placeholder">
-    <div class="icon">🔍</div>
-    <p>Use the filters above and click <strong>Search</strong> to view activities</p>
+  <div class="stats-grid" id="stats-row" style="display:none">
+    <div class="stat-card"><div class="val" id="total-activities">—</div><div class="lbl">Activities found</div></div>
+    <div class="stat-card"><div class="val" id="total-distance">—</div><div class="lbl">Total km</div></div>
+    <div class="stat-card dark"><div class="val" id="total-participants">—</div><div class="lbl">Participants</div></div>
+    <div class="stat-card green"><div class="val" id="total-steps">—</div><div class="lbl">Total steps</div></div>
+    <div class="stat-card"><div class="val" id="avg-distance">—</div><div class="lbl">Avg km / activity</div></div>
   </div>
-  <div id="results" style="display:none">
-    <div class="result-count" id="result-count"></div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Athlete</th>
-          <th>Team</th>
-          <th>Activity name</th>
-          <th>Type</th>
-          <th>Date</th>
-          <th>Start time</th>
-          <th>Distance</th>
-          <th>Duration</th>
-          <th>Pace / Speed</th>
-          <th>Elevation</th>
-          <th>Steps</th>
-          <th>Calories</th>
-          <th>Heart rate</th>
-        </tr>
-      </thead>
-      <tbody id="activities-body"></tbody>
-    </table>
+
+  <div class="card">
+    <div id="placeholder" class="empty">
+      <div class="icon">🔍</div>
+      <p>Use the filters above and click <strong>Search</strong> to view activities</p>
+    </div>
+    <div id="results" style="display:none">
+      <div class="result-count" id="result-count"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Athlete</th><th>Team</th><th>Activity</th><th>Type</th>
+            <th>Date</th><th>Start time</th><th>Distance</th><th>Duration</th>
+            <th>Pace / Speed</th><th>Elevation</th><th>Steps</th><th>Calories</th><th>Heart rate</th>
+          </tr></thead>
+          <tbody id="activities-body"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
+<div class="site-footer">
+  © 2026 Arcgate Walkathon &nbsp;·&nbsp;
+  <a href="privacy.html">Privacy Policy</a>
+  <a href="terms.html">Terms of Service</a>
+</div>
+
+<script src="_nav.js"></script>
 <script>
-  // ── Auth guard ───────────────────────────────────────────────
-  const session = JSON.parse(sessionStorage.getItem('wk_admin') || '{}');
-  if (!session.loggedIn || session.expires < Date.now()) {
-    window.location.href = 'admin-login.html';
-  }
-
-  const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-  const HEADERS = { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` };
-
-  function fmtDate(d) {
-    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-  function fmtTime(d) {
-    return new Date(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-  }
-  function fmtDuration(s) {
-    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  }
-  function fmtPaceSpeed(avgSpeedMs, sportType) {
-    if (!avgSpeedMs) return '—';
-    if (sportType === 'Ride' || sportType === 'VirtualRide') {
-      return (avgSpeedMs * 3.6).toFixed(1) + ' km/h';
-    }
-    const paceSecPerKm = 1000 / avgSpeedMs;
-    const mins = Math.floor(paceSecPerKm / 60);
-    const secs = Math.round(paceSecPerKm % 60);
-    return `${mins}:${secs.toString().padStart(2,'0')} /km`;
-  }
-  function badgeClass(t) {
-    if (t === 'Walk') return 'badge-walk';
-    if (t === 'Run' || t === 'VirtualRun') return 'badge-run';
-    if (t === 'Ride' || t === 'VirtualRide') return 'badge-ride';
-    return 'badge-hike';
-  }
-
-  function clearFilters() {
-    ['date-from','date-to','athlete-name'].forEach(id => document.getElementById(id).value = '');
-    ['sport-filter','team-filter'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('results').style.display     = 'none';
-    document.getElementById('placeholder').style.display = 'block';
-    document.getElementById('stats-row').style.display   = 'none';
-  }
-
-  async function loadActivities() {
-    document.getElementById('placeholder').style.display = 'none';
-    document.getElementById('results').style.display     = 'block';
-    document.getElementById('stats-row').style.display   = 'none';
-    document.getElementById('activities-body').innerHTML =
-      '<tr><td colspan="14" class="loading">⏳ Searching...</td></tr>';
-
-    const dateFrom    = document.getElementById('date-from').value;
-    const dateTo      = document.getElementById('date-to').value;
-    const sportType   = document.getElementById('sport-filter').value;
-    const athleteName = document.getElementById('athlete-name').value.trim().toLowerCase();
-    const team        = document.getElementById('team-filter').value;
-
-    let url = `${SUPABASE_URL}/rest/v1/activities?is_flagged=eq.false&is_deleted=eq.false&order=activity_date.desc`;
-    if (dateFrom)  url += `&activity_date=gte.${dateFrom}`;
-    if (dateTo)    url += `&activity_date=lte.${dateTo}T23:59:59`;
-    if (sportType) url += `&sport_type=eq.${sportType}`;
-
-    const [actRes, regRes] = await Promise.all([
-      fetch(url, { headers: HEADERS }),
-      fetch(`${SUPABASE_URL}/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team`, { headers: HEADERS })
-    ]);
-
-    let activities = await actRes.json();
-    const registrations = await regRes.json();
-
-    const regMap = {};
-    registrations.forEach(r => regMap[r.strava_athlete_id] = r);
-
-    // Client-side filters
-    if (athleteName) {
-      activities = activities.filter(a => {
-        const name = (regMap[a.strava_athlete_id]?.full_name || '').toLowerCase();
-        return name.includes(athleteName);
-      });
-    }
-    if (team) {
-      activities = activities.filter(a => regMap[a.strava_athlete_id]?.leaderboard_team === team);
-    }
-
-    // Stats
-    const totalKm   = activities.reduce((s,a) => s + (a.distance_meters||0), 0) / 1000;
-    const totalSteps = activities.reduce((s,a) => s + (a.steps||0), 0);
-    const uniquePax = new Set(activities.map(a => a.strava_athlete_id)).size;
-    document.getElementById('total-activities').textContent   = activities.length;
-    document.getElementById('total-distance').textContent     = totalKm.toFixed(1);
-    document.getElementById('total-participants').textContent = uniquePax;
-    document.getElementById('total-steps').textContent        = totalSteps.toLocaleString();
-    document.getElementById('avg-distance').textContent       = activities.length ? (totalKm/activities.length).toFixed(1) : '0';
-    document.getElementById('stats-row').style.display = 'flex';
-
-    document.getElementById('result-count').textContent =
-      `${activities.length} activit${activities.length===1?'y':'ies'} found`;
-
-    if (!activities.length) {
-      document.getElementById('activities-body').innerHTML =
-        '<tr><td colspan="14" class="loading">No activities match your filters</td></tr>';
-      return;
-    }
-
-    document.getElementById('activities-body').innerHTML = activities.map((a, i) => {
-      const reg  = regMap[a.strava_athlete_id];
-      const name = reg?.full_name || 'Unknown';
-      const team = reg?.leaderboard_team || '—';
-      return `<tr>
-        <td>${i + 1}</td>
-        <td>
-          <a href="https://www.strava.com/athletes/${a.strava_athlete_id}"
-             target="_blank" class="athlete-link">${name}</a>
-        </td>
-        <td>${team}</td>
-        <td>${a.activity_name || '—'}</td>
-        <td><span class="badge ${badgeClass(a.sport_type)}">${a.sport_type||'—'}</span></td>
-        <td>${fmtDate(a.activity_date)}</td>
-        <td>${fmtTime(a.activity_date)}</td>
-        <td>${a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '—'}</td>
-        <td>${a.moving_time_seconds ? fmtDuration(a.moving_time_seconds) : '—'}</td>
-        <td>${fmtPaceSpeed(a.avg_speed, a.sport_type)}</td>
-        <td>${a.elevation_gain ? a.elevation_gain.toFixed(0)+' m' : '—'}</td>
-        <td>${a.steps ? a.steps.toLocaleString() : '—'}</td>
-        <td>${a.calories ? a.calories.toFixed(0) : '—'}</td>
-        <td>${a.avg_heart_rate ? a.avg_heart_rate.toFixed(0)+' bpm' : '—'}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  document.getElementById('athlete-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadActivities();
-  });
+authGuard();
+function clearFilters() {
+  ['date-from','date-to','athlete-name'].forEach(id=>document.getElementById(id).value='');
+  ['sport-filter','team-filter'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('results').style.display='none';
+  document.getElementById('placeholder').style.display='block';
+  document.getElementById('stats-row').style.display='none';
+}
+async function loadActivities() {
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('results').style.display='block';
+  document.getElementById('stats-row').style.display='none';
+  document.getElementById('activities-body').innerHTML='<tr class="loading-row"><td colspan="14">⏳ Searching...</td></tr>';
+  const dateFrom=document.getElementById('date-from').value;
+  const dateTo=document.getElementById('date-to').value;
+  const sport=document.getElementById('sport-filter').value;
+  const name=document.getElementById('athlete-name').value.trim().toLowerCase();
+  const team=document.getElementById('team-filter').value;
+  let url=`${SUPABASE_URL}/rest/v1/activities?is_flagged=eq.false&is_deleted=eq.false&order=activity_date.desc`;
+  if(dateFrom) url+=`&activity_date=gte.${dateFrom}`;
+  if(dateTo)   url+=`&activity_date=lte.${dateTo}T23:59:59`;
+  if(sport)    url+=`&sport_type=eq.${sport}`;
+  const [actRes,regRes]=await Promise.all([
+    fetch(url,{headers:HDR}),
+    fetch(`${SUPABASE_URL}/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team`,{headers:HDR})
+  ]);
+  let acts=await actRes.json();
+  const regs=await regRes.json();
+  const regMap={};
+  regs.forEach(r=>regMap[r.strava_athlete_id]=r);
+  if(name) acts=acts.filter(a=>(regMap[a.strava_athlete_id]?.full_name||'').toLowerCase().includes(name));
+  if(team) acts=acts.filter(a=>regMap[a.strava_athlete_id]?.leaderboard_team===team);
+  const totalKm=acts.reduce((s,a)=>s+(a.distance_meters||0),0)/1000;
+  const totalSteps=acts.reduce((s,a)=>s+(a.steps||0),0);
+  const uniq=new Set(acts.map(a=>a.strava_athlete_id)).size;
+  document.getElementById('total-activities').textContent=acts.length;
+  document.getElementById('total-distance').textContent=totalKm.toFixed(1);
+  document.getElementById('total-participants').textContent=uniq;
+  document.getElementById('total-steps').textContent=totalSteps.toLocaleString();
+  document.getElementById('avg-distance').textContent=acts.length?(totalKm/acts.length).toFixed(1):'0';
+  document.getElementById('stats-row').style.display='flex';
+  document.getElementById('result-count').textContent=`${acts.length} activit${acts.length===1?'y':'ies'} found`;
+  if(!acts.length){document.getElementById('activities-body').innerHTML='<tr class="loading-row"><td colspan="14">No activities match your filters</td></tr>';return;}
+  document.getElementById('activities-body').innerHTML=acts.map((a,i)=>{
+    const r=regMap[a.strava_athlete_id];
+    return `<tr>
+      <td>${i+1}</td>
+      <td><a href="https://www.strava.com/athletes/${a.strava_athlete_id}" target="_blank" class="ath">${r?.full_name||'Unknown'}</a></td>
+      <td style="font-size:12px;color:#888">${r?.leaderboard_team||'—'}</td>
+      <td>${a.activity_name||'—'}</td>
+      <td><span class="badge ${badgeClass(a.sport_type)}">${a.sport_type||'—'}</span></td>
+      <td>${fmtDate(a.activity_date)}</td>
+      <td>${fmtTime(a.activity_date)}</td>
+      <td>${a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—'}</td>
+      <td>${a.moving_time_seconds?fmtDuration(a.moving_time_seconds):'—'}</td>
+      <td>${fmtPaceSpeed(a.avg_speed,a.sport_type)}</td>
+      <td>${a.elevation_gain?a.elevation_gain.toFixed(0)+' m':'—'}</td>
+      <td>${a.steps?a.steps.toLocaleString():'—'}</td>
+      <td>${a.calories?a.calories.toFixed(0):'—'}</td>
+      <td>${a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—'}</td>
+    </tr>`;
+  }).join('');
+}
+document.getElementById('athlete-name').addEventListener('keydown',e=>{if(e.key==='Enter')loadActivities();});
 </script>
 </body>
 </html>

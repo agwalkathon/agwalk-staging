@@ -1,0 +1,131 @@
+/* ── Arcgate Walkathon 2026 — Shared Design System ── */
+/* Brand: #E8622A orange, #1A1A1A dark, #F5F5F5 bg   */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F5F5; color: #1A1A1A; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Header */
+.site-header { background: #fff; border-bottom: 3px solid #E8622A; padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.site-header img { height: 42px; }
+.site-header nav { display: flex; gap: 6px; align-items: center; }
+.site-header nav a { font-size: 13px; color: #555; text-decoration: none; padding: 6px 14px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
+.site-header nav a:hover { background: #f0f0f0; color: #1A1A1A; }
+.site-header nav a.active { background: #E8622A; color: white; }
+
+/* Page title bar */
+.page-bar { background: #1A1A1A; color: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+.page-bar h1 { font-size: 20px; font-weight: 600; }
+.page-bar .back { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.page-bar .back:hover { color: #E8622A; }
+
+/* Orange accent bar */
+.accent-bar { background: #E8622A; display: flex; justify-content: center; flex-wrap: wrap; }
+.accent-bar .stat { padding: 13px 44px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2); color: white; }
+.accent-bar .stat:last-child { border-right: none; }
+.accent-bar .stat .val { font-size: 20px; font-weight: 700; }
+.accent-bar .stat .lbl { font-size: 11px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+/* Content wrapper */
+.content { flex: 1; padding: 28px 32px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+/* Cards */
+.card { background: white; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+.card-header { padding: 18px 24px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+.card-header h2 { font-size: 16px; font-weight: 600; color: #1A1A1A; }
+
+/* Stat cards */
+.stats-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.stat-card { background: white; border-radius: 12px; padding: 18px 22px; flex: 1; min-width: 140px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid #E8622A; }
+.stat-card .val { font-size: 26px; font-weight: 700; color: #E8622A; }
+.stat-card .lbl { font-size: 12px; color: #888; margin-top: 4px; }
+.stat-card.dark { border-left-color: #1A1A1A; }
+.stat-card.dark .val { color: #1A1A1A; }
+.stat-card.green { border-left-color: #2e7d32; }
+.stat-card.green .val { color: #2e7d32; }
+.stat-card.red { border-left-color: #c62828; }
+.stat-card.red .val { color: #c62828; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th { background: #fafafa; padding: 11px 16px; text-align: left; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; white-space: nowrap; }
+td { padding: 11px 16px; font-size: 13px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fdfcfb; }
+
+/* Badges & pills */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.badge-walk   { background: #e8f5e9; color: #2e7d32; }
+.badge-run    { background: #e3f2fd; color: #1565c0; }
+.badge-ride   { background: #fff3e0; color: #e65100; }
+.badge-hike   { background: #f3e5f5; color: #6a1b9a; }
+.badge-clean  { background: #e8f5e9; color: #2e7d32; }
+.badge-flag   { background: #ffebee; color: #c62828; }
+.badge-del    { background: #f5f5f5; color: #999; }
+.badge-conn   { background: #e3f2fd; color: #1565c0; }
+.badge-pend   { background: #fff3e0; color: #e65100; }
+.badge-active { background: #e8f5e9; color: #2e7d32; }
+
+/* Athlete link */
+.ath { color: #E8622A; text-decoration: none; font-weight: 500; }
+.ath:hover { text-decoration: underline; }
+
+/* Buttons */
+.btn { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: #E8622A; color: white; }
+.btn-dark    { background: #1A1A1A; color: white; }
+.btn-ghost   { background: #f0f0f0; color: #555; }
+.btn-green   { background: #e8f5e9; color: #2e7d32; }
+.btn-red     { background: #ffebee; color: #c62828; }
+.btn-blue    { background: #e3f2fd; color: #1565c0; }
+
+/* Filter bar */
+.filter-bar { background: white; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; }
+.filter-bar h3 { font-size: 14px; font-weight: 600; color: #1A1A1A; margin-bottom: 16px; }
+.filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.filter-group label { display: block; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.filter-group input, .filter-group select { width: 100%; padding: 9px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13px; color: #1A1A1A; background: #fafafa; transition: border 0.15s; }
+.filter-group input:focus, .filter-group select:focus { outline: none; border-color: #E8622A; background: white; }
+.filter-actions { display: flex; gap: 10px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid #f0f0f0; margin-bottom: 24px; }
+.tab { padding: 12px 20px; cursor: pointer; font-size: 14px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color 0.15s; white-space: nowrap; }
+.tab.active { color: #E8622A; border-bottom-color: #E8622A; font-weight: 500; }
+.tab:hover { color: #1A1A1A; }
+
+/* Toolbar */
+.toolbar { background: white; border-radius: 14px; padding: 14px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.toolbar input, .toolbar select { padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13px; }
+.toolbar input:focus, .toolbar select:focus { outline: none; border-color: #E8622A; }
+
+/* Empty / loading states */
+.empty { text-align: center; padding: 56px 24px; color: #bbb; }
+.empty .icon { font-size: 40px; margin-bottom: 12px; }
+.empty p { font-size: 15px; }
+.loading-row td { text-align: center; padding: 48px; color: #bbb; font-size: 14px; }
+
+/* Summary box */
+.summary { border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 14px; }
+.summary.warn { background: #fff3e0; border: 1px solid #ffcc80; color: #e65100; }
+.summary.ok   { background: #e8f5e9; border: 1px solid #a5d6a7; color: #2e7d32; }
+.summary.info { background: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; }
+
+/* Footer */
+.site-footer { background: #1A1A1A; color: #666; text-align: center; padding: 18px 32px; font-size: 12px; margin-top: auto; }
+.site-footer a { color: #E8622A; text-decoration: none; margin: 0 8px; }
+.site-footer a:hover { text-decoration: underline; }
+
+/* Rank medals */
+.rank { font-weight: 700; font-size: 16px; color: #ccc; }
+.rank.r1 { color: #FFD700; }
+.rank.r2 { color: #C0C0C0; }
+.rank.r3 { color: #CD7F32; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .site-header { padding: 12px 16px; }
+  .content { padding: 16px; }
+  .accent-bar .stat { padding: 12px 20px; }
+}
