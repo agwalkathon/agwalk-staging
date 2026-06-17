@@ -106,23 +106,6 @@
     <div class="filter-grid">
       <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div>
       <div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
-      <div class="filter-group"><label>Activity type</label>
-        <select id="sport-filter">
-          <option value="">All types</option>
-          <option value="Walk">Walk</option><option value="Run">Run</option>
-          <option value="Ride">Ride</option><option value="Hike">Hike</option>
-          <option value="VirtualRun">Virtual Run</option>
-        </select>
-      </div>
-      <div class="filter-group"><label>Athlete name</label><input type="text" id="athlete-name" placeholder="Search name..."></div>
-      <div class="filter-group"><label>Team</label>
-        <select id="team-filter">
-          <option value="">All teams</option>
-          <option>Team Seattle</option><option>Team San Francisco</option>
-          <option>Team Los Angeles</option><option>Team Chicago</option>
-          <option>Team Austin</option><option>Team New York</option>
-        </select>
-      </div>
       <div class="filter-group"><label>Status</label>
         <select id="status-filter">
           <option value="">All statuses</option>
@@ -147,6 +130,23 @@
           <option value="Distance Cropped - GPS Glitch">Distance Cropped - GPS Glitch</option>
           <option value="Distance Issue">Distance Issue</option>
           <option value="GPS Glitch">GPS Glitch</option>
+        </select>
+      </div>
+      <div class="filter-group"><label>Activity type</label>
+        <select id="sport-filter">
+          <option value="">All types</option>
+          <option value="Walk">Walk</option><option value="Run">Run</option>
+          <option value="Ride">Ride</option><option value="Hike">Hike</option>
+          <option value="VirtualRun">Virtual Run</option>
+        </select>
+      </div>
+      <div class="filter-group"><label>Athlete name</label><input type="text" id="athlete-name" placeholder="Search name..."></div>
+      <div class="filter-group"><label>Team</label>
+        <select id="team-filter">
+          <option value="">All teams</option>
+          <option>Team Seattle</option><option>Team San Francisco</option>
+          <option>Team Los Angeles</option><option>Team Chicago</option>
+          <option>Team Austin</option><option>Team New York</option>
         </select>
       </div>
     </div>
@@ -357,7 +357,9 @@ async function loadActivities() {
       fetch(url,{headers:{...HDR, 'Range-Unit':'items', 'Range':'0-1999'}}),
       fetch(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,leaderboard_team',{headers:HDR})
     ]);
-    var acts=await results[0].json(), regs=await results[1].json();
+    var actsRaw=await results[0].json();
+    if (!Array.isArray(actsRaw)) { console.error('Activities fetch error:', actsRaw); actsRaw = []; }
+    var acts=actsRaw, regs=await results[1].json();
     var rm={}; regs.forEach(function(r){ rm[r.strava_athlete_id]=r; });
     if(nm) acts=acts.filter(function(a){ return (rm[a.strava_athlete_id]?.full_name||'').toLowerCase().includes(nm); });
     if(tm) acts=acts.filter(function(a){ return rm[a.strava_athlete_id]?.leaderboard_team===tm; });
