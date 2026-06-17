@@ -376,21 +376,28 @@ function checkChallenge(act, challenge) {
   if (!sportTypes.includes(act.sport_type)) return false;
   var km = (act.distance_meters||0) / 1000;
   if (challenge.distance_type === 'fixed') {
-    if (km < challenge.distance_min - 0.05 || km > challenge.distance_max + 0.05) return false;
+    if (km < challenge.distance_min - 0.1  || km > challenge.distance_max + 0.1 ) return false;
   } else if (challenge.distance_type === 'range') {
     if (km < challenge.distance_min || km > challenge.distance_max) return false;
   } else { // extended
     if (km < challenge.distance_min) return false;
   }
   if (challenge.elevation_criteria > 0 && (act.elevation_gain||0) < challenge.elevation_criteria) return false;
-  if (challenge.start_time_criteria) {
+  // Note: start_time check skipped for imported activities (time data not available)
+  // Only check time for webhook-received activities that have real timestamps
+  if (challenge.start_time_criteria && act.activity_date && act.activity_date.includes('T')) {
     var actTime = new Date(act.activity_date);
-    var actHour = actTime.getHours();
-    var actMin  = actTime.getMinutes();
-    var parts   = challenge.start_time_criteria.split(':');
-    var critH   = parseInt(parts[0]), critM = parseInt(parts[1]||0);
-    var actMins = actHour*60+actMin, critMins = critH*60+critM;
-    if (Math.abs(actMins - critMins) > 30) return false; // within 30 min window
+    var timeStr = act.activity_date.split('T')[1] || '';
+    // Skip time check if activity was imported (all set to 06:30:00 placeholder)
+    var isImported = timeStr.startsWith('06:30:00');
+    if (!isImported) {
+      var actHour = actTime.getHours();
+      var actMin  = actTime.getMinutes();
+      var parts   = challenge.start_time_criteria.split(':');
+      var critH   = parseInt(parts[0]), critM = parseInt(parts[1]||0);
+      var actMins = actHour*60+actMin, critMins = critH*60+critM;
+      if (Math.abs(actMins - critMins) > 30) return false;
+    }
   }
   return true;
 }
