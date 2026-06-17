@@ -191,8 +191,10 @@ async function loadConfig() {
     var rows = await r.json();
     rows.forEach(function(row) {
       if (row.config_key==='medals')       CONFIG.medals     = row.config_value;
-      if (row.config_key==='bonus_points') CONFIG.bonus      = row.config_value;
-      if (row.config_key==='base_points')  CONFIG.basePer_km = row.config_value.per_km || 1;
+      if (row.config_key==='bonus_points') {
+      CONFIG.bonus = row.config_value.map(function(b){ return {km: Number(b.km), points: Number(b.points||b.pts||0)}; });
+    }
+      if (row.config_key==='base_points')  CONFIG.basePer_km = Number(row.config_value.per_km) || 1;
     });
   } catch(e) { console.warn('Config load failed, using defaults'); }
 }
@@ -222,12 +224,14 @@ async function loadActivities() {
 
 // Calculate bonus points for daily total km (highest bracket only)
 function calcBonus(km) {
-  var pts = 0;
+  var result = 0;
   var sorted = CONFIG.bonus.slice().sort(function(a,b){ return b.km-a.km; });
   for (var i=0; i<sorted.length; i++) {
-    if (km >= sorted[i].km) { pts = sorted[i].pts; break; }
+    var bracketKm  = Number(sorted[i].km)     || 0;
+    var bracketPts = Number(sorted[i].points) || Number(sorted[i].pts) || 0;
+    if (km >= bracketKm) { result = bracketPts; break; }
   }
-  return pts;
+  return result;
 }
 
 // Check if an activity qualifies for a challenge
@@ -297,7 +301,7 @@ function calcPoints(acts, athleteId, gender) {
     var dayActs = byDay[day];
     var dayKm = dayActs.reduce(function(s,a){ return s+(a.distance_meters||0)/1000; }, 0);
     totalDistKm += dayKm;
-    var distPts = Math.floor(dayKm * CONFIG.basePer_km);
+    var distPts = Math.round(dayKm * CONFIG.basePer_km);
     totalDistPts += distPts;
     totalBonus += calcBonus(dayKm);
   });
