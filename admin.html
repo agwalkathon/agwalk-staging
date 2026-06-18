@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard — Arcgate Walkathon 2026</title>
   <style>
@@ -55,6 +56,16 @@
     .loading-row td { text-align: center; padding: 48px; color: #bbb; font-size: 14px; }
     .site-footer { background: #1A1A1A; color: #666; text-align: center; padding: 16px 28px; font-size: 12px; margin-top: auto; }
     .site-footer a { color: #E8622A; text-decoration: none; margin: 0 8px; }
+
+    @media (max-width: 768px) {
+      .site-header { padding: 10px 16px; }
+      .site-header nav { display: none; }
+      .content { padding: 14px 16px; }
+      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat-card .val { font-size: 18px; }
+      table { font-size: 12px; }
+      th, td { padding: 7px 8px; }
+    }
   </style>
 </head>
 <body>
