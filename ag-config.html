@@ -18,41 +18,37 @@
     .page-bar h1 { font-size: 20px; font-weight: 600; }
     .page-bar .back { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px; }
     .content { flex: 1; padding: 24px 28px; max-width: 1100px; width: 100%; margin: 0 auto; }
-    .section { background: white; border-radius: 14px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; }
-    .section-title { font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .section-sub { font-size: 13px; color: #888; margin-bottom: 22px; }
+    /* Collapsible sections */
+    .section { background: white; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; overflow: hidden; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; cursor: pointer; user-select: none; transition: background 0.15s; }
+    .section-header:hover { background: #fafafa; }
+    .section-header-left { display: flex; align-items: center; gap: 12px; }
+    .section-title { font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0; }
+    .section-sub-inline { font-size: 13px; color: #999; }
+    .section-chevron { font-size: 14px; color: #bbb; transition: transform 0.2s; }
+    .section-chevron.open { transform: rotate(180deg); }
+    .section-body { display: none; padding: 0 24px 24px; border-top: 1px solid #f5f5f5; }
+    .section-body.open { display: block; }
+    /* Keep existing form styles */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 18px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .field input, .field select { padding: 9px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 14px; background: #fafafa; }
-    .field input:focus, .field select:focus { outline: none; border-color: #E8622A; background: white; }
-    .save-btn { padding: 10px 24px; background: #E8622A; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .field input, .field select, .field textarea { padding: 9px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 14px; background: #fafafa; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #E8622A; background: white; }
+    .save-btn { padding: 10px 24px; background: #E8622A; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .save-btn:hover { background: #d4561f; }
     .saved-msg { display: none; color: #2e7d32; font-size: 13px; margin-left: 12px; }
-
-    /* Bonus table */
     .bonus-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
     .bonus-table th { background: #fafafa; padding: 9px 14px; text-align: left; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
     .bonus-table td { padding: 9px 14px; border-bottom: 1px solid #f8f8f8; }
     .bonus-table input { width: 80px; padding: 6px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; text-align: center; }
-    .bonus-table input:focus { outline: none; border-color: #E8622A; }
-
-    /* Challenges */
-    .challenge-card { border: 1px solid #e8e8e8; border-radius: 12px; padding: 20px; margin-bottom: 16px; position: relative; }
-    .challenge-card .ch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .challenge-card .ch-name { font-size: 15px; font-weight: 600; color: #1A1A1A; }
-    .challenge-card .ch-actions { display: flex; gap: 8px; }
     .btn-del { padding: 6px 12px; background: #ffebee; color: #c62828; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; }
     .btn-save-ch { padding: 6px 14px; background: #E8622A; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; }
     .btn-add { padding: 10px 20px; background: #1A1A1A; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 8px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .dot-active { background: #2e7d32; }
-    .dot-inactive { background: #bbb; }
     .toggle-active { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 500; cursor: pointer; }
     .toggle-on  { background: #e8f5e9; color: #2e7d32; }
     .toggle-off { background: #f5f5f5; color: #999; }
-
-    .ch-compact { border: 1px solid #e8e8e8; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+    .ch-compact { border: 1px solid #e8e8e8; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
     .ch-compact:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .ch-summary:hover { background: #fafafa; }
     .site-footer { background: #1A1A1A; color: #666; text-align: center; padding: 16px 28px; font-size: 12px; margin-top: auto; }
@@ -79,9 +75,18 @@
 
   <!-- Medal Milestones -->
   <div class="section">
-    <div class="section-title">🏅 Medal Milestones</div>
-    <div class="section-sub">Points required to earn each medal, by gender</div>
-    <div class="form-grid">
+    <div class="section-header" onclick="toggleSection('medals')">
+      <div class="section-header-left">
+        <span>🏅</span>
+        <div>
+          <div class="section-title">Medal Milestones</div>
+          <div class="section-sub-inline">Points required for Bronze, Silver, Gold — by gender</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-medals">▼</span>
+    </div>
+    <div class="section-body" id="body-medals">
+      <div class="form-grid">
       <div class="field"><label>🥇 Gold — Male</label><input type="number" id="gold-male" value="300"></div>
       <div class="field"><label>🥇 Gold — Female</label><input type="number" id="gold-female" value="250"></div>
       <div class="field"><label>🥈 Silver — Male</label><input type="number" id="silver-male" value="200"></div>
@@ -91,13 +96,23 @@
     </div>
     <button class="save-btn" onclick="saveMedals()">Save medals</button>
     <span class="saved-msg" id="medals-saved">✅ Saved!</span>
+    </div>
   </div>
 
   <!-- Base + Bonus Points -->
   <div class="section">
-    <div class="section-title">📊 Points Configuration</div>
-    <div class="section-sub">Base points per km, and bonus points for daily distance milestones (highest bracket only)</div>
-    <div class="form-grid" style="max-width:300px;margin-bottom:20px">
+    <div class="section-header" onclick="toggleSection('bonus')">
+      <div class="section-header-left">
+        <span>📊</span>
+        <div>
+          <div class="section-title">Points Configuration</div>
+          <div class="section-sub-inline">Base points per km + daily bonus milestones</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-bonus">▼</span>
+    </div>
+    <div class="section-body" id="body-bonus">
+      <div class="form-grid" style="max-width:300px;margin-bottom:20px">
       <div class="field"><label>Base points per km</label><input type="number" id="base-per-km" value="1" step="0.1"></div>
     </div>
     <table class="bonus-table">
@@ -106,6 +121,7 @@
     </table>
     <button class="save-btn" onclick="saveBonus()">Save points config</button>
     <span class="saved-msg" id="bonus-saved">✅ Saved!</span>
+    </div>
   </div>
 
   <!-- Challenges -->
@@ -120,43 +136,51 @@
 
   <!-- Manual Bonus -->
   <div class="section">
-    <div class="section-title">🎁 Manual Bonus by Activity ID</div>
-    <div class="section-sub">Add manual challenge bonus for activities where criteria cannot be auto-tracked. Enter one Activity ID per line.</div>
-    <div class="form-grid" style="max-width:600px">
-      <div class="field" style="grid-column:1/-1">
-        <label>Activity IDs (one per line, or comma separated)</label>
-        <textarea id="manual-ids" rows="6" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909&#10;18773676802"></textarea>
+    <div class="section-header" onclick="toggleSection('manual')">
+      <div class="section-header-left">
+        <span>🎁</span>
+        <div>
+          <div class="section-title">Manual Bonus by Activity ID</div>
+          <div class="section-sub-inline">Apply bonus points to specific activities manually</div>
+        </div>
       </div>
-      <div class="field">
-        <label>Apply bonus to</label>
-        <select id="manual-apply-to">
-          <option value="each">Each activity individually</option>
-          <option value="day">All activities on same day (combined)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Bonus points</label>
-        <input type="number" id="manual-pts" value="3" min="1" max="50">
-      </div>
-      <div class="field">
-        <label>Challenge (select or type)</label>
-        <select id="manual-challenge-select" onchange="syncManualChallenge()">
-          <option value="">— Select existing challenge —</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Or enter custom reason</label>
-        <input type="text" id="manual-reason" placeholder="e.g. World Environment Day">
-      </div>
+      <span class="section-chevron" id="chev-manual">▼</span>
     </div>
-    <button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button>
-    <span class="saved-msg" id="manual-saved">✅ Applied!</span>
-    <div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div>
-
-    <!-- View existing manual bonuses -->
-    <div style="margin-top:24px">
-      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Existing manual bonuses</div>
-      <div id="manual-list">Loading...</div>
+    <div class="section-body" id="body-manual">
+      <div class="form-grid" style="max-width:700px">
+        <div class="field" style="grid-column:1/-1">
+          <label>Activity IDs (one per line, or comma separated)</label>
+          <textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea>
+        </div>
+        <div class="field">
+          <label>Apply bonus to</label>
+          <select id="manual-apply-to">
+            <option value="each">Each activity individually</option>
+            <option value="day">All activities on same day</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bonus points</label>
+          <input type="number" id="manual-pts" value="3" min="1" max="50">
+        </div>
+        <div class="field">
+          <label>Challenge (select existing)</label>
+          <select id="manual-challenge-select" onchange="syncManualChallenge()">
+            <option value="">— Select challenge —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Or custom reason</label>
+          <input type="text" id="manual-reason" placeholder="e.g. World Environment Day">
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button>
+      <span class="saved-msg" id="manual-saved">✅ Applied!</span>
+      <div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div>
+      <div style="margin-top:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px">Existing manual bonuses</div>
+        <div id="manual-list">Loading...</div>
+      </div>
     </div>
   </div>
 
@@ -178,6 +202,16 @@ authGuard();
 
 var BONUS_DEFAULT = [{km:5,pts:1},{km:8,pts:2},{km:10,pts:3},{km:15,pts:4},{km:21,pts:7}];
 var bonusData = BONUS_DEFAULT.slice();
+
+
+function toggleSection(id) {
+  var body  = document.getElementById('body-'+id);
+  var chev  = document.getElementById('chev-'+id);
+  if (!body) return;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (chev) chev.classList.toggle('open', !isOpen);
+}
 
 function showSaved(id) { var el=document.getElementById(id); el.style.display='inline'; setTimeout(function(){ el.style.display='none'; },2500); }
 
