@@ -300,6 +300,7 @@ authGuard();
 var currentBoard = 'dayshift-male';
 var CONFIG = { medals: { bronze:{male:125,female:100}, silver:{male:200,female:150}, gold:{male:300,female:250} }, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}], basePer_km: 1 };
 var CHALLENGES = [];
+var SPECIAL_DAYS = []; // dates (YYYY-MM-DD) where 21 km cap is lifted
 var allData = {}; // cache {board: rows}
 
 function switchBoard(board) {
@@ -386,6 +387,14 @@ async function loadChallenges() {
     CHALLENGES = await r.json();
     // challenge chip removed
   } catch(e) { CHALLENGES = []; }
+}
+
+async function loadSpecialDays() {
+  try {
+    var r = await fetch(SB_URL+'/rest/v1/special_scoring_days?select=special_date', {headers:HDR});
+    var rows = await r.json();
+    SPECIAL_DAYS = Array.isArray(rows) ? rows.map(function(x){ return x.special_date; }) : [];
+  } catch(e) { SPECIAL_DAYS = []; }
 }
 
 async function loadRegistration() {
@@ -523,6 +532,15 @@ function calcPoints(acts, athleteId, gender) {
       dayKm += dm / 1000.0;
     });
     dayKm = parseFloat(dayKm.toFixed(4));
+
+    // Apply 21 km daily cap unless this date is a configured special day
+    var DAILY_CAP = 21;
+    var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
+    if (!isSpecialDay && dayKm > DAILY_CAP) {
+      dayKm = DAILY_CAP;
+    }
+    dayKm = parseFloat(dayKm.toFixed(4));
+
     totalDistKm += dayKm;
     var base = parseFloat(CONFIG.basePer_km) || 1;
     var distPts = parseFloat((dayKm * base).toFixed(2));
@@ -632,7 +650,7 @@ async function loadAll() {
   document.getElementById('lb-body').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:60px;color:#bbb"><div class="spinner"></div><span style="font-size:14px">Loading all activities...</span></div>';
   try {
   allData = {};
-  await Promise.all([loadConfig(), loadChallenges()]);
+  await Promise.all([loadConfig(), loadChallenges(), loadSpecialDays()]);
   var [reg, acts] = await Promise.all([loadRegistration(), loadActivities()]);
   allActivities = acts; // store globally for sport filter
 
@@ -751,9 +769,17 @@ function toggleExpand(athleteId, gender, trEl) {
 
   var g = (gender||'').toLowerCase();
   var dayRows = days.map(function(day) {
-    var dayKm = 0;
-    byDay[day].forEach(function(a){ dayKm += (parseFloat(a.distance_meters)||0)/1000; });
+    var rawKm = 0;
+    byDay[day].forEach(function(a){ rawKm += (parseFloat(a.distance_meters)||0)/1000; });
+    rawKm = parseFloat(rawKm.toFixed(4));
+
+    // Apply 21 km daily cap unless this date is a special day
+    var DAILY_CAP = 21;
+    var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
+    var dayKm = (!isSpecialDay && rawKm > DAILY_CAP) ? DAILY_CAP : rawKm;
+    var capped = (!isSpecialDay && rawKm > DAILY_CAP);
     dayKm = parseFloat(dayKm.toFixed(2));
+
     var base = parseFloat(CONFIG.basePer_km)||1;
     var dp = parseFloat((dayKm*base).toFixed(2));
     var bp = calcBonus(dayKm);
@@ -765,9 +791,10 @@ function toggleExpand(athleteId, gender, trEl) {
       cp += parseFloat(a.manual_bonus)||0;
     });
     var tp = parseFloat((dp+bp+cp).toFixed(2));
+    var distLabel = dayKm.toFixed(2)+' km'+(capped?' <span style="font-size:10px;color:#e65100;background:#fff3e0;padding:1px 5px;border-radius:4px;vertical-align:middle">capped</span>':'')+(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
     return '<tr style="background:#fafafa">'
       +'<td style="padding:9px 14px;font-size:12px;color:#666;font-weight:500;white-space:nowrap">'+day+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px">'+dayKm.toFixed(2)+' km</td>'
+      +'<td style="padding:8px 14px;font-size:12px">'+distLabel+'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+dp.toFixed(2)+'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+bp+'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#1565c0;font-weight:600">'+(cp>0?'+'+cp:'—')+'</td>'
