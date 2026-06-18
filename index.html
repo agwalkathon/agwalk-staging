@@ -303,8 +303,13 @@ if (authCode) {
       var role = d.role || 'user';
       var session = { loggedIn:true, role:role, athleteId:d.athlete_id, name:d.name, expires:Date.now()+(8*60*60*1000) };
       sessionStorage.setItem('wk_user', JSON.stringify(session));
-      if (role === 'admin') sessionStorage.setItem('wk_admin', JSON.stringify(session));
-      window.location.replace(role === 'admin' ? 'admin.html' : 'portal.html');
+      if (role === 'admin') {
+        sessionStorage.setItem('wk_admin', JSON.stringify(session));
+        window.location.replace('admin.html');
+      } else {
+        // Pass code to portal.html so it can load full dashboard data via /my-data
+        window.location.replace('portal.html?code=' + encodeURIComponent(authCode) + '&state=portal');
+      }
     } else if (d.error === 'not_registered') {
       showMsg('msg-error', '⛔ <strong>Not registered.</strong><br>Contact your event admin to get approved first.');
     } else {
