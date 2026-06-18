@@ -271,12 +271,11 @@ var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
 var EVENT_CODE  = 'walkathon2026';
 var params      = new URLSearchParams(window.location.search);
 var authCode    = params.get('code');
-// Redirect to portal.html after Strava auth — portal handles the code
-var portalURI = window.location.origin + window.location.pathname.replace('index.html','') + 'portal.html';
+var redirectURI = window.location.origin + window.location.pathname;
 var authUrl = 'https://www.strava.com/oauth/authorize'
   + '?client_id=' + STRAVA_CLIENT_ID
-  + '&redirect_uri=' + encodeURIComponent(portalURI)
-  + '&response_type=code&scope=read,activity:read&state=portal';
+  + '&redirect_uri=' + encodeURIComponent(redirectURI)
+  + '&response_type=code&scope=read,activity:read&state=walkathon2026';
 document.getElementById('strava-btn').href = authUrl;
 
 function showMsg(type, html) {
@@ -290,6 +289,33 @@ function setProcessing(show, text) {
 }
 
 
+
+if (authCode) {
+  setProcessing(true, 'Connecting your account...');
+  fetch(BACKEND_URL + '/register', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ code: authCode, event_code: EVENT_CODE })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    setProcessing(false);
+    if (d.success) {
+      var role = d.role || 'user';
+      var session = { loggedIn:true, role:role, athleteId:d.athlete_id, name:d.name, expires:Date.now()+(8*60*60*1000) };
+      sessionStorage.setItem('wk_user', JSON.stringify(session));
+      if (role === 'admin') sessionStorage.setItem('wk_admin', JSON.stringify(session));
+      window.location.replace(role === 'admin' ? 'admin.html' : 'portal.html');
+    } else if (d.error === 'not_registered') {
+      showMsg('msg-error', '⛔ <strong>Not registered.</strong><br>Contact your event admin to get approved first.');
+    } else {
+      showMsg('msg-error', '❌ <strong>Login failed.</strong><br>Please try again.');
+    }
+  })
+  .catch(function(){
+    setProcessing(false);
+    showMsg('msg-error', '❌ Connection error. Please try again.');
+  });
+}
 </script>
 </body>
 </html>
