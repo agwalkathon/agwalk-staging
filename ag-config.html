@@ -331,6 +331,7 @@
 </div>
 
 <script>
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
 var SB_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SB_ANON, Authorization: 'Bearer '+SB_ANON, 'Content-Type': 'application/json' };
@@ -386,17 +387,26 @@ async function fetchFlagCandidates() {
   var dateFrom = document.getElementById('fr-date-from').value;
   var dateTo   = document.getElementById('fr-date-to').value;
   var sport    = document.getElementById('fr-sport').value;
-  var distMin  = parseFloat(document.getElementById('fr-dist-min').value);
-  var distMax  = parseFloat(document.getElementById('fr-dist-max').value);
+  var distMinVal = document.getElementById('fr-dist-min').value.trim();
+  var distMaxVal = document.getElementById('fr-dist-max').value.trim();
+  var distMin  = distMinVal !== '' ? parseFloat(distMinVal) : null;
+  var distMax  = distMaxVal !== '' ? parseFloat(distMaxVal) : null;
 
-  var url = SB_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc';
+  // Must have at least date range OR distance OR pace set
+  var paceRules = getPaceRules();
+  var hasDistFilter = distMin !== null || distMax !== null;
+  var hasPaceFilter = paceRules.length > 0;
+  if (!dateFrom && !dateTo && !hasDistFilter && !hasPaceFilter) {
+    throw new Error('Please set at least a date range, distance range, or pace rule before previewing.');
+  }
+
+  var url = SB_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc&select=id,strava_activity_id,strava_athlete_id,activity_name,sport_type,activity_date,distance_meters,avg_speed,is_flagged,flag_reason';
   if (dateFrom) url += '&activity_date=gte.'+dateFrom+'T00:00:00';
   if (dateTo)   url += '&activity_date=lte.'+dateTo+'T23:59:59';
   if (sport)    url += '&sport_type=eq.'+sport;
 
   // Fetch all pages
-  var all = [];
-  var from = 0;
+  var all = [], from = 0;
   while (true) {
     var r = await fetch(url, {
       headers: Object.assign({}, HDR, {'Range-Unit':'items','Range':from+'-'+(from+999)})
@@ -412,41 +422,41 @@ async function fetchFlagCandidates() {
   var regR = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name', {headers:HDR});
   var regs = await regR.json();
   var regMap = {};
-  regs.forEach(function(r){ regMap[r.strava_athlete_id] = r.full_name; });
+  if (Array.isArray(regs)) regs.forEach(function(r){ regMap[r.strava_athlete_id] = r.full_name; });
 
-  // Apply distance filter client-side
-  var paceRules = getPaceRules();
   var matches = [];
 
   all.forEach(function(a) {
-    var km = (parseFloat(a.distance_meters)||0) / 1000;
+    var km = (parseFloat(a.distance_meters) || 0) / 1000;
     var flagReasons = [];
 
-    // Distance filter
-    if (!isNaN(distMin) && distMin > 0 && km < distMin) flagReasons.push('Less than '+distMin+' km');
-    if (!isNaN(distMax) && distMax > 0 && km > distMax) flagReasons.push('More than '+distMax+' km');
+    // Distance filter — flag if OUTSIDE min-max range
+    if (hasDistFilter) {
+      var belowMin = distMin !== null && km < distMin;
+      var aboveMax = distMax !== null && km > distMax;
+      if (belowMin) flagReasons.push('Manual Review - Distance Issue ('+km.toFixed(2)+' km < '+distMin+' km)');
+      if (aboveMax) flagReasons.push('Manual Review - Distance Issue ('+km.toFixed(2)+' km > '+distMax+' km)');
+    }
 
-    // Pace rules — flag if OUTSIDE the valid range
-    if (paceRules.length > 0 && a.avg_speed) {
-      var paceMinkm = paceFromSpeed(a.avg_speed);
+    // Pace rules — flag if pace is OUTSIDE the valid range
+    if (hasPaceFilter && a.avg_speed && a.avg_speed > 0) {
+      var paceMinkm = paceFromSpeed(a.avg_speed); // min/km
       paceRules.forEach(function(rule) {
-        // Flag if pace is outside the min-max range (too fast or too slow)
-        if (paceMinkm < rule.minPace || paceMinkm > rule.maxPace) {
-          flagReasons.push(rule.reason + ' ('+fmtPace(a.avg_speed)+')');
+        var tooFast = paceMinkm < rule.minPace; // lower pace = faster
+        var tooSlow = paceMinkm > rule.maxPace; // higher pace = slower
+        if (tooFast || tooSlow) {
+          flagReasons.push('Manual Review - Pace Issue ('+fmtPace(a.avg_speed)+' — '+rule.reason+')');
         }
       });
     }
 
-    // If no distance or pace filter set, match all fetched activities
-    var hasFilter = (!isNaN(distMin) && distMin > 0) || (!isNaN(distMax) && distMax > 0) || paceRules.length > 0;
-    if (!hasFilter || flagReasons.length > 0) {
-      if (flagReasons.length > 0 || !hasFilter) {
-        matches.push({
-          act: a,
-          name: regMap[a.strava_athlete_id] || 'Unknown',
-          reasons: flagReasons.length > 0 ? flagReasons : ['Matches filter']
-        });
-      }
+    // Only include if at least one rule triggered
+    if (flagReasons.length > 0) {
+      matches.push({
+        act: a,
+        name: regMap[a.strava_athlete_id] || 'Unknown',
+        reasons: flagReasons
+      });
     }
   });
 
@@ -479,14 +489,19 @@ async function previewFlagRules() {
       var km = ((parseFloat(a.distance_meters)||0)/1000).toFixed(2);
       var dt = (a.activity_date||'').split('T')[0];
       var alreadyFlagged = a.is_flagged ? ' style="opacity:0.5"' : '';
+      var athleteUrl = 'https://www.strava.com/athletes/'+a.strava_athlete_id;
+      var actUrl = 'https://www.strava.com/activities/'+(a.strava_activity_id||a.id);
+      var actName = (a.activity_name||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       return '<tr'+alreadyFlagged+'>'
-        +'<td style="padding:8px 12px">'+(a.is_flagged?'<span style="color:#bbb">✓ already</span> ':'')+'<strong>'+m.name+'</strong></td>'
-        +'<td style="padding:8px 12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(a.activity_name||'—')+'</td>'
+        +'<td style="padding:8px 12px">'+(a.is_flagged?'<span style="color:#bbb">✓ already</span> ':'')
+        +'<a href="'+athleteUrl+'" target="_blank" style="color:#E8622A;font-weight:600;text-decoration:none">'+m.name+'</a></td>'
+        +'<td style="padding:8px 12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+        +'<a href="'+actUrl+'" target="_blank" style="color:#1A1A1A;text-decoration:none" title="'+actName+'">'+actName+'</a></td>'
         +'<td style="padding:8px 12px"><span style="background:#f5f5f5;padding:2px 8px;border-radius:10px;font-size:12px">'+(a.sport_type||'—')+'</span></td>'
         +'<td style="padding:8px 12px;white-space:nowrap">'+dt+'</td>'
         +'<td style="padding:8px 12px">'+km+' km</td>'
         +'<td style="padding:8px 12px;white-space:nowrap">'+fmtPace(a.avg_speed)+'</td>'
-        +'<td style="padding:8px 12px;color:#c62828;font-size:12px">'+m.reasons.join(', ')+'</td>'
+        +'<td style="padding:8px 12px;color:#c62828;font-size:12px">'+m.reasons.join('<br>')+'</td>'
         +'</tr>';
     }).join('');
 
