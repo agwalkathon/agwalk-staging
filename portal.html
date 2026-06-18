@@ -588,20 +588,7 @@ document.getElementById('strava-login-btn').href=authUrl;
 var params=new URLSearchParams(window.location.search);
 var authCode=params.get('code'), state=params.get('state');
 
-// ── Check if already logged in via index.html (session stored) ──
-var storedSession = JSON.parse(sessionStorage.getItem('wk_user')||'{}');
-if(!authCode && storedSession.loggedIn && storedSession.expires > Date.now() && storedSession.athleteId) {
-  // User already authenticated via index.html — load their data directly
-  setLoading('Loading your data...');
-  fetch(BACKEND_URL+'/my-data-by-id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({athlete_id:storedSession.athleteId})})
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if(!data.success) { showError('⚠️','Something went wrong',data.error||'Please sign in again.'); return; }
-    document.getElementById('loading-text').textContent='Calculating your points...';
-    renderDashboard(data);
-  })
-  .catch(function(){ showError('⚠️','Connection error','Could not reach the server. Please try again.'); });
-} else if(authCode&&state==='portal') {
+if(authCode&&state==='portal') {
   // Fresh OAuth login directly on this page
   setLoading('Verifying your Strava account...');
   window.history.replaceState({},'',window.location.pathname);
@@ -613,8 +600,6 @@ if(!authCode && storedSession.loggedIn && storedSession.expires > Date.now() && 
       else showError('⚠️','Something went wrong',data.error||'Please try again.');
       return;
     }
-    // Save session for page reloads
-    sessionStorage.setItem('wk_user', JSON.stringify({loggedIn:true,role:data.role||'user',athleteId:data.athlete.id,name:data.participant.full_name,expires:Date.now()+(8*60*60*1000)}));
     document.getElementById('loading-text').textContent='Calculating your points...';
     renderDashboard(data);
   })
