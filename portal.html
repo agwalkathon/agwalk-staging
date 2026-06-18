@@ -573,28 +573,33 @@ function renderDashboard(data) {
   showScreen('dashboard-screen');
 }
 
-// Check session set by index.html, then load dashboard
-var storedSession = JSON.parse(sessionStorage.getItem('wk_user') || '{}');
-if (!storedSession.loggedIn || storedSession.expires < Date.now()) {
-  window.location.replace('index.html');
-} else {
-  // Session valid — load full dashboard data
+// Get code from URL (passed by index.html after login)
+var portalParams = new URLSearchParams(window.location.search);
+var portalCode   = portalParams.get('code');
+var portalState  = portalParams.get('state');
+
+if (portalCode && portalState === 'portal') {
+  // Fresh login — clear URL and load dashboard
+  window.history.replaceState({}, '', window.location.pathname);
   setLoading('Loading your data...');
-  fetch(BACKEND_URL + '/my-data-session', {
+  fetch(BACKEND_URL + '/my-data', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ athlete_id: storedSession.athleteId })
+    body: JSON.stringify({ code: portalCode })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (!data.success) {
-      sessionStorage.removeItem('wk_user');
-      window.location.replace('index.html');
+      if (data.error === 'not_registered') showError('🔒', 'Not registered', 'Contact your event organizer.');
+      else showError('⚠️', 'Something went wrong', data.error || 'Please try again.');
       return;
     }
     renderDashboard(data);
   })
-  .catch(function(){ showError('⚠️','Connection error','Could not reach the server. Please try again.'); });
+  .catch(function(){ showError('⚠️', 'Connection error', 'Could not reach the server.'); });
+} else {
+  // No code — send back to login
+  window.location.replace('index.html');
 }
 
 // ══ LEADERBOARD TAB ════════════════════════════════════════
