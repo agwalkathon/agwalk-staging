@@ -183,6 +183,46 @@
     .tab-panel { display:none; }
     .tab-panel.active { display:block; }
 
+
+    /* ── Leaderboard tab ── */
+    .lb-tab { transition: all 0.15s; }
+    .lb-row-card { background:var(--white); border-bottom:1px solid var(--border); }
+    .lb-row-card.top1 { border-left:3px solid #f59e0b; }
+    .lb-row-card.top2 { border-left:3px solid #94a3b8; }
+    .lb-row-card.top3 { border-left:3px solid #b45309; }
+    .lb-main-row { display:flex; align-items:center; gap:10px; padding:12px 16px; cursor:pointer; }
+    .lb-rank-num { font-size:16px; font-weight:800; width:32px; text-align:center; flex-shrink:0; color:#d1d5db; }
+    .lb-rank-num.r1{color:#f59e0b;} .lb-rank-num.r2{color:#94a3b8;} .lb-rank-num.r3{color:#b45309;}
+    .lb-athlete { flex:1; min-width:0; }
+    .lb-athlete-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+    .lb-athlete-meta { display:flex; align-items:center; gap:6px; }
+    .lb-medal-pill { display:inline-flex; align-items:center; padding:2px 7px; border-radius:20px; font-size:10px; font-weight:700; }
+    .lmp-gold   { background:#fef3c7; color:#92400e; }
+    .lmp-silver { background:#f1f5f9; color:#475569; }
+    .lmp-bronze { background:#fef3c7; color:#78350f; }
+    .lmp-none   { background:#f9fafb; color:#9ca3af; }
+    .lb-team-txt { font-size:10px; color:var(--text2); }
+    .lb-pts-right { text-align:right; flex-shrink:0; }
+    .lb-pts-val { font-size:18px; font-weight:800; color:var(--brand); line-height:1; }
+    .lb-pts-lbl { font-size:9px; color:var(--text2); text-transform:uppercase; }
+    .lb-mini-row { display:flex; gap:10px; padding:0 16px 10px 58px; }
+    .lb-mini-stat { font-size:11px; color:var(--text2); }
+    .lb-mini-stat strong { color:var(--text); font-weight:600; }
+    .lb-expand-btn { padding:6px 16px 10px 58px; font-size:11px; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:4px; }
+    .lb-expand-btn .arr { transition:transform 0.2s; display:inline-block; }
+    .lb-expand-btn.open .arr { transform:rotate(180deg); }
+    .lb-days { display:none; background:#fafafa; border-top:1px solid var(--border); padding:10px 12px; }
+    .lb-days.open { display:block; }
+    .lb-day-row { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--white); border-radius:8px; margin-bottom:5px; border:1px solid var(--border); }
+    .lb-day-row:last-child { margin-bottom:0; }
+    .lb-day-date { font-size:11px; font-weight:600; color:var(--text); min-width:44px; flex-shrink:0; }
+    .lb-day-km { flex:1; font-size:11px; color:var(--text2); }
+    .lb-day-km strong { color:var(--text); }
+    .lb-day-pts { text-align:right; flex-shrink:0; }
+    .lb-day-total { font-size:13px; font-weight:800; color:var(--brand); }
+    .lb-day-detail { font-size:9px; color:var(--text2); }
+    .lb-cap { display:inline-block; font-size:9px; font-weight:700; background:#fff7ed; color:#ea580c; padding:1px 4px; border-radius:3px; margin-left:2px; }
+
     /* ── Sign out button ── */
     .signout-btn { width:100%; padding:14px; background:var(--error-bg); color:var(--error); border:1px solid #fecaca; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:8px; }
 
@@ -288,6 +328,37 @@
       </div>
     </div>
 
+
+    <!-- LEADERBOARD TAB -->
+    <div class="tab-panel" id="tab-leaderboard">
+      <div class="section-header" style="margin-top:4px">
+        <h3>🏆 Leaderboard</h3>
+        <button onclick="doLbRefresh()" style="font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;font-weight:600;">↺ Refresh</button>
+      </div>
+
+      <!-- Board tabs -->
+      <div style="display:flex;overflow-x:auto;scrollbar-width:none;background:var(--dark);border-radius:var(--radius-sm);margin-bottom:12px;padding:4px;gap:2px;-webkit-overflow-scrolling:touch;">
+        <button class="lb-tab active" data-board="dayshift-male"   onclick="switchLbBoard('dayshift-male')"   style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:var(--brand);color:white;">👨 Day Male</button>
+        <button class="lb-tab"        data-board="dayshift-female" onclick="switchLbBoard('dayshift-female')" style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">👩 Day Female</button>
+        <button class="lb-tab"        data-board="nightshift-all"  onclick="switchLbBoard('nightshift-all')"  style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🌙 Night</button>
+        <button class="lb-tab"        data-board="team-male"       onclick="switchLbBoard('team-male')"       style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🏙️ Team M</button>
+        <button class="lb-tab"        data-board="team-female"     onclick="switchLbBoard('team-female')"     style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🏙️ Team F</button>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+        <div class="stat-tile"><div class="sv" id="lb-st-total">—</div><div class="sl">On board</div></div>
+        <div class="stat-tile" style="--accent:#f59e0b"><div class="sv" style="color:#f59e0b" id="lb-st-gold">—</div><div class="sl">🥇 Gold</div></div>
+        <div class="stat-tile" style="--accent:#94a3b8"><div class="sv" style="color:#94a3b8" id="lb-st-silver">—</div><div class="sl">🥈 Silver</div></div>
+        <div class="stat-tile" style="--accent:#b45309"><div class="sv" style="color:#b45309" id="lb-st-bronze">—</div><div class="sl">🥉 Bronze</div></div>
+      </div>
+
+      <!-- Board content -->
+      <div id="lb-content">
+        <div style="text-align:center;padding:40px;color:var(--text2);font-size:14px;">Tap Leaderboard to load</div>
+      </div>
+    </div>
+
     <!-- PROFILE TAB -->
     <div class="tab-panel" id="tab-profile">
       <div class="section-header" style="margin-top:4px"><h3>My profile</h3></div>
@@ -313,9 +384,9 @@
     <button class="nav-item" id="nav-activities" onclick="switchTab('activities')">
       <span class="ni">🏃</span>Activities
     </button>
-    <a href="ag-leaderboard.html" class="nav-item">
+    <button class="nav-item" id="nav-leaderboard" onclick="switchTab('leaderboard')">
       <span class="ni">🏆</span>Leaderboard
-    </a>
+    </button>
     <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
       <span class="ni">👤</span>Profile
     </button>
@@ -540,6 +611,200 @@ if(authCode&&state==='portal') {
   })
   .catch(function(){ showError('⚠️','Connection error','Could not reach the server. Please try again.'); });
 }
+
+// ══ LEADERBOARD TAB ════════════════════════════════════════
+var LB_CONFIG = null; // will use same CONFIG from main portal
+var LB_CHALLENGES = [];
+var LB_SPECIAL_DAYS = [];
+var LB_REGISTRATION = [];
+var LB_ACTIVITIES = [];
+var LB_DATA = {};
+var LB_BOARD = 'dayshift-male';
+var LB_LOADED = false;
+
+async function lbFetchAll(url) {
+  var all=[], from=0, ps=1000;
+  while(true){
+    var to=from+ps-1;
+    var r=await fetch(url+(url.includes('?')?'&':'?')+'limit='+ps+'&offset='+from,{
+      headers:Object.assign({},{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE',Authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE'},{'Range-Unit':'items','Range':from+'-'+to})
+    });
+    if(!r.ok) break;
+    var p=await r.json(); if(!Array.isArray(p)||!p.length) break;
+    all=all.concat(p); if(p.length<ps) break; from+=ps;
+  }
+  return all;
+}
+
+function lbCalcBonus(km) {
+  var c=CONFIG; var sorted=c.bonus.slice().sort(function(a,b){return b.km-a.km;});
+  for(var i=0;i<sorted.length;i++){if(km>=Number(sorted[i].km)) return Number(sorted[i].points)||0;} return 0;
+}
+function lbGetMedal(pts,gender){
+  var g=(gender||'').toLowerCase(),m=CONFIG.medals;
+  var gold=g==='female'?m.gold.female:m.gold.male;
+  var silver=g==='female'?m.silver.female:m.silver.male;
+  var bronze=g==='female'?m.bronze.female:m.bronze.male;
+  if(pts>=gold)   return {label:'🥇 Gold',  cls:'lmp-gold',  level:'gold'};
+  if(pts>=silver) return {label:'🥈 Silver',cls:'lmp-silver',level:'silver'};
+  if(pts>=bronze) return {label:'🥉 Bronze',cls:'lmp-bronze',level:'bronze'};
+  return {label:'No medal',cls:'lmp-none',level:'none'};
+}
+function lbCalcPoints(acts,athleteId){
+  var byDay={};
+  acts.filter(function(a){return a.strava_athlete_id==athleteId;}).forEach(function(a){
+    var d=(a.activity_date||'').split('T')[0]; if(!d) return;
+    if(!byDay[d]) byDay[d]=[];
+    byDay[d].push(a);
+  });
+  var totalKm=0,distPts=0,bonusPts=0,challengePts=0;
+  Object.keys(byDay).forEach(function(day){
+    var raw=0; byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
+    raw=parseFloat(raw.toFixed(4));
+    var isSpecial=LB_SPECIAL_DAYS.indexOf(day)!==-1;
+    var dk=(!isSpecial&&raw>21)?21:raw; dk=parseFloat(dk.toFixed(4));
+    totalKm+=dk; distPts+=parseFloat((dk*(parseFloat(CONFIG.basePer_km)||1)).toFixed(2));
+    bonusPts+=lbCalcBonus(dk);
+  });
+  acts.filter(function(a){return a.strava_athlete_id==athleteId&&!a.is_flagged;}).forEach(function(a){challengePts+=parseFloat(a.manual_bonus)||0;});
+  return {totalKm:parseFloat(totalKm.toFixed(2)),distPts:parseFloat(distPts.toFixed(2)),bonusPts:bonusPts,challengePts:challengePts,totalPts:parseFloat((distPts+bonusPts+challengePts).toFixed(2)),byDay:byDay};
+}
+function lbFilterReg(board){
+  return LB_REGISTRATION.filter(function(p){
+    var g=(p.gender||'').toLowerCase(),s=(p.shift||'').toLowerCase();
+    if(board==='dayshift-female') return g==='female'&&s.includes('day');
+    if(board==='dayshift-male')   return (g==='male'||g==='m')&&s.includes('day');
+    if(board==='nightshift-all')  return s.includes('night');
+    if(board==='team-male')       return g==='male'||g==='m';
+    if(board==='team-female')     return g==='female';
+    return true;
+  });
+}
+function switchLbBoard(board){
+  LB_BOARD=board;
+  document.querySelectorAll('.lb-tab').forEach(function(t){
+    var active=t.getAttribute('data-board')===board;
+    t.style.background=active?'var(--brand)':'none';
+    t.style.color=active?'white':'rgba(255,255,255,0.5)';
+  });
+  if(LB_DATA[board]) lbRenderBoard(board);
+  else lbBuildBoard(board);
+}
+function lbBuildBoard(board){
+  var reg=lbFilterReg(board), rows=[];
+  reg.forEach(function(p){
+    var pts=lbCalcPoints(LB_ACTIVITIES,p.strava_athlete_id,p.gender);
+    if(pts.totalKm>0) rows.push({p:p,pts:pts});
+  });
+  rows.sort(function(a,b){return b.pts.totalPts-a.pts.totalPts;});
+  LB_DATA[board]=rows;
+  lbRenderBoard(board);
+}
+function lbRenderBoard(board){
+  var rows=LB_DATA[board]||[];
+  var gold=0,silver=0,bronze=0;
+  rows.forEach(function(r){var m=lbGetMedal(r.pts.totalPts,r.p.gender);if(m.level==='gold')gold++;else if(m.level==='silver')silver++;else if(m.level==='bronze')bronze++;});
+  document.getElementById('lb-st-total').textContent=rows.length;
+  document.getElementById('lb-st-gold').textContent=gold;
+  document.getElementById('lb-st-silver').textContent=silver;
+  document.getElementById('lb-st-bronze').textContent=bronze;
+  if(!rows.length){document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)">No activities yet</div>';return;}
+  var isTeam=board==='team-male'||board==='team-female';
+  var html='';
+  if(isTeam){
+    var teams={};
+    rows.forEach(function(r){var t=r.p.leaderboard_team||'No Team';if(!teams[t])teams[t]=[];teams[t].push(r);});
+    var tnames=Object.keys(teams).sort(function(a,b){return teams[b].reduce(function(s,r){return s+r.pts.totalPts;},0)-teams[a].reduce(function(s,r){return s+r.pts.totalPts;},0);});
+    tnames.forEach(function(tn){
+      html+='<div style="background:var(--dark);color:white;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:0.3px">🏙️ '+tn+'</div>';
+      teams[tn].forEach(function(r,i){html+=lbBuildCard(r,i,false);});
+    });
+  } else {
+    rows.forEach(function(r,i){html+=lbBuildCard(r,i,true);});
+  }
+  document.getElementById('lb-content').innerHTML=html;
+}
+function lbBuildCard(row,i,showRank){
+  var p=row.p,pts=row.pts;
+  var medal=lbGetMedal(pts.totalPts,p.gender);
+  var topCls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+  var rCls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+  var rLabel=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+  var aid=p.strava_athlete_id;
+  // Day rows
+  var byDay=pts.byDay||{};
+  var days=Object.keys(byDay).filter(function(d){return d.startsWith('2026-06');}).sort();
+  var dayHtml=days.map(function(day){
+    var raw=0; byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
+    raw=parseFloat(raw.toFixed(4));
+    var isSpecial=LB_SPECIAL_DAYS.indexOf(day)!==-1;
+    var capped=!isSpecial&&raw>21; var dk=capped?21:raw; dk=parseFloat(dk.toFixed(2));
+    var dp=parseFloat((dk*(parseFloat(CONFIG.basePer_km)||1)).toFixed(2));
+    var bp=lbCalcBonus(dk); var tp=parseFloat((dp+bp).toFixed(2));
+    var ds=day.replace('2026-','').replace('-','/');
+    return '<div class="lb-day-row">'
+      +'<div class="lb-day-date">'+ds+'</div>'
+      +'<div class="lb-day-km"><strong>'+dk.toFixed(2)+' km</strong>'+(capped?'<span class="lb-cap">cap</span>':'')+'</div>'
+      +'<div class="lb-day-pts"><div class="lb-day-total">+'+tp.toFixed(1)+'</div><div class="lb-day-detail">'+dp.toFixed(1)+'+'+bp+'</div></div>'
+      +'</div>';
+  }).join('');
+  return '<div class="lb-row-card '+topCls+'">'
+    +'<div class="lb-main-row" onclick="lbToggleDay(''+aid+'')">'
+    +'<div class="lb-rank-num '+rCls+'">'+rLabel+'</div>'
+    +'<div class="lb-athlete">'
+    +'<div class="lb-athlete-name">'+p.full_name+'</div>'
+    +'<div class="lb-athlete-meta">'
+    +'<span class="lb-medal-pill '+medal.cls+'">'+medal.label+'</span>'
+    +'<span class="lb-team-txt">'+( p.leaderboard_team||'—')+'</span>'
+    +'</div>'
+    +'</div>'
+    +'<div class="lb-pts-right"><div class="lb-pts-val">'+pts.totalPts.toFixed(1)+'</div><div class="lb-pts-lbl">pts</div></div>'
+    +'</div>'
+    +'<div class="lb-mini-row">'
+    +'<span class="lb-mini-stat">📏 <strong>'+pts.totalKm.toFixed(2)+' km</strong></span>'
+    +'<span class="lb-mini-stat">⚡ +<strong>'+pts.bonusPts+'</strong></span>'
+    +(pts.challengePts>0?'<span class="lb-mini-stat">🎯 +<strong>'+pts.challengePts+'</strong></span>':'')
+    +'</div>'
+    +(days.length?'<div class="lb-expand-btn" id="lbtog-'+aid+'" onclick="lbToggleDay(''+aid+'')"><span class="arr">▼</span> '+days.length+' days</div>':'')
+    +'<div class="lb-days" id="lbdays-'+aid+'"><div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📅 Daily breakdown</div>'+dayHtml+'</div>'
+    +'</div>';
+}
+function lbToggleDay(aid){
+  var el=document.getElementById('lbdays-'+aid);
+  var tog=document.getElementById('lbtog-'+aid);
+  if(!el) return;
+  var open=el.classList.contains('open');
+  el.classList.toggle('open',!open);
+  if(tog) tog.classList.toggle('open',!open);
+}
+async function doLbRefresh(){
+  LB_DATA={}; LB_LOADED=false;
+  await loadLeaderboardTab();
+}
+async function loadLeaderboardTab(){
+  if(LB_LOADED) { lbRenderBoard(LB_BOARD); return; }
+  document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:13px"><div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>Loading...</div>';
+  try {
+    var SB='https://jhdgkncpkrttvemvwukc.supabase.co';
+    // Load special days
+    try{var sr=await fetch(SB+'/rest/v1/special_scoring_days?select=special_date',{headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE',Authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE'}}); var srows=await sr.json(); LB_SPECIAL_DAYS=Array.isArray(srows)?srows.map(function(x){return x.special_date;}):[]; }catch(e){LB_SPECIAL_DAYS=[];}
+    var [reg,acts]=await Promise.all([
+      lbFetchAll(SB+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team&order=full_name.asc'),
+      lbFetchAll(SB+'/rest/v1/activities?is_deleted=eq.false&is_flagged=eq.false&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-06-30T23:59:59&select=strava_athlete_id,distance_meters,sport_type,activity_date,manual_bonus&order=id.asc')
+    ]);
+    LB_REGISTRATION=reg; LB_ACTIVITIES=acts; LB_LOADED=true;
+    lbBuildBoard(LB_BOARD);
+  } catch(err){
+    document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--error);font-size:13px">❌ '+err.message+'</div>';
+  }
+}
+// Hook into switchTab to load leaderboard on demand
+var _origSwitchTab = switchTab;
+switchTab = function(t) {
+  _origSwitchTab(t);
+  if(t==='leaderboard') loadLeaderboardTab();
+};
+
 </script>
 </body>
 </html>
