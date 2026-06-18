@@ -180,43 +180,83 @@ load();
 
 // ── Supabase Realtime — auto-refresh recent activities on new insert ──
 (function startRealtime() {
-  // Use Supabase Realtime v2 broadcast via WebSocket
+  // Supabase Realtime v2 — postgres_changes subscription
   const wsUrl = 'wss://jhdgkncpkrttvemvwukc.supabase.co/realtime/v1/websocket?vsn=1.0.0&apikey='+SUPABASE_ANON;
-  let ws, pingInterval;
+  let ws, pingInterval, ref = 0;
+
+  function nextRef() { return String(++ref); }
+
   function connect() {
     try {
       ws = new WebSocket(wsUrl);
+
       ws.onopen = function() {
-        // Join the activities channel
-        ws.send(JSON.stringify({topic:'realtime:public:activities',event:'phx_join',payload:{},ref:'1'}));
-        // Keep-alive ping every 25s
-        pingInterval = setInterval(function(){
-          if(ws.readyState===1) ws.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'}));
+        // Step 1: join the realtime channel with postgres_changes config
+        ws.send(JSON.stringify({
+          topic: 'realtime:activities-watch',
+          event: 'phx_join',
+          payload: {
+            config: {
+              broadcast: { self: false },
+              presence: { key: '' },
+              postgres_changes: [
+                { event: 'INSERT', schema: 'public', table: 'activities' },
+                { event: 'UPDATE', schema: 'public', table: 'activities' }
+              ]
+            },
+            access_token: SUPABASE_ANON
+          },
+          ref: nextRef()
+        }));
+
+        // Keep-alive heartbeat every 25s
+        pingInterval = setInterval(function() {
+          if (ws.readyState === 1) {
+            ws.send(JSON.stringify({
+              topic: 'phoenix',
+              event: 'heartbeat',
+              payload: {},
+              ref: nextRef()
+            }));
+          }
         }, 25000);
       };
+
       ws.onmessage = function(evt) {
         try {
           var msg = JSON.parse(evt.data);
-          // New INSERT or UPDATE on activities table → reload dashboard
-          if(msg.topic && msg.topic.startsWith('realtime:public:activities') &&
-             msg.event === 'phx_reply' && msg.payload && msg.payload.status === 'ok') {
-            // Subscription confirmed
+
+          // Subscription confirmed
+          if (msg.event === 'phx_reply' && msg.payload && msg.payload.status === 'ok') {
             document.getElementById('realtime-badge').textContent = '🟢 Live';
           }
-          if(msg.event === 'postgres_changes') {
+
+          // New/updated activity received
+          if (msg.event === 'postgres_changes' ||
+              (msg.payload && msg.payload.data && msg.payload.data.type === 'INSERT') ||
+              (msg.payload && msg.payload.data && msg.payload.data.type === 'UPDATE')) {
             document.getElementById('realtime-badge').textContent = '⚡ New activity!';
-            setTimeout(function(){ load(); document.getElementById('realtime-badge').textContent='🟢 Live'; }, 800);
+            setTimeout(function() {
+              load();
+              document.getElementById('realtime-badge').textContent = '🟢 Live';
+            }, 1000);
           }
         } catch(e) {}
       };
+
       ws.onclose = function() {
         clearInterval(pingInterval);
         document.getElementById('realtime-badge').textContent = '🔴 Reconnecting...';
-        setTimeout(connect, 5000); // auto-reconnect
+        setTimeout(connect, 5000);
       };
+
       ws.onerror = function() { ws.close(); };
-    } catch(e) {}
+
+    } catch(e) {
+      document.getElementById('realtime-badge').textContent = '🔴 Error';
+    }
   }
+
   connect();
 })();
 </script>
