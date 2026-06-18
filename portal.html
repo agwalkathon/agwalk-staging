@@ -3,794 +3,487 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#111827">
   <title>My Walkathon — Arcgate 2026</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --brand: #E8622A; --brand-dark: #c4511f; --brand-light: rgba(232,98,42,0.12);
-      --dark: #111827; --dark2: #1f2937; --text: #111827; --text2: #6b7280;
-      --border: #e5e7eb; --bg: #f3f4f6; --white: #ffffff;
-      --gold: #f59e0b; --silver: #94a3b8; --bronze: #b45309;
-      --success: #16a34a; --success-bg: #f0fdf4;
-      --error: #dc2626; --error-bg: #fef2f2;
-      --radius: 16px; --radius-sm: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
-      --nav-h: 64px;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html,body { height:100%; }
-    body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+    :root{--brand:#E8622A;--dark:#111827;--dark2:#1f2937;--bg:#f3f4f6;--white:#fff;--border:#e5e7eb;--text:#111827;--text2:#6b7280;--gold:#f59e0b;--silver:#94a3b8;--bronze:#b45309;--nav:60px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+    @keyframes spin{to{transform:rotate(360deg);}}
 
-    /* ── Screens ── */
-    .screen { display:none; min-height:100dvh; flex-direction:column; }
-    .screen.active { display:flex; }
+    /* ── Full-screen states ── */
+    .screen{display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;}
+    .screen.on{display:flex;}
+    #s-loading{background:var(--dark);gap:14px;}
+    #s-error{background:var(--dark);padding:32px 24px;text-align:center;}
+    .big-spin{width:40px;height:40px;border:4px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;}
+    .load-txt{font-size:14px;color:rgba(255,255,255,0.45);}
+    .err-icon{font-size:44px;margin-bottom:12px;}
+    .err-title{font-size:20px;font-weight:700;color:white;margin-bottom:8px;}
+    .err-msg{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:24px;line-height:1.6;}
+    .btn-retry{padding:12px 28px;background:var(--brand);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
 
-    /* ══ LOGIN SCREEN ══ */
-    #login-screen { background:var(--dark); align-items:center; justify-content:center; padding:32px 24px; }
-    .login-wrap { width:100%; max-width:400px; text-align:center; }
-    .login-logo { width:120px; margin-bottom:32px; }
-    .login-title { color:white; font-size:26px; font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; }
-    .login-title em { color:var(--brand); font-style:normal; }
-    .login-sub { color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; margin-bottom:36px; }
-    .btn-strava-login {
-      display:flex; align-items:center; justify-content:center; gap:12px;
-      width:100%; padding:17px; background:var(--brand); color:white;
-      border:none; border-radius:var(--radius-sm); font-size:16px; font-weight:700;
-      text-decoration:none; cursor:pointer; font-family:inherit;
-      box-shadow:0 4px 20px rgba(232,98,42,0.4);
-      transition:all 0.2s;
-    }
-    .btn-strava-login:active { transform:scale(0.97); }
-    .btn-strava-login svg { width:22px; height:22px; fill:white; }
-    .login-note { margin-top:20px; font-size:11px; color:rgba(255,255,255,0.3); line-height:1.8; }
-    .login-note a { color:var(--brand); text-decoration:none; }
+    /* ── Dashboard ── */
+    #s-dash{display:none;min-height:100dvh;flex-direction:column;background:var(--bg);}
+    #s-dash.on{display:flex;}
 
-    /* ══ LOADING SCREEN ══ */
-    #loading-screen { background:var(--dark); align-items:center; justify-content:center; gap:16px; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .big-spinner { width:48px; height:48px; border:4px solid rgba(255,255,255,0.1); border-top-color:var(--brand); border-radius:50%; animation:spin 0.8s linear infinite; }
-    .loading-text { color:rgba(255,255,255,0.5); font-size:14px; }
+    /* Top bar */
+    .top-bar{background:var(--dark);padding:14px 16px;padding-top:max(14px,env(safe-area-inset-top));display:flex;align-items:center;gap:12px;}
+    .av{width:40px;height:40px;border-radius:50%;border:2px solid var(--brand);object-fit:cover;flex-shrink:0;}
+    .top-info{flex:1;min-width:0;}
+    .top-name{font-size:15px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .top-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .medal-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;flex-shrink:0;}
+    .mb-gold{background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.25);}
+    .mb-silver{background:rgba(148,163,184,0.15);color:var(--silver);border:1px solid rgba(148,163,184,0.25);}
+    .mb-bronze{background:rgba(180,83,9,0.15);color:#b45309;border:1px solid rgba(180,83,9,0.25);}
+    .mb-none{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);font-size:10px;}
 
-    /* ══ ERROR SCREEN ══ */
-    #error-screen { background:var(--dark); align-items:center; justify-content:center; padding:32px 24px; }
-    .error-box { text-align:center; max-width:320px; }
-    .error-box .ei { font-size:48px; margin-bottom:16px; }
-    .error-box h2 { color:white; font-size:20px; font-weight:700; margin-bottom:8px; }
-    .error-box p { color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; margin-bottom:24px; }
-    .btn-retry { padding:12px 28px; background:var(--brand); color:white; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+    /* Scroll area */
+    .scroll{flex:1;overflow-y:auto;padding:16px 16px calc(var(--nav) + 16px + env(safe-area-inset-bottom));}
 
-    /* ══ DASHBOARD SCREEN ══ */
-    #dashboard-screen { background:var(--bg); }
+    /* Tabs */
+    .tab{display:none;} .tab.on{display:block;}
 
-    /* ── Top bar ── */
-    .top-bar {
-      background:var(--dark);
-      padding:16px 20px;
-      padding-top:max(16px, env(safe-area-inset-top));
-      display:flex; align-items:center; gap:12px;
-    }
-    .top-avatar { width:42px; height:42px; border-radius:50%; border:2px solid var(--brand); object-fit:cover; }
-    .top-info { flex:1; min-width:0; }
-    .top-name { color:white; font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .top-team { color:rgba(255,255,255,0.45); font-size:11px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .medal-chip { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; flex-shrink:0; }
-    .medal-gold   { background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
-    .medal-silver { background:rgba(148,163,184,0.15); color:#94a3b8; border:1px solid rgba(148,163,184,0.25); }
-    .medal-bronze { background:rgba(180,83,9,0.15); color:#b45309; border:1px solid rgba(180,83,9,0.25); }
-    .medal-none   { background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.35); border:1px solid rgba(255,255,255,0.1); font-size:11px; }
+    /* Cards */
+    .card{background:var(--white);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05);margin-bottom:14px;overflow:hidden;}
+    .sec-hdr{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;}
+    .sec-hdr h3{font-size:14px;font-weight:700;}
+    .sec-hdr span{font-size:12px;color:var(--text2);}
 
-    /* ── Scrollable content ── */
-    .dash-content { flex:1; overflow-y:auto; padding:16px 16px calc(var(--nav-h) + 16px + env(safe-area-inset-bottom)); }
+    /* Stat grid */
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .stat-tile{background:var(--white);border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
+    .st-val{font-size:22px;font-weight:800;color:var(--brand);line-height:1;margin-bottom:3px;}
+    .st-lbl{font-size:11px;color:var(--text2);}
+    .st-green .st-val{color:#16a34a;} .st-blue .st-val{color:#1d4ed8;} .st-dark .st-val{color:var(--dark);}
 
-    /* ── Stats grid ── */
-    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-    .stat-tile {
-      background:var(--white); border-radius:var(--radius-sm); padding:16px;
-      box-shadow:var(--shadow);
-    }
-    .stat-tile .sv { font-size:24px; font-weight:800; color:var(--brand); line-height:1; margin-bottom:4px; }
-    .stat-tile .sl { font-size:11px; color:var(--text2); font-weight:500; }
-    .stat-tile.accent-green .sv { color:#16a34a; }
-    .stat-tile.accent-blue .sv  { color:#1d4ed8; }
-    .stat-tile.accent-dark .sv  { color:var(--dark); }
-    .stat-tile.wide { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; }
-    .stat-tile.wide .sv { font-size:20px; }
+    /* Rank card */
+    .rank-card{background:linear-gradient(135deg,var(--dark),var(--dark2));border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .rank-num{font-size:52px;font-weight:800;color:var(--brand);line-height:1;}
+    .rank-num.r1{color:var(--gold);} .rank-num.r2{color:var(--silver);} .rank-num.r3{color:var(--bronze);}
+    .rank-info h4{font-size:14px;font-weight:700;color:white;margin-bottom:4px;}
+    .rank-info p{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5;}
 
-    /* ── Section header ── */
-    .section-header { display:flex; align-items:center; justify-content:space-between; margin:20px 0 10px; }
-    .section-header h3 { font-size:15px; font-weight:700; color:var(--text); }
-    .section-header span { font-size:12px; color:var(--text2); }
+    /* Points rows */
+    .pt-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);}
+    .pt-row:last-child{border-bottom:none;}
+    .pt-lbl{font-size:13px;color:var(--text2);}
+    .pt-val{font-size:14px;font-weight:700;color:var(--brand);}
+    .pt-row.total .pt-lbl{font-weight:700;color:var(--text);}
+    .pt-row.total .pt-val{font-size:18px;color:var(--dark);}
 
-    /* ── Rank card ── */
-    .rank-card {
-      background:linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-      border-radius:var(--radius); padding:20px; margin-bottom:16px;
-      display:flex; align-items:center; gap:16px; color:white;
-    }
-    .rank-big { font-size:56px; font-weight:800; line-height:1; }
-    .rank-big.r1{color:#f59e0b} .rank-big.r2{color:#94a3b8} .rank-big.r3{color:#cd7f32}
-    .rank-right { flex:1; min-width:0; }
-    .rank-right h4 { font-size:13px; font-weight:600; margin-bottom:4px; }
-    .rank-right p { font-size:11px; color:rgba(255,255,255,0.45); line-height:1.5; }
+    /* Medal progress */
+    .med-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .med-row:last-child{border-bottom:none;}
+    .med-em{font-size:20px;width:26px;text-align:center;flex-shrink:0;}
+    .med-body{flex:1;}
+    .med-top{display:flex;justify-content:space-between;margin-bottom:5px;}
+    .med-name{font-size:12px;font-weight:600;}
+    .med-pct{font-size:12px;font-weight:700;color:var(--text2);}
+    .prog{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:3px;transition:width 0.7s ease;}
+    .pf-b{background:var(--bronze);} .pf-s{background:var(--silver);} .pf-g{background:var(--gold);}
 
-    /* ── Points card ── */
-    .card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; overflow:hidden; }
-    .card-header { padding:16px 16px 0; }
-    .card-header h3 { font-size:15px; font-weight:700; margin-bottom:12px; }
-    .pts-row { display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1px solid var(--border); }
-    .pts-row:last-child { border-bottom:none; font-weight:700; }
-    .pts-row .pl { font-size:13px; color:var(--text2); }
-    .pts-row .pv { font-size:14px; font-weight:700; color:var(--brand); }
-    .pts-row.total .pl { font-size:14px; color:var(--text); font-weight:700; }
-    .pts-row.total .pv { font-size:20px; color:var(--dark); }
+    /* Activity cards */
+    .act-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;}
+    .act-item:last-child{border-bottom:none;}
+    .act-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .ico-walk{background:#dcfce7;} .ico-run{background:#dbeafe;} .ico-hike{background:#f3e8ff;} .ico-ride{background:#fff7ed;}
+    .act-info{flex:1;min-width:0;}
+    .act-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+    .act-meta{font-size:11px;color:var(--text2);}
+    .act-right{text-align:right;flex-shrink:0;}
+    .act-km{font-size:13px;font-weight:700;}
+    .act-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:3px;display:inline-block;}
+    .ab-ok{background:#dcfce7;color:#16a34a;} .ab-flag{background:#fee2e2;color:#dc2626;}
 
-    /* ── Medal progress ── */
-    .medal-row { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); }
-    .medal-row:last-child { border-bottom:none; }
-    .medal-emoji { font-size:22px; width:28px; text-align:center; flex-shrink:0; }
-    .medal-body { flex:1; min-width:0; }
-    .medal-name-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-    .medal-name-row .mn { font-size:13px; font-weight:600; }
-    .medal-name-row .mp { font-size:12px; font-weight:700; color:var(--text2); }
-    .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:3px; transition:width 0.8s ease; }
-    .fill-bronze { background:#b45309; }
-    .fill-silver { background:#94a3b8; }
-    .fill-gold   { background:#f59e0b; }
+    /* Leaderboard tab */
+    .lb-board-tabs{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--dark);border-radius:10px;padding:3px;gap:2px;margin-bottom:12px;}
+    .lb-board-tabs::-webkit-scrollbar{display:none;}
+    .lb-tab{flex-shrink:0;padding:7px 11px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;color:rgba(255,255,255,0.45);background:none;transition:all 0.15s;}
+    .lb-tab.on{background:var(--brand);color:white;}
 
-    /* ── Activity cards ── */
-    .act-card {
-      display:flex; align-items:center; gap:12px;
-      padding:14px 16px; border-bottom:1px solid var(--border);
-    }
-    .act-card:last-child { border-bottom:none; }
-    .act-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-    .act-icon.walk { background:#dcfce7; } .act-icon.run { background:#dbeafe; }
-    .act-icon.hike { background:#f3e8ff; } .act-icon.ride { background:#fff7ed; }
-    .act-body { flex:1; min-width:0; }
-    .act-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-    .act-meta { font-size:11px; color:var(--text2); }
-    .act-right { text-align:right; flex-shrink:0; }
-    .act-dist { font-size:14px; font-weight:700; color:var(--text); }
-    .act-status { font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; margin-top:3px; display:inline-block; }
-    .act-status.valid { background:#dcfce7; color:#16a34a; }
-    .act-status.flag  { background:#fee2e2; color:#dc2626; }
+    /* Leaderboard rows */
+    .lb-card{background:var(--white);border-bottom:1px solid var(--border);}
+    .lb-card.t1{border-left:3px solid var(--gold);} .lb-card.t2{border-left:3px solid var(--silver);} .lb-card.t3{border-left:3px solid var(--bronze);}
+    .lb-main{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;}
+    .lb-rank{font-size:16px;font-weight:800;width:30px;text-align:center;flex-shrink:0;color:#d1d5db;}
+    .lb-rank.r1{color:var(--gold);} .lb-rank.r2{color:var(--silver);} .lb-rank.r3{color:var(--bronze);}
+    .lb-info{flex:1;min-width:0;}
+    .lb-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+    .lb-meta{display:flex;gap:6px;align-items:center;}
+    .lb-med{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;}
+    .lm-g{background:#fef3c7;color:#92400e;} .lm-s{background:#f1f5f9;color:#475569;} .lm-b{background:#fef3c7;color:#78350f;} .lm-n{background:#f9fafb;color:#9ca3af;}
+    .lb-team{font-size:10px;color:var(--text2);}
+    .lb-pts-r{text-align:right;flex-shrink:0;}
+    .lb-pts-v{font-size:18px;font-weight:800;color:var(--brand);line-height:1;}
+    .lb-pts-l{font-size:9px;color:var(--text2);text-transform:uppercase;}
+    .lb-mini{display:flex;gap:10px;padding:0 16px 10px 56px;}
+    .lb-mini span{font-size:11px;color:var(--text2);}
+    .lb-mini strong{color:var(--text);font-weight:600;}
+    .lb-toggle{padding:5px 16px 10px 56px;font-size:11px;font-weight:600;color:var(--brand);cursor:pointer;display:flex;align-items:center;gap:3px;}
+    .lb-toggle .arr{display:inline-block;transition:transform 0.2s;}
+    .lb-toggle.open .arr{transform:rotate(180deg);}
+    .lb-days{display:none;background:#fafafa;border-top:1px solid var(--border);padding:10px 12px;}
+    .lb-days.open{display:block;}
+    .day-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--white);border-radius:8px;margin-bottom:5px;border:1px solid var(--border);}
+    .day-row:last-child{margin-bottom:0;}
+    .day-dt{font-size:11px;font-weight:600;min-width:42px;flex-shrink:0;}
+    .day-km{flex:1;font-size:11px;color:var(--text2);}
+    .day-km strong{color:var(--text);}
+    .day-pts{text-align:right;flex-shrink:0;}
+    .day-total{font-size:13px;font-weight:800;color:var(--brand);}
+    .day-detail{font-size:9px;color:var(--text2);}
+    .cap{display:inline-block;font-size:9px;font-weight:700;background:#fff7ed;color:#ea580c;padding:1px 4px;border-radius:3px;margin-left:2px;}
+    .team-hdr{background:var(--dark);color:white;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:0.3px;}
 
-    /* ── Bottom nav ── */
-    .bottom-nav {
-      position:fixed; bottom:0; left:0; right:0;
-      height:var(--nav-h);
-      padding-bottom:env(safe-area-inset-bottom);
-      background:var(--white);
-      border-top:1px solid var(--border);
-      display:flex;
-      z-index:200;
-      box-shadow:0 -4px 20px rgba(0,0,0,0.08);
-    }
-    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; text-decoration:none; color:var(--text2); font-size:10px; font-weight:500; border:none; background:none; cursor:pointer; font-family:inherit; padding-bottom:2px; }
-    .nav-item .ni { font-size:22px; line-height:1; }
-    .nav-item.active { color:var(--brand); }
-    .nav-item.active .ni { filter:drop-shadow(0 0 4px rgba(232,98,42,0.4)); }
+    /* Profile tab */
+    .signout{width:100%;padding:14px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;}
 
-    /* ── Tab panels ── */
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
+    /* Bottom nav */
+    .nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);padding-bottom:env(safe-area-inset-bottom);background:var(--white);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,0.07);}
+    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;font-family:inherit;color:var(--text2);font-size:10px;font-weight:500;}
+    .nav-btn .ic{font-size:22px;line-height:1;}
+    .nav-btn.on{color:var(--brand);}
 
-
-    /* ── Leaderboard tab ── */
-    .lb-tab { transition: all 0.15s; }
-    .lb-row-card { background:var(--white); border-bottom:1px solid var(--border); }
-    .lb-row-card.top1 { border-left:3px solid #f59e0b; }
-    .lb-row-card.top2 { border-left:3px solid #94a3b8; }
-    .lb-row-card.top3 { border-left:3px solid #b45309; }
-    .lb-main-row { display:flex; align-items:center; gap:10px; padding:12px 16px; cursor:pointer; }
-    .lb-rank-num { font-size:16px; font-weight:800; width:32px; text-align:center; flex-shrink:0; color:#d1d5db; }
-    .lb-rank-num.r1{color:#f59e0b;} .lb-rank-num.r2{color:#94a3b8;} .lb-rank-num.r3{color:#b45309;}
-    .lb-athlete { flex:1; min-width:0; }
-    .lb-athlete-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
-    .lb-athlete-meta { display:flex; align-items:center; gap:6px; }
-    .lb-medal-pill { display:inline-flex; align-items:center; padding:2px 7px; border-radius:20px; font-size:10px; font-weight:700; }
-    .lmp-gold   { background:#fef3c7; color:#92400e; }
-    .lmp-silver { background:#f1f5f9; color:#475569; }
-    .lmp-bronze { background:#fef3c7; color:#78350f; }
-    .lmp-none   { background:#f9fafb; color:#9ca3af; }
-    .lb-team-txt { font-size:10px; color:var(--text2); }
-    .lb-pts-right { text-align:right; flex-shrink:0; }
-    .lb-pts-val { font-size:18px; font-weight:800; color:var(--brand); line-height:1; }
-    .lb-pts-lbl { font-size:9px; color:var(--text2); text-transform:uppercase; }
-    .lb-mini-row { display:flex; gap:10px; padding:0 16px 10px 58px; }
-    .lb-mini-stat { font-size:11px; color:var(--text2); }
-    .lb-mini-stat strong { color:var(--text); font-weight:600; }
-    .lb-expand-btn { padding:6px 16px 10px 58px; font-size:11px; font-weight:600; color:var(--brand); cursor:pointer; display:flex; align-items:center; gap:4px; }
-    .lb-expand-btn .arr { transition:transform 0.2s; display:inline-block; }
-    .lb-expand-btn.open .arr { transform:rotate(180deg); }
-    .lb-days { display:none; background:#fafafa; border-top:1px solid var(--border); padding:10px 12px; }
-    .lb-days.open { display:block; }
-    .lb-day-row { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--white); border-radius:8px; margin-bottom:5px; border:1px solid var(--border); }
-    .lb-day-row:last-child { margin-bottom:0; }
-    .lb-day-date { font-size:11px; font-weight:600; color:var(--text); min-width:44px; flex-shrink:0; }
-    .lb-day-km { flex:1; font-size:11px; color:var(--text2); }
-    .lb-day-km strong { color:var(--text); }
-    .lb-day-pts { text-align:right; flex-shrink:0; }
-    .lb-day-total { font-size:13px; font-weight:800; color:var(--brand); }
-    .lb-day-detail { font-size:9px; color:var(--text2); }
-    .lb-cap { display:inline-block; font-size:9px; font-weight:700; background:#fff7ed; color:#ea580c; padding:1px 4px; border-radius:3px; margin-left:2px; }
-
-    /* ── Sign out button ── */
-    .signout-btn { width:100%; padding:14px; background:var(--error-bg); color:var(--error); border:1px solid #fecaca; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:8px; }
-
-    .empty-state { text-align:center; padding:48px 24px; color:var(--text2); font-size:14px; }
-    .empty-state .ei { font-size:40px; margin-bottom:12px; }
+    .empty{text-align:center;padding:48px 24px;color:var(--text2);font-size:13px;}
+    .empty .ei{font-size:36px;margin-bottom:10px;}
+    .lb-loading{text-align:center;padding:48px;color:var(--text2);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+    .sm-spin{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;}
   </style>
 </head>
 <body>
 
-<!-- LOGIN (redirect only — login is on index.html) -->
-<div class="screen" id="login-screen">
-  <div style="text-align:center;padding:40px;">
-    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:16px">Redirecting to login...</p>
-  </div>
-</div>
-
 <!-- LOADING -->
-<div class="screen" id="loading-screen">
-  <div class="big-spinner"></div>
-  <div class="loading-text" id="loading-text">Loading your data...</div>
+<div class="screen on" id="s-loading">
+  <div class="big-spin"></div>
+  <div class="load-txt" id="load-txt">Loading your data...</div>
 </div>
 
 <!-- ERROR -->
-<div class="screen" id="error-screen">
-  <div class="error-box">
-    <div class="ei" id="error-icon">⚠️</div>
-    <h2 id="error-title">Something went wrong</h2>
-    <p id="error-msg">Please try again.</p>
-    <button class="btn-retry" onclick="resetToLogin()">Try again</button>
-  </div>
+<div class="screen" id="s-error">
+  <div class="err-icon" id="err-icon">⚠️</div>
+  <div class="err-title" id="err-title">Something went wrong</div>
+  <div class="err-msg" id="err-msg">Please try again.</div>
+  <button class="btn-retry" onclick="window.location.replace('index.html')">Back to login</button>
 </div>
 
 <!-- DASHBOARD -->
-<div class="screen" id="dashboard-screen">
-
+<div id="s-dash">
   <div class="top-bar">
-    <img class="top-avatar" id="top-avatar" src="" alt="">
+    <img class="av" id="av" src="" alt="">
     <div class="top-info">
-      <div class="top-name" id="top-name">—</div>
-      <div class="top-team" id="top-team">—</div>
+      <div class="top-name" id="t-name">—</div>
+      <div class="top-sub"  id="t-sub">—</div>
     </div>
-    <span class="medal-chip medal-none" id="medal-chip">Working toward Bronze</span>
+    <span class="medal-badge mb-none" id="medal-badge">—</span>
   </div>
 
-  <div class="dash-content">
+  <div class="scroll">
 
-    <!-- HOME TAB -->
-    <div class="tab-panel active" id="tab-home">
-      <div class="stats-grid" style="margin-top:4px">
-        <div class="stat-tile">
-          <div class="sv" id="st-km">—</div>
-          <div class="sl">Total km</div>
-        </div>
-        <div class="stat-tile accent-green">
-          <div class="sv" id="st-pts">—</div>
-          <div class="sl">Total points</div>
-        </div>
-        <div class="stat-tile accent-blue">
-          <div class="sv" id="st-acts">—</div>
-          <div class="sl">Activities</div>
-        </div>
-        <div class="stat-tile accent-dark">
-          <div class="sv" id="st-rank">—</div>
-          <div class="sl">My rank</div>
-        </div>
+    <!-- HOME -->
+    <div class="tab on" id="tab-home">
+      <div class="stat-grid" style="margin-top:4px">
+        <div class="stat-tile"><div class="st-val" id="s-km">—</div><div class="st-lbl">Total km</div></div>
+        <div class="stat-tile st-green"><div class="st-val" id="s-pts">—</div><div class="st-lbl">Total points</div></div>
+        <div class="stat-tile st-blue"><div class="st-val" id="s-acts">—</div><div class="st-lbl">Activities</div></div>
+        <div class="stat-tile st-dark"><div class="st-val" id="s-rank">—</div><div class="st-lbl">My rank</div></div>
       </div>
-
       <div class="rank-card">
-        <div class="rank-big" id="rank-big">—</div>
-        <div class="rank-right">
-          <h4 id="rank-label">My rank</h4>
-          <p id="rank-sub">Loading leaderboard...</p>
-        </div>
+        <div class="rank-num" id="rank-num">—</div>
+        <div class="rank-info"><h4 id="rank-label">—</h4><p id="rank-sub">—</p></div>
       </div>
-
-      <div class="section-header"><h3>🎯 Points</h3></div>
+      <div class="sec-hdr"><h3>🎯 Points</h3></div>
       <div class="card">
-        <div class="pts-row"><span class="pl">Distance <span style="color:#bbb;font-size:11px">(1pt/km)</span></span><span class="pv" id="pts-dist">—</span></div>
-        <div class="pts-row"><span class="pl">Daily bonus</span><span class="pv" id="pts-bonus">—</span></div>
-        <div class="pts-row"><span class="pl">Challenge bonus</span><span class="pv" id="pts-challenge">—</span></div>
-        <div class="pts-row total"><span class="pl">Total</span><span class="pv" id="pts-total">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Distance (1pt/km)</span><span class="pt-val" id="pt-dist">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Daily bonus</span><span class="pt-val" id="pt-bonus">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Challenge bonus</span><span class="pt-val" id="pt-chal">—</span></div>
+        <div class="pt-row total"><span class="pt-lbl">Total</span><span class="pt-val" id="pt-total">—</span></div>
       </div>
-
-      <div class="section-header"><h3>🏅 Medal progress</h3></div>
+      <div class="sec-hdr"><h3>🏅 Medal progress</h3></div>
       <div class="card" id="medal-card"></div>
     </div>
 
-    <!-- ACTIVITIES TAB -->
-    <div class="tab-panel" id="tab-activities">
-      <div class="section-header" style="margin-top:4px">
-        <h3>My activities</h3>
-        <span id="acts-count-label"></span>
+    <!-- ACTIVITIES -->
+    <div class="tab" id="tab-acts">
+      <div class="sec-hdr" style="margin-top:4px"><h3>My activities</h3><span id="acts-count"></span></div>
+      <div class="card" id="acts-list"><div class="empty"><div class="ei">🏃</div>No activities yet</div></div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="tab" id="tab-lb">
+      <div class="sec-hdr" style="margin-top:4px"><h3>🏆 Leaderboard</h3><button onclick="lbRefresh()" style="font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;font-weight:600;">↺ Refresh</button></div>
+      <div class="lb-board-tabs">
+        <button class="lb-tab on" data-b="dayshift-male"   onclick="lbSwitch('dayshift-male')">👨 Day M</button>
+        <button class="lb-tab"    data-b="dayshift-female" onclick="lbSwitch('dayshift-female')">👩 Day F</button>
+        <button class="lb-tab"    data-b="nightshift-all"  onclick="lbSwitch('nightshift-all')">🌙 Night</button>
+        <button class="lb-tab"    data-b="team-male"       onclick="lbSwitch('team-male')">🏙️ Team M</button>
+        <button class="lb-tab"    data-b="team-female"     onclick="lbSwitch('team-female')">🏙️ Team F</button>
       </div>
-      <div class="card" id="acts-list">
-        <div class="empty-state"><div class="ei">🏃</div>No activities yet</div>
+      <div class="card" id="lb-content">
+        <div class="lb-loading"><div class="sm-spin"></div>Loading...</div>
       </div>
     </div>
 
-
-    <!-- LEADERBOARD TAB -->
-    <div class="tab-panel" id="tab-leaderboard">
-      <div class="section-header" style="margin-top:4px">
-        <h3>🏆 Leaderboard</h3>
-        <button onclick="doLbRefresh()" style="font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;font-weight:600;">↺ Refresh</button>
-      </div>
-
-      <!-- Board tabs -->
-      <div style="display:flex;overflow-x:auto;scrollbar-width:none;background:var(--dark);border-radius:var(--radius-sm);margin-bottom:12px;padding:4px;gap:2px;-webkit-overflow-scrolling:touch;">
-        <button class="lb-tab active" data-board="dayshift-male"   onclick="switchLbBoard('dayshift-male')"   style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:var(--brand);color:white;">👨 Day Male</button>
-        <button class="lb-tab"        data-board="dayshift-female" onclick="switchLbBoard('dayshift-female')" style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">👩 Day Female</button>
-        <button class="lb-tab"        data-board="nightshift-all"  onclick="switchLbBoard('nightshift-all')"  style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🌙 Night</button>
-        <button class="lb-tab"        data-board="team-male"       onclick="switchLbBoard('team-male')"       style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🏙️ Team M</button>
-        <button class="lb-tab"        data-board="team-female"     onclick="switchLbBoard('team-female')"     style="flex-shrink:0;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:none;color:rgba(255,255,255,0.5);">🏙️ Team F</button>
-      </div>
-
-      <!-- Board content -->
-      <div id="lb-content">
-        <div style="text-align:center;padding:40px;color:var(--text2);font-size:14px;">Tap Leaderboard to load</div>
-      </div>
-    </div>
-
-    <!-- PROFILE TAB -->
-    <div class="tab-panel" id="tab-profile">
-      <div class="section-header" style="margin-top:4px"><h3>My profile</h3></div>
+    <!-- PROFILE -->
+    <div class="tab" id="tab-profile">
+      <div class="sec-hdr" style="margin-top:4px"><h3>My profile</h3></div>
       <div class="card">
-        <div class="pts-row"><span class="pl">Name</span><span class="pv" id="prof-name" style="font-size:13px;color:var(--text)">—</span></div>
-        <div class="pts-row"><span class="pl">Team</span><span class="pv" id="prof-team" style="font-size:13px;color:var(--text)">—</span></div>
-        <div class="pts-row"><span class="pl">Shift</span><span class="pv" id="prof-shift" style="font-size:13px;color:var(--text)">—</span></div>
-        <div class="pts-row"><span class="pl">Gender</span><span class="pv" id="prof-gender" style="font-size:13px;color:var(--text)">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Name</span>  <span style="font-size:13px;color:var(--text)" id="pr-name">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Team</span>  <span style="font-size:13px;color:var(--text)" id="pr-team">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Shift</span> <span style="font-size:13px;color:var(--text)" id="pr-shift">—</span></div>
+        <div class="pt-row"><span class="pt-lbl">Gender</span><span style="font-size:13px;color:var(--text)" id="pr-gender">—</span></div>
       </div>
-      <button class="signout-btn" onclick="logout()">Sign out</button>
-      <div style="margin-top:16px;font-size:11px;color:var(--text2);text-align:center;line-height:1.8">
-        <a href="privacy.html" style="color:var(--brand);text-decoration:none">Privacy Policy</a> ·
-        <a href="terms.html" style="color:var(--brand);text-decoration:none">Terms of Service</a>
+      <button class="signout" onclick="signOut()">Sign out</button>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--text2);">
+        <a href="privacy.html" style="color:var(--brand);text-decoration:none">Privacy</a> ·
+        <a href="terms.html"   style="color:var(--brand);text-decoration:none">Terms</a>
       </div>
     </div>
 
-  </div>
+  </div><!-- /scroll -->
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
-      <span class="ni">🏠</span>Home
-    </button>
-    <button class="nav-item" id="nav-activities" onclick="switchTab('activities')">
-      <span class="ni">🏃</span>Activities
-    </button>
-    <button class="nav-item" id="nav-leaderboard" onclick="switchTab('leaderboard')">
-      <span class="ni">🏆</span>Leaderboard
-    </button>
-    <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
-      <span class="ni">👤</span>Profile
-    </button>
+  <nav class="nav">
+    <button class="nav-btn on" id="nb-home" onclick="showTab('home')"><span class="ic">🏠</span>Home</button>
+    <button class="nav-btn"    id="nb-acts" onclick="showTab('acts')"><span class="ic">🏃</span>Activities</button>
+    <button class="nav-btn"    id="nb-lb"   onclick="showTab('lb')"><span class="ic">🏆</span>Leaderboard</button>
+    <button class="nav-btn"    id="nb-profile" onclick="showTab('profile')"><span class="ic">👤</span>Profile</button>
   </nav>
 </div>
 
 <script>
-var STRAVA_CLIENT_ID = '29159';
-var BACKEND_URL  = 'https://walkathon-backend-hv9j.onrender.com';
-var EVENT_CODE   = 'walkathon2026';
-var CONFIG = {
-  medals:   { bronze:{male:125,female:100}, silver:{male:200,female:150}, gold:{male:300,female:250} },
-  bonus:    [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}],
-  basePer_km: 1
+var BACKEND = 'https://walkathon-backend-hv9j.onrender.com';
+var CFG = {
+  medals:{bronze:{male:125,female:100},silver:{male:200,female:150},gold:{male:300,female:250}},
+  bonus:[{km:5,pts:1},{km:8,pts:2},{km:10,pts:3},{km:15,pts:4},{km:21,pts:7}],
+  base:1
 };
+var LB_DATA={}, LB_BOARD='dayshift-male', LB_REG=[], LB_ACTS=[], LB_LOADED=false, LB_DAYS=[];
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
+// ── Screens ──
+function showScreen(id){
+  ['s-loading','s-error'].forEach(function(s){document.getElementById(s).classList.remove('on');});
+  document.getElementById('s-dash').classList.remove('on');
+  var el=document.getElementById(id);
+  if(el){el.classList.add('on');}
 }
-function resetToLogin() {
-  showScreen('login-screen');
-  window.history.replaceState({}, '', window.location.pathname);
+function showErr(icon,title,msg){
+  document.getElementById('err-icon').textContent=icon;
+  document.getElementById('err-title').textContent=title;
+  document.getElementById('err-msg').textContent=msg;
+  showScreen('s-error');
 }
-function logout() {
-  localStorage.removeItem('wk_portal');
-  resetToLogin();
-}
-function setLoading(msg) {
-  document.getElementById('loading-text').textContent = msg||'Loading...';
-  showScreen('loading-screen');
-}
-function showError(icon, title, msg) {
-  document.getElementById('error-icon').textContent  = icon;
-  document.getElementById('error-title').textContent = title;
-  document.getElementById('error-msg').textContent   = msg;
-  showScreen('error-screen');
-}
-function switchTab(t) {
-  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
-  document.getElementById('tab-'+t).classList.add('active');
-  var ni = document.getElementById('nav-'+t);
-  if(ni) ni.classList.add('active');
+function setLoad(txt){ document.getElementById('load-txt').textContent=txt||'Loading...'; showScreen('s-loading'); }
+
+// ── Tabs ──
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('on');});
+  document.querySelectorAll('.nav-btn').forEach(function(el){el.classList.remove('on');});
+  document.getElementById('tab-'+t).classList.add('on');
+  document.getElementById('nb-'+t).classList.add('on');
+  if(t==='lb'&&!LB_LOADED) lbLoad();
 }
 
-function fmtDate(d){ return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}); }
-function fmtDur(s){ if(!s) return '—'; var h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?h+'h '+m+'m':m+'m'; }
-function fmtPace(ms){ if(!ms) return '—'; var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60); return min+':'+sec.toString().padStart(2,'0')+'/km'; }
-
-function sportIcon(t){ if(t==='Walk') return {icon:'🚶',cls:'walk'}; if(t==='Run'||t==='VirtualRun') return {icon:'🏃',cls:'run'}; if(t==='Hike') return {icon:'🥾',cls:'hike'}; return {icon:'🚴',cls:'ride'}; }
-
-function calcBonus(km) {
-  var sorted = CONFIG.bonus.slice().sort(function(a,b){ return b.km-a.km; });
-  for(var i=0;i<sorted.length;i++){ if(km>=Number(sorted[i].km)) return Number(sorted[i].points)||0; }
-  return 0;
-}
-function calcPoints(acts, athleteId) {
+// ── Helpers ──
+function fmtDate(d){return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short'});}
+function fmtDur(s){if(!s)return'—';var h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m';}
+function fmtPace(ms){if(!ms)return'—';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+String(sec).padStart(2,'0')+'/km';}
+function sportIco(t){if(t==='Walk')return{e:'🚶',c:'ico-walk'};if(t==='Run'||t==='VirtualRun')return{e:'🏃',c:'ico-run'};if(t==='Hike')return{e:'🥾',c:'ico-hike'};return{e:'🚴',c:'ico-ride'};}
+function bonus(km){var s=CFG.bonus.slice().sort(function(a,b){return b.km-a.km;});for(var i=0;i<s.length;i++){if(km>=s[i].km)return s[i].pts;}return 0;}
+function medal(pts,g){var gd=(g||'').toLowerCase(),m=CFG.medals;var go=gd==='female'?m.gold.female:m.gold.male,si=gd==='female'?m.silver.female:m.silver.male,br=gd==='female'?m.bronze.female:m.bronze.male;if(pts>=go)return{l:'🥇 Gold',b:'mb-gold',lm:'lm-g',lv:'gold'};if(pts>=si)return{l:'🥈 Silver',b:'mb-silver',lm:'lm-s',lv:'silver'};if(pts>=br)return{l:'🥉 Bronze',b:'mb-bronze',lm:'lm-b',lv:'bronze'};return{l:'Working toward Bronze',b:'mb-none',lm:'lm-n',lv:'none'};}
+function calcPts(acts,id){
   var byDay={};
-  acts.filter(function(a){ return a.strava_athlete_id==athleteId; }).forEach(function(a){
-    var d=(a.activity_date||'').split('T')[0];
-    if(!byDay[d]) byDay[d]=[];
-    byDay[d].push(a);
+  acts.filter(function(a){return a.strava_athlete_id==id&&!a.is_flagged;}).forEach(function(a){
+    var d=(a.activity_date||'').split('T')[0];if(!d)return;
+    if(!byDay[d])byDay[d]=[];byDay[d].push(a);
   });
-  var totalKm=0,distPts=0,bonusPts=0;
+  var km=0,dp=0,bp=0,cp=0;
   Object.keys(byDay).forEach(function(day){
-    var dayKm=0;
-    byDay[day].forEach(function(a){ dayKm+=(parseFloat(a.distance_meters)||0)/1000; });
-    dayKm=parseFloat(dayKm.toFixed(4));
-    totalKm+=dayKm; distPts+=parseFloat((dayKm*CONFIG.basePer_km).toFixed(2));
-    bonusPts+=calcBonus(dayKm);
+    var raw=0;byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
+    raw=parseFloat(raw.toFixed(4));
+    var isSpec=LB_DAYS.indexOf(day)!==-1;
+    var dk=(!isSpec&&raw>21)?21:raw;dk=parseFloat(dk.toFixed(4));
+    km+=dk;dp+=parseFloat((dk*CFG.base).toFixed(2));bp+=bonus(dk);
   });
-  return { totalKm:parseFloat(totalKm.toFixed(2)), distPts:parseFloat(distPts.toFixed(2)), bonusPts, challengePts:0, totalPts:parseFloat((distPts+bonusPts).toFixed(2)) };
-}
-function getMedal(pts, gender) {
-  var g=(gender||'').toLowerCase(), m=CONFIG.medals;
-  var gold=g==='female'?m.gold.female:m.gold.male;
-  var silver=g==='female'?m.silver.female:m.silver.male;
-  var bronze=g==='female'?m.bronze.female:m.bronze.male;
-  if(pts>=gold)   return {label:'🥇 Gold',   cls:'medal-gold',   level:'gold',   threshold:gold};
-  if(pts>=silver) return {label:'🥈 Silver', cls:'medal-silver', level:'silver', threshold:silver};
-  if(pts>=bronze) return {label:'🥉 Bronze', cls:'medal-bronze', level:'bronze', threshold:bronze};
-  return {label:'Working toward Bronze', cls:'medal-none', level:'none', threshold:bronze};
-}
-function filterForBoard(p) {
-  var g=(p.gender||'').toLowerCase(), s=(p.shift||'').toLowerCase();
-  if(s.includes('day')&&g==='female') return 'dayshift-female';
-  if(s.includes('day')&&(g==='male'||g==='m')) return 'dayshift-male';
-  if(s.includes('night')) return 'nightshift-all';
-  return 'all';
+  acts.filter(function(a){return a.strava_athlete_id==id&&!a.is_flagged;}).forEach(function(a){cp+=parseFloat(a.manual_bonus)||0;});
+  return{km:parseFloat(km.toFixed(2)),dp:parseFloat(dp.toFixed(2)),bp:bp,cp:cp,tp:parseFloat((dp+bp+cp).toFixed(2)),byDay:byDay};
 }
 
-function renderDashboard(data) {
+// ── Render dashboard ──
+function render(data){
   var p=data.participant, mine=data.activities, all=data.allActs, regs=data.regList, ath=data.athlete;
+  LB_REG=regs||[]; LB_ACTS=all||[];
 
   // Top bar
-  document.getElementById('top-avatar').src = ath.profile||'';
-  document.getElementById('top-name').textContent = p.full_name||(ath.firstname+' '+ath.lastname);
-  document.getElementById('top-team').textContent = (p.leaderboard_team||'—')+' · '+(p.shift||'—');
+  document.getElementById('av').src=ath.profile||'';
+  document.getElementById('t-name').textContent=p.full_name||(ath.firstname+' '+ath.lastname);
+  document.getElementById('t-sub').textContent=(p.leaderboard_team||'—')+' · '+(p.shift||'—');
 
-  var validMine = mine.filter(function(a){ return !a.is_flagged; });
-  var pts = calcPoints(validMine, ath.id);
-  var medal = getMedal(pts.totalPts, p.gender);
+  var valid=mine.filter(function(a){return!a.is_flagged;});
+  var pts=calcPts(mine,ath.id);
+  var med=medal(pts.tp,p.gender);
 
-  var chip = document.getElementById('medal-chip');
-  chip.textContent = medal.label;
-  chip.className = 'medal-chip '+medal.cls;
+  // Medal badge
+  var mb=document.getElementById('medal-badge');
+  mb.textContent=med.l; mb.className='medal-badge '+med.b;
 
   // Stats
-  document.getElementById('st-km').textContent   = pts.totalKm.toFixed(1)+' km';
-  document.getElementById('st-pts').textContent  = pts.totalPts.toFixed(0);
-  document.getElementById('st-acts').textContent = validMine.length;
-
-  // Points breakdown
-  document.getElementById('pts-dist').textContent      = pts.distPts.toFixed(1);
-  document.getElementById('pts-bonus').textContent     = pts.bonusPts;
-  document.getElementById('pts-challenge').textContent = pts.challengePts||'—';
-  document.getElementById('pts-total').textContent     = pts.totalPts.toFixed(1);
-
-  // Medal progress
-  var g=(p.gender||'').toLowerCase(), m=CONFIG.medals;
-  var tiers = [
-    {name:'🥉 Bronze', t:g==='female'?m.bronze.female:m.bronze.male, fill:'fill-bronze'},
-    {name:'🥈 Silver', t:g==='female'?m.silver.female:m.silver.male, fill:'fill-silver'},
-    {name:'🥇 Gold',   t:g==='female'?m.gold.female:m.gold.male,     fill:'fill-gold'}
-  ];
-  document.getElementById('medal-card').innerHTML = tiers.map(function(tier){
-    var pct=Math.min(100,Math.round((pts.totalPts/tier.t)*100));
-    var earned=pts.totalPts>=tier.t;
-    return '<div class="medal-row">'
-      +'<div class="medal-emoji">'+tier.name.split(' ')[0]+'</div>'
-      +'<div class="medal-body">'
-      +'<div class="medal-name-row"><span class="mn">'+tier.name+(earned?' ✅':'')+'</span><span class="mp">'+tier.t+' pts needed</span></div>'
-      +'<div class="progress-bar"><div class="progress-fill '+tier.fill+'" style="width:'+pct+'%"></div></div>'
-      +'</div>'
-      +'</div>';
-  }).join('');
+  document.getElementById('s-km').textContent=pts.km.toFixed(2)+' km';
+  document.getElementById('s-pts').textContent=pts.tp.toFixed(1);
+  document.getElementById('s-acts').textContent=valid.length;
 
   // Rank
-  var myBoard=filterForBoard(p);
-  var boardRegs=regs.filter(function(r){
-    var rg=(r.gender||'').toLowerCase(), rs=(r.shift||'').toLowerCase();
-    if(myBoard==='dayshift-female') return rg==='female'&&rs.includes('day');
-    if(myBoard==='dayshift-male')   return (rg==='male'||rg==='m')&&rs.includes('day');
-    if(myBoard==='nightshift-all')  return rs.includes('night');
-    return true;
-  });
-  var boardScores=[];
-  boardRegs.forEach(function(r){
-    var rActs=all.filter(function(a){ return a.strava_athlete_id==r.strava_athlete_id&&!a.is_flagged; });
-    if(!rActs.length) return;
-    var rPts=calcPoints(rActs,r.strava_athlete_id);
-    boardScores.push({id:r.strava_athlete_id,name:r.full_name,pts:rPts.totalPts});
-  });
-  boardScores.sort(function(a,b){ return b.pts-a.pts; });
-  var myRank=boardScores.findIndex(function(s){ return s.id==ath.id; })+1;
-  var boardLabel=myBoard==='dayshift-female'?'Dayshift Female':myBoard==='dayshift-male'?'Dayshift Male':'Nightshift';
-  document.getElementById('st-rank').textContent = myRank>0?'#'+myRank:'—';
-  var rb=document.getElementById('rank-big');
-  rb.textContent=myRank>0?'#'+myRank:'—';
-  rb.className='rank-big'+(myRank===1?' r1':myRank===2?' r2':myRank===3?' r3':'');
-  document.getElementById('rank-label').textContent=boardLabel+' Leaderboard';
-  var above=myRank>1?boardScores[myRank-2]:null;
-  var below=myRank<boardScores.length?boardScores[myRank]:null;
-  document.getElementById('rank-sub').textContent=myRank>0
-    ?(above?'▲ '+above.pts.toFixed(0)+' pts to pass '+above.name:'🏆 You are leading!')+(below?' · ▼ '+below.pts.toFixed(0)+' pts ahead of '+below.name:'')
-    :'Not yet on this leaderboard';
+  var myBoard=function(){var g=(p.gender||'').toLowerCase(),s=(p.shift||'').toLowerCase();if(g==='female'&&s.includes('day'))return'dayshift-female';if((g==='male'||g==='m')&&s.includes('day'))return'dayshift-male';if(s.includes('night'))return'nightshift-all';return'all';}();
+  var bRegs=regs.filter(function(r){var rg=(r.gender||'').toLowerCase(),rs=(r.shift||'').toLowerCase();if(myBoard==='dayshift-female')return rg==='female'&&rs.includes('day');if(myBoard==='dayshift-male')return(rg==='male'||rg==='m')&&rs.includes('day');if(myBoard==='nightshift-all')return rs.includes('night');return true;});
+  var scores=[];
+  bRegs.forEach(function(r){var rp=calcPts(all,r.strava_athlete_id);if(rp.tp>0)scores.push({id:r.strava_athlete_id,name:r.full_name,tp:rp.tp});});
+  scores.sort(function(a,b){return b.tp-a.tp;});
+  var rank=scores.findIndex(function(s){return s.id==ath.id;})+1;
+  document.getElementById('s-rank').textContent=rank>0?'#'+rank:'—';
+  var rn=document.getElementById('rank-num');
+  rn.textContent=rank>0?'#'+rank:'—';
+  rn.className='rank-num'+(rank===1?' r1':rank===2?' r2':rank===3?' r3':'');
+  var bLabel=myBoard==='dayshift-female'?'Dayshift Female':myBoard==='dayshift-male'?'Dayshift Male':'Nightshift';
+  document.getElementById('rank-label').textContent=bLabel+' Board';
+  var above=rank>1?scores[rank-2]:null, below=rank<scores.length?scores[rank]:null;
+  document.getElementById('rank-sub').textContent=rank>0?(above?'▲ '+above.tp.toFixed(0)+' pts to pass '+above.name:'🏆 You are leading!')+(below?' · ▼ '+below.tp.toFixed(0)+' pts ahead of '+below.name:''):'Not on this leaderboard yet';
+
+  // Points
+  document.getElementById('pt-dist').textContent=pts.dp.toFixed(1);
+  document.getElementById('pt-bonus').textContent=pts.bp;
+  document.getElementById('pt-chal').textContent=pts.cp||'—';
+  document.getElementById('pt-total').textContent=pts.tp.toFixed(1);
+
+  // Medal progress
+  var g=(p.gender||'').toLowerCase(),m=CFG.medals;
+  var tiers=[{n:'🥉 Bronze',t:g==='female'?m.bronze.female:m.bronze.male,c:'pf-b'},{n:'🥈 Silver',t:g==='female'?m.silver.female:m.silver.male,c:'pf-s'},{n:'🥇 Gold',t:g==='female'?m.gold.female:m.gold.male,c:'pf-g'}];
+  document.getElementById('medal-card').innerHTML=tiers.map(function(tier){
+    var pct=Math.min(100,Math.round((pts.tp/tier.t)*100));
+    return '<div class="med-row"><div class="med-em">'+tier.n.split(' ')[0]+'</div><div class="med-body"><div class="med-top"><span class="med-name">'+tier.n+(pts.tp>=tier.t?' ✅':'')+'</span><span class="med-pct">'+pct+'% · '+tier.t+' pts</span></div><div class="prog"><div class="prog-fill '+tier.c+'" style="width:'+pct+'%"></div></div></div></div>';
+  }).join('');
+
+  // Activities
+  var juneActs=mine.filter(function(a){return(a.activity_date||'').startsWith('2026-06');});
+  document.getElementById('acts-count').textContent=juneActs.length+' activities';
+  document.getElementById('acts-list').innerHTML=juneActs.length?juneActs.map(function(a){
+    var si=sportIco(a.sport_type);
+    var km2=a.distance_meters?(parseFloat(a.distance_meters)/1000).toFixed(2)+' km':'—';
+    return '<a href="https://www.strava.com/activities/'+a.strava_activity_id+'" target="_blank" class="act-item">'
+      +'<div class="act-ico '+si.c+'">'+si.e+'</div>'
+      +'<div class="act-info"><div class="act-name">'+(a.activity_name||'Activity')+'</div><div class="act-meta">'+fmtDate(a.activity_date)+' · '+fmtDur(a.moving_time_seconds)+' · '+fmtPace(a.avg_speed)+'</div></div>'
+      +'<div class="act-right"><div class="act-km">'+km2+'</div><div class="act-badge '+(a.is_flagged?'ab-flag':'ab-ok')+'">'+(a.is_flagged?'🚩 Flagged':'✅ Valid')+'</div></div>'
+      +'</a>';
+  }).join(''):'<div class="empty"><div class="ei">🏃</div>No June activities yet</div>';
 
   // Profile
-  document.getElementById('prof-name').textContent   = p.full_name||(ath.firstname+' '+ath.lastname);
-  document.getElementById('prof-team').textContent   = p.leaderboard_team||'—';
-  document.getElementById('prof-shift').textContent  = p.shift||'—';
-  document.getElementById('prof-gender').textContent = p.gender||'—';
+  document.getElementById('pr-name').textContent=p.full_name||(ath.firstname+' '+ath.lastname);
+  document.getElementById('pr-team').textContent=p.leaderboard_team||'—';
+  document.getElementById('pr-shift').textContent=p.shift||'—';
+  document.getElementById('pr-gender').textContent=p.gender||'—';
 
-  // Activities list
-  document.getElementById('acts-count-label').textContent = mine.length+' total';
-  var juneActs=mine.filter(function(a){ return (a.activity_date||'').startsWith('2026-06'); });
-  if(juneActs.length) {
-    document.getElementById('acts-list').innerHTML = juneActs.map(function(a){
-      var si=sportIcon(a.sport_type);
-      var dist=a.distance_meters?(parseFloat(a.distance_meters)/1000).toFixed(2)+' km':'—';
-      var actUrl='https://www.strava.com/activities/'+a.strava_activity_id;
-      return '<a href="'+actUrl+'" target="_blank" style="text-decoration:none;display:block" class="act-card">'
-        +'<div class="act-icon '+si.cls+'">'+si.icon+'</div>'
-        +'<div class="act-body">'
-        +'<div class="act-name">'+(a.activity_name||'Activity')+'</div>'
-        +'<div class="act-meta">'+fmtDate(a.activity_date)+' · '+fmtDur(a.moving_time_seconds)+' · '+fmtPace(a.avg_speed)+'</div>'
-        +'</div>'
-        +'<div class="act-right">'
-        +'<div class="act-dist">'+dist+'</div>'
-        +'<div class="act-status '+(a.is_flagged?'flag':'valid')+'">'+(a.is_flagged?'🚩 Flagged':'✅ Valid')+'</div>'
-        +'</div>'
-        +'</a>';
-    }).join('');
-  } else {
-    document.getElementById('acts-list').innerHTML='<div class="empty-state"><div class="ei">🏃</div>No June 2026 activities yet</div>';
-  }
-
-  showScreen('dashboard-screen');
+  // Show dashboard
+  showScreen('s-dash');
 }
 
-// Get code from URL (passed by index.html after login)
-var portalParams = new URLSearchParams(window.location.search);
-var portalCode   = portalParams.get('code');
-var portalState  = portalParams.get('state');
-
-if (portalCode && portalState === 'portal') {
-  // Fresh login — clear URL and load dashboard
-  window.history.replaceState({}, '', window.location.pathname);
-  setLoading('Loading your data...');
-  fetch(BACKEND_URL + '/my-data', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ code: portalCode })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (!data.success) {
-      if (data.error === 'not_registered') showError('🔒', 'Not registered', 'Contact your event organizer.');
-      else showError('⚠️', 'Something went wrong', data.error || 'Please try again.');
-      return;
+// ── Leaderboard ──
+var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var SB='https://jhdgkncpkrttvemvwukc.supabase.co';
+var SB_HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON};
+async function lbFetch(url){var all=[],from=0;while(true){var r=await fetch(url+(url.includes('?')?'&':'?')+'limit=1000&offset='+from,{headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+(from+999)})});if(!r.ok)break;var p=await r.json();if(!Array.isArray(p)||!p.length)break;all=all.concat(p);if(p.length<1000)break;from+=1000;}return all;}
+async function lbLoad(){
+  document.getElementById('lb-content').innerHTML='<div class="lb-loading"><div class="sm-spin"></div>Loading...</div>';
+  try{
+    var sr=await fetch(SB+'/rest/v1/special_scoring_days?select=special_date',{headers:SB_HDR});
+    var sd=await sr.json(); LB_DAYS=Array.isArray(sd)?sd.map(function(x){return x.special_date;}):[]; 
+    // Use data already loaded from /my-data
+    if(LB_REG.length&&LB_ACTS.length){LB_LOADED=true;lbBuild(LB_BOARD);}
+    else{
+      var reg=await lbFetch(SB+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team&order=full_name.asc');
+      var acts=await lbFetch(SB+'/rest/v1/activities?is_deleted=eq.false&is_flagged=eq.false&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-06-30T23:59:59&select=strava_athlete_id,distance_meters,sport_type,activity_date,manual_bonus&order=id.asc');
+      LB_REG=reg;LB_ACTS=acts;LB_LOADED=true;lbBuild(LB_BOARD);
     }
-    renderDashboard(data);
-  })
-  .catch(function(){ showError('⚠️', 'Connection error', 'Could not reach the server.'); });
-} else {
-  // No code — send back to login
-  window.location.replace('index.html');
+  }catch(e){document.getElementById('lb-content').innerHTML='<div class="empty"><div class="ei">⚠️</div>'+e.message+'</div>';}
 }
-
-// ══ LEADERBOARD TAB ════════════════════════════════════════
-var LB_CONFIG = null; // will use same CONFIG from main portal
-var LB_CHALLENGES = [];
-var LB_SPECIAL_DAYS = [];
-var LB_REGISTRATION = [];
-var LB_ACTIVITIES = [];
-var LB_DATA = {};
-var LB_BOARD = 'dayshift-male';
-var LB_LOADED = false;
-
-async function lbFetchAll(url) {
-  var all=[], from=0, ps=1000;
-  while(true){
-    var to=from+ps-1;
-    var r=await fetch(url+(url.includes('?')?'&':'?')+'limit='+ps+'&offset='+from,{
-      headers:Object.assign({},{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE',Authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE'},{'Range-Unit':'items','Range':from+'-'+to})
-    });
-    if(!r.ok) break;
-    var p=await r.json(); if(!Array.isArray(p)||!p.length) break;
-    all=all.concat(p); if(p.length<ps) break; from+=ps;
-  }
-  return all;
+function lbRefresh(){LB_LOADED=false;LB_DATA={};lbLoad();}
+function lbSwitch(b){LB_BOARD=b;document.querySelectorAll('.lb-tab').forEach(function(t){t.classList.toggle('on',t.getAttribute('data-b')===b);});if(LB_DATA[b])lbRender(b);else lbBuild(b);}
+function lbBuild(b){
+  var reg=LB_REG.filter(function(p){var g=(p.gender||'').toLowerCase(),s=(p.shift||'').toLowerCase();if(b==='dayshift-female')return g==='female'&&s.includes('day');if(b==='dayshift-male')return(g==='male'||g==='m')&&s.includes('day');if(b==='nightshift-all')return s.includes('night');if(b==='team-male')return g==='male'||g==='m';if(b==='team-female')return g==='female';return true;});
+  var rows=[];reg.forEach(function(p){var pts=calcPts(LB_ACTS,p.strava_athlete_id);if(pts.km>0)rows.push({p:p,pts:pts});});
+  rows.sort(function(a,b){return b.pts.tp-a.pts.tp;});LB_DATA[b]=rows;lbRender(b);
 }
-
-function lbCalcBonus(km) {
-  var c=CONFIG; var sorted=c.bonus.slice().sort(function(a,b){return b.km-a.km;});
-  for(var i=0;i<sorted.length;i++){if(km>=Number(sorted[i].km)) return Number(sorted[i].points)||0;} return 0;
-}
-function lbGetMedal(pts,gender){
-  var g=(gender||'').toLowerCase(),m=CONFIG.medals;
-  var gold=g==='female'?m.gold.female:m.gold.male;
-  var silver=g==='female'?m.silver.female:m.silver.male;
-  var bronze=g==='female'?m.bronze.female:m.bronze.male;
-  if(pts>=gold)   return {label:'🥇 Gold',  cls:'lmp-gold',  level:'gold'};
-  if(pts>=silver) return {label:'🥈 Silver',cls:'lmp-silver',level:'silver'};
-  if(pts>=bronze) return {label:'🥉 Bronze',cls:'lmp-bronze',level:'bronze'};
-  return {label:'No medal',cls:'lmp-none',level:'none'};
-}
-function lbCalcPoints(acts,athleteId){
-  var byDay={};
-  acts.filter(function(a){return a.strava_athlete_id==athleteId;}).forEach(function(a){
-    var d=(a.activity_date||'').split('T')[0]; if(!d) return;
-    if(!byDay[d]) byDay[d]=[];
-    byDay[d].push(a);
-  });
-  var totalKm=0,distPts=0,bonusPts=0,challengePts=0;
-  Object.keys(byDay).forEach(function(day){
-    var raw=0; byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
-    raw=parseFloat(raw.toFixed(4));
-    var isSpecial=LB_SPECIAL_DAYS.indexOf(day)!==-1;
-    var dk=(!isSpecial&&raw>21)?21:raw; dk=parseFloat(dk.toFixed(4));
-    totalKm+=dk; distPts+=parseFloat((dk*(parseFloat(CONFIG.basePer_km)||1)).toFixed(2));
-    bonusPts+=lbCalcBonus(dk);
-  });
-  acts.filter(function(a){return a.strava_athlete_id==athleteId&&!a.is_flagged;}).forEach(function(a){challengePts+=parseFloat(a.manual_bonus)||0;});
-  return {totalKm:parseFloat(totalKm.toFixed(2)),distPts:parseFloat(distPts.toFixed(2)),bonusPts:bonusPts,challengePts:challengePts,totalPts:parseFloat((distPts+bonusPts+challengePts).toFixed(2)),byDay:byDay};
-}
-function lbFilterReg(board){
-  return LB_REGISTRATION.filter(function(p){
-    var g=(p.gender||'').toLowerCase(),s=(p.shift||'').toLowerCase();
-    if(board==='dayshift-female') return g==='female'&&s.includes('day');
-    if(board==='dayshift-male')   return (g==='male'||g==='m')&&s.includes('day');
-    if(board==='nightshift-all')  return s.includes('night');
-    if(board==='team-male')       return g==='male'||g==='m';
-    if(board==='team-female')     return g==='female';
-    return true;
-  });
-}
-function switchLbBoard(board){
-  LB_BOARD=board;
-  document.querySelectorAll('.lb-tab').forEach(function(t){
-    var active=t.getAttribute('data-board')===board;
-    t.style.background=active?'var(--brand)':'none';
-    t.style.color=active?'white':'rgba(255,255,255,0.5)';
-  });
-  if(LB_DATA[board]) lbRenderBoard(board);
-  else lbBuildBoard(board);
-}
-function lbBuildBoard(board){
-  var reg=lbFilterReg(board), rows=[];
-  reg.forEach(function(p){
-    var pts=lbCalcPoints(LB_ACTIVITIES,p.strava_athlete_id,p.gender);
-    if(pts.totalKm>0) rows.push({p:p,pts:pts});
-  });
-  rows.sort(function(a,b){return b.pts.totalPts-a.pts.totalPts;});
-  LB_DATA[board]=rows;
-  lbRenderBoard(board);
-}
-function lbRenderBoard(board){
-  var rows=LB_DATA[board]||[];
-  // Stats tiles removed per design — no DOM update needed
-  if(!rows.length){document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)">No activities yet</div>';return;}
-  var isTeam=board==='team-male'||board==='team-female';
+function lbRender(b){
+  var rows=LB_DATA[b]||[];
+  if(!rows.length){document.getElementById('lb-content').innerHTML='<div class="empty"><div class="ei">🏃</div>No activities yet</div>';return;}
+  var isTeam=b==='team-male'||b==='team-female';
   var html='';
   if(isTeam){
-    var teams={};
-    rows.forEach(function(r){var t=r.p.leaderboard_team||'No Team';if(!teams[t])teams[t]=[];teams[t].push(r);});
-    var tnames=Object.keys(teams).sort(function(a,b){return teams[b].reduce(function(s,r){return s+r.pts.totalPts;},0)-teams[a].reduce(function(s,r){return s+r.pts.totalPts;},0);});
-    tnames.forEach(function(tn){
-      html+='<div style="background:var(--dark);color:white;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:0.3px">🏙️ '+tn+'</div>';
-      teams[tn].forEach(function(r,i){html+=lbBuildCard(r,i,false);});
-    });
-  } else {
-    rows.forEach(function(r,i){html+=lbBuildCard(r,i,true);});
-  }
+    var teams={};rows.forEach(function(r){var t=r.p.leaderboard_team||'No Team';if(!teams[t])teams[t]=[];teams[t].push(r);});
+    var tNames=Object.keys(teams).sort(function(a,b2){return teams[b2].reduce(function(s,r){return s+r.pts.tp;},0)-teams[a].reduce(function(s,r){return s+r.pts.tp;},0);});
+    tNames.forEach(function(tn){html+='<div class="team-hdr">🏙️ '+tn+'</div>';teams[tn].forEach(function(r,i){html+=lbRow(r,i,false);});});
+  }else{rows.forEach(function(r,i){html+=lbRow(r,i,true);});}
   document.getElementById('lb-content').innerHTML=html;
 }
-function lbBuildCard(row,i,showRank){
-  var p=row.p,pts=row.pts;
-  var medal=lbGetMedal(pts.totalPts,p.gender);
-  var topCls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+function lbRow(row,i,showR){
+  var p=row.p,pts=row.pts,aid=p.strava_athlete_id;
+  var med=medal(pts.tp,p.gender);
+  var tCls=i===0?'t1':i===1?'t2':i===2?'t3':'';
   var rCls=i===0?'r1':i===1?'r2':i===2?'r3':'';
-  var rLabel=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
-  var aid=p.strava_athlete_id;
-  // Day rows
+  var rLbl=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
   var byDay=pts.byDay||{};
   var days=Object.keys(byDay).filter(function(d){return d.startsWith('2026-06');}).sort();
   var dayHtml=days.map(function(day){
-    var raw=0; byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
+    var raw=0;byDay[day].forEach(function(a){raw+=(parseFloat(a.distance_meters)||0)/1000;});
     raw=parseFloat(raw.toFixed(4));
-    var isSpecial=LB_SPECIAL_DAYS.indexOf(day)!==-1;
-    var capped=!isSpecial&&raw>21; var dk=capped?21:raw; dk=parseFloat(dk.toFixed(2));
-    var dp=parseFloat((dk*(parseFloat(CONFIG.basePer_km)||1)).toFixed(2));
-    var bp=lbCalcBonus(dk); var tp=parseFloat((dp+bp).toFixed(2));
+    var isS=LB_DAYS.indexOf(day)!==-1,cap=!isS&&raw>21,dk=cap?21:raw;dk=parseFloat(dk.toFixed(2));
+    var dp2=parseFloat((dk*CFG.base).toFixed(2)),bp2=bonus(dk),tp2=parseFloat((dp2+bp2).toFixed(2));
     var ds=day.replace('2026-','').replace('-','/');
-    return '<div class="lb-day-row">'
-      +'<div class="lb-day-date">'+ds+'</div>'
-      +'<div class="lb-day-km"><strong>'+dk.toFixed(2)+' km</strong>'+(capped?'<span class="lb-cap">cap</span>':'')+'</div>'
-      +'<div class="lb-day-pts"><div class="lb-day-total">+'+tp.toFixed(1)+'</div><div class="lb-day-detail">'+dp.toFixed(1)+'+'+bp+'</div></div>'
-      +'</div>';
+    return '<div class="day-row"><div class="day-dt">'+ds+'</div><div class="day-km"><strong>'+dk.toFixed(2)+'</strong>'+(cap?'<span class="cap">cap</span>':'')+'</div><div class="day-pts"><div class="day-total">+'+tp2.toFixed(1)+'</div><div class="day-detail">'+dp2.toFixed(1)+'+'+bp2+'</div></div></div>';
   }).join('');
-  return '<div class="lb-row-card '+topCls+'">'
-    +'<div class="lb-main-row" onclick="lbToggleDay(''+aid+'')">'
-    +'<div class="lb-rank-num '+rCls+'">'+rLabel+'</div>'
-    +'<div class="lb-athlete">'
-    +'<div class="lb-athlete-name">'+p.full_name+'</div>'
-    +'<div class="lb-athlete-meta">'
-    +'<span class="lb-medal-pill '+medal.cls+'">'+medal.label+'</span>'
-    +'<span class="lb-team-txt">'+( p.leaderboard_team||'—')+'</span>'
-    +'</div>'
-    +'</div>'
-    +'<div class="lb-pts-right"><div class="lb-pts-val">'+pts.totalPts.toFixed(1)+'</div><div class="lb-pts-lbl">pts</div></div>'
-    +'</div>'
-    +'<div class="lb-mini-row">'
-    +'<span class="lb-mini-stat">📏 <strong>'+pts.totalKm.toFixed(2)+' km</strong></span>'
-    +'<span class="lb-mini-stat">⚡ +<strong>'+pts.bonusPts+'</strong></span>'
-    +(pts.challengePts>0?'<span class="lb-mini-stat">🎯 +<strong>'+pts.challengePts+'</strong></span>':'')
-    +'</div>'
-    +(days.length?'<div class="lb-expand-btn" id="lbtog-'+aid+'" onclick="lbToggleDay(''+aid+'')"><span class="arr">▼</span> '+days.length+' days</div>':'')
-    +'<div class="lb-days" id="lbdays-'+aid+'"><div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📅 Daily breakdown</div>'+dayHtml+'</div>'
+  return '<div class="lb-card '+tCls+'">'
+    +'<div class="lb-main" onclick="lbToggle(\''+aid+'\')">'
+    +'<div class="lb-rank '+rCls+'">'+(showR?rLbl:(i+1))+'</div>'
+    +'<div class="lb-info"><div class="lb-name">'+p.full_name+'</div>'
+    +'<div class="lb-meta"><span class="lb-med '+med.lm+'">'+med.l+'</span><span class="lb-team">'+( p.leaderboard_team||'—')+'</span></div></div>'
+    +'<div class="lb-pts-r"><div class="lb-pts-v">'+pts.tp.toFixed(1)+'</div><div class="lb-pts-l">pts</div></div></div>'
+    +'<div class="lb-mini"><span>📏 <strong>'+pts.km.toFixed(2)+' km</strong></span><span>⚡ +<strong>'+pts.bp+'</strong></span>'+(pts.cp>0?'<span>🎯 +<strong>'+pts.cp+'</strong></span>':'')+'</div>'
+    +(days.length?'<div class="lb-toggle" id="lbt-'+aid+'" onclick="lbToggle(\''+aid+'\')"><span class="arr">▼</span> '+days.length+' days</div>':'')
+    +'<div class="lb-days" id="lbd-'+aid+'"><div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">📅 Daily breakdown</div>'+dayHtml+'</div>'
     +'</div>';
 }
-function lbToggleDay(aid){
-  var el=document.getElementById('lbdays-'+aid);
-  var tog=document.getElementById('lbtog-'+aid);
-  if(!el) return;
+function lbToggle(aid){
+  var el=document.getElementById('lbd-'+aid),tog=document.getElementById('lbt-'+aid);
+  if(!el)return;
   var open=el.classList.contains('open');
   el.classList.toggle('open',!open);
-  if(tog) tog.classList.toggle('open',!open);
+  if(tog)tog.classList.toggle('open',!open);
 }
-async function doLbRefresh(){
-  LB_DATA={}; LB_LOADED=false;
-  await loadLeaderboardTab();
-}
-async function loadLeaderboardTab(){
-  if(LB_LOADED) { lbRenderBoard(LB_BOARD); return; }
-  document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:13px"><div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>Loading...</div>';
-  try {
-    var SB='https://jhdgkncpkrttvemvwukc.supabase.co';
-    // Load special days
-    try{var sr=await fetch(SB+'/rest/v1/special_scoring_days?select=special_date',{headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE',Authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE'}}); var srows=await sr.json(); LB_SPECIAL_DAYS=Array.isArray(srows)?srows.map(function(x){return x.special_date;}):[]; }catch(e){LB_SPECIAL_DAYS=[];}
-    var [reg,acts]=await Promise.all([
-      lbFetchAll(SB+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team&order=full_name.asc'),
-      lbFetchAll(SB+'/rest/v1/activities?is_deleted=eq.false&is_flagged=eq.false&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-06-30T23:59:59&select=strava_athlete_id,distance_meters,sport_type,activity_date,manual_bonus&order=id.asc')
-    ]);
-    LB_REGISTRATION=reg; LB_ACTIVITIES=acts; LB_LOADED=true;
-    lbBuildBoard(LB_BOARD);
-  } catch(err){
-    document.getElementById('lb-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--error);font-size:13px">❌ '+err.message+'</div>';
-  }
-}
-// Hook into switchTab to load leaderboard on demand
-var _origSwitchTab = switchTab;
-switchTab = function(t) {
-  _origSwitchTab(t);
-  if(t==='leaderboard') loadLeaderboardTab();
-};
 
+function signOut(){sessionStorage.removeItem('wk_user');window.location.replace('index.html');}
+
+// ── Boot: get code from URL ──
+var params=new URLSearchParams(window.location.search);
+var code=params.get('code'), state=params.get('state');
+if(code && state==='portal'){
+  window.history.replaceState({},'',window.location.pathname);
+  setLoad('Loading your data...');
+  fetch(BACKEND+'/my-data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(!d.success){
+      if(d.error==='not_registered') showErr('🔒','Not registered','Contact your event organizer.');
+      else showErr('⚠️','Something went wrong',d.error||'Please try again.');
+      return;
+    }
+    render(d);
+  })
+  .catch(function(){showErr('⚠️','Connection error','Could not reach the server.');});
+} else {
+  window.location.replace('index.html');
+}
 </script>
 </body>
 </html>
-
