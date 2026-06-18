@@ -6,7 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#E8622A">
+  <meta name="theme-color" content="#111827">
   <title>Arcgate Walkathon 2026</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,394 +14,251 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --brand: #E8622A;
-      --brand-dark: #c4511f;
-      --brand-light: rgba(232,98,42,0.12);
-      --dark: #111827;
-      --dark2: #1f2937;
-      --text: #111827;
-      --text2: #6b7280;
-      --border: #e5e7eb;
-      --bg: #f9fafb;
-      --white: #ffffff;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --error: #dc2626;
-      --error-bg: #fef2f2;
-      --info: #1d4ed8;
-      --info-bg: #eff6ff;
-      --radius: 16px;
-      --radius-sm: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
-      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+      --brand:#E8622A; --brand-dark:#c4511f; --brand-light:rgba(232,98,42,0.12);
+      --dark:#111827; --dark2:#1f2937;
+      --text:#111827; --text2:#6b7280;
+      --border:#e5e7eb; --bg:#f9fafb; --white:#ffffff;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --error:#dc2626; --error-bg:#fef2f2;
+      --radius:16px; --radius-sm:12px;
+      --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { height: 100%; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      -webkit-font-smoothing: antialiased;
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;}
+    body{
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--dark);
+      color:white;
+      min-height:100dvh;
+      display:flex;
+      flex-direction:column;
+      -webkit-font-smoothing:antialiased;
     }
 
-    /* ── App Header ── */
-    .app-header {
-      background: var(--white);
-      padding: 12px 20px;
-      padding-top: max(12px, env(safe-area-inset-top));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* ── Header ── */
+    .app-header{
+      padding:16px 20px;
+      padding-top:max(16px,env(safe-area-inset-top));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
     }
-    .app-header img { height: 36px; object-fit: contain; }
-    .header-action { font-size: 13px; color: var(--text2); text-decoration: none; padding: 6px 10px; border-radius: 8px; }
-    .header-action:hover { background: var(--bg); }
-    .header-action.dark { background: var(--dark); color: white; font-weight: 600; font-size: 12px; padding: 7px 12px; }
+    .app-header img{height:34px;object-fit:contain;}
+    .admin-link{font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;}
 
     /* ── Hero ── */
-    .hero {
-      background: var(--dark);
-      color: white;
-      padding: 36px 20px 32px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    .hero{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:32px 24px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
     }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 220px; height: 220px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,98,42,0.25) 0%, transparent 70%);
-      pointer-events: none;
+    .hero::before{
+      content:'';
+      position:absolute;
+      top:-80px;right:-80px;
+      width:300px;height:300px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(232,98,42,0.2) 0%,transparent 65%);
+      pointer-events:none;
     }
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -40px; left: -40px;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,98,42,0.15) 0%, transparent 70%);
-      pointer-events: none;
+    .hero::after{
+      content:'';
+      position:absolute;
+      bottom:-60px;left:-60px;
+      width:240px;height:240px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(232,98,42,0.12) 0%,transparent 65%);
+      pointer-events:none;
     }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--brand-light);
-      border: 1px solid rgba(232,98,42,0.3);
-      color: var(--brand);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:var(--brand-light);
+      border:1px solid rgba(232,98,42,0.3);
+      color:var(--brand);
+      font-size:11px;
+      font-weight:600;
+      padding:5px 14px;
+      border-radius:20px;
+      letter-spacing:0.8px;
+      text-transform:uppercase;
+      margin-bottom:24px;
     }
-    .hero h1 {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 10px;
-      letter-spacing: -0.5px;
+    .hero h1{
+      font-size:34px;
+      font-weight:800;
+      line-height:1.15;
+      letter-spacing:-1px;
+      margin-bottom:12px;
     }
-    .hero h1 em { color: var(--brand); font-style: normal; }
-    .hero p { font-size: 14px; opacity: 0.6; line-height: 1.65; max-width: 320px; margin: 0 auto; }
-
-    /* ── Stats bar ── */
-    .stats-bar {
-      background: var(--brand);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-    }
-    .stats-bar .s {
-      padding: 12px 8px;
-      text-align: center;
-      color: white;
-      border-right: 1px solid rgba(255,255,255,0.2);
-    }
-    .stats-bar .s:last-child { border-right: none; }
-    .stats-bar .s .v { font-size: 15px; font-weight: 700; }
-    .stats-bar .s .l { font-size: 10px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 1px; }
-
-    /* ── Main content ── */
-    .main { flex: 1; padding: 24px 16px 32px; max-width: 480px; margin: 0 auto; width: 100%; }
-
-    /* ── Login card ── */
-    .login-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-    }
-    .login-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .login-card .sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
-
-    /* ── Mode tabs ── */
-    .mode-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      background: var(--bg);
-      border-radius: var(--radius-sm);
-      padding: 4px;
-      margin-bottom: 20px;
-    }
-    .mode-tab {
-      padding: 9px 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text2);
-      cursor: pointer;
-      transition: all 0.2s;
-      border: none;
-      background: none;
-    }
-    .mode-tab.active {
-      background: var(--white);
-      color: var(--text);
-      font-weight: 600;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    .hero h1 em{color:var(--brand);font-style:normal;}
+    .hero-sub{
+      font-size:15px;
+      color:rgba(255,255,255,0.45);
+      line-height:1.65;
+      margin-bottom:40px;
+      max-width:300px;
     }
 
-    /* ── Strava button ── */
-    .btn-strava {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
-      background: var(--brand);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      box-shadow: 0 4px 12px rgba(232,98,42,0.35);
-      margin-bottom: 4px;
+    /* ── Stats ── */
+    .stats-row{
+      display:flex;
+      gap:0;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--radius-sm);
+      overflow:hidden;
+      margin-bottom:40px;
+      width:100%;
+      max-width:360px;
     }
-    .btn-strava:active { background: var(--brand-dark); transform: scale(0.98); }
-    .btn-strava svg { width: 20px; height: 20px; fill: white; flex-shrink: 0; }
+    .stat-s{
+      flex:1;
+      padding:12px 8px;
+      text-align:center;
+      border-right:1px solid rgba(255,255,255,0.08);
+    }
+    .stat-s:last-child{border-right:none;}
+    .stat-s .sv{font-size:16px;font-weight:800;color:var(--brand);}
+    .stat-s .sl{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;}
 
-    .connect-note {
-      font-size: 11px;
-      color: var(--text2);
-      text-align: center;
-      line-height: 1.6;
-      padding-top: 12px;
+    /* ── Login box ── */
+    .login-box{
+      width:100%;
+      max-width:360px;
     }
-    .connect-note a { color: var(--brand); text-decoration: none; }
-
-    /* ── Form ── */
-    .form-field { margin-bottom: 14px; }
-    .form-field label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
+    .btn-strava{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      width:100%;
+      padding:18px;
+      background:var(--brand);
+      color:white;
+      border:none;
+      border-radius:var(--radius-sm);
+      font-size:16px;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:inherit;
+      box-shadow:0 4px 24px rgba(232,98,42,0.4);
+      transition:all 0.2s;
+      position:relative;
     }
-    .form-field input,
-    .form-field select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-family: inherit;
-      background: var(--white);
-      color: var(--text);
-      -webkit-appearance: none;
-      appearance: none;
-      transition: border-color 0.15s;
-    }
-    .form-field input:focus,
-    .form-field select:focus {
-      outline: none;
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3px var(--brand-light);
-    }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn-submit {
-      width: 100%;
-      padding: 16px;
-      background: var(--dark);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-      font-family: inherit;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .btn-submit:active { transform: scale(0.98); }
-
-    /* ── Messages ── */
-    .msg { display: none; margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.55; }
-    .msg-success { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
-    .msg-error   { background: var(--error-bg);   color: var(--error);   border: 1px solid #fecaca; }
-    .msg-info    { background: var(--info-bg);    color: var(--info);    border: 1px solid #bfdbfe; }
+    .btn-strava:active{transform:scale(0.97);background:var(--brand-dark);}
+    .btn-strava svg{width:22px;height:22px;fill:white;flex-shrink:0;}
 
     /* ── Processing ── */
-    .processing { display: none; align-items: center; gap: 10px; justify-content: center; padding: 16px; font-size: 13px; color: var(--text2); }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .processing{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:18px;
+      font-size:14px;
+      color:rgba(255,255,255,0.5);
+    }
+    .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,0.15);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+
+    /* ── Messages ── */
+    .msg{display:none;margin-top:14px;padding:14px 16px;border-radius:var(--radius-sm);font-size:13px;line-height:1.55;}
+    .msg-success{background:var(--success-bg);color:var(--success);border:1px solid #bbf7d0;}
+    .msg-error{background:var(--error-bg);color:var(--error);border:1px solid #fecaca;}
+
+    /* ── Note ── */
+    .login-note{
+      margin-top:16px;
+      font-size:11px;
+      color:rgba(255,255,255,0.25);
+      text-align:center;
+      line-height:1.8;
+    }
+    .login-note a{color:var(--brand);text-decoration:none;opacity:0.8;}
+
+    /* ── Leaderboard link ── */
+    .lb-link{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-top:16px;
+      padding:14px 18px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--radius-sm);
+      text-decoration:none;
+      color:rgba(255,255,255,0.7);
+      font-size:14px;
+      font-weight:500;
+      transition:background 0.15s;
+    }
+    .lb-link:active{background:rgba(255,255,255,0.09);}
+    .lb-link .icon{font-size:20px;}
+    .lb-link .arr{margin-left:auto;opacity:0.3;font-size:16px;}
 
     /* ── Footer ── */
-    .app-footer {
-      text-align: center;
-      padding: 16px 20px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
-      font-size: 11px;
-      color: var(--text2);
-      border-top: 1px solid var(--border);
-      background: var(--white);
+    .app-footer{
+      text-align:center;
+      padding:16px 20px;
+      padding-bottom:max(16px,env(safe-area-inset-bottom));
+      font-size:11px;
+      color:rgba(255,255,255,0.2);
     }
-    .app-footer a { color: var(--brand); text-decoration: none; margin: 0 6px; }
-
-    .hidden { display: none !important; }
-
-    /* ── Leaderboard teaser ── */
-    .leaderboard-teaser {
-      margin-top: 20px;
-      background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-      border-radius: var(--radius);
-      padding: 20px;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-    }
-    .teaser-icon { font-size: 36px; flex-shrink: 0; }
-    .teaser-text .t { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-    .teaser-text .s { font-size: 12px; opacity: 0.6; }
-    .teaser-arrow { margin-left: auto; font-size: 18px; opacity: 0.5; }
+    .app-footer a{color:var(--brand);text-decoration:none;margin:0 6px;opacity:0.7;}
   </style>
 </head>
 <body>
 
 <div class="app-header">
   <img src="aw_logo.jpg" alt="Arcgate Walkathon">
-  <a href="admin-login.html" class="header-action dark">Admin</a>
+  <a href="admin-login.html" class="admin-link">Admin</a>
 </div>
 
 <div class="hero">
   <div class="hero-badge">🏃 Arcgate · June 2026</div>
-  <h1>Walk. Run. Compete.<br><em>Win together.</em></h1>
-  <p>Connect your Strava and join 500+ colleagues on the live leaderboard.</p>
-</div>
+  <h1>Walk. Run.<br><em>Win together.</em></h1>
+  <p class="hero-sub">Join 500+ colleagues on the live leaderboard. Connect Strava once — that's it.</p>
 
-<div class="stats-bar">
-  <div class="s"><div class="v">500+</div><div class="l">Athletes</div></div>
-  <div class="s"><div class="v">June</div><div class="l">Event</div></div>
-  <div class="s"><div class="v">6</div><div class="l">Teams</div></div>
-  <div class="s"><div class="v">Live</div><div class="l">Board</div></div>
-</div>
-
-<div class="main">
-  <div class="login-card">
-    <h2>Login / Register</h2>
-    <p class="sub">Already approved? Connect Strava. New here? Submit a request.</p>
-
-    <div class="mode-tabs">
-      <button class="mode-tab active" onclick="switchMode('existing')">Existing Participant</button>
-      <button class="mode-tab" onclick="switchMode('new')">New Request</button>
-    </div>
-
-    <!-- Existing participant -->
-    <div id="existing-box">
-      <a id="strava-btn" href="#" class="btn-strava">
-        <svg viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
-        Connect with Strava
-      </a>
-      <p class="connect-note">Only approved participants can connect. Not approved yet? Switch to New Request.<br><br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
-    </div>
-
-    <!-- New participant form -->
-    <div id="new-box" class="hidden">
-      <div class="form-field">
-        <label>Full Name *</label>
-        <input id="full_name" type="text" placeholder="Your full name" required>
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label>EMP Code</label>
-          <input id="emp_code" type="text" placeholder="e.g. ARC001">
-        </div>
-        <div class="form-field">
-          <label>Gender</label>
-          <select id="gender">
-            <option value="">Select</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-field">
-        <label>Email *</label>
-        <input id="email" type="email" placeholder="work@arcgate.com" required>
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label>WhatsApp</label>
-          <input id="whatsapp" type="tel" placeholder="+91 ...">
-        </div>
-        <div class="form-field">
-          <label>Shift</label>
-          <input id="shift" type="text" placeholder="Day / Night">
-        </div>
-      </div>
-      <div class="form-field">
-        <label>Team Lead</label>
-        <input id="team_lead" type="text" placeholder="Manager name">
-      </div>
-      <div class="form-field">
-        <label>T-Shirt Size</label>
-        <select id="tshirt_size">
-          <option value="">Select size</option>
-          <option>XS</option><option>S</option><option>M</option>
-          <option>L</option><option>XL</option><option>XXL</option><option>XXXL</option>
-        </select>
-      </div>
-      <button class="btn-submit" onclick="submitRequest()">Submit Request</button>
-    </div>
-
-    <div class="processing" id="processing"><div class="spinner"></div><span id="processing-text">Processing...</span></div>
-    <div class="msg msg-success" id="msg-success"></div>
-    <div class="msg msg-info"    id="msg-info"></div>
-    <div class="msg msg-error"   id="msg-error"></div>
+  <div class="stats-row">
+    <div class="stat-s"><div class="sv">500+</div><div class="sl">Athletes</div></div>
+    <div class="stat-s"><div class="sv">June</div><div class="sl">Period</div></div>
+    <div class="stat-s"><div class="sv">6</div><div class="sl">Teams</div></div>
+    <div class="stat-s"><div class="sv">Live</div><div class="sl">Board</div></div>
   </div>
 
-  <a href="ag-leaderboard.html" class="leaderboard-teaser">
-    <div class="teaser-icon">🏆</div>
-    <div class="teaser-text">
-      <div class="t">View Leaderboard</div>
-      <div class="s">See who's leading the pack</div>
+  <div class="login-box">
+    <a id="strava-btn" href="#" class="btn-strava">
+      <svg viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+      Sign in with Strava
+    </a>
+
+    <div class="processing" id="processing">
+      <div class="spinner"></div>
+      <span id="processing-text">Connecting your account...</span>
     </div>
-    <div class="teaser-arrow">›</div>
-  </a>
+    <div class="msg msg-success" id="msg-success"></div>
+    <div class="msg msg-error"   id="msg-error"></div>
+
+    <p class="login-note">
+      Approved participants only · Read-only access · Never posts to Strava<br>
+      <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a>
+    </p>
+
+    <a href="leaderboard.html" class="lb-link">
+      <span class="icon">🏆</span>
+      <span>View public leaderboard</span>
+      <span class="arr">›</span>
+    </a>
+  </div>
 </div>
 
 <div class="app-footer">
@@ -412,13 +269,11 @@
 
 <script>
 var STRAVA_CLIENT_ID = '29159';
-var BACKEND_URL  = 'https://walkathon-backend-hv9j.onrender.com';
-var SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-var EVENT_CODE   = 'walkathon2026';
-var params       = new URLSearchParams(window.location.search);
-var authCode     = params.get('code');
-var redirectURI  = window.location.origin + window.location.pathname;
+var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
+var EVENT_CODE  = 'walkathon2026';
+var params      = new URLSearchParams(window.location.search);
+var authCode    = params.get('code');
+var redirectURI = window.location.origin + window.location.pathname;
 var authUrl = 'https://www.strava.com/oauth/authorize'
   + '?client_id=' + STRAVA_CLIENT_ID
   + '&redirect_uri=' + encodeURIComponent(redirectURI)
@@ -426,52 +281,19 @@ var authUrl = 'https://www.strava.com/oauth/authorize'
 document.getElementById('strava-btn').href = authUrl;
 
 function showMsg(type, html) {
-  ['msg-success','msg-info','msg-error'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  ['msg-success','msg-error'].forEach(function(id){ document.getElementById(id).style.display='none'; });
   var el = document.getElementById(type); el.innerHTML = html; el.style.display = 'block';
 }
 function setProcessing(show, text) {
   document.getElementById('processing-text').textContent = text||'Processing...';
   document.getElementById('processing').style.display = show ? 'flex' : 'none';
+  document.getElementById('strava-btn').style.display  = show ? 'none' : 'flex';
 }
-function switchMode(mode) {
-  document.querySelectorAll('.mode-tab').forEach(function(t,i){ t.classList.toggle('active', (i===0&&mode==='existing')||(i===1&&mode==='new')); });
-  document.getElementById('existing-box').classList.toggle('hidden', mode !== 'existing');
-  document.getElementById('new-box').classList.toggle('hidden', mode !== 'new');
-  ['msg-success','msg-info','msg-error'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-}
-async function submitRequest() {
-  var fn = document.getElementById('full_name').value.trim();
-  var em = document.getElementById('email').value.trim();
-  if (!fn || !em) { showMsg('msg-error','❌ Full Name and Email are required.'); return; }
-  setProcessing(true, 'Submitting request...');
-  var payload = {
-    full_name: fn, emp_code: document.getElementById('emp_code').value.trim(),
-    gender: document.getElementById('gender').value, event_name: EVENT_CODE,
-    email: em, whatsapp: document.getElementById('whatsapp').value.trim(),
-    shift: document.getElementById('shift').value.trim(),
-    team_lead: document.getElementById('team_lead').value.trim(),
-    tshirt_size: document.getElementById('tshirt_size').value, status: 'pending'
-  };
-  try {
-    var r = await fetch(SUPABASE_URL + '/rest/v1/registration_requests', {
-      method: 'POST',
-      headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer '+SUPABASE_ANON, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-      body: JSON.stringify(payload)
-    });
-    if (!r.ok) { var e=await r.text(); console.error('Supabase error',r.status,e); throw new Error(e); }
-    document.getElementById('full_name').value='';document.getElementById('email').value='';
-    showMsg('msg-success','✅ <strong>Request submitted!</strong><br>Admin will review and approve. Once approved, come back and choose Existing Participant to connect Strava.');
-  } catch(err) {
-    console.error('submitRequest error:', err.message);
-    showMsg('msg-error','❌ <strong>Unable to submit.</strong><br>Please try again or contact the event admin.');
-  }
-  setProcessing(false);
-}
+
 if (authCode) {
-  document.getElementById('strava-btn').style.display = 'none';
-  setProcessing(true, 'Connecting your Strava account...');
+  setProcessing(true, 'Connecting your account...');
   fetch(BACKEND_URL + '/register', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ code: authCode, event_code: EVENT_CODE })
   })
   .then(function(r){ return r.json().then(function(d){ d.http_status=r.status; return d; }); })
@@ -480,17 +302,21 @@ if (authCode) {
     if (d.success) {
       var role = d.role||'user';
       var session = { loggedIn:true, role:role, athleteId:d.athlete_id, name:d.name, expires:Date.now()+(8*60*60*1000) };
-      sessionStorage.removeItem('wk_admin'); sessionStorage.setItem('wk_user', JSON.stringify(session));
+      sessionStorage.removeItem('wk_admin');
+      sessionStorage.setItem('wk_user', JSON.stringify(session));
       if (role==='admin') sessionStorage.setItem('wk_admin', JSON.stringify(session));
-      showMsg('msg-success','✅ <strong>Logged in!</strong><br>Redirecting...');
-      setTimeout(function(){ window.location.href = role==='admin'?'admin.html':'portal.html'; }, 900);
+      showMsg('msg-success','✅ <strong>Logged in!</strong> Redirecting...');
+      setTimeout(function(){ window.location.href = role==='admin' ? 'admin.html' : 'portal.html'; }, 800);
     } else if (d.error==='not_registered') {
-      showMsg('msg-error','⛔ <strong>Not registered.</strong><br>Submit a New Request first, then wait for admin approval.');
+      showMsg('msg-error','⛔ <strong>Not registered.</strong><br>Your Strava account is not registered for this event. Contact your event admin.');
     } else {
       showMsg('msg-error','❌ <strong>Login failed.</strong><br>Please try again.');
     }
   })
-  .catch(function(){ setProcessing(false); showMsg('msg-error','❌ Connection error. Please try again.'); });
+  .catch(function(){
+    setProcessing(false);
+    showMsg('msg-error','❌ Connection error. Please try again.');
+  });
 }
 </script>
 </body>
