@@ -52,6 +52,9 @@
     .toggle-on  { background: #e8f5e9; color: #2e7d32; }
     .toggle-off { background: #f5f5f5; color: #999; }
 
+    .ch-compact { border: 1px solid #e8e8e8; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+    .ch-compact:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .ch-summary:hover { background: #fafafa; }
     .site-footer { background: #1A1A1A; color: #666; text-align: center; padding: 16px 28px; font-size: 12px; margin-top: auto; }
     .site-footer a { color: #E8622A; text-decoration: none; margin: 0 8px; }
   </style>
@@ -121,15 +124,28 @@
     <div class="section-sub">Add manual challenge bonus for activities where criteria cannot be auto-tracked. Enter one Activity ID per line.</div>
     <div class="form-grid" style="max-width:600px">
       <div class="field" style="grid-column:1/-1">
-        <label>Activity IDs (one per line)</label>
+        <label>Activity IDs (one per line, or comma separated)</label>
         <textarea id="manual-ids" rows="6" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909&#10;18773676802"></textarea>
       </div>
       <div class="field">
-        <label>Bonus points per activity</label>
+        <label>Apply bonus to</label>
+        <select id="manual-apply-to">
+          <option value="each">Each activity individually</option>
+          <option value="day">All activities on same day (combined)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bonus points</label>
         <input type="number" id="manual-pts" value="3" min="1" max="50">
       </div>
       <div class="field">
-        <label>Reason / Challenge name</label>
+        <label>Challenge (select or type)</label>
+        <select id="manual-challenge-select" onchange="syncManualChallenge()">
+          <option value="">— Select existing challenge —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Or enter custom reason</label>
         <input type="text" id="manual-reason" placeholder="e.g. World Environment Day">
       </div>
     </div>
@@ -225,15 +241,27 @@ function renderChallenges(chs) {
 
 function challengeHtml(c) {
   var types = (c.sport_types||[]).join(', ');
-  return '<div class="challenge-card" id="ch-'+c.id+'">'
-    +'<div class="ch-header">'
-    +'<div class="ch-name"><span class="status-dot '+(c.is_active?'dot-active':'dot-inactive')+'"></span>'+c.name+'</div>'
-    +'<div class="ch-actions">'
-    +'<button class="toggle-active '+(c.is_active?'toggle-on':'toggle-off')+'" onclick="toggleChallenge('+c.id+','+c.is_active+')">'+(c.is_active?'✅ Active':'⏸ Inactive')+'</button>'
-    +'<button class="btn-save-ch" onclick="saveChallenge('+c.id+')">Save</button>'
-    +'<button class="btn-del" onclick="deleteChallenge('+c.id+')">Delete</button>'
+  var statusDot = c.is_active
+    ? '<span style="display:inline-block;width:8px;height:8px;background:#2e7d32;border-radius:50%;margin-right:6px"></span>'
+    : '<span style="display:inline-block;width:8px;height:8px;background:#bbb;border-radius:50%;margin-right:6px"></span>';
+
+  return '<div class="ch-compact" id="ch-'+c.id+'">'
+    // ── Compact summary row ──
+    +'<div class="ch-summary" onclick="toggleCh('+c.id+')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none">'
+    +'<div style="flex:1;display:flex;align-items:center;gap:8px">'
+    +statusDot
+    +'<strong style="font-size:14px">'+c.name+'</strong>'
+    +'<span style="font-size:12px;color:#888;background:#f5f5f5;padding:2px 8px;border-radius:10px">'+c.start_date+(c.end_date!==c.start_date?' → '+c.end_date:'')+'</span>'
+    +'<span style="font-size:12px;color:#888">📏 '+c.distance_min+'–'+c.distance_max+' km</span>'
+    +'<span style="font-size:12px;font-weight:700;color:#1565c0">+'+c.bonus_points+' pts</span>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px;align-items:center">'
+    +'<button class="toggle-active '+(c.is_active?'toggle-on':'toggle-off')+'" onclick="event.stopPropagation();toggleChallenge('+c.id+','+c.is_active+')">'+(c.is_active?'✅ Active':'⏸ Inactive')+'</button>'
+    +'<span style="font-size:12px;color:#bbb">▼</span>'
     +'</div></div>'
-    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px">'
+    // ── Expanded edit form (hidden by default) ──
+    +'<div class="ch-detail" id="chd-'+c.id+'" style="display:none;padding:16px 18px;border-top:1px solid #f0f0f0;background:#fafafa">'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px">'
     +field('Challenge name','ch-name-'+c.id,'text',c.name)
     +field('Start date','ch-start-'+c.id,'date',c.start_date)
     +field('End date','ch-end-'+c.id,'date',c.end_date)
@@ -245,8 +273,21 @@ function challengeHtml(c) {
     +field('Max distance (km)','ch-dmax-'+c.id,'number',c.distance_max)
     +field('Start time (HH:MM)','ch-time-'+c.id,'text',c.start_time_criteria||'')
     +field('Elevation (m)','ch-elev-'+c.id,'number',c.elevation_criteria||0)
-    +'</div></div>';
+    +'</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-save-ch" onclick="saveChallenge('+c.id+')">💾 Save</button>'
+    +'<button class="btn-del" onclick="deleteChallenge('+c.id+')">🗑️ Delete</button>'
+    +'</div></div>'
+    +'</div>';
 }
+
+function toggleCh(id) {
+  var det = document.getElementById('chd-'+id);
+  if (!det) return;
+  det.style.display = det.style.display === 'none' ? 'block' : 'none';
+}
+
+
 
 function field(label, id, type, val) {
   var input = '';
@@ -332,6 +373,27 @@ async function saveManualBonus() {
   loadManualBonuses();
 }
 
+function syncManualChallenge() {
+  var sel = document.getElementById('manual-challenge-select');
+  var inp = document.getElementById('manual-reason');
+  if (sel.value) inp.value = sel.value;
+}
+
+async function populateChallengeDropdown() {
+  try {
+    var r = await fetch(SB_URL+'/rest/v1/challenges?is_active=eq.true&select=name', {headers:HDR});
+    var chs = await r.json();
+    var sel = document.getElementById('manual-challenge-select');
+    if (sel) {
+      chs.forEach(function(c){
+        var opt = document.createElement('option');
+        opt.value = c.name; opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+    }
+  } catch(e) {}
+}
+
 async function loadManualBonuses() {
   try {
     var r = await fetch(SB_URL+'/rest/v1/activities?manual_bonus=gt.0&select=strava_activity_id,activity_name,strava_athlete_id,manual_bonus&order=manual_bonus.desc&limit=50', {headers:HDR});
@@ -371,6 +433,7 @@ async function clearManualBonus(activityId) {
 loadConfig();
 loadChallenges();
 loadManualBonuses();
+populateChallengeDropdown();
 </script>
 </body>
 </html>
