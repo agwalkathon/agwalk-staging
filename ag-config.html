@@ -252,7 +252,7 @@
               <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace1-min" placeholder="e.g. 4" step="0.5" min="0"></div>
               <span style="color:#888;margin-top:18px">–</span>
               <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace1-max" placeholder="e.g. 20" step="0.5" min="0"></div>
-              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace1-reason" placeholder="Pace Issue" value="Pace Issue (Bike/Cycle)"></div>
+              
             </div>
           </div>
           <div style="background:#f9f9f9;border-radius:10px;padding:14px">
@@ -261,7 +261,7 @@
               <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace2-min" placeholder="e.g. 2" step="0.5" min="0"></div>
               <span style="color:#888;margin-top:18px">–</span>
               <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace2-max" placeholder="e.g. 6" step="0.5" min="0"></div>
-              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace2-reason" placeholder="Suspicious Activity" value="Suspicious Activity"></div>
+              
             </div>
           </div>
           <div style="background:#f9f9f9;border-radius:10px;padding:14px">
@@ -270,7 +270,7 @@
               <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace3-min" placeholder="" step="0.5" min="0"></div>
               <span style="color:#888;margin-top:18px">–</span>
               <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace3-max" placeholder="" step="0.5" min="0"></div>
-              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace3-reason" placeholder="Custom reason"></div>
+              
             </div>
           </div>
           <div style="background:#f9f9f9;border-radius:10px;padding:14px">
@@ -279,7 +279,7 @@
               <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace4-min" placeholder="" step="0.5" min="0"></div>
               <span style="color:#888;margin-top:18px">–</span>
               <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace4-max" placeholder="" step="0.5" min="0"></div>
-              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace4-reason" placeholder="Custom reason"></div>
+              
             </div>
           </div>
         </div>
@@ -359,11 +359,17 @@ var flagPreviewData = [];
 function getPaceRules() {
   var rules = [];
   [1,2,3,4].forEach(function(n) {
-    var minPace = parseFloat(document.getElementById('fr-pace'+n+'-min').value);
-    var maxPace = parseFloat(document.getElementById('fr-pace'+n+'-max').value);
-    var reason  = document.getElementById('fr-pace'+n+'-reason').value.trim();
-    if (!isNaN(minPace) && minPace > 0 && !isNaN(maxPace) && maxPace > 0) {
-      rules.push({ minPace: minPace, maxPace: maxPace, reason: reason || 'Pace Issue' });
+    var minVal = document.getElementById('fr-pace'+n+'-min').value.trim();
+    var maxVal = document.getElementById('fr-pace'+n+'-max').value.trim();
+    var minPace = minVal !== '' ? parseFloat(minVal) : null;
+    var maxPace = maxVal !== '' ? parseFloat(maxVal) : null;
+    // Need at least one of min or max
+    if (minPace !== null || maxPace !== null) {
+      rules.push({
+        minPace: minPace, // min pace (fastest) — flag if faster than this
+        maxPace: maxPace, // max pace (slowest) — flag if slower than this
+        reason: 'Manual Review - Pace Issue'
+      });
     }
   });
   return rules;
@@ -430,24 +436,29 @@ async function fetchFlagCandidates() {
     var km = (parseFloat(a.distance_meters) || 0) / 1000;
     var flagReasons = [];
 
-    // Distance filter — flag if OUTSIDE min-max range
+    // Distance filter — flag activities where distance is WITHIN the suspect range
+    // e.g. Min=21, Max=100 → flag anything between 21 and 100 km for review
     if (hasDistFilter) {
-      var belowMin = distMin !== null && km < distMin;
-      var aboveMax = distMax !== null && km > distMax;
-      if (belowMin) flagReasons.push('Manual Review - Distance Issue ('+km.toFixed(2)+' km < '+distMin+' km)');
-      if (aboveMax) flagReasons.push('Manual Review - Distance Issue ('+km.toFixed(2)+' km > '+distMax+' km)');
+      var aboveMin = distMin === null || km >= distMin;
+      var belowMax = distMax === null || km <= distMax;
+      if (aboveMin && belowMax) {
+        flagReasons.push('Manual Review - Distance Issue');
+      }
     }
 
     // Pace rules — flag if pace is OUTSIDE the valid range
+    // e.g. min=4, max=20 → flag if pace < 4 (too fast) or > 20 (too slow)
     if (hasPaceFilter && a.avg_speed && a.avg_speed > 0) {
       var paceMinkm = paceFromSpeed(a.avg_speed); // min/km
-      paceRules.forEach(function(rule) {
-        var tooFast = paceMinkm < rule.minPace; // lower pace = faster
-        var tooSlow = paceMinkm > rule.maxPace; // higher pace = slower
+      for (var ri = 0; ri < paceRules.length; ri++) {
+        var rule = paceRules[ri];
+        var tooFast = rule.minPace !== null && paceMinkm < rule.minPace;
+        var tooSlow = rule.maxPace !== null && paceMinkm > rule.maxPace;
         if (tooFast || tooSlow) {
-          flagReasons.push('Manual Review - Pace Issue ('+fmtPace(a.avg_speed)+' — '+rule.reason+')');
+          flagReasons.push('Manual Review - Pace Issue');
+          break; // one pace flag per activity is enough
         }
-      });
+      }
     }
 
     // Only include if at least one rule triggered
