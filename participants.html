@@ -16,7 +16,7 @@
     .page-bar { background: #1A1A1A; color: white; padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; }
     .page-bar h1 { font-size: 20px; font-weight: 600; }
     .page-bar .back { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px; }
-    .content { flex: 1; padding: 24px 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+    .content { flex: 1; padding: 24px 28px; max-width: 1500px; width: 100%; margin: 0 auto; }
     .stats-grid { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
     .stat-card { background: white; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 130px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid #E8622A; }
     .stat-card .val { font-size: 24px; font-weight: 700; color: #E8622A; }
@@ -24,20 +24,19 @@
     .stat-card.green .val { color: #2e7d32; } .stat-card.green { border-left-color: #2e7d32; }
     .stat-card.dark  .val { color: #1A1A1A; } .stat-card.dark  { border-left-color: #1A1A1A; }
     .toolbar { background: white; border-radius: 14px; padding: 14px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .toolbar input, .toolbar select { padding: 8px 11px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13px; }
-    .toolbar input:focus, .toolbar select:focus { outline: none; border-color: #E8622A; }
+    .toolbar input, .toolbar select, .role-select { padding: 8px 11px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13px; background: white; }
+    .toolbar input:focus, .toolbar select:focus, .role-select:focus { outline: none; border-color: #E8622A; }
     .card { background: white; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1050px; }
     th { background: #fafafa; padding: 10px 14px; text-align: left; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; white-space: nowrap; }
     td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fdfcfb; }
     .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-    .badge-conn   { background: #e3f2fd; color: #1565c0; }
-    .badge-pend   { background: #fff3e0; color: #e65100; }
+    .badge-conn { background: #e3f2fd; color: #1565c0; }
+    .badge-pend { background: #fff3e0; color: #e65100; }
     .badge-active { background: #e8f5e9; color: #2e7d32; }
-    .badge-del    { background: #f5f5f5; color: #999; }
+    .badge-del { background: #f5f5f5; color: #999; }
     .ath { color: #E8622A; text-decoration: none; font-weight: 500; }
     .ath:hover { text-decoration: underline; }
     .loading-row td { text-align: center; padding: 48px; color: #bbb; }
@@ -54,15 +53,13 @@
     <a href="ag-leaderboard.html">AG Leaderboards</a>
     <a href="ag-config.html">Config</a>
     <a href="participants.html" class="active">Participants</a>
+    <a href="participant-requests.html">Requests</a>
     <a href="data-upload.html">Data Upload</a>
     <a href="email-send.html">Email Send</a>
     <a href="#" onclick="logout();return false;">Sign out</a>
   </nav>
 </div>
-<div class="page-bar">
-  <h1>👥 Participants</h1>
-  <a href="admin.html" class="back">← Dashboard</a>
-</div>
+<div class="page-bar"><h1>👥 Participants</h1><a href="admin.html" class="back">← Dashboard</a></div>
 <div class="content">
   <div class="stats-grid">
     <div class="stat-card"><div class="val" id="s-total">—</div><div class="lbl">Total registered</div></div>
@@ -72,126 +69,27 @@
   </div>
   <div class="toolbar">
     <input type="text" id="search" placeholder="Search name, email or team..." oninput="filterTable()" style="width:240px">
-    <select id="team-filter" onchange="filterTable()">
-      <option value="">All teams</option>
-      <option>Team Seattle</option><option>Team San Francisco</option>
-      <option>Team Los Angeles</option><option>Team Chicago</option>
-      <option>Team Austin</option><option>Team New York</option>
-    </select>
-    <select id="shift-filter" onchange="filterTable()">
-      <option value="">All shifts</option>
-      <option value="Dayshift">Dayshift</option>
-      <option value="Nightshift">Nightshift</option>
-    </select>
-    <select id="status-filter" onchange="filterTable()">
-      <option value="">All statuses</option>
-      <option value="active">Has activities</option>
-      <option value="inactive">No activities</option>
-      <option value="connected">Strava connected</option>
-      <option value="notconnected">Not connected</option>
-    </select>
+    <select id="team-filter" onchange="filterTable()"><option value="">All teams</option><option>Team Seattle</option><option>Team San Francisco</option><option>Team Los Angeles</option><option>Team Chicago</option><option>Team Austin</option><option>Team New York</option></select>
+    <select id="shift-filter" onchange="filterTable()"><option value="">All shifts</option><option value="Dayshift">Dayshift</option><option value="Nightshift">Nightshift</option></select>
+    <select id="status-filter" onchange="filterTable()"><option value="">All statuses</option><option value="active">Has activities</option><option value="inactive">No activities</option><option value="connected">Strava connected</option><option value="notconnected">Not connected</option></select>
     <span style="margin-left:auto;font-size:13px;color:#888" id="count"></span>
   </div>
-  <div class="card">
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>#</th><th>Name</th><th>Team</th><th>Shift</th><th>Gender</th>
-          <th>T-shirt</th><th>Project lead</th><th>Strava</th><th>Activities</th><th>Total km</th><th>Status</th>
-        </tr></thead>
-        <tbody id="participants-body"><tr class="loading-row"><td colspan="11">Loading...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Team</th><th>Shift</th><th>Gender</th><th>T-shirt</th><th>Project lead</th><th>Strava</th><th>Activities</th><th>Total km</th><th>Status</th></tr></thead><tbody id="participants-body"><tr class="loading-row"><td colspan="12">Loading...</td></tr></tbody></table></div></div>
 </div>
-<div class="site-footer">
-  © 2026 Arcgate Walkathon &nbsp;·&nbsp;
-  <a href="privacy.html">Privacy Policy</a>
-  <a href="terms.html">Terms of Service</a>
-</div>
+<div class="site-footer">© 2026 Arcgate Walkathon &nbsp;·&nbsp;<a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
 <script>
-const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer '+SUPABASE_ANON };
-
-// ── fetchAllRows: fetch ALL rows from Supabase with automatic pagination ──
-async function fetchAllRows(baseUrl, hdrs) {
-  var all = [];
-  var pageSize = 1000;
-  var from = 0;
-  while (true) {
-    var to = from + pageSize - 1;
-    var r = await fetch(baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'limit=' + pageSize + '&offset=' + from, {
-      headers: Object.assign({}, hdrs, { 'Range-Unit': 'items', 'Range': from + '-' + to })
-    });
-    if (!r.ok) { console.error('fetchAllRows error', r.status, baseUrl); break; }
-    var page = await r.json();
-    if (!Array.isArray(page) || page.length === 0) break;
-    all = all.concat(page);
-    if (page.length < pageSize) break;
-    from += pageSize;
-  }
-  return all;
-}
-
-function authGuard() { const s=JSON.parse(sessionStorage.getItem('wk_admin')||'{}'); if(!s.loggedIn||s.expires<Date.now()) window.location.href='admin-login.html'; }
-function logout() { sessionStorage.removeItem('wk_admin'); window.location.href='admin-login.html'; }
-authGuard();
-let allRows=[];
-function filterTable(){
-  const q=document.getElementById('search').value.toLowerCase();
-  const tm=document.getElementById('team-filter').value;
-  const sh=document.getElementById('shift-filter').value;
-  const st=document.getElementById('status-filter').value;
-  const filtered=allRows.filter(r=>{
-    const mq=!q||r.full_name?.toLowerCase().includes(q)||r.email?.toLowerCase().includes(q)||r.leaderboard_team?.toLowerCase().includes(q);
-    const mt=!tm||r.leaderboard_team===tm;
-    const ms=!sh||r.shift===sh;
-    const mst=!st?true:st==='active'?r.cnt>0:st==='inactive'?r.cnt===0:st==='connected'?r.connected:!r.connected;
-    return mq&&mt&&ms&&mst;
-  });
-  document.getElementById('count').textContent=filtered.length+' of '+allRows.length+' participants';
-  renderRows(filtered);
-}
-function renderRows(rows){
-  document.getElementById('participants-body').innerHTML=rows.length
-    ?rows.map((p,i)=>'<tr>'
-      +'<td>'+(i+1)+'</td>'
-      +'<td><a href="'+(p.strava_profile_url||'https://www.strava.com/athletes/'+p.strava_athlete_id)+'" target="_blank" class="ath">'+(p.full_name||'—')+'</a></td>'
-      +'<td><span style="background:#f0f4f8;padding:2px 8px;border-radius:6px;font-size:12px;color:#555">'+(p.leaderboard_team||'—')+'</span></td>'
-      +'<td>'+(p.shift||'—')+'</td>'
-      +'<td>'+(p.gender||'—')+'</td>'
-      +'<td>'+(p.tshirt_size||'—')+'</td>'
-      +'<td style="font-size:12px;color:#888">'+(p.project_lead||'—')+'</td>'
-      +'<td><span class="badge '+(p.connected?'badge-conn':'badge-pend')+'">'+(p.connected?'✅ Connected':'⚠️ Not yet')+'</span></td>'
-      +'<td>'+(p.cnt||0)+'</td>'
-      +'<td>'+(p.dist?(p.dist/1000).toFixed(1)+' km':'—')+'</td>'
-      +'<td><span class="badge '+(p.cnt>0?'badge-active':'badge-del')+'">'+(p.cnt>0?'🏃 Active':'Pending')+'</span></td>'
-      +'</tr>').join('')
-    :'<tr class="loading-row"><td colspan="11">No participants match your filters</td></tr>';
-}
-async function loadParticipants(){
-  const [rR,pR,aR]=await Promise.all([
-    fetch(SUPABASE_URL+'/rest/v1/registration?order=full_name.asc',{headers:HDR}),
-    fetch(SUPABASE_URL+'/rest/v1/participants?select=strava_athlete_id',{headers:HDR}),
-    fetchAllRows(SUPABASE_URL+'/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false&order=id.asc',HDR)
-  ]);
-  const regs=await rR.json();
-  const conn=new Set((await pR.json()).map(p=>p.strava_athlete_id));
-  const am={};
-  aR.forEach(a=>{ if(!am[a.strava_athlete_id]) am[a.strava_athlete_id]={cnt:0,dist:0}; am[a.strava_athlete_id].cnt++; am[a.strava_athlete_id].dist+=a.distance_meters||0; });
-  allRows=regs.map(r=>({...r,connected:conn.has(r.strava_athlete_id),cnt:am[r.strava_athlete_id]?.cnt||0,dist:am[r.strava_athlete_id]?.dist||0}));
-  const cc=allRows.filter(r=>r.connected).length;
-  const ac=allRows.filter(r=>r.cnt>0).length;
-  const km=allRows.reduce((s,r)=>s+r.dist,0)/1000;
-  document.getElementById('s-total').textContent=allRows.length;
-  document.getElementById('s-connected').textContent=cc;
-  document.getElementById('s-active').textContent=ac;
-  document.getElementById('s-km').textContent=km.toFixed(1)+' km';
-  document.getElementById('count').textContent=allRows.length+' participants';
-  renderRows(allRows);
-}
+const SUPABASE_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+const HDR={apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON,'Content-Type':'application/json'};
+async function fetchAllRows(baseUrl,hdrs){var all=[],pageSize=1000,from=0;while(true){var to=from+pageSize-1;var r=await fetch(baseUrl+(baseUrl.includes('?')?'&':'?')+'limit='+pageSize+'&offset='+from,{headers:Object.assign({},hdrs,{'Range-Unit':'items','Range':from+'-'+to})});if(!r.ok)break;var page=await r.json();if(!Array.isArray(page)||page.length===0)break;all=all.concat(page);if(page.length<pageSize)break;from+=pageSize}return all}
+function authGuard(){const s=JSON.parse(sessionStorage.getItem('wk_admin')||'{}');if(!s.loggedIn||s.expires<Date.now()||s.role!=='admin')window.location.href='admin-login.html'}
+function logout(){sessionStorage.removeItem('wk_admin');sessionStorage.removeItem('wk_user');window.location.href='admin-login.html'}
+authGuard();let allRows=[];
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function filterTable(){const q=document.getElementById('search').value.toLowerCase(),tm=document.getElementById('team-filter').value,sh=document.getElementById('shift-filter').value,st=document.getElementById('status-filter').value;const filtered=allRows.filter(r=>{const mq=!q||(r.full_name||'').toLowerCase().includes(q)||(r.email||'').toLowerCase().includes(q)||(r.leaderboard_team||'').toLowerCase().includes(q);const mt=!tm||r.leaderboard_team===tm;const ms=!sh||r.shift===sh;const mst=!st?true:st==='active'?r.cnt>0:st==='inactive'?r.cnt===0:st==='connected'?r.connected:!r.connected;return mq&&mt&&ms&&mst});document.getElementById('count').textContent=filtered.length+' of '+allRows.length+' participants';renderRows(filtered)}
+function roleDropdown(p){const id=p.strava_athlete_id;const role=p.role||'user';return '<select class="role-select" onchange="saveRole('+id+', this.value)"><option value="user" '+(role==='user'?'selected':'')+'>User</option><option value="admin" '+(role==='admin'?'selected':'')+'>Admin</option></select>'}
+function renderRows(rows){document.getElementById('participants-body').innerHTML=rows.length?rows.map((p,i)=>'<tr>'+'<td>'+(i+1)+'</td>'+'<td><a href="'+(p.strava_profile_url||'https://www.strava.com/athletes/'+p.strava_athlete_id)+'" target="_blank" class="ath">'+esc(p.full_name||'—')+'</a><div style="font-size:11px;color:#999">'+esc(p.email||'')+'</div></td>'+'<td>'+roleDropdown(p)+'</td>'+'<td><span style="background:#f0f4f8;padding:2px 8px;border-radius:6px;font-size:12px;color:#555">'+esc(p.leaderboard_team||'—')+'</span></td>'+'<td>'+esc(p.shift||'—')+'</td>'+'<td>'+esc(p.gender||'—')+'</td>'+'<td>'+esc(p.tshirt_size||'—')+'</td>'+'<td style="font-size:12px;color:#888">'+esc(p.project_lead||'—')+'</td>'+'<td><span class="badge '+(p.connected?'badge-conn':'badge-pend')+'">'+(p.connected?'✅ Connected':'⚠️ Not yet')+'</span></td>'+'<td>'+(p.cnt||0)+'</td>'+'<td>'+(p.dist?(p.dist/1000).toFixed(1)+' km':'—')+'</td>'+'<td><span class="badge '+(p.cnt>0?'badge-active':'badge-del')+'">'+(p.cnt>0?'🏃 Active':'Pending')+'</span></td>'+'</tr>').join(''):'<tr class="loading-row"><td colspan="12">No participants match your filters</td></tr>'}
+async function saveRole(athleteId,newRole){if(!confirm('Change role to '+newRole+'?')){loadParticipants();return}try{const r=await fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId,{method:'PATCH',headers:HDR,body:JSON.stringify({role:newRole})});if(!r.ok)throw new Error('Save failed '+r.status);const row=allRows.find(x=>String(x.strava_athlete_id)===String(athleteId));if(row)row.role=newRole;alert('Role updated')}catch(e){alert('Error: '+e.message);loadParticipants()}}
+async function loadParticipants(){const [rR,pR,aR]=await Promise.all([fetch(SUPABASE_URL+'/rest/v1/registration?order=full_name.asc',{headers:HDR}),fetch(SUPABASE_URL+'/rest/v1/participants?select=strava_athlete_id',{headers:HDR}),fetchAllRows(SUPABASE_URL+'/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false&order=id.asc',HDR)]);const regs=await rR.json();const conn=new Set((await pR.json()).map(p=>p.strava_athlete_id));const am={};aR.forEach(a=>{if(!am[a.strava_athlete_id])am[a.strava_athlete_id]={cnt:0,dist:0};am[a.strava_athlete_id].cnt++;am[a.strava_athlete_id].dist+=a.distance_meters||0});allRows=(Array.isArray(regs)?regs:[]).map(r=>({...r,role:r.role||'user',connected:conn.has(r.strava_athlete_id),cnt:am[r.strava_athlete_id]?.cnt||0,dist:am[r.strava_athlete_id]?.dist||0}));document.getElementById('s-total').textContent=allRows.length;document.getElementById('s-connected').textContent=allRows.filter(r=>r.connected).length;document.getElementById('s-active').textContent=allRows.filter(r=>r.cnt>0).length;document.getElementById('s-km').textContent=(allRows.reduce((s,r)=>s+r.dist,0)/1000).toFixed(1)+' km';filterTable()}
 loadParticipants();
-</script>
-</body>
-</html>
+</script></body></html>
