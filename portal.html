@@ -232,17 +232,10 @@
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="screen active" id="login-screen">
-  <div class="login-wrap">
-    <img src="aw_logo_dark.png" class="login-logo" alt="Arcgate Walkathon">
-    <div class="login-title">My <em>Walkathon</em></div>
-    <p class="login-sub">View your rank, points, medal progress and all your activities.</p>
-    <a id="strava-login-btn" href="#" class="btn-strava-login">
-      <svg viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
-      Sign in with Strava
-    </a>
-    <p class="login-note">Only your data · Read-only · Never posted to Strava<br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
+<!-- LOGIN (redirect only — login is on index.html) -->
+<div class="screen" id="login-screen">
+  <div style="text-align:center;padding:40px;">
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:16px">Redirecting to login...</p>
   </div>
 </div>
 
@@ -580,30 +573,11 @@ function renderDashboard(data) {
   showScreen('dashboard-screen');
 }
 
-// OAuth - redirect URI for fresh login via this page
-var redirectURI=window.location.origin+window.location.pathname;
-var authUrl='https://www.strava.com/oauth/authorize?client_id='+STRAVA_CLIENT_ID+'&redirect_uri='+encodeURIComponent(redirectURI)+'&response_type=code&scope=read,activity:read&state=portal';
-document.getElementById('strava-login-btn').href=authUrl;
-
-var params=new URLSearchParams(window.location.search);
-var authCode=params.get('code'), state=params.get('state');
-
-if(authCode&&state==='portal') {
-  // Fresh OAuth login directly on this page
-  setLoading('Verifying your Strava account...');
-  window.history.replaceState({},'',window.location.pathname);
-  fetch(BACKEND_URL+'/my-data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:authCode})})
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if(!data.success) {
-      if(data.error==='not_registered') showError('🔒','Not registered','Your Strava account is not registered. Contact your event organizer.');
-      else showError('⚠️','Something went wrong',data.error||'Please try again.');
-      return;
-    }
-    document.getElementById('loading-text').textContent='Calculating your points...';
-    renderDashboard(data);
-  })
-  .catch(function(){ showError('⚠️','Connection error','Could not reach the server. Please try again.'); });
+// Check session set by index.html login
+var storedSession = JSON.parse(sessionStorage.getItem('wk_user') || '{}');
+if (!storedSession.loggedIn || storedSession.expires < Date.now()) {
+  // Not logged in — send to index
+  window.location.replace('index.html');
 }
 
 // ══ LEADERBOARD TAB ════════════════════════════════════════
