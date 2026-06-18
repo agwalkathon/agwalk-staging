@@ -184,6 +184,134 @@
     </div>
   </div>
 
+
+  <!-- Flagged Activities Config -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection('flagrules')">
+      <div class="section-header-left">
+        <span>🚩</span>
+        <div>
+          <div class="section-title">Flagged Activities Rules</div>
+          <div class="section-sub-inline">Set dynamic rules and bulk-flag matching activities for manual review</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-flagrules">▼</span>
+    </div>
+    <div class="section-body" id="body-flagrules">
+
+      <!-- Rules Form -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">
+
+        <div class="field">
+          <label>Date From</label>
+          <input type="date" id="fr-date-from">
+        </div>
+        <div class="field">
+          <label>Date To</label>
+          <input type="date" id="fr-date-to">
+        </div>
+        <div class="field">
+          <label>Activity Type</label>
+          <select id="fr-sport">
+            <option value="">All types</option>
+            <option value="Walk">Walk</option>
+            <option value="Run">Run</option>
+            <option value="Hike">Hike</option>
+            <option value="Ride">Ride</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Min Distance (km)</label>
+          <input type="number" id="fr-dist-min" placeholder="e.g. 0.5" step="0.1" min="0">
+        </div>
+        <div class="field">
+          <label>Max Distance (km)</label>
+          <input type="number" id="fr-dist-max" placeholder="e.g. 50" step="0.1" min="0">
+        </div>
+      </div>
+
+      <!-- Pace Rules -->
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:600;color:#1A1A1A;margin-bottom:12px">
+          Pace Rules <span style="font-size:12px;font-weight:400;color:#888">(flag if pace is outside any of these ranges — leave blank to skip)</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+          <div style="background:#f9f9f9;border-radius:10px;padding:14px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px">Pace Range 1</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace1-min" placeholder="e.g. 4" step="0.5" min="0"></div>
+              <span style="color:#888;margin-top:18px">–</span>
+              <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace1-max" placeholder="e.g. 20" step="0.5" min="0"></div>
+              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace1-reason" placeholder="Pace Issue" value="Pace Issue (Bike/Cycle)"></div>
+            </div>
+          </div>
+          <div style="background:#f9f9f9;border-radius:10px;padding:14px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px">Pace Range 2</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace2-min" placeholder="e.g. 2" step="0.5" min="0"></div>
+              <span style="color:#888;margin-top:18px">–</span>
+              <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace2-max" placeholder="e.g. 6" step="0.5" min="0"></div>
+              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace2-reason" placeholder="Suspicious Activity" value="Suspicious Activity"></div>
+            </div>
+          </div>
+          <div style="background:#f9f9f9;border-radius:10px;padding:14px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px">Pace Range 3</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace3-min" placeholder="" step="0.5" min="0"></div>
+              <span style="color:#888;margin-top:18px">–</span>
+              <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace3-max" placeholder="" step="0.5" min="0"></div>
+              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace3-reason" placeholder="Custom reason"></div>
+            </div>
+          </div>
+          <div style="background:#f9f9f9;border-radius:10px;padding:14px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px">Pace Range 4</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="field" style="flex:1"><label>Min (min/km)</label><input type="number" id="fr-pace4-min" placeholder="" step="0.5" min="0"></div>
+              <span style="color:#888;margin-top:18px">–</span>
+              <div class="field" style="flex:1"><label>Max (min/km)</label><input type="number" id="fr-pace4-max" placeholder="" step="0.5" min="0"></div>
+              <div class="field" style="flex:1"><label>Flag reason</label><input type="text" id="fr-pace4-reason" placeholder="Custom reason"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview + Action -->
+      <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:13px;color:#e65100;margin-bottom:8px">
+          ⚠️ <strong>This will only flag activities matching ALL active filters above.</strong>
+          Flagged activities stay on the leaderboard until you review and clear them individually.
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="save-btn" style="background:#1A1A1A" onclick="previewFlagRules()">👁️ Preview matches</button>
+          <button class="save-btn" style="background:#c62828" id="btn-apply-flags" onclick="applyFlagRules()" disabled>🚩 Flag them</button>
+          <span id="flag-preview-count" style="font-size:13px;color:#888"></span>
+        </div>
+      </div>
+
+      <!-- Preview results table -->
+      <div id="flag-preview-list" style="display:none">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px">Matching activities</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="background:#fafafa">
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">ATHLETE</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">ACTIVITY</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">TYPE</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">DATE</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">DISTANCE</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">PACE</th>
+                <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;border-bottom:2px solid #f0f0f0">FLAG REASON</th>
+              </tr>
+            </thead>
+            <tbody id="flag-preview-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <div class="site-footer">
@@ -211,6 +339,191 @@ function toggleSection(id) {
   var isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
   if (chev) chev.classList.toggle('open', !isOpen);
+}
+
+
+// ── Flag Rules ────────────────────────────────────────────────
+var flagPreviewData = [];
+
+function getPaceRules() {
+  var rules = [];
+  [1,2,3,4].forEach(function(n) {
+    var minPace = parseFloat(document.getElementById('fr-pace'+n+'-min').value);
+    var maxPace = parseFloat(document.getElementById('fr-pace'+n+'-max').value);
+    var reason  = document.getElementById('fr-pace'+n+'-reason').value.trim();
+    if (!isNaN(minPace) && minPace > 0 && !isNaN(maxPace) && maxPace > 0) {
+      rules.push({ minPace: minPace, maxPace: maxPace, reason: reason || 'Pace Issue' });
+    }
+  });
+  return rules;
+}
+
+function paceFromSpeed(avgSpeed) {
+  // avgSpeed in m/s → pace in min/km
+  if (!avgSpeed || avgSpeed <= 0) return null;
+  return (1000 / avgSpeed) / 60; // min/km
+}
+
+function fmtPace(avgSpeed) {
+  var p = paceFromSpeed(avgSpeed);
+  if (!p) return '—';
+  var min = Math.floor(p);
+  var sec = Math.round((p - min) * 60);
+  return min + ':' + String(sec).padStart(2,'0') + ' /km';
+}
+
+async function fetchFlagCandidates() {
+  var dateFrom = document.getElementById('fr-date-from').value;
+  var dateTo   = document.getElementById('fr-date-to').value;
+  var sport    = document.getElementById('fr-sport').value;
+  var distMin  = parseFloat(document.getElementById('fr-dist-min').value);
+  var distMax  = parseFloat(document.getElementById('fr-dist-max').value);
+
+  var url = SB_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc';
+  if (dateFrom) url += '&activity_date=gte.'+dateFrom+'T00:00:00';
+  if (dateTo)   url += '&activity_date=lte.'+dateTo+'T23:59:59';
+  if (sport)    url += '&sport_type=eq.'+sport;
+
+  // Fetch all pages
+  var all = [];
+  var from = 0;
+  while (true) {
+    var r = await fetch(url, {
+      headers: Object.assign({}, HDR, {'Range-Unit':'items','Range':from+'-'+(from+999)})
+    });
+    var page = await r.json();
+    if (!Array.isArray(page) || page.length === 0) break;
+    all = all.concat(page);
+    if (page.length < 1000) break;
+    from += 1000;
+  }
+
+  // Load registration for names
+  var regR = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name', {headers:HDR});
+  var regs = await regR.json();
+  var regMap = {};
+  regs.forEach(function(r){ regMap[r.strava_athlete_id] = r.full_name; });
+
+  // Apply distance filter client-side
+  var paceRules = getPaceRules();
+  var matches = [];
+
+  all.forEach(function(a) {
+    var km = (parseFloat(a.distance_meters)||0) / 1000;
+    var flagReasons = [];
+
+    // Distance filter
+    if (!isNaN(distMin) && distMin > 0 && km < distMin) flagReasons.push('Less than '+distMin+' km');
+    if (!isNaN(distMax) && distMax > 0 && km > distMax) flagReasons.push('More than '+distMax+' km');
+
+    // Pace rules — flag if OUTSIDE the valid range
+    if (paceRules.length > 0 && a.avg_speed) {
+      var paceMinkm = paceFromSpeed(a.avg_speed);
+      paceRules.forEach(function(rule) {
+        // Flag if pace is outside the min-max range (too fast or too slow)
+        if (paceMinkm < rule.minPace || paceMinkm > rule.maxPace) {
+          flagReasons.push(rule.reason + ' ('+fmtPace(a.avg_speed)+')');
+        }
+      });
+    }
+
+    // If no distance or pace filter set, match all fetched activities
+    var hasFilter = (!isNaN(distMin) && distMin > 0) || (!isNaN(distMax) && distMax > 0) || paceRules.length > 0;
+    if (!hasFilter || flagReasons.length > 0) {
+      if (flagReasons.length > 0 || !hasFilter) {
+        matches.push({
+          act: a,
+          name: regMap[a.strava_athlete_id] || 'Unknown',
+          reasons: flagReasons.length > 0 ? flagReasons : ['Matches filter']
+        });
+      }
+    }
+  });
+
+  return matches;
+}
+
+async function previewFlagRules() {
+  var countEl = document.getElementById('flag-preview-count');
+  var bodyEl  = document.getElementById('flag-preview-body');
+  var listEl  = document.getElementById('flag-preview-list');
+  var btn     = document.getElementById('btn-apply-flags');
+
+  countEl.textContent = '⏳ Scanning activities...';
+  bodyEl.innerHTML = '';
+  listEl.style.display = 'none';
+  btn.disabled = true;
+
+  try {
+    flagPreviewData = await fetchFlagCandidates();
+    countEl.textContent = flagPreviewData.length + ' activit'+(flagPreviewData.length===1?'y':'ies')+' match the rules';
+    btn.disabled = flagPreviewData.length === 0;
+
+    if (flagPreviewData.length === 0) {
+      listEl.style.display = 'none';
+      return;
+    }
+
+    bodyEl.innerHTML = flagPreviewData.slice(0,200).map(function(m) {
+      var a = m.act;
+      var km = ((parseFloat(a.distance_meters)||0)/1000).toFixed(2);
+      var dt = (a.activity_date||'').split('T')[0];
+      var alreadyFlagged = a.is_flagged ? ' style="opacity:0.5"' : '';
+      return '<tr'+alreadyFlagged+'>'
+        +'<td style="padding:8px 12px">'+(a.is_flagged?'<span style="color:#bbb">✓ already</span> ':'')+'<strong>'+m.name+'</strong></td>'
+        +'<td style="padding:8px 12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(a.activity_name||'—')+'</td>'
+        +'<td style="padding:8px 12px"><span style="background:#f5f5f5;padding:2px 8px;border-radius:10px;font-size:12px">'+(a.sport_type||'—')+'</span></td>'
+        +'<td style="padding:8px 12px;white-space:nowrap">'+dt+'</td>'
+        +'<td style="padding:8px 12px">'+km+' km</td>'
+        +'<td style="padding:8px 12px;white-space:nowrap">'+fmtPace(a.avg_speed)+'</td>'
+        +'<td style="padding:8px 12px;color:#c62828;font-size:12px">'+m.reasons.join(', ')+'</td>'
+        +'</tr>';
+    }).join('');
+
+    if (flagPreviewData.length > 200) {
+      bodyEl.innerHTML += '<tr><td colspan="7" style="padding:12px;text-align:center;color:#888;font-size:13px">...and '+(flagPreviewData.length-200)+' more</td></tr>';
+    }
+    listEl.style.display = 'block';
+  } catch(e) {
+    countEl.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+async function applyFlagRules() {
+  if (!flagPreviewData.length) return;
+  var btn = document.getElementById('btn-apply-flags');
+  var countEl = document.getElementById('flag-preview-count');
+
+  if (!confirm('Flag '+flagPreviewData.length+' activities? They will stay on the leaderboard until manually reviewed.')) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Flagging...';
+
+  var success = 0, skip = 0;
+  for (var i = 0; i < flagPreviewData.length; i++) {
+    var m = flagPreviewData[i];
+    if (m.act.is_flagged) { skip++; continue; } // already flagged
+    try {
+      var existingReason = m.act.flag_reason ? m.act.flag_reason + ', ' : '';
+      var newReason = existingReason + m.reasons.join(', ');
+      var r = await fetch(SB_URL+'/rest/v1/activities?id=eq.'+m.act.id, {
+        method: 'PATCH',
+        headers: Object.assign({}, HDR, {'Content-Type':'application/json'}),
+        body: JSON.stringify({ is_flagged: true, flag_reason: newReason })
+      });
+      if (r.ok) success++;
+    } catch(e) { /* continue */ }
+
+    // Update progress every 10
+    if (i % 10 === 0) {
+      countEl.textContent = 'Flagging... ' + (i+1) + ' / ' + flagPreviewData.length;
+    }
+  }
+
+  btn.textContent = '🚩 Flag them';
+  btn.disabled = false;
+  countEl.textContent = '✅ Done — '+success+' flagged, '+skip+' already flagged, '+(flagPreviewData.length-success-skip)+' errors';
+  flagPreviewData = [];
 }
 
 function showSaved(id) { var el=document.getElementById(id); el.style.display='inline'; setTimeout(function(){ el.style.display='none'; },2500); }
