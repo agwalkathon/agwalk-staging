@@ -512,17 +512,17 @@ async function loadTemplates() {
   document.getElementById('tpls-count').textContent = rows.length || 0;
   if (!rows.length) { list.innerHTML = '<div style="text-align:center;padding:32px;color:#bbb">No templates yet. Add one above.</div>'; return; }
   list.innerHTML = rows.map(function(t){
-    return '<div class="tpl-card">'\
-      +'<div class="tpl-head">'\
-      +'<span class="tpl-name">'+esc(t.name)+'</span>'\
-      +'<div style="display:flex;gap:8px">'\
-      +'<button class="btn btn-ghost btn-sm" onclick="editTemplate('+t.id+')">✏️ Edit</button>'\
-      +'<button class="btn btn-ghost btn-sm" onclick="showTplPreview('+t.id+')">👁 Preview</button>'\
-      +'<button class="btn btn-sm" style="background:#ffebee;color:#c62828" onclick="deleteTemplate('+t.id+')">🗑</button>'\
-      +'</div></div>'\
-      +'<div class="tpl-desc">'+esc(t.description||'')+'</div>'\
-      +'<div style="font-size:12px;color:#666;margin-bottom:6px">Subject: <strong>'+esc(t.subject||'')+'</strong></div>'\
-      +'<div class="tpl-preview">'+esc((t.body_html||'').substring(0,200))+'...</div>'\
+    return '<div class="tpl-card">'
+      +'<div class="tpl-head">'
+      +'<span class="tpl-name">'+esc(t.name)+'</span>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button class="btn btn-ghost btn-sm" onclick="editTemplate('+t.id+')">✏️ Edit</button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="showTplPreview('+t.id+')">👁 Preview</button>'
+      +'<button class="btn btn-sm" style="background:#ffebee;color:#c62828" onclick="deleteTemplate('+t.id+')">🗑</button>'
+      +'</div></div>'
+      +'<div class="tpl-desc">'+esc(t.description||'')+'</div>'
+      +'<div style="font-size:12px;color:#666;margin-bottom:6px">Subject: <strong>'+esc(t.subject||'')+'</strong></div>'
+      +'<div class="tpl-preview">'+esc((t.body_html||'').substring(0,200))+'...</div>'
       +'</div>';
   }).join('');
 }
@@ -606,21 +606,21 @@ async function loadJobs() {
   list.innerHTML = rows.map(function(j){
     var freqLabel = {manual:'Manual',daily:'Daily',weekly:'Weekly',weekly_monday:'Every Monday',weekly_friday:'Every Friday'}[j.frequency]||j.frequency;
     var statusPill = j.status==='active'?'<span class="pill pill-green">● Active</span>':'<span class="pill pill-grey">⏸ Paused</span>';
-    return '<div class="job-card">'\
-      +'<div class="job-info">'\
-      +'<div class="job-title">'+esc(j.name)+'</div>'\
-      +'<div class="job-meta">'\
-      +'<span>📅 '+freqLabel+(j.send_time?' at '+j.send_time:'')+'</span>'\
-      +'<span>📝 '+(tplMap[j.template_id]||'No template')+'</span>'\
-      +'<span>🎯 '+(j.event_name||'All participants')+'</span>'\
-      +(j.last_sent_at?'<span>Last sent: '+new Date(j.last_sent_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</span>':'')\
-      +'</div></div>'\
-      +'<div style="display:flex;align-items:center;gap:10px">'\
-      +statusPill\
-      +'<div class="job-actions">'\
-      +'<button class="btn btn-ghost btn-sm" onclick="toggleJob('+j.id+',\''+j.status+'\')">'+( j.status==='active'?'⏸ Pause':'▶ Resume')+'</button>'\
-      +'<button class="btn btn-sm" style="background:#fff3e0;color:#e65100" onclick="deleteJob('+j.id+')">🗑</button>'\
-      +'</div></div>'\
+    return '<div class="job-card">'
+      +'<div class="job-info">'
+      +'<div class="job-title">'+esc(j.name)+'</div>'
+      +'<div class="job-meta">'
+      +'<span>📅 '+freqLabel+(j.send_time?' at '+j.send_time:'')+'</span>'
+      +'<span>📝 '+(tplMap[j.template_id]||'No template')+'</span>'
+      +'<span>🎯 '+(j.event_name||'All participants')+'</span>'
+      +(j.last_sent_at?'<span>Last sent: '+new Date(j.last_sent_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</span>':'')
+      +'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +statusPill
+      +'<div class="job-actions">'
+      +'<button class="btn btn-ghost btn-sm" onclick="toggleJob('+j.id+',\''+j.status+'\')">'+( j.status==='active'?'⏸ Pause':'▶ Resume')+'</button>'
+      +'<button class="btn btn-sm" style="background:#fff3e0;color:#e65100" onclick="deleteJob('+j.id+')">🗑</button>'
+      +'</div></div>'
       +'</div>';
   }).join('');
 }
@@ -773,6 +773,7 @@ async function startSend(testOnly) {
 
   btn.disabled = false;
 }
+}
 
 // ── Send History ──────────────────────────────────────────
 async function loadHistory() {
@@ -783,13 +784,13 @@ async function loadHistory() {
   var tplMap = {}; tpls.forEach(function(t){ tplMap[t.id]=t.name; });
   list.innerHTML = '<table class="recip-table"><thead><tr><th>Date</th><th>Template</th><th>Event</th><th>Sent</th><th>Failed</th><th>Mode</th></tr></thead><tbody>'+
     rows.map(function(h){
-      return '<tr>'\
-        +'<td>'+new Date(h.sent_at||h.created_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</td>'\
-        +'<td>'+(tplMap[h.template_id]||'—')+'</td>'\
-        +'<td>'+(h.event_name||'All')+'</td>'\
-        +'<td style="color:#2e7d32;font-weight:600">'+(h.recipients_count||0)+'</td>'\
-        +'<td style="color:'+( h.failed_count>0?'#c62828':'#888')+'">'+( h.failed_count||0)+'</td>'\
-        +'<td>'+(h.test_mode?'<span class="pill pill-blue">Test</span>':'<span class="pill pill-green">Live</span>')+'</td>'\
+      return '<tr>'
+        +'<td>'+new Date(h.sent_at||h.created_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</td>'
+        +'<td>'+(tplMap[h.template_id]||'—')+'</td>'
+        +'<td>'+(h.event_name||'All')+'</td>'
+        +'<td style="color:#2e7d32;font-weight:600">'+(h.recipients_count||0)+'</td>'
+        +'<td style="color:'+( h.failed_count>0?'#c62828':'#888')+'">'+( h.failed_count||0)+'</td>'
+        +'<td>'+(h.test_mode?'<span class="pill pill-blue">Test</span>':'<span class="pill pill-green">Live</span>')+'</td>'
         +'</tr>';
     }).join('')+'</tbody></table>';
 }
