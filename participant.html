@@ -225,6 +225,7 @@
 <!-- Profile Card -->
 <div class="profile-card" id="profile-card">
 
+  <div class="profile-avatar" id="p-initials" style="width:48px;height:48px;border-radius:50%;background:#E8622A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">?</div>
   <div class="profile-info">
     <div class="profile-name" id="p-name">Loading...</div>
     <div class="profile-tags" id="p-tags"></div>
@@ -614,10 +615,10 @@ async function load() {
     var name = reg.full_name || s.name || 'Participant';
 
     // Profile card
-    document.getElementById('p-name').textContent = name;
+    var el_p_name=document.getElementById('p-name'); if(el_p_name) el_p_name.textContent=name;
     // initials fallback
     var initials = name.split(' ').map(function(w){ return w[0]||''; }).slice(0,2).join('').toUpperCase();
-    document.getElementById('p-initials').textContent = initials;
+    var pInit = document.getElementById('p-initials'); if(pInit) pInit.textContent = initials;
     // profile photo from session (set during login via Strava)
 
     var tags = [];
@@ -633,8 +634,8 @@ async function load() {
 
     // ── Stat cards ──────────────────────────────────────────────────────────
     var validCount = myActs.filter(function(a){ return !a.is_flagged; }).length;
-    document.getElementById('s-dist').textContent = fullPts.km.toFixed(1);
-    document.getElementById('s-acts').textContent = validCount;
+    var el_s_dist=document.getElementById('s-dist'); if(el_s_dist) el_s_dist.textContent=fullPts.km.toFixed(1);
+    var el_s_acts=document.getElementById('s-acts'); if(el_s_acts) el_s_acts.textContent=validCount;
 
     // ── Medal thresholds ─────────────────────────────────────────────────────
     var medalData = await medalRes.json();
@@ -653,8 +654,8 @@ async function load() {
     if (myPts >= goldThresh)   { currentMedal = 'Gold';   medalIcon = '🥇'; medalClass = 'gold'; }
     else if (myPts >= silverThresh) { currentMedal = 'Silver'; medalIcon = '🥈'; medalClass = 'silver'; }
     else if (myPts >= bronzeThresh) { currentMedal = 'Bronze'; medalIcon = '🥉'; medalClass = 'bronze'; }
-    document.getElementById('medal-icon').textContent  = medalIcon;
-    document.getElementById('medal-label').textContent = currentMedal;
+    var el_medal_icon=document.getElementById('medal-icon'); if(el_medal_icon) el_medal_icon.textContent=medalIcon;
+    var el_medal_label=document.getElementById('medal-label'); if(el_medal_label) el_medal_label.textContent=currentMedal;
     var mc = document.querySelector('.medal-card');
     if (mc) { mc.classList.remove('bronze','silver','gold'); if (medalClass) mc.classList.add(medalClass); }
 
@@ -741,17 +742,16 @@ async function load() {
       : 'Dayshift · '   + (isFemale ? 'Female' : 'Male');
     var teamLabel  = (reg.leaderboard_team||'Team') + ' · ' + (isFemale ? 'Female' : 'Male');
 
-    document.getElementById('standing-shift-label').textContent = shiftLabel;
-    document.getElementById('standing-shift-rank').textContent  = ordinal(shiftRank);
-    document.getElementById('standing-team-label').textContent  = teamLabel;
-    document.getElementById('standing-team-rank').textContent   = ordinal(teamRank);
+    var el_standing_shift_label=document.getElementById('standing-shift-label'); if(el_standing_shift_label) el_standing_shift_label.textContent=shiftLabel;
+    var el_standing_shift_rank=document.getElementById('standing-shift-rank'); if(el_standing_shift_rank) el_standing_shift_rank.textContent=ordinal(shiftRank);
+    var el_standing_team_label=document.getElementById('standing-team-label'); if(el_standing_team_label) el_standing_team_label.textContent=teamLabel;
+    var el_standing_team_rank=document.getElementById('standing-team-rank'); if(el_standing_team_rank) el_standing_team_rank.textContent=ordinal(teamRank);
 
     // Section title
     var flaggedCount = myActs.filter(function(a) { return a.is_flagged; }).length;
     var uniqueDays = new Set(myActs.filter(function(a){ return !a.is_flagged; })
       .map(function(a){ return (a.activity_date||'').split('T')[0]; })).size;
-    document.getElementById('act-section-title').textContent =
-      uniqueDays + ' Days · ' + myActs.length + ' Activities' +
+    var el_act_section_title=document.getElementById('act-section-title'); if(el_act_section_title) el_act_section_title.textContent=uniqueDays + ' Days · ' + myActs.length + ' Activities' +
       (flaggedCount ? ' · ' + flaggedCount + ' Flagged' : '');
 
     renderActivities(myActs, fullPts.dayBreakdown, fullPts.actBreakdown, reg.gender);
