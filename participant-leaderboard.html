@@ -77,17 +77,14 @@
     .you-chip{display:inline-block;background:var(--brand);color:white;
                font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px;
                vertical-align:middle;margin-left:5px;text-transform:uppercase;}
-    .pts-col{text-align:right;flex-shrink:0;min-width:110px;}
-    .lb-pts-breakdown{display:flex;flex-direction:column;gap:2px;}
-    .lb-pts-line{display:flex;justify-content:space-between;align-items:center;
-                  font-size:11px;gap:8px;}
-    .lb-pts-line.total{border-top:1px solid var(--border);margin-top:3px;padding-top:3px;}
-    .lb-pts-lbl{color:var(--muted);font-size:10px;}
-    .lb-pts-val{font-weight:700;min-width:36px;text-align:right;}
-    .lb-pts-val.dist{color:#4338CA;}
-    .lb-pts-val.bonus{color:#C2410C;}
-    .lb-pts-val.challenge{color:#15803D;}
-    .lb-pts-val.total{color:var(--brand);font-size:13px;}
+    .pts-col{flex-shrink:0;}
+    .lb-pts-strip{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+    .lb-pts-main{font-size:16px;font-weight:800;color:var(--brand);}
+    .lb-pts-sub{display:flex;gap:6px;align-items:center;}
+    .lb-pip{font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;white-space:nowrap;}
+    .lb-pip.dist{background:#EEF2FF;color:#4338CA;}
+    .lb-pip.bonus{background:#FFF7ED;color:#C2410C;}
+    .lb-pip.chall{background:#F0FDF4;color:#15803D;}
 
     @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
     .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
@@ -413,11 +410,13 @@ function renderRows(rows) {
         '<div class="row-meta">' + esc(meta) + '</div>' +
       '</div>' +
       '<div class="pts-col">' +
-        '<div class="lb-pts-breakdown">' +
-          '<div class="lb-pts-line"><span class="lb-pts-lbl">Dist</span><span class="lb-pts-val dist">' + r.pts.distPts.toFixed(2) + '</span></div>' +
-          '<div class="lb-pts-line"><span class="lb-pts-lbl">Bonus</span><span class="lb-pts-val bonus">+' + r.pts.bonusPts + '</span></div>' +
-          '<div class="lb-pts-line"><span class="lb-pts-lbl">Challenge</span><span class="lb-pts-val challenge">+' + r.pts.challengePts.toFixed(2) + '</span></div>' +
-          '<div class="lb-pts-line total"><span class="lb-pts-lbl"><strong>Total</strong></span><span class="lb-pts-val total">' + r.pts.total.toFixed(2) + '</span></div>' +
+        '<div class="lb-pts-strip">' +
+          '<div class="lb-pts-main">' + r.pts.total.toFixed(2) + ' <span style="font-size:10px;font-weight:500;color:var(--muted)">pts</span></div>' +
+          '<div class="lb-pts-sub">' +
+            '<span class="lb-pip dist">Dist ' + r.pts.distPts.toFixed(1) + '</span>' +
+            '<span class="lb-pip bonus">+' + r.pts.bonusPts + '</span>' +
+            '<span class="lb-pip chall">🎯 +' + r.pts.challengePts.toFixed(1) + '</span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
