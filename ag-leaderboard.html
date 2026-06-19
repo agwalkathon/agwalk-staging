@@ -588,11 +588,11 @@ function calcPoints(acts, athleteId, gender) {
     var cSportTypes = Array.isArray(c.sport_types) && c.sport_types.length
       ? c.sport_types : ['Walk','Run','Hike','Ride'];
 
-    // ── Range-split: in-range acts each get bonus_points; out-of-range acts summed → standard bracket
+    // ── Range-split: in-range acts each earn bonus_points as challenge pts.
+    // Out-of-range acts stay in normal dist+bonus flow — nothing extra added here.
     if (c.range_split) {
       var myActsRS = acts.filter(function(a){ return a.strava_athlete_id === athleteId && !a.is_flagged; });
       var inRangePts  = 0;
-      var outRangeKm  = 0;
       var inRangeCount = 0;
       var cSportTypesRS = Array.isArray(c.sport_types) && c.sport_types.length ? c.sport_types : ['Walk','Run','Hike','Ride'];
       for (var rsi = 0; rsi < myActsRS.length; rsi++) {
@@ -601,19 +601,15 @@ function calcPoints(acts, athleteId, gender) {
         if (raDate < c.start_date || raDate > c.end_date) continue;
         if (!cSportTypesRS.includes(ra.sport_type)) continue;
         var raKm = (ra.distance_meters || 0) / 1000;
-        var inRange = raKm >= (c.distance_min - 0.1) && raKm <= (c.distance_max + 0.1);
-        if (inRange) {
+        if (raKm >= (c.distance_min - 0.1) && raKm <= (c.distance_max + 0.1)) {
           inRangePts += Number(c.bonus_points) || 0;
           inRangeCount++;
-        } else {
-          outRangeKm += raKm;
         }
+        // Out-of-range: no action here — already counted in totalDistPts + totalBonus above
       }
-      var outRangePts = calcBonus(parseFloat(outRangeKm.toFixed(4)));
-      var rsTotal = inRangePts + outRangePts;
-      if (rsTotal > 0 || inRangeCount > 0) {
+      if (inRangeCount > 0) {
         earnedChallenges.add(key);
-        totalChallenge += rsTotal;
+        totalChallenge += inRangePts;
         challengeNames.push(c.name);
       }
       continue;
