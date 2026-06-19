@@ -43,17 +43,18 @@
                   cursor:pointer;padding:7px 12px;border-radius:8px;font-family:inherit;font-weight:500;}
 
     /* ── Profile card ── */
-    .profile-card{background:var(--dark);padding:14px 20px;display:flex;align-items:center;gap:14px;}
-    .profile-photo-wrap{position:relative;flex-shrink:0;}
+    .profile-card{background:var(--dark);padding:14px 20px;display:flex;align-items:center;
+               gap:14px;overflow:hidden;}
+    .profile-photo-wrap{flex-shrink:0;width:56px;height:56px;}
     .profile-photo{width:56px;height:56px;border-radius:50%;object-fit:cover;
                    border:2px solid var(--brand);display:block;}
     .profile-initials{width:56px;height:56px;border-radius:50%;background:var(--brand);
                       color:white;font-size:20px;font-weight:800;display:none;
                       align-items:center;justify-content:center;}
     .profile-info{flex:1;min-width:0;}
-    .profile-name{font-size:18px;font-weight:800;color:white;letter-spacing:-0.3px;
+    .profile-name{font-size:17px;font-weight:800;color:white;letter-spacing:-0.3px;
                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .profile-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+    .profile-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
     .tag{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
          color:rgba(255,255,255,0.7);font-size:10px;font-weight:500;padding:3px 9px;
          border-radius:20px;}
@@ -61,12 +62,13 @@
 
 
     /* ── Dashboard cards ── */
-    .dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+    .dash-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
     .dash-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);
-               padding:14px 10px;text-align:center;}
-    .dc-icon{font-size:22px;margin-bottom:4px;}
-    .dc-val{font-size:22px;font-weight:800;color:var(--brand);line-height:1.1;}
-    .dc-lbl{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.3;}
+               padding:16px 12px;text-align:center;}
+    .medal-card{grid-column:1/-1;}  /* medal spans full width */
+    .dc-icon{font-size:24px;margin-bottom:6px;}
+    .dc-val{font-size:24px;font-weight:800;color:var(--brand);line-height:1.1;}
+    .dc-lbl{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3;}
     .medal-card.bronze .dc-val{color:#CD7F32;}
     .medal-card.silver .dc-val{color:#94A3B8;}
     .medal-card.gold   .dc-val{color:#F59E0B;}
@@ -99,7 +101,7 @@
     .medal-row.gold-row   .progress-bar-fill{background:#F59E0B;}
 
     /* ── Content ── */
-    .content{flex:1;padding:16px;max-width:640px;width:100%;margin:0 auto;}
+    .content{flex:1;padding:16px;padding-bottom:80px;max-width:640px;width:100%;margin:0 auto;}
 
     /* ── Date-group accordion ── */
     .section-title{font-size:13px;font-weight:700;color:var(--muted);
@@ -229,7 +231,7 @@
 <div class="profile-card" id="profile-card">
   <div class="profile-photo-wrap">
     <img class="profile-photo" id="p-photo" src="" alt="" style="display:none;">
-    <div class="profile-initials" id="p-initials"></div></div>
+    <div class="profile-initials" id="p-initials"></div>
   </div>
   <div class="profile-info">
     <div class="profile-name" id="p-name">Loading...</div>
