@@ -13,6 +13,8 @@
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
+
+/* ── Sidebar ── */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;align-items:center;padding:16px 0 12px;z-index:300;transition:width .24s cubic-bezier(.4,0,.2,1);overflow:hidden}
 .sidebar:hover{width:var(--sidebar-exp)}
 .sb-logo{display:flex;align-items:center;width:100%;padding:4px 14px 20px;text-decoration:none;gap:10px;flex-shrink:0}
@@ -41,134 +43,347 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 .sb-signout:hover i{color:#ff6b6b}
 .sb-signout .sb-label{color:rgba(255,255,255,.3)}
 .sb-signout:hover .sb-label{color:#ff6b6b}
+
+/* ── Layout ── */
 .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
-.topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
 .topbar-left h1{font-size:17px;font-weight:600;color:var(--text-primary)}
 .topbar-left p{font-size:12px;color:var(--text-muted);margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:10px}
 .topbar-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--page-bg);transition:all .15s}
 .topbar-back:hover{background:#EAECF0;color:var(--text-primary)}
-.content{flex:1;padding:28px 32px;max-width:1600px;width:100%}
-.card{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden}
-.card-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.card-header-left{display:flex;align-items:center;gap:10px}
-.card-header-icon{width:34px;height:34px;border-radius:9px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:17px}
-.card-header h2{font-size:15px;font-weight:600;color:var(--text-primary)}
-.card-header-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
-.btn{padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);transition:all .15s}
-.btn-primary{background:var(--brand);color:#fff}
-.btn-primary:hover{background:#d4551f}
-.btn-ghost{background:var(--page-bg);color:var(--text-secondary);border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn-ghost:hover{background:#EAECF0;color:var(--text-primary)}
-.btn-danger{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
-.btn-danger:hover{background:#DC2626;color:#fff}
-.btn-success{background:#ECFDF5;color:#059669;border:1px solid #A7F3D0}
-.btn-success:hover{background:#059669;color:#fff}
-.stats-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
-.stat-card{background:var(--card-bg);border-radius:var(--radius-md);padding:18px 20px;flex:1;min-width:130px;box-shadow:var(--shadow-sm);border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
+
+/* ── Content fills remaining space, pushing footer down ── */
+.content{flex:1;padding:28px 32px;width:100%;display:flex;flex-direction:column}
+
+/* ── Stats grid ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;flex-shrink:0}
+.stat-card{background:var(--card-bg);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border);display:flex;align-items:center;gap:16px;transition:transform .18s,box-shadow .18s}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.val{font-size:24px;font-weight:700;color:var(--brand);line-height:1}
-.lbl{font-size:12px;color:var(--text-secondary);margin-top:2px}
-.stat-card.green .val{color:#059669}
-.stat-card.dark .val{color:var(--text-primary)}
-.stat-card.red .val{color:#DC2626}
-.stat-card.blue .val{color:#3B82F6}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:600px}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.stat-icon.orange{background:var(--brand-light);color:var(--brand)}
+.stat-icon.purple{background:#F5F3FF;color:#7C3AED}
+.stat-icon.green{background:#ECFDF5;color:#059669}
+.stat-icon.blue{background:#EFF6FF;color:#3B82F6}
+.stat-body{}
+.stat-val{font-size:26px;font-weight:700;line-height:1;color:var(--text-primary)}
+.stat-lbl{font-size:12px;color:var(--text-secondary);margin-top:3px}
+
+/* ── Toolbar (filter bar above table) ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+.toolbar input,.toolbar select{padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--card-bg);font-family:var(--font);color:var(--text-primary);transition:border-color .15s}
+.toolbar input{width:260px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--brand)}
+.count-badge{margin-left:auto;font-size:12px;color:var(--text-muted);white-space:nowrap}
+
+/* ── Table card ── */
+.card{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column}
+.table-wrap{overflow-x:auto;flex:1}
+table{width:100%;border-collapse:collapse;min-width:900px}
 th{background:#F9FAFB;padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:12px 16px;font-size:13px;border-bottom:1px solid #F9FAFB;vertical-align:middle;color:var(--text-primary)}
+td{padding:11px 16px;font-size:13px;border-bottom:1px solid #F9FAFB;vertical-align:middle;color:var(--text-primary)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#FAFAFA}
-.loading-row td{text-align:center;padding:48px;color:var(--text-muted);font-size:14px}
+
+/* ── Badges ── */
 .badge,.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
-.badge-walk,.pill-walk{background:#ECFDF5;color:#059669}
-.badge-run,.pill-run{background:#EFF6FF;color:#3B82F6}
-.badge-ride,.pill-ride{background:#FFF7ED;color:#EA580C}
-.badge-hike,.pill-hike{background:#F5F3FF;color:#7C3AED}
-.badge-valid,.badge-clean,.pill-clean{background:#ECFDF5;color:#059669}
-.badge-flag,.badge-invalid,.pill-flag{background:#FEF2F2;color:#DC2626}
-.badge-conn{background:#EFF6FF;color:#3B82F6}
-.badge-active,.badge-ok{background:#ECFDF5;color:#059669}
+.badge.ok,.pill-clean{background:#ECFDF5;color:#059669}
+.badge.warn{background:#FFF7ED;color:#EA580C}
+.badge.conn{background:#EFF6FF;color:#3B82F6}
+
+/* ── Role dropdown ── */
+.role-select{padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font);background:var(--page-bg);color:var(--text-primary);cursor:pointer}
+.role-select:focus{outline:none;border-color:var(--brand)}
+.muted{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* ── Links ── */
 .ath{color:var(--brand);text-decoration:none;font-weight:500}
 .ath:hover{text-decoration:underline}
-.act-link{color:var(--text-primary);text-decoration:none;font-weight:500}
-.act-link:hover{color:var(--brand)}
-.filter-bar{background:var(--card-bg);border-radius:var(--radius-md);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
-.filter-bar h3{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-primary)}
-.default-note{font-size:12px;color:var(--text-muted);margin-left:6px;font-weight:400}
-.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
-.filter-group label{display:block;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
-.filter-group input,.filter-group select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--page-bg);font-family:var(--font);color:var(--text-primary)}
-.filter-group input:focus,.filter-group select:focus{outline:none;border-color:var(--brand);background:#fff}
-.filter-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.empty{text-align:center;padding:56px 24px;color:var(--text-muted);font-size:13px}
-.empty .icon{font-size:40px;margin-bottom:12px;display:block}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal{background:#fff;border-radius:var(--radius-lg);padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);margin:20px}
-.modal h3{font-size:18px;font-weight:600;margin-bottom:4px;color:var(--text-primary)}
-.modal .sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
-.modal label{display:block;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
-.modal select,.modal input[type=number],.modal input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;margin-bottom:14px;background:var(--page-bg);font-family:var(--font)}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end}
-.modal-actions button{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
-.btn-confirm{background:var(--brand);color:#fff}
-.btn-cancel{background:var(--page-bg);color:var(--text-secondary);border:1px solid var(--border)}
-.site-footer{background:var(--card-bg);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+
+/* ── Footer ── */
+.site-footer{background:var(--card-bg);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 .site-footer a{color:var(--brand);text-decoration:none;margin-left:14px}
 .site-footer a:hover{text-decoration:underline}
-.editable{cursor:pointer}
-.editable:hover{background:var(--brand-light)!important;border-radius:4px}
-.edit-input{width:80px;padding:4px 6px;border:1px solid var(--brand);border-radius:4px;font-size:12px;font-family:var(--font)}
-.edit-select{width:110px;padding:4px 6px;border:1px solid var(--brand);border-radius:4px;font-size:12px;font-family:var(--font)}
-.result-count{padding:10px 16px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border)}
-.scroll-top{overflow-x:auto;overflow-y:hidden;height:12px}
-.scroll-top-inner{height:1px}
-.dist-field{display:none}
-.dist-field.show{display:block}
-@media(max-width:768px){.sidebar{width:56px}.main{margin-left:56px}.topbar{padding:0 16px;height:54px}.content{padding:16px}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.val{font-size:18px}th,td{padding:8px 10px;font-size:12px}.filter-grid{grid-template-columns:1fr 1fr;gap:8px}.site-footer{flex-direction:column;gap:6px;text-align:center}}
-@media(max-width:480px){.filter-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
 
+/* ── Spinner ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Responsive ── */
+@media(max-width:1100px){.stats-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .sidebar{width:56px}.main{margin-left:56px}
+  .topbar{padding:0 16px;height:54px}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-val{font-size:20px}
+  th,td{padding:8px 10px;font-size:12px}
+  .toolbar input{width:100%}
+  .site-footer{flex-direction:column;gap:6px;text-align:center}
+}
   </style>
 </head>
 <body>
-<aside class="sidebar"><a class="sb-logo" href="admin.html"><div class="sb-logo-icon"><img src="favicon.png" alt="AW"></div><div class="sb-logo-text">Walkathon 2026 <span>Admin Panel</span></div></a>
-<div class="sb-section">Main</div>
-<a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
-<a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
-<a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
-<a href="participants.html" class="sb-item active"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
-<a href="participant-requests.html" class="sb-item"><i class="ti ti-user-check"></i><span class="sb-label">Requests</span></a>
-<div class="sb-section" style="margin-top:10px;">Config</div>
-<a href="ag-config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
-<a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
-<a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
-<div class="sb-spacer"></div><div class="sb-divider"></div><button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button></aside>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <a class="sb-logo" href="admin.html">
+    <div class="sb-logo-icon"><img src="favicon.png" alt="AW"></div>
+    <div class="sb-logo-text">Walkathon 2026 <span>Admin Panel</span></div>
+  </a>
+  <div class="sb-section">Main</div>
+  <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+  <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+  <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+  <a href="participants.html" class="sb-item active"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+  <a href="participant-requests.html" class="sb-item"><i class="ti ti-user-check"></i><span class="sb-label">Requests</span></a>
+  <div class="sb-section" style="margin-top:10px;">Config</div>
+  <a href="ag-config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
+  <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+  <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+  <div class="sb-spacer"></div>
+  <div class="sb-divider"></div>
+  <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+</aside>
+
+<!-- ── Main ── -->
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Participants</h1><p>Manage registered Arcgate employees</p></div><div class="topbar-right"><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Participants</h1>
+      <p>Manage registered Arcgate employees</p>
+    </div>
+    <div class="topbar-right">
+      <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
+    </div>
+  </header>
+
   <div class="content">
-<div class="cards"><div class="card"><div class="val" id="s-total">—</div><div class="lbl">Total registered</div></div><div class="card"><div class="val" id="s-connected">—</div><div class="lbl">Strava connected</div></div><div class="card"><div class="val" id="s-active">—</div><div class="lbl">Have activities</div></div><div class="card"><div class="val" id="s-km">—</div><div class="lbl">Total km</div></div></div><div class="toolbar"><input id="search" oninput="filterTable()" placeholder="Search name, email or team" style="width:260px"><select id="status-filter" onchange="filterTable()"><option value="">All statuses</option><option value="active">Has activities</option><option value="inactive">No activities</option><option value="connected">Strava connected</option><option value="notconnected">Not connected</option></select><span id="count" class="muted" style="float:right;margin-top:9px"></span></div><div class="tablebox"><table><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Team</th><th>Shift</th><th>Gender</th><th>T-shirt</th><th>Lead</th><th>Strava</th><th>Activities</th><th>Total km</th><th>Status</th></tr></thead><tbody id="participants-body"><tr><td colspan="12" style="text-align:center;padding:40px;color:#999">Loading...</td></tr></tbody></table></div></div>
-  </div>
 
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon orange"><i class="ti ti-users"></i></div>
+        <div class="stat-body">
+          <div class="stat-val" id="s-total">—</div>
+          <div class="stat-lbl">Total registered</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="ti ti-brand-strava"></i></div>
+        <div class="stat-body">
+          <div class="stat-val" id="s-connected">—</div>
+          <div class="stat-lbl">Strava connected</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="ti ti-run"></i></div>
+        <div class="stat-body">
+          <div class="stat-val" id="s-active">—</div>
+          <div class="stat-lbl">Have activities</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="ti ti-map-pin"></i></div>
+        <div class="stat-body">
+          <div class="stat-val" id="s-km">—</div>
+          <div class="stat-lbl">Total km</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter toolbar -->
+    <div class="toolbar">
+      <input id="search" oninput="filterTable()" placeholder="Search name, email or team">
+      <select id="status-filter" onchange="filterTable()">
+        <option value="">All statuses</option>
+        <option value="active">Has activities</option>
+        <option value="inactive">No activities</option>
+        <option value="connected">Strava connected</option>
+        <option value="notconnected">Not connected</option>
+      </select>
+      <span id="count" class="count-badge"></span>
+    </div>
+
+    <!-- Table card -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Team</th>
+              <th>Shift</th>
+              <th>Gender</th>
+              <th>T-Shirt</th>
+              <th>Lead</th>
+              <th>Strava</th>
+              <th>Activities</th>
+              <th>Total km</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="participants-body">
+            <tr><td colspan="12" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer class="site-footer">
+    <span>© 2026 Arcgate Walkathon</span>
+    <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
+  </footer>
+
+</div><!-- /main -->
+
 <script>
+const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
+let allRows = [];
 
-const SUPABASE_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
-const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-const HDR={apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON,'Content-Type':'application/json'};let allRows=[];
-function authGuard(){const s=JSON.parse(sessionStorage.getItem('wk_admin')||'{}');if(!s.loggedIn||s.expires<Date.now()||s.role!=='admin')location.href='admin-login.html'}
-function logout(){sessionStorage.removeItem('wk_admin');sessionStorage.removeItem('wk_user');location.href='admin-login.html'}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-async function getAll(url){let all=[],from=0;while(true){const r=await fetch(url+(url.includes('?')?'&':'?')+'limit=1000&offset='+from,{headers:HDR});if(!r.ok)throw new Error(await r.text());const p=await r.json();if(!Array.isArray(p)||!p.length)break;all=all.concat(p);if(p.length<1000)break;from+=1000}return all}
-function roleDrop(p){const id=p.strava_athlete_id,role=p.role||'user';if(!id)return 'No Strava ID';return '<select id="role-'+id+'" data-current="'+role+'" onchange="saveRole(\''+id+'\',this.value)"><option value="user" '+(role==='user'?'selected':'')+'>User</option><option value="admin" '+(role==='admin'?'selected':'')+'>Admin</option></select><div class="muted" id="note-'+id+'"></div>'}
-function renderRows(rows){document.getElementById('participants-body').innerHTML=rows.length?rows.map((p,i)=>'<tr><td>'+(i+1)+'</td><td><a class="ath" target="_blank" href="https://www.strava.com/athletes/'+p.strava_athlete_id+'">'+esc(p.full_name||'—')+'</a><div class="muted">'+esc(p.email||'')+'</div></td><td>'+roleDrop(p)+'</td><td>'+esc(p.leaderboard_team||'—')+'</td><td>'+esc(p.shift||'—')+'</td><td>'+esc(p.gender||'—')+'</td><td>'+esc(p.tshirt_size||'—')+'</td><td>'+esc(p.project_lead||'—')+'</td><td><span class="badge '+(p.connected?'ok':'warn')+'">'+(p.connected?'Connected':'Not yet')+'</span></td><td>'+(p.cnt||0)+'</td><td>'+(p.dist?(p.dist/1000).toFixed(1)+' km':'—')+'</td><td><span class="badge '+(p.cnt>0?'ok':'warn')+'">'+(p.cnt>0?'Active':'Pending')+'</span></td></tr>').join(''):'<tr><td colspan="12" style="text-align:center;padding:40px;color:#999">No participants found</td></tr>'}
-function filterTable(){const q=document.getElementById('search').value.toLowerCase(),st=document.getElementById('status-filter').value;const rows=allRows.filter(r=>{const mq=!q||[r.full_name,r.email,r.leaderboard_team].join(' ').toLowerCase().includes(q);const ms=!st?true:st==='active'?r.cnt>0:st==='inactive'?r.cnt===0:st==='connected'?r.connected:!r.connected;return mq&&ms});document.getElementById('count').textContent=rows.length+' of '+allRows.length+' participants';renderRows(rows)}
-async function saveRole(id,newRole){const sel=document.getElementById('role-'+id),note=document.getElementById('note-'+id),old=sel.dataset.current;if(!confirm('Change role to '+newRole+'?')){sel.value=old;return}try{note.textContent='Saving...';const r=await fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...HDR,Prefer:'return=representation'},body:JSON.stringify({role:newRole})});const txt=await r.text();if(!r.ok)throw new Error(txt);const arr=JSON.parse(txt||'[]');if(!arr.length)throw new Error('No row updated');const row=allRows.find(x=>String(x.strava_athlete_id)===String(id));if(row)row.role=newRole;sel.dataset.current=newRole;note.textContent='Saved ✅'}catch(e){sel.value=old;note.textContent='Not saved ❌';alert('Role not saved: '+e.message)}}
-async function loadParticipants(){try{const regs=await getAll(SUPABASE_URL+'/rest/v1/registration?order=full_name.asc');const parts=await getAll(SUPABASE_URL+'/rest/v1/participants?select=strava_athlete_id');const acts=await getAll(SUPABASE_URL+'/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false');const conn=new Set(parts.map(p=>p.strava_athlete_id));const am={};acts.forEach(a=>{if(!am[a.strava_athlete_id])am[a.strava_athlete_id]={cnt:0,dist:0};am[a.strava_athlete_id].cnt++;am[a.strava_athlete_id].dist+=a.distance_meters||0});allRows=regs.map(r=>({...r,role:r.role||'user',connected:conn.has(r.strava_athlete_id),cnt:am[r.strava_athlete_id]?.cnt||0,dist:am[r.strava_athlete_id]?.dist||0}));document.getElementById('s-total').textContent=allRows.length;document.getElementById('s-connected').textContent=allRows.filter(r=>r.connected).length;document.getElementById('s-active').textContent=allRows.filter(r=>r.cnt>0).length;document.getElementById('s-km').textContent=(allRows.reduce((s,r)=>s+r.dist,0)/1000).toFixed(1)+' km';filterTable()}catch(e){document.getElementById('participants-body').innerHTML='<tr><td colspan="12" style="text-align:center;padding:40px;color:#c62828">Error loading participants: '+esc(e.message)+'</td></tr>'}}
-authGuard();loadParticipants();
+function authGuard() {
+  const s = JSON.parse(sessionStorage.getItem('wk_admin') || '{}');
+  if (!s.loggedIn || s.expires < Date.now()) location.href = 'admin-login.html';
+}
+function logout() {
+  sessionStorage.removeItem('wk_admin');
+  sessionStorage.removeItem('wk_user');
+  location.href = 'admin-login.html';
+}
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
+async function getAll(url) {
+  let all = [], from = 0;
+  while (true) {
+    const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'limit=1000&offset=' + from, { headers: HDR });
+    if (!r.ok) throw new Error(await r.text());
+    const p = await r.json();
+    if (!Array.isArray(p) || !p.length) break;
+    all = all.concat(p);
+    if (p.length < 1000) break;
+    from += 1000;
+  }
+  return all;
+}
+
+function roleDrop(p) {
+  const id = p.strava_athlete_id, role = p.role || 'user';
+  if (!id) return 'No Strava ID';
+  return `<select class="role-select" id="role-${id}" data-current="${role}" onchange="saveRole('${id}',this.value)">
+    <option value="user" ${role === 'user' ? 'selected' : ''}>User</option>
+    <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
+  </select>
+  <div class="muted" id="note-${id}"></div>`;
+}
+
+function renderRows(rows) {
+  document.getElementById('participants-body').innerHTML = rows.length
+    ? rows.map((p, i) => `<tr>
+        <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
+        <td>
+          <a class="ath" target="_blank" href="https://www.strava.com/athletes/${p.strava_athlete_id}">${esc(p.full_name || '—')}</a>
+          <div class="muted">${esc(p.email || '')}</div>
+        </td>
+        <td>${roleDrop(p)}</td>
+        <td>${esc(p.leaderboard_team || '—')}</td>
+        <td>${esc(p.shift || '—')}</td>
+        <td>${esc(p.gender || '—')}</td>
+        <td>${esc(p.tshirt_size || '—')}</td>
+        <td style="font-size:12px">${esc(p.project_lead || '—')}</td>
+        <td><span class="badge ${p.connected ? 'conn' : 'warn'}">${p.connected ? '✓ Connected' : 'Not yet'}</span></td>
+        <td style="font-weight:600">${p.cnt || 0}</td>
+        <td style="font-weight:600">${p.dist ? (p.dist / 1000).toFixed(1) + ' km' : '—'}</td>
+        <td><span class="badge ${p.cnt > 0 ? 'ok' : 'warn'}">${p.cnt > 0 ? 'Active' : 'Pending'}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="12" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
+}
+
+function filterTable() {
+  const q  = document.getElementById('search').value.toLowerCase();
+  const st = document.getElementById('status-filter').value;
+  const rows = allRows.filter(r => {
+    const mq = !q || [r.full_name, r.email, r.leaderboard_team].join(' ').toLowerCase().includes(q);
+    const ms = !st ? true
+      : st === 'active'      ? r.cnt > 0
+      : st === 'inactive'    ? r.cnt === 0
+      : st === 'connected'   ? r.connected
+      : !r.connected;
+    return mq && ms;
+  });
+  document.getElementById('count').textContent = rows.length + ' of ' + allRows.length + ' participants';
+  renderRows(rows);
+}
+
+async function saveRole(id, newRole) {
+  const sel  = document.getElementById('role-' + id);
+  const note = document.getElementById('note-' + id);
+  const old  = sel.dataset.current;
+  if (!confirm('Change role to ' + newRole + '?')) { sel.value = old; return; }
+  try {
+    note.textContent = 'Saving…';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + encodeURIComponent(id), {
+      method: 'PATCH',
+      headers: { ...HDR, Prefer: 'return=representation' },
+      body: JSON.stringify({ role: newRole })
+    });
+    const txt = await r.text();
+    if (!r.ok) throw new Error(txt);
+    const arr = JSON.parse(txt || '[]');
+    if (!arr.length) throw new Error('No row updated');
+    const row = allRows.find(x => String(x.strava_athlete_id) === String(id));
+    if (row) row.role = newRole;
+    sel.dataset.current = newRole;
+    note.textContent = 'Saved ✅';
+    setTimeout(() => { note.textContent = ''; }, 2500);
+  } catch(e) {
+    sel.value = old;
+    note.textContent = 'Not saved ❌';
+    alert('Role not saved: ' + e.message);
+  }
+}
+
+async function loadParticipants() {
+  try {
+    const [regs, parts, acts] = await Promise.all([
+      getAll(SUPABASE_URL + '/rest/v1/registration?order=full_name.asc'),
+      getAll(SUPABASE_URL + '/rest/v1/participants?select=strava_athlete_id'),
+      getAll(SUPABASE_URL + '/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false')
+    ]);
+    const conn = new Set(parts.map(p => p.strava_athlete_id));
+    const am = {};
+    acts.forEach(a => {
+      if (!am[a.strava_athlete_id]) am[a.strava_athlete_id] = { cnt: 0, dist: 0 };
+      am[a.strava_athlete_id].cnt++;
+      am[a.strava_athlete_id].dist += a.distance_meters || 0;
+    });
+    allRows = regs.map(r => ({
+      ...r,
+      role:      r.role || 'user',
+      connected: conn.has(r.strava_athlete_id),
+      cnt:       am[r.strava_athlete_id]?.cnt  || 0,
+      dist:      am[r.strava_athlete_id]?.dist || 0
+    }));
+    document.getElementById('s-total').textContent     = allRows.length;
+    document.getElementById('s-connected').textContent = allRows.filter(r => r.connected).length;
+    document.getElementById('s-active').textContent    = allRows.filter(r => r.cnt > 0).length;
+    document.getElementById('s-km').textContent        = (allRows.reduce((s, r) => s + r.dist, 0) / 1000).toFixed(1) + ' km';
+    filterTable();
+  } catch(e) {
+    document.getElementById('participants-body').innerHTML =
+      `<tr><td colspan="12" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+  }
+}
+
+authGuard();
+loadParticipants();
 </script>
 </body>
 </html>
