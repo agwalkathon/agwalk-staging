@@ -60,17 +60,13 @@
 
 
 
-    /* ── Dashboard cards ── */
+    /* ── Dashboard stat cards ── */
     .dash-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
     .dash-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);
                padding:16px 12px;text-align:center;}
-    .medal-card{grid-column:1/-1;}  /* medal spans full width */
     .dc-icon{font-size:24px;margin-bottom:6px;}
     .dc-val{font-size:24px;font-weight:800;color:var(--brand);line-height:1.1;}
     .dc-lbl{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3;}
-    .medal-card.bronze .dc-val{color:#CD7F32;}
-    .medal-card.silver .dc-val{color:#94A3B8;}
-    .medal-card.gold   .dc-val{color:#F59E0B;}
 
     /* ── Standing section ── */
     .dash-section{margin-bottom:16px;}
@@ -96,21 +92,21 @@
     .pts-needed{font-size:10px;color:var(--muted);font-weight:400;}
 
     /* ── Pace rows ── */
-    .pace-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+    .pace-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
     .pace-row:last-child{border-bottom:none;padding-bottom:0;}
-    .pace-icon-wrap{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;
-                    justify-content:center;font-size:14px;flex-shrink:0;}
+    .pace-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+                    justify-content:center;font-size:15px;flex-shrink:0;}
     .pace-text-wrap{flex:1;min-width:0;}
-    .pace-main{font-size:11px;font-weight:600;color:var(--text);line-height:1.3;}
-    .pace-sub{font-size:10px;color:var(--muted);margin-top:1px;}
-    .pace-val-right{font-size:12px;font-weight:800;flex-shrink:0;color:var(--brand);}
+    .pace-main{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;}
+    .pace-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .pace-val-right{font-size:13px;font-weight:800;flex-shrink:0;color:var(--brand);text-align:right;min-width:44px;}
 
     /* ── Streak bars ── */
-    .sbar{flex:1;height:5px;border-radius:3px;}
+    .sbar{flex:1;height:8px;border-radius:4px;}
     .sbar.on{background:var(--brand);}
-    .sbar.dim{background:#fca5a5;}
+    .sbar.dim{background:rgba(232,98,42,0.3);}
     .sbar.off{background:var(--border);}
-    .sbar-lbl{font-size:8px;color:var(--muted);}
+    .sbar-lbl{font-size:10px;color:var(--muted);}
 
     /* ── Rivals ── */
     .rival-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
@@ -287,7 +283,7 @@
 <!-- DASHBOARD TAB -->
 <div class="content" id="tab-dashboard">
 
-  <!-- Stat cards -->
+  <!-- Stat cards: Distance + Activities -->
   <div class="dash-cards">
     <div class="dash-card">
       <div class="dc-icon">📏</div>
@@ -299,10 +295,57 @@
       <div class="dc-val" id="s-acts">—</div>
       <div class="dc-lbl">Activities</div>
     </div>
-    <div class="dash-card medal-card">
-      <div class="dc-icon" id="medal-icon">🏅</div>
-      <div class="dc-val" id="medal-label">—</div>
-      <div class="dc-lbl">Current Medal</div>
+  </div>
+
+  <!-- MERGED: Current Medal + Road to Medal -->
+  <div class="dash-section">
+    <div class="dash-section-title">🎯 Road to Medal</div>
+    <div class="standing-card">
+      <!-- Current medal hero -->
+      <div style="display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:12px;">
+        <div id="medal-icon" style="font-size:36px;line-height:1;">🏅</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Current Medal</div>
+          <div id="medal-label" style="font-size:22px;font-weight:800;color:var(--brand);line-height:1.2;">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div id="s-pts-display" style="font-size:18px;font-weight:800;color:var(--text);">—</div>
+          <div style="font-size:10px;color:var(--muted);">Total Points</div>
+        </div>
+      </div>
+      <!-- Progress bars -->
+      <div class="medal-progress-wrap" id="medal-progress"></div>
+    </div>
+  </div>
+
+  <!-- Daily Pace & Days Left -->
+  <div class="dash-section">
+    <div class="dash-section-title">📅 Your Pace Goals</div>
+    <div class="standing-card" id="pace-card">
+      <div class="pace-row">
+        <div class="pace-icon-wrap" style="background:#fff7ed;">⏳</div>
+        <div class="pace-text-wrap">
+          <div class="pace-main" id="pace-days-text">—</div>
+          <div class="pace-sub">Event ends June 30</div>
+        </div>
+        <div class="pace-val-right" id="pace-days-val">—</div>
+      </div>
+      <div class="pace-row">
+        <div class="pace-icon-wrap" style="background:#f0fdf4;">📈</div>
+        <div class="pace-text-wrap">
+          <div class="pace-main" id="pace-silver-text">—</div>
+          <div class="pace-sub" id="pace-silver-sub">—</div>
+        </div>
+        <div class="pace-val-right" id="pace-silver-val" style="color:#16a34a;">—</div>
+      </div>
+      <div class="pace-row">
+        <div class="pace-icon-wrap" style="background:#eff6ff;">⚡</div>
+        <div class="pace-text-wrap">
+          <div class="pace-main" id="pace-today-text">—</div>
+          <div class="pace-sub" id="pace-today-sub">—</div>
+        </div>
+        <div class="pace-val-right" id="pace-today-val" style="color:#2563eb;">—</div>
+      </div>
     </div>
   </div>
 
@@ -317,34 +360,6 @@
       <div class="standing-row">
         <span class="standing-cat" id="standing-team-label">—</span>
         <span class="standing-rank" id="standing-team-rank">—</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Road to Medal -->
-  <div class="dash-section">
-    <div class="dash-section-title">🎯 Road to Medal</div>
-    <div class="medal-progress-wrap" id="medal-progress"></div>
-  </div>
-
-  <!-- Daily Pace & Days Left -->
-  <div class="dash-section">
-    <div class="dash-section-title">📅 Your Pace Goals</div>
-    <div class="standing-card" id="pace-card">
-      <div class="pace-row" id="pace-days-row">
-        <div class="pace-icon-wrap" style="background:#fff7ed;">⏳</div>
-        <div class="pace-text-wrap"><div class="pace-main" id="pace-days-text">—</div><div class="pace-sub">Event ends June 30</div></div>
-        <div class="pace-val-right" id="pace-days-val">—</div>
-      </div>
-      <div class="pace-row" id="pace-silver-row">
-        <div class="pace-icon-wrap" style="background:#f0fdf4;">📈</div>
-        <div class="pace-text-wrap"><div class="pace-main" id="pace-silver-text">—</div><div class="pace-sub" id="pace-silver-sub">—</div></div>
-        <div class="pace-val-right" id="pace-silver-val" style="color:#16a34a;">—</div>
-      </div>
-      <div class="pace-row" id="pace-today-row">
-        <div class="pace-icon-wrap" style="background:#eff6ff;">⚡</div>
-        <div class="pace-text-wrap"><div class="pace-main" id="pace-today-text">—</div><div class="pace-sub" id="pace-today-sub">—</div></div>
-        <div class="pace-val-right" id="pace-today-val" style="color:#2563eb;">—</div>
       </div>
     </div>
   </div>
@@ -741,7 +756,7 @@ async function load() {
       fetch(SUPABASE_URL + '/rest/v1/challenges?is_active=eq.true&select=*', {headers: HDR}),
       fetch(SUPABASE_URL + '/rest/v1/special_scoring_days?select=special_date', {headers: HDR}),
       fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value', {headers: HDR}),
-      fetchAll(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,gender,shift,leaderboard_team')
+      fetchAll(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
     ]);
 
     var cfgRows = await cfgRes.json();
@@ -799,9 +814,12 @@ async function load() {
     else if (myPts >= silverThresh) { currentMedal = 'Silver'; medalIcon = '🥈'; medalClass = 'silver'; }
     else if (myPts >= bronzeThresh) { currentMedal = 'Bronze'; medalIcon = '🥉'; medalClass = 'bronze'; }
     var el_medal_icon=document.getElementById('medal-icon'); if(el_medal_icon) el_medal_icon.textContent=medalIcon;
-    var el_medal_label=document.getElementById('medal-label'); if(el_medal_label) el_medal_label.textContent=currentMedal;
-    var mc = document.querySelector('.medal-card');
-    if (mc) { mc.classList.remove('bronze','silver','gold'); if (medalClass) mc.classList.add(medalClass); }
+    var el_medal_label=document.getElementById('medal-label');
+    if(el_medal_label) {
+      el_medal_label.textContent=currentMedal;
+      el_medal_label.style.color=medalClass==='gold'?'#F59E0B':medalClass==='silver'?'#94A3B8':medalClass==='bronze'?'#CD7F32':'var(--muted)';
+    }
+    var el_sp=document.getElementById('s-pts-display'); if(el_sp) el_sp.textContent=myPts.toFixed(1)+' pts';
 
     // ── Road to Medal ────────────────────────────────────────────────────────
     var mpWrap = document.getElementById('medal-progress');
