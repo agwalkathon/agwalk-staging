@@ -851,17 +851,31 @@ function toggleExpand(athleteId, gender, trEl) {
     var bp = dayExcludeBonus ? 0 : calcBonus(dayKm);
 
     var cp = 0;
-    // Per-activity challenge points
+    // Per-day challenge bonus — mirrors calcPoints() logic exactly
     CHALLENGES.forEach(function(c){
+      if (!c.is_active) return;
+      // range_split: only in-range activities earn bonus_points; out-of-range already in dist+bonus
+      if (c.range_split) {
+        var cSportTypesExp = Array.isArray(c.sport_types) && c.sport_types.length ? c.sport_types : ['Walk','Run','Hike','Ride'];
+        byDay[day].forEach(function(a){
+          if (!cSportTypesExp.includes(a.sport_type)) return;
+          var aKm = (a.distance_meters||0)/1000;
+          if (aKm >= (c.distance_min - 0.1) && aKm <= (c.distance_max + 0.1)) {
+            cp += Number(c.bonus_points) || 0;
+          }
+        });
+        return;
+      }
+      // Per-activity challenge (non range_split)
       var perActPts = Number(c.per_activity_points) || 0;
       if (perActPts > 0) {
         byDay[day].forEach(function(a){ if (checkChallenge(a,c)) cp += perActPts; });
         return;
       }
-      // One-time challenge: count at most once per challenge per day
+      // One-time challenge: awarded at most once per day
       var awarded = false;
       byDay[day].forEach(function(a){
-        if (!awarded && checkChallenge(a,c)) { cp += c.bonus_points; awarded = true; }
+        if (!awarded && checkChallenge(a,c)) { cp += Number(c.bonus_points)||0; awarded = true; }
       });
     });
     byDay[day].forEach(function(a){ cp += parseFloat(a.manual_bonus)||0; });
