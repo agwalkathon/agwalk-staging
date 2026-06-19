@@ -22,149 +22,135 @@
          background:var(--bg);color:var(--text);display:flex;flex-direction:column;
          min-height:100dvh;-webkit-font-smoothing:antialiased;}
 
-    /* Header */
     .header{background:var(--white);border-bottom:2px solid var(--brand);
             padding:12px 20px;padding-top:max(12px,env(safe-area-inset-top));
             display:flex;align-items:center;justify-content:space-between;
             position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
     .header img{height:36px;object-fit:contain;}
-    .header-right{display:flex;align-items:center;gap:4px;}
-    .refresh-btn{background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;
-                 color:var(--muted);display:flex;align-items:center;justify-content:center;}
-    .refresh-btn svg{width:18px;height:18px;}
+    .hdr-right{display:flex;align-items:center;gap:4px;}
+    .icon-btn{background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;
+               color:var(--muted);display:flex;align-items:center;}
+    .icon-btn svg{width:18px;height:18px;}
     @keyframes spin{to{transform:rotate(360deg);}}
     .spinning{animation:spin 1s linear infinite;}
-    .sign-out-btn{font-size:13px;color:var(--muted);background:none;border:none;
-                  cursor:pointer;padding:7px 12px;border-radius:8px;font-family:inherit;font-weight:500;}
+    .sign-out{font-size:13px;color:var(--muted);background:none;border:none;
+               cursor:pointer;padding:7px 12px;border-radius:8px;font-family:inherit;font-weight:500;}
 
-    /* My position banner */
     .my-banner{background:var(--dark);color:white;padding:16px 20px;
                display:flex;align-items:center;justify-content:space-between;gap:12px;}
-    .my-info .my-name{font-size:16px;font-weight:800;margin-bottom:4px;}
-    .my-info .my-tags{display:flex;gap:6px;flex-wrap:wrap;}
+    .my-name{font-size:16px;font-weight:800;margin-bottom:5px;}
+    .my-tags{display:flex;gap:6px;flex-wrap:wrap;}
     .my-tag{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);
-            color:rgba(255,255,255,0.75);font-size:10px;font-weight:500;
-            padding:3px 8px;border-radius:20px;}
+             color:rgba(255,255,255,0.7);font-size:10px;font-weight:500;
+             padding:3px 8px;border-radius:20px;}
     .my-rank-box{text-align:center;flex-shrink:0;}
     .my-rank-num{font-size:32px;font-weight:800;color:var(--brand);line-height:1;}
-    .my-rank-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;
-                   color:rgba(255,255,255,0.45);margin-top:2px;}
+    .my-rank-lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;
+                  color:rgba(255,255,255,0.4);margin-top:2px;}
 
-    /* Tabs */
-    .tabs-container{background:var(--white);border-bottom:1px solid var(--border);
-                    padding:0 16px;position:sticky;top:62px;z-index:150;
-                    display:flex;gap:0;}
-    .tab-btn{flex:1;padding:12px 8px;border:none;border-bottom:2px solid transparent;
-             background:none;font-family:inherit;font-size:12px;font-weight:700;
-             color:var(--muted);cursor:pointer;letter-spacing:0.3px;
-             text-transform:uppercase;margin-bottom:-1px;transition:all 0.15s;}
+    .tabs-wrap{background:var(--white);border-bottom:1px solid var(--border);
+               display:flex;position:sticky;top:62px;z-index:150;}
+    .tab-btn{flex:1;padding:13px 8px;border:none;border-bottom:2px solid transparent;
+              background:none;font-family:inherit;font-size:12px;font-weight:700;
+              color:var(--muted);cursor:pointer;letter-spacing:0.3px;
+              text-transform:uppercase;margin-bottom:-1px;transition:all 0.15s;}
     .tab-btn.active{color:var(--brand);border-bottom-color:var(--brand);}
 
-    /* Content */
-    .content{flex:1;max-width:640px;width:100%;margin:0 auto;padding:12px 0 16px;}
+    .content{flex:1;max-width:640px;width:100%;margin:0 auto;padding:10px 0 80px;}
 
-    /* Leaderboard rows */
     .lb-row{background:var(--white);margin:0 12px 6px;border-radius:var(--radius-sm);
-            box-shadow:var(--shadow);display:flex;align-items:center;
-            padding:12px 14px;gap:12px;transition:transform 0.1s;}
-    .lb-row.is-me{border:1.5px solid var(--brand);background:#fff8f5;}
-    .lb-row:active{transform:scale(0.985);}
-
-    .rank-num{width:36px;font-size:17px;font-weight:900;text-align:center;flex-shrink:0;color:var(--muted);}
-    .rank-num.r1{color:var(--gold);}
-    .rank-num.r2{color:var(--silver);}
-    .rank-num.r3{color:var(--bronze);}
-
-    .row-info{flex:1;min-width:0;}
-    .row-name{font-size:14px;font-weight:700;white-space:nowrap;
-              overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-    .row-meta{font-size:11px;color:var(--muted);margin-top:2px;
-              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+             box-shadow:var(--shadow);display:flex;align-items:center;padding:12px 14px;gap:12px;}
+    .lb-row.is-me{border:2px solid var(--brand);background:#fff8f5;}
+    .rank-col{width:36px;font-size:17px;font-weight:900;text-align:center;flex-shrink:0;color:var(--muted);}
+    .rank-col.r1{color:var(--gold);}
+    .rank-col.r2{color:var(--silver);}
+    .rank-col.r3{color:var(--bronze);}
+    .info-col{flex:1;min-width:0;}
+    .row-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .row-meta{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .you-chip{display:inline-block;background:var(--brand);color:white;
-              font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px;
-              vertical-align:middle;margin-left:5px;text-transform:uppercase;letter-spacing:0.3px;}
-
-    .row-pts{text-align:right;flex-shrink:0;}
+               font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px;
+               vertical-align:middle;margin-left:5px;text-transform:uppercase;}
+    .pts-col{text-align:right;flex-shrink:0;}
     .pts-val{font-size:18px;font-weight:800;color:var(--brand);}
     .pts-sub{font-size:10px;color:var(--muted);margin-top:1px;}
 
-    /* Skeleton */
     @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
     .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
                background-size:400px 100%;animation:shimmer 1.4s ease infinite;border-radius:6px;}
-    .skel-row{height:66px;background:var(--white);margin:0 12px 6px;border-radius:var(--radius-sm);
-              box-shadow:var(--shadow);display:flex;align-items:center;padding:12px 14px;gap:12px;}
-    .skel-circle{width:36px;height:36px;border-radius:50%;flex-shrink:0;}
-    .skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;}
-    .skel-l{height:12px;}
-    .skel-l.short{width:40%;}
-    .skel-l.med{width:65%;}
+    .skel-row{height:64px;background:var(--white);margin:0 12px 6px;border-radius:var(--radius-sm);
+               box-shadow:var(--shadow);display:flex;align-items:center;padding:12px 14px;gap:12px;}
+    .skel-c{width:36px;height:36px;border-radius:50%;flex-shrink:0;}
+    .skel-lines{flex:1;display:flex;flex-direction:column;gap:7px;}
+    .skel-l{height:11px;}
+    .skel-l.s{width:40%;}
+    .skel-l.m{width:65%;}
 
-    /* Empty */
-    .empty-state{text-align:center;padding:48px 24px;color:var(--muted);margin:0 12px;}
-    .empty-state .icon{font-size:40px;margin-bottom:12px;}
+    .empty-box{text-align:center;padding:48px 24px;color:var(--muted);}
+    .empty-box .ei{font-size:36px;margin-bottom:10px;}
+    .empty-box p{font-size:14px;line-height:1.6;}
 
-    /* Bottom nav */
     .bottom-nav{background:var(--white);border-top:1px solid var(--border);
-                display:grid;grid-template-columns:1fr 1fr;
-                padding-bottom:max(12px,env(safe-area-inset-bottom));
-                position:sticky;bottom:0;z-index:100;}
-    .bnav-item{display:flex;flex-direction:column;align-items:center;
-               padding:10px 8px 4px;text-decoration:none;
-               color:var(--muted);font-size:10px;font-weight:600;
-               letter-spacing:0.3px;text-transform:uppercase;gap:4px;transition:color 0.15s;}
-    .bnav-item svg{width:22px;height:22px;}
-    .bnav-item.active{color:var(--brand);}
+                 display:grid;grid-template-columns:1fr 1fr;
+                 padding-bottom:max(12px,env(safe-area-inset-bottom));
+                 position:fixed;bottom:0;left:0;right:0;z-index:100;}
+    .bnav-a{display:flex;flex-direction:column;align-items:center;
+             padding:10px 8px 4px;text-decoration:none;
+             color:var(--muted);font-size:10px;font-weight:600;
+             letter-spacing:0.3px;text-transform:uppercase;gap:3px;}
+    .bnav-a svg{width:22px;height:22px;}
+    .bnav-a.active{color:var(--brand);}
   </style>
 </head>
 <body>
 
 <header class="header">
   <img src="aw_logo.jpg" alt="Arcgate Walkathon 2026">
-  <div class="header-right">
-    <button class="refresh-btn" onclick="refreshAll()" title="Refresh">
+  <div class="hdr-right">
+    <button class="icon-btn" id="refresh-btn" onclick="doRefresh()" title="Refresh">
       <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
         <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
       </svg>
     </button>
-    <button class="sign-out-btn" onclick="logout()">Sign out</button>
+    <button class="sign-out" onclick="logout()">Sign out</button>
   </div>
 </header>
 
-<div class="my-banner" id="my-banner">
-  <div class="my-info">
+<div class="my-banner">
+  <div>
     <div class="my-name" id="my-name">Loading...</div>
     <div class="my-tags" id="my-tags"></div>
   </div>
   <div class="my-rank-box">
     <div class="my-rank-num" id="my-rank">—</div>
-    <div class="my-rank-label">My Rank</div>
+    <div class="my-rank-lbl">My Rank</div>
   </div>
 </div>
 
-<div class="tabs-container" id="tabs-row">
-  <!-- tabs built dynamically -->
+<div class="tabs-wrap" id="tabs-wrap">
+  <button class="tab-btn active" id="tab-shift" onclick="switchTab('shift')">My Category</button>
+  <button class="tab-btn"        id="tab-team"  onclick="switchTab('team')">My Team</button>
 </div>
 
-<div class="content" id="content">
+<div class="content">
   <div id="lb-list">
-    <div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>
-    <div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>
-    <div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>
-    <div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>
-    <div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>
+    <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
+    <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
+    <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
+    <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
+    <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
   </div>
 </div>
 
 <nav class="bottom-nav">
-  <a class="bnav-item" href="participant.html">
+  <a class="bnav-a" href="participant.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
     </svg>
     Dashboard
   </a>
-  <a class="bnav-item active" href="participant-leaderboard.html">
+  <a class="bnav-a active" href="participant-leaderboard.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
       <line x1="6" y1="20" x2="6" y2="14"/>
@@ -174,61 +160,66 @@
 </nav>
 
 <script>
-var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SB   = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
-var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
+var HDR  = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 
-var ME = null, REG = [], ACTS = [];
+var ME   = null;
+var REG  = [];   // all registrations
+var ACTS = [];   // all activities
 var currentTab = 'shift';
 
+/* ── helpers ── */
 function logout() {
   sessionStorage.removeItem('wk_user');
   sessionStorage.removeItem('wk_admin');
   window.location.href = 'index.html';
 }
 function esc(v) {
-  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];
-  });
+  return String(v == null ? '' : v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+function norm(s) { return String(s || '').trim().toLowerCase(); }
 
+/* ── points calc — matches admin leaderboard ── */
 function calcBonus(km) {
   if (km >= 21) return 7;
   if (km >= 15) return 4;
   if (km >= 10) return 3;
-  if (km >= 8) return 2;
-  if (km >= 5) return 1;
+  if (km >= 8)  return 2;
+  if (km >= 5)  return 1;
   return 0;
 }
-
 function calcPts(athleteId) {
   var byDay = {};
-  ACTS.filter(function(a) {
-    return String(a.strava_athlete_id) === String(athleteId) && !a.is_flagged;
-  }).forEach(function(a) {
+  for (var i = 0; i < ACTS.length; i++) {
+    var a = ACTS[i];
+    if (String(a.strava_athlete_id) !== String(athleteId) || a.is_flagged) continue;
     var d = (a.activity_date || '').split('T')[0];
-    if (!d) return;
+    if (!d) continue;
     byDay[d] = (byDay[d] || 0) + (Number(a.distance_meters) || 0) / 1000;
-  });
+  }
   var km = 0, bonus = 0;
   for (var d in byDay) {
     var dk = Math.min(byDay[d], 21);
-    km += dk;
+    km    += dk;
     bonus += calcBonus(dk);
   }
   return { km: km, bonus: bonus, total: km + bonus };
 }
 
+/* ── fetch all pages from Supabase ── */
 async function fetchAll(url) {
   var all = [], from = 0, ps = 1000;
   while (true) {
     var sep = url.indexOf('?') > -1 ? '&' : '?';
-    var r = await fetch(url + sep + 'limit=' + ps + '&offset=' + from, {
-      headers: Object.assign({}, HDR, {'Range-Unit':'items','Range':from+'-'+(from+ps-1)})
+    var res = await fetch(url + sep + 'limit=' + ps + '&offset=' + from, {
+      headers: Object.assign({}, HDR, { 'Range-Unit':'items', 'Range': from + '-' + (from + ps - 1) })
     });
-    if (!r.ok) break;
-    var page = await r.json();
-    if (!Array.isArray(page) || !page.length) break;
+    if (!res.ok) break;
+    var page = await res.json();
+    if (!Array.isArray(page) || page.length === 0) break;
     all = all.concat(page);
     if (page.length < ps) break;
     from += ps;
@@ -236,66 +227,67 @@ async function fetchAll(url) {
   return all;
 }
 
-function buildTabs() {
-  var g = (ME.gender || '').toLowerCase();
-  var sh = (ME.shift || '').toLowerCase();
-  var team = ME.leaderboard_team || 'My Team';
-  var isNight = sh.indexOf('night') > -1;
-  var isFemale = g === 'female';
-
-  var tabs = [
-    { id: 'shift', label: isNight ? '🌙 Night Shift' : (isFemale ? '👩 Day Female' : '👨 Day Male') },
-    { id: 'team', label: '🏙️ ' + team }
-  ];
-  document.getElementById('tabs-row').innerHTML = tabs.map(function(t) {
-    return '<button class="tab-btn' + (t.id === currentTab ? ' active' : '') + '" onclick="switchTab('' + t.id + '')">' + t.label + '</button>';
-  }).join('');
-}
-
+/* ── filter rows for a given tab ── */
 function getRows(mode) {
-  var g = (ME.gender || '').toLowerCase();
-  var sh = (ME.shift || '').toLowerCase();
-  var team = ME.leaderboard_team || '';
-  var isNight = sh.indexOf('night') > -1;
-  var isFemale = g === 'female';
+  if (!ME) return [];
 
-  return REG.filter(function(p) {
-    var pg = (p.gender || '').toLowerCase();
-    var ps = (p.shift || '').toLowerCase();
+  var myGender  = norm(ME.gender);
+  var myShift   = norm(ME.shift);
+  var myTeam    = norm(ME.leaderboard_team);
+  var isNight   = myShift.indexOf('night') > -1;
+  var isFemale  = myGender === 'female' || myGender === 'f';
+
+  var filtered = REG.filter(function(p) {
+    var pg = norm(p.gender);
+    var ps = norm(p.shift);
+    var pt = norm(p.leaderboard_team);
+    var pIsFemale = (pg === 'female' || pg === 'f');
+
+    // gender must match
+    if (pIsFemale !== isFemale) return false;
+
     if (mode === 'team') {
-      return (p.leaderboard_team || '') === team &&
-             (isFemale ? pg === 'female' : (pg === 'male' || pg === 'm'));
+      // same team, same gender
+      return pt === myTeam;
     }
-    // shift mode
-    if (isNight) return ps.indexOf('night') > -1 && (isFemale ? pg === 'female' : (pg === 'male' || pg === 'm'));
-    return ps.indexOf('day') > -1 && (isFemale ? pg === 'female' : (pg === 'male' || pg === 'm'));
-  })
-  .map(function(p) { return { p: p, pts: calcPts(p.strava_athlete_id) }; })
-  .filter(function(r) { return r.pts.total > 0; })
-  .sort(function(a, b) { return b.pts.total - a.pts.total; });
+
+    // shift mode: same shift type (night vs day)
+    var pIsNight = ps.indexOf('night') > -1;
+    return pIsNight === isNight;
+  });
+
+  return filtered
+    .map(function(p) { return { p: p, pts: calcPts(p.strava_athlete_id) }; })
+    .filter(function(r) { return r.pts.total > 0; })
+    .sort(function(a, b) { return b.pts.total - a.pts.total; });
 }
 
+/* ── render rows ── */
 function renderRows(rows) {
-  if (!rows.length) {
+  var meId = ME ? String(ME.strava_athlete_id) : '';
+
+  if (rows.length === 0) {
     document.getElementById('lb-list').innerHTML =
-      '<div class="empty-state"><div class="icon">🏃</div><p>No activities in this category yet.</p></div>';
+      '<div class="empty-box"><div class="ei">🏃</div><p>No activities yet in this category.<br>Activities appear automatically after you save on Strava.</p></div>';
+    document.getElementById('my-rank').textContent = '—';
     return;
   }
-  var meId = String(ME.strava_athlete_id);
-  var myRankInList = rows.findIndex(function(r) { return String(r.p.strava_athlete_id) === meId; }) + 1;
 
+  var myRank = 0;
   var html = rows.map(function(r, i) {
     var isMe = String(r.p.strava_athlete_id) === meId;
-    var rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
-    var rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
+    if (isMe) myRank = i + 1;
+    var rc   = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+    var rl   = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
     var meta = [r.p.leaderboard_team, r.p.shift, r.p.gender].filter(Boolean).join(' · ');
     return '<div class="lb-row' + (isMe ? ' is-me' : '') + '">' +
-      '<div class="rank-num ' + rankClass + '">' + rankLabel + '</div>' +
-      '<div class="row-info">' +
-        '<div class="row-name">' + esc(r.p.full_name) + (isMe ? '<span class="you-chip">You</span>' : '') + '</div>' +
+      '<div class="rank-col ' + rc + '">' + rl + '</div>' +
+      '<div class="info-col">' +
+        '<div class="row-name">' + esc(r.p.full_name || '—') +
+          (isMe ? '<span class="you-chip">You</span>' : '') + '</div>' +
         '<div class="row-meta">' + esc(meta) + '</div>' +
       '</div>' +
-      '<div class="row-pts">' +
+      '<div class="pts-col">' +
         '<div class="pts-val">' + r.pts.total.toFixed(1) + '</div>' +
         '<div class="pts-sub">' + r.pts.km.toFixed(1) + ' km</div>' +
       '</div>' +
@@ -303,77 +295,91 @@ function renderRows(rows) {
   }).join('');
 
   document.getElementById('lb-list').innerHTML = html;
+  if (myRank > 0) document.getElementById('my-rank').textContent = '#' + myRank;
 
-  // Update my rank in banner to reflect this leaderboard
-  if (myRankInList > 0) document.getElementById('my-rank').textContent = '#' + myRankInList;
+  // scroll "You" into view
+  setTimeout(function() {
+    var el = document.querySelector('.lb-row.is-me');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 150);
 }
 
+/* ── tab switching ── */
 function switchTab(mode) {
   currentTab = mode;
-  // Update tab active state
-  var tabModes = ['shift', 'team'];
-  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
-    btn.classList.toggle('active', tabModes[i] === mode);
-  });
+  document.getElementById('tab-shift').classList.toggle('active', mode === 'shift');
+  document.getElementById('tab-team').classList.toggle('active',  mode === 'team');
   renderRows(getRows(mode));
-  // Scroll "You" row into view gently
-  setTimeout(function() {
-    var meRow = document.querySelector('.lb-row.is-me');
-    if (meRow) meRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 100);
 }
 
-function renderSkeletons() {
-  var html = '';
+/* ── update tab labels ── */
+function setTabLabels() {
+  if (!ME) return;
+  var myGender = norm(ME.gender);
+  var myShift  = norm(ME.shift);
+  var myTeam   = ME.leaderboard_team || 'My Team';
+  var isNight  = myShift.indexOf('night') > -1;
+  var isFemale = myGender === 'female' || myGender === 'f';
+
+  document.getElementById('tab-shift').textContent =
+    isNight ? '🌙 Night · ' + (isFemale ? 'Female' : 'Male')
+            : '☀️ Day · '   + (isFemale ? 'Female' : 'Male');
+  document.getElementById('tab-team').textContent = '🏙️ ' + myTeam;
+}
+
+/* ── skeletons ── */
+function showSkeletons() {
+  var h = '';
   for (var i = 0; i < 6; i++) {
-    html += '<div class="skel-row"><div class="skeleton skel-circle"></div><div class="skel-lines"><div class="skeleton skel-l med"></div><div class="skeleton skel-l short"></div></div></div>';
+    h += '<div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>';
   }
-  document.getElementById('lb-list').innerHTML = html;
+  document.getElementById('lb-list').innerHTML = h;
 }
 
+/* ── boot ── */
 async function boot() {
   var s = JSON.parse(sessionStorage.getItem('wk_user') || '{}');
   if (!s.loggedIn || !s.athleteId) { window.location.href = 'index.html'; return; }
 
   try {
-    var [regRes, regAll, acts] = await Promise.all([
-      fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=*', { headers: HDR }),
-      fetchAll(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
-      fetchAll(SUPABASE_URL + '/rest/v1/activities?is_deleted=eq.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged')
+    // Fetch in parallel
+    var results = await Promise.all([
+      fetch(SB + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=*', { headers: HDR }),
+      fetchAll(SB + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
+      fetchAll(SB + '/rest/v1/activities?is_deleted=eq.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged')
     ]);
 
-    var myRegs = await regRes.json();
-    ME = Array.isArray(myRegs) && myRegs.length ? myRegs[0] : {};
-    if (ME.strava_athlete_id === undefined) ME.strava_athlete_id = s.athleteId;
-    REG = regAll;
-    ACTS = acts;
+    var myRegs = await results[0].json();
+    ME   = (Array.isArray(myRegs) && myRegs.length) ? myRegs[0] : { strava_athlete_id: s.athleteId };
+    REG  = results[1];
+    ACTS = results[2];
 
-    // Profile banner
+    // Banner
     document.getElementById('my-name').textContent = ME.full_name || s.name || 'Participant';
     var tags = [];
     if (ME.leaderboard_team) tags.push(ME.leaderboard_team);
-    if (ME.gender) tags.push(ME.gender);
-    if (ME.shift) tags.push(ME.shift);
+    if (ME.gender)            tags.push(ME.gender);
+    if (ME.shift)             tags.push(ME.shift);
     document.getElementById('my-tags').innerHTML = tags.map(function(t) {
       return '<span class="my-tag">' + esc(t) + '</span>';
     }).join('');
 
-    buildTabs();
-    var rows = getRows(currentTab);
-    renderRows(rows);
+    setTabLabels();
+    renderRows(getRows(currentTab));
 
-  } catch(e) {
+  } catch (e) {
+    console.error('Leaderboard boot error:', e);
     document.getElementById('lb-list').innerHTML =
-      '<div class="empty-state"><div class="icon">⚠️</div><p>Could not load leaderboard.<br>Check your connection and refresh.</p></div>';
-    console.error(e);
+      '<div class="empty-box"><div class="ei">⚠️</div><p>Could not load leaderboard.<br>Check connection and tap refresh.</p></div>';
   }
 }
 
-function refreshAll() {
-  var icon = document.getElementById('refresh-icon');
-  icon.classList.add('spinning');
-  renderSkeletons();
-  boot().finally(function() { icon.classList.remove('spinning'); });
+function doRefresh() {
+  document.getElementById('refresh-icon').classList.add('spinning');
+  showSkeletons();
+  boot().finally(function() {
+    document.getElementById('refresh-icon').classList.remove('spinning');
+  });
 }
 
 boot();
