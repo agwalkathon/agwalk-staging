@@ -890,19 +890,14 @@ async function load() {
     }
     var el_mt = document.getElementById('s-movetime'); if(el_mt) el_mt.textContent = movingTimeStr;
 
-    // Time of Day counts (using IST = UTC+5:30)
+    // Time of Day counts — based on activity name keyword matching
     var tod = { morning:0, afternoon:0, evening:0, night:0 };
     validActs.forEach(function(a) {
-      if (!a.activity_date || a.activity_date.indexOf('T') === -1) return;
-      // Skip placeholder import times (06:30:00 UTC = imported from Excel)
-      if (a.activity_date.indexOf('T06:30:00') > -1) return;
-      var dt = new Date(a.activity_date);
-      // Convert to IST (UTC+5:30)
-      var istHour = (dt.getUTCHours() + 5 + Math.floor((dt.getUTCMinutes() + 30) / 60)) % 24;
-      if (istHour >= 5  && istHour < 12) tod.morning++;
-      else if (istHour >= 12 && istHour < 17) tod.afternoon++;
-      else if (istHour >= 17 && istHour < 21) tod.evening++;
-      else tod.night++;
+      var name = (a.activity_name || '').toLowerCase();
+      if      (name.indexOf('morning')   > -1) tod.morning++;
+      else if (name.indexOf('afternoon') > -1) tod.afternoon++;
+      else if (name.indexOf('evening')   > -1) tod.evening++;
+      else if (name.indexOf('night')     > -1) tod.night++;
     });
     var el_tm = document.getElementById('tod-morning');   if(el_tm) el_tm.textContent = tod.morning;
     var el_ta = document.getElementById('tod-afternoon'); if(el_ta) el_ta.textContent = tod.afternoon;
