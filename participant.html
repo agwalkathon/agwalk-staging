@@ -73,9 +73,9 @@
     .dash-section-title{font-size:12px;font-weight:700;color:var(--muted);
                          text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
     .standing-card{background:var(--white);border-radius:var(--radius);
-                   box-shadow:var(--shadow);overflow:hidden;}
+                   box-shadow:var(--shadow);overflow:hidden;padding:0 14px;}
     .standing-row{display:flex;align-items:center;justify-content:space-between;
-                  padding:12px 16px;border-bottom:1px solid var(--border);}
+                  padding:12px 0;border-bottom:1px solid var(--border);}
     .standing-row:last-child{border-bottom:none;}
     .standing-cat{font-size:13px;font-weight:600;color:var(--text);}
     .standing-rank{font-size:15px;font-weight:800;color:var(--brand);}
@@ -92,37 +92,37 @@
     .pts-needed{font-size:10px;color:var(--muted);font-weight:400;}
 
     /* ── Pace rows ── */
-    .pace-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .pace-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);min-width:0;}
     .pace-row:last-child{border-bottom:none;padding-bottom:0;}
     .pace-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
                     justify-content:center;font-size:15px;flex-shrink:0;}
     .pace-text-wrap{flex:1;min-width:0;}
     .pace-main{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;}
     .pace-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-    .pace-val-right{font-size:13px;font-weight:800;flex-shrink:0;color:var(--brand);text-align:right;min-width:44px;}
+    .pace-val-right{font-size:12px;font-weight:800;flex-shrink:0;color:var(--brand);text-align:right;min-width:48px;white-space:nowrap;}
 
     /* ── Streak bars ── */
     .sbar{flex:1;height:8px;border-radius:4px;}
     .sbar.on{background:var(--brand);}
     .sbar.dim{background:rgba(232,98,42,0.3);}
     .sbar.off{background:var(--border);}
-    .sbar-lbl{font-size:10px;color:var(--muted);}
+    .sbar-lbl{font-size:9px;color:var(--muted);text-align:center;}
 
     /* ── Rivals ── */
-    .rival-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+    .rival-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);min-width:0;}
     .rival-row:last-child{border-bottom:none;}
     .rival-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;flex-shrink:0;min-width:32px;text-align:center;}
     .rb-ahead{background:#fef3c7;color:#92400e;}
     .rb-you{background:#fff8f5;color:var(--brand);border:1px solid var(--brand);}
     .rb-behind{background:#dcfce7;color:#166534;}
-    .rival-name{flex:1;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .rival-gap{font-size:10px;font-weight:700;flex-shrink:0;}
+    .rival-name{flex:1;font-size:12px;font-weight:600;color:var(--text);min-width:0;padding-right:6px;}
+    .rival-gap{font-size:10px;font-weight:700;flex-shrink:0;white-space:nowrap;}
     .gap-up{color:#ef4444;}
     .gap-dn{color:#22c55e;}
     .gap-me{color:var(--brand);}
 
     /* ── Challenge rows ── */
-    .ch-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+    .ch-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0;}
     .ch-row:last-child{border-bottom:none;}
     .ch-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
              justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;}
@@ -378,7 +378,7 @@
           <div id="streak-msg" style="font-size:10px;color:var(--muted);margin-top:2px;">—</div>
         </div>
       </div>
-      <div id="streak-bars" style="display:flex;gap:4px;margin-top:10px;"></div>
+      <div id="streak-bars" style="display:flex;gap:4px;margin-top:10px;overflow:hidden;"></div>
       <div id="streak-labels" style="display:flex;justify-content:space-between;margin-top:3px;"></div>
     </div>
   </div>
@@ -1057,7 +1057,7 @@ async function load() {
           var rankNum = ri + 1;
           var div = document.createElement('div');
           div.className = 'rival-row';
-          if (isMe) div.style.cssText = 'background:#fff8f5;border-radius:8px;padding:6px 8px;margin:-2px 0;';
+          if (isMe) div.style.cssText = 'background:#fff8f5;border-radius:8px;padding:6px 4px;margin:0 -4px;';
           var badgeCls = ri < myRivalIdx ? 'rb-ahead' : isMe ? 'rb-you' : 'rb-behind';
           var gapHtml = '';
           if (!isMe) {
