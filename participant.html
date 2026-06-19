@@ -69,13 +69,13 @@
     .dc-lbl{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3;}
 
     /* ── Standing section ── */
-    .dash-section{margin-bottom:16px;}
-    .dash-section-title{font-size:12px;font-weight:700;color:var(--muted);
-                         text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+    .dash-section{margin-bottom:10px;}
+    .dash-section-title{font-size:11px;font-weight:700;color:var(--muted);
+                         text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
     .standing-card{background:var(--white);border-radius:var(--radius);
-                   box-shadow:var(--shadow);overflow:hidden;padding:0 14px;}
+                   box-shadow:var(--shadow);overflow:hidden;padding:2px 14px;}
     .standing-row{display:flex;align-items:center;justify-content:space-between;
-                  padding:12px 0;border-bottom:1px solid var(--border);}
+                  padding:9px 0;border-bottom:1px solid var(--border);}
     .standing-row:last-child{border-bottom:none;}
     .standing-cat{font-size:13px;font-weight:600;color:var(--text);}
     .standing-rank{font-size:15px;font-weight:800;color:var(--brand);}
@@ -83,7 +83,7 @@
     /* ── Medal progress ── */
     .medal-row{padding:6px 0;border-bottom:1px solid var(--border);}
     .medal-row:last-child{border-bottom:none;padding-bottom:0;}
-    .medal-row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    .medal-row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
     .medal-row-name{font-size:12px;font-weight:700;}
     .medal-row-pts{font-size:11px;color:var(--muted);}
     .progress-bar-bg{background:var(--border);border-radius:20px;height:5px;overflow:hidden;}
@@ -92,7 +92,7 @@
     .pts-needed{font-size:10px;color:var(--muted);font-weight:400;}
 
     /* ── Pace rows ── */
-    .pace-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);min-width:0;}
+    .pace-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0;}
     .pace-row:last-child{border-bottom:none;padding-bottom:0;}
     .pace-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
                     justify-content:center;font-size:15px;flex-shrink:0;}
@@ -109,7 +109,7 @@
     .sbar-lbl{font-size:9px;color:var(--muted);text-align:center;}
 
     /* ── Rivals ── */
-    .rival-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);min-width:0;}
+    .rival-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);min-width:0;}
     .rival-row:last-child{border-bottom:none;}
     .rival-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;flex-shrink:0;min-width:32px;text-align:center;}
     .rb-ahead{background:#fef3c7;color:#92400e;}
@@ -122,7 +122,7 @@
     .gap-me{color:var(--brand);}
 
     /* ── Challenge rows ── */
-    .ch-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);min-width:0;}
+    .ch-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);min-width:0;}
     .ch-row:last-child{border-bottom:none;}
     .ch-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
              justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;}
@@ -372,16 +372,16 @@
     <div class="standing-card">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
-          <div id="streak-num" style="font-size:28px;font-weight:800;color:var(--brand);line-height:1;">0</div>
+          <div id="streak-num" style="font-size:22px;font-weight:800;color:var(--brand);line-height:1;">0</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">consecutive days</div>
         </div>
         <div style="text-align:right;">
-          <div id="streak-best" style="font-size:11px;font-weight:700;color:var(--text);">Best: 0 days</div>
+          <div id="streak-best" style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px;">Best: 0 days</div>
           <div id="streak-msg" style="font-size:10px;color:var(--muted);margin-top:2px;">—</div>
         </div>
       </div>
-      <div id="streak-bars" style="display:flex;gap:4px;margin-top:10px;overflow:hidden;"></div>
-      <div id="streak-labels" style="display:flex;justify-content:space-between;margin-top:3px;"></div>
+      <div id="streak-bars" style="display:flex;gap:3px;margin-top:8px;overflow:hidden;"></div>
+      <div id="streak-labels" style="display:flex;justify-content:space-between;margin-top:4px;padding-bottom:4px;"></div>
     </div>
   </div>
 
