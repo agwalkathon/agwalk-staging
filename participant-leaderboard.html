@@ -190,31 +190,121 @@ function esc(v) {
 }
 function norm(s) { return String(s || '').trim().toLowerCase(); }
 
-/* ── points calc — matches admin leaderboard ── */
+/* ── points calc — exact match to admin leaderboard ── */
+var CONFIG  = { basePer_km: 1, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}] };
+var CHALLENGES   = [];
+var SPECIAL_DAYS = [];
+
 function calcBonus(km) {
-  if (km >= 21) return 7;
-  if (km >= 15) return 4;
-  if (km >= 10) return 3;
-  if (km >= 8)  return 2;
-  if (km >= 5)  return 1;
-  return 0;
+  var result = 0;
+  var sorted = CONFIG.bonus.slice().sort(function(a,b){ return b.km - a.km; });
+  for (var i = 0; i < sorted.length; i++) {
+    if (km >= Number(sorted[i].km)) { result = Number(sorted[i].points||sorted[i].pts||0); break; }
+  }
+  return result;
 }
-function calcPts(athleteId) {
+
+function calcPts(athleteId, gender) {
+  // Group valid (non-flagged) activities by date
   var byDay = {};
   for (var i = 0; i < ACTS.length; i++) {
     var a = ACTS[i];
     if (String(a.strava_athlete_id) !== String(athleteId) || a.is_flagged) continue;
     var d = (a.activity_date || '').split('T')[0];
     if (!d) continue;
-    byDay[d] = (byDay[d] || 0) + (Number(a.distance_meters) || 0) / 1000;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(a);
   }
-  var km = 0, bonus = 0;
-  for (var d in byDay) {
-    var dk = Math.min(byDay[d], 21);
-    km    += dk;
-    bonus += calcBonus(dk);
+
+  var totalDistKm = 0, totalDistPts = 0, totalBonus = 0, totalChallenge = 0;
+  var earnedChallenges = {};
+
+  // Per-day: sum km, apply 21km cap (unless special day), calc dist pts + bonus
+  for (var day in byDay) {
+    var dayKm = 0;
+    byDay[day].forEach(function(a){ dayKm += (parseFloat(a.distance_meters) || 0) / 1000; });
+    dayKm = parseFloat(dayKm.toFixed(4));
+    var isSpecial = SPECIAL_DAYS.indexOf(day) !== -1;
+    if (!isSpecial && dayKm > 21) dayKm = 21;
+    dayKm = parseFloat(dayKm.toFixed(4));
+    totalDistKm  += dayKm;
+    totalDistPts += parseFloat((dayKm * (parseFloat(CONFIG.basePer_km) || 1)).toFixed(2));
+    totalBonus   += calcBonus(dayKm);
   }
-  return { km: km, bonus: bonus, total: km + bonus };
+  totalDistKm  = parseFloat(totalDistKm.toFixed(2));
+  totalDistPts = parseFloat(totalDistPts.toFixed(2));
+
+  // Challenges — each awarded at most once per athlete
+  for (var ci = 0; ci < CHALLENGES.length; ci++) {
+    var ch = CHALLENGES[ci];
+    var key = 'ch_' + (ch.id || ci);
+    if (earnedChallenges[key]) continue;
+    var eligible = ch.eligible === 'all'
+      || ch.eligible === (gender || '').toLowerCase()
+      || ch.eligible === 'dayshift' || ch.eligible === 'nightshift';
+    if (!eligible) continue;
+    var cSports = (Array.isArray(ch.sport_types) && ch.sport_types.length)
+      ? ch.sport_types : ['Walk','Run','Hike','Ride'];
+    var awarded = false;
+    if (ch.activity_scope === 'daily') {
+      var cDays = [];
+      for (var day in byDay) {
+        // check direct date + IST+1 offset
+        var next = new Date(day + 'T00:00:00Z');
+        next.setDate(next.getDate() + 1);
+        var nextStr = next.toISOString().split('T')[0];
+        if ((day >= ch.start_date && day <= ch.end_date) ||
+            (nextStr >= ch.start_date && nextStr <= ch.end_date)) {
+          cDays.push(day);
+        }
+      }
+      for (var di = 0; di < cDays.length && !awarded; di++) {
+        var dActs = byDay[cDays[di]] || [];
+        var hasSport = dActs.some(function(a){ return cSports.indexOf(a.sport_type) > -1; });
+        if (!hasSport) continue;
+        var dKm = 0;
+        dActs.forEach(function(a){ if (cSports.indexOf(a.sport_type) > -1) dKm += (a.distance_meters||0)/1000; });
+        if (ch.distance_type === 'fixed' || ch.distance_type === 'range') {
+          awarded = dKm >= ch.distance_min - 0.1 && dKm <= ch.distance_max + 0.1;
+        } else {
+          awarded = dKm >= ch.distance_min;
+        }
+      }
+    } else {
+      // single activity scope
+      for (var ai = 0; ai < ACTS.length && !awarded; ai++) {
+        var a = ACTS[ai];
+        if (String(a.strava_athlete_id) !== String(athleteId)) continue;
+        if (cSports.indexOf(a.sport_type) === -1) continue;
+        var aKm = (a.distance_meters || 0) / 1000;
+        if (ch.distance_type === 'fixed' || ch.distance_type === 'range') {
+          awarded = aKm >= ch.distance_min - 0.1 && aKm <= ch.distance_max + 0.1;
+        } else {
+          awarded = aKm >= ch.distance_min;
+        }
+      }
+    }
+    if (awarded) {
+      earnedChallenges[key] = true;
+      totalChallenge += Number(ch.bonus_points) || 0;
+    }
+  }
+
+  // Manual bonus from activity rows
+  for (var i = 0; i < ACTS.length; i++) {
+    var a = ACTS[i];
+    if (String(a.strava_athlete_id) === String(athleteId) && !a.is_flagged) {
+      totalChallenge += parseFloat(a.manual_bonus) || 0;
+    }
+  }
+
+  return {
+    km:           totalDistKm,
+    distPts:      totalDistPts,
+    bonusPts:     totalBonus,
+    challengePts: parseFloat(totalChallenge.toFixed(2)),
+    total:        parseFloat((totalDistPts + totalBonus + totalChallenge).toFixed(2))
+  };
 }
 
 /* ── fetch all pages from Supabase ── */
@@ -265,7 +355,7 @@ function getRows(mode) {
   });
 
   return filtered
-    .map(function(p) { return { p: p, pts: calcPts(p.strava_athlete_id) }; })
+    .map(function(p) { return { p: p, pts: calcPts(p.strava_athlete_id, p.gender) }; })
     .filter(function(r) { return r.pts.total > 0; })
     .sort(function(a, b) { return b.pts.total - a.pts.total; });
 }
@@ -296,8 +386,9 @@ function renderRows(rows) {
         '<div class="row-meta">' + esc(meta) + '</div>' +
       '</div>' +
       '<div class="pts-col">' +
-        '<div class="pts-val">' + r.pts.total.toFixed(1) + '</div>' +
-        '<div class="pts-sub">' + r.pts.km.toFixed(1) + ' km</div>' +
+        '<div class="pts-val">' + r.pts.total.toFixed(1) + ' <span style="font-size:11px;font-weight:500;color:var(--muted)">pts</span></div>' +
+        '<div class="pts-sub">' + r.pts.km.toFixed(2) + ' km · ⚡' + r.pts.bonusPts +
+          (r.pts.challengePts > 0 ? ' · 🎯' + r.pts.challengePts.toFixed(1) : '') + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -364,17 +455,31 @@ async function boot() {
   if (!s.loggedIn || !s.athleteId) { window.location.href = 'index.html'; return; }
 
   try {
-    // Fetch in parallel
+    // Fetch in parallel — including config, challenges, special days
     var results = await Promise.all([
       fetch(SB + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=*', { headers: HDR }),
       fetchAll(SB + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
-      fetchAll(SB + '/rest/v1/activities?is_deleted=eq.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged')
+      fetchAll(SB + '/rest/v1/activities?is_deleted=eq.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus'),
+      fetch(SB + '/rest/v1/leaderboard_config?select=config_key,config_value', { headers: HDR }),
+      fetch(SB + '/rest/v1/challenges?is_active=eq.true&select=*', { headers: HDR }),
+      fetch(SB + '/rest/v1/special_scoring_days?select=special_date', { headers: HDR })
     ]);
 
     var myRegs = await results[0].json();
     ME   = (Array.isArray(myRegs) && myRegs.length) ? myRegs[0] : { strava_athlete_id: s.athleteId };
     REG  = results[1];
     ACTS = results[2];
+
+    // Load config
+    var cfgRows = await results[3].json();
+    if (Array.isArray(cfgRows)) cfgRows.forEach(function(row) {
+      if (row.config_key === 'bonus_points') CONFIG.bonus = row.config_value.map(function(b){ return {km:Number(b.km),points:Number(b.points||b.pts||0)}; });
+      if (row.config_key === 'base_points_per_km') CONFIG.basePer_km = parseFloat(row.config_value) || 1;
+    });
+    var chRows = await results[4].json();
+    CHALLENGES = Array.isArray(chRows) ? chRows : [];
+    var sdRows = await results[5].json();
+    SPECIAL_DAYS = Array.isArray(sdRows) ? sdRows.map(function(x){ return x.special_date; }) : [];
 
     // Banner
     document.getElementById('my-name').textContent = ME.full_name || s.name || 'Participant';
