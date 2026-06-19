@@ -365,35 +365,51 @@ async function startImport() {
 
   var allActivities = toImport.map(function(r){ return rowToActivity(r.row); });
   addLog('🚀 Starting import of ' + allActivities.length + ' activities...');
-  addLog('📡 Sending to server — this may take a moment...', '#fff3e0');
-
-  // Update progress to show working
-  fill.style.width = '50%';
-  pct.textContent = '50%';
-  lbl.textContent = 'Uploading to server...';
 
   var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
   var success = 0, failed = 0, skipped = 0;
+  var BATCH = 200;
+  var totalBatches = Math.ceil(allActivities.length / BATCH);
 
-  try {
-    var r = await fetch(BACKEND_URL + '/bulk-import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ activities: allActivities })
-    });
+  for (var i = 0; i < allActivities.length; i += BATCH) {
+    var batch = allActivities.slice(i, i + BATCH);
+    var batchNum = Math.floor(i / BATCH) + 1;
+    lbl.textContent = 'Batch ' + batchNum + ' / ' + totalBatches + '…';
+    addLog('📡 Sending batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' rows)...', '#fff3e0');
 
-    var result = await r.json();
-    if (r.ok && result.success) {
-      success = result.imported || 0;
-      skipped = result.skipped || 0;
-      failed  = result.failed  || 0;
-    } else {
-      failed = allActivities.length;
-      addLog('❌ Server error: ' + (result.error || 'Unknown error'), '#ef9a9a');
+    try {
+      var r = await fetch(BACKEND_URL + '/bulk-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activities: batch })
+      });
+
+      if (!r.ok) {
+        var errText = await r.text();
+        failed += batch.length;
+        addLog('❌ Batch ' + batchNum + ' server error: ' + errText.substring(0, 120), '#ef9a9a');
+      } else {
+        var result = await r.json();
+        if (result.success) {
+          success += result.imported || 0;
+          skipped += result.skipped || 0;
+          failed  += result.failed  || 0;
+          addLog('✅ Batch ' + batchNum + ': ' + (result.imported||0) + ' imported, ' + (result.skipped||0) + ' skipped');
+        } else {
+          failed += batch.length;
+          addLog('❌ Batch ' + batchNum + ' error: ' + (result.error || 'Unknown'), '#ef9a9a');
+        }
+      }
+    } catch(e) {
+      failed += batch.length;
+      addLog('❌ Batch ' + batchNum + ' network error: ' + e.message, '#ef9a9a');
     }
-  } catch(e) {
-    failed = allActivities.length;
-    addLog('❌ Network error: ' + e.message, '#ef9a9a');
+
+    // Update progress bar
+    var done = Math.min(i + BATCH, allActivities.length);
+    var pctVal = Math.round(done / allActivities.length * 100);
+    fill.style.width = pctVal + '%';
+    pct.textContent = pctVal + '%';
   }
 
   // Done
