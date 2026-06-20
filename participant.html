@@ -327,11 +327,7 @@
     }
     .bnav-item svg{width:22px;height:22px;stroke-width:2;}
     .bnav-item.active{color:var(--brand);}
-    .bnav-item.active::after{
-      content:'';position:absolute;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 100% - 4px);
-      left:50%;transform:translateX(-50%);
-      width:24px;height:3px;background:var(--brand);border-radius:0 0 3px 3px;
-    }
+
 
     .points,.distance,.rank,td,th{font-variant-numeric:tabular-nums;}
   </style>
@@ -989,6 +985,9 @@ function showTab(tab){
   document.getElementById('bnav-dashboard').classList.toggle('active',tab==='dashboard');
   document.getElementById('bnav-activities').classList.toggle('active',tab==='activities');
   document.getElementById('bnav-leaderboard').classList.remove('active');
+  var isDash=tab==='dashboard';
+  document.querySelector('.hero-rings-block').style.display=isDash?'':'none';
+  document.querySelector('.hero-metrics-block').style.display=isDash?'':'none';
 }
 
 function refreshData(){
