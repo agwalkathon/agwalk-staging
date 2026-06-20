@@ -672,7 +672,7 @@ async function load() {
     if(reg.gender)tags.push(reg.gender==='Female'?icoFemale+' Female':icoMale+' Male');
     if(reg.shift)tags.push(icoClock+' '+reg.shift);
     if(reg.leaderboard_team)tags.push(icoTeam+' '+reg.leaderboard_team);
-    document.getElementById('p-tags').innerHTML=tags.map(function(t){return '<span class="hero-tag">'+esc(t)+'</span>';}).join('');
+    document.getElementById('p-tags').innerHTML=tags.map(function(t){var sp=t.indexOf('</svg>');return sp>=0?'<span class="hero-tag">'+t.substring(0,sp+6)+' '+esc(t.substring(sp+6).trim())+'</span>':'<span class="hero-tag">'+esc(t)+'</span>';}).join('');
 
     var fullPts=calcFullPts(myActs,reg.gender);
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
