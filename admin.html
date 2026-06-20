@@ -640,7 +640,12 @@
     </div>
 
     <!-- ── Quick Nav ── -->
-    <div class="section-title">Quick access</div>
+    <div style="margin-bottom:20px">
+      <div id="quick-access-header" onclick="toggleQuickAccess()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;user-select:none">
+        <span style="font-size:13px;font-weight:600;color:var(--text-primary)">Quick access</span>
+        <span id="quick-access-chevron" style="font-size:12px;color:#888;transition:transform .2s">▼</span>
+      </div>
+      <div id="quick-access-body" style="display:none;margin-top:8px">
     <div class="nav-grid">
       <a href="activities.html" class="nav-card">
         <div class="nav-card-icon"><i class="ti ti-run"></i></div>
@@ -687,6 +692,8 @@
         </div>
       </a>
     </div>
+      </div><!-- /quick-access-body -->
+    </div><!-- /quick-access wrapper -->
 
     <!-- ── Recent Activity Feed ── -->
     <div class="card">
@@ -721,6 +728,14 @@
 const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
+
+function toggleQuickAccess() {
+  var body = document.getElementById('quick-access-body');
+  var chev = document.getElementById('quick-access-chevron');
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.textContent = open ? '▼' : '▲';
+}
 
 function authGuard() {
   const s = JSON.parse(sessionStorage.getItem('wk_admin') || '{}');
@@ -814,12 +829,31 @@ async function load() {
   const nm = {};
   if (Array.isArray(regs)) regs.forEach(r => nm[r.strava_athlete_id] = r.full_name);
 
-  document.getElementById('s-participants').textContent = Array.isArray(regs) ? regs.length : 0;
-  document.getElementById('s-activities').textContent   = totalCount;
-  document.getElementById('s-km').textContent           = totalKm.toFixed(1) + ' km';
-  document.getElementById('s-flagged').textContent      = flagCount;
-  document.getElementById('s-today').textContent        = todayCount;
-  document.getElementById('s-connected').textContent    = Array.isArray(conn) ? conn.length : 0;
+  function fmtIN(n) {
+    n = Math.round(n);
+    if (n < 1000) return n.toString();
+    var s = n.toString(), last3 = s.slice(-3), rest = s.slice(0, -3);
+    var parts = [last3];
+    while (rest.length > 2) { parts.unshift(rest.slice(-2)); rest = rest.slice(0,-2); }
+    if (rest) parts.unshift(rest);
+    return parts.join(',');
+  }
+  function fmtKmIN(km) {
+    var k = Math.round(km * 10) / 10;
+    var s = k.toFixed(1), dec = s.slice(-2), intPart = s.slice(0, -2);
+    var n = parseInt(intPart, 10);
+    var fmt;
+    if (n < 1000) { fmt = n.toString(); }
+    else { var last3 = intPart.slice(-3), rest = intPart.slice(0,-3); var parts=[last3]; while(rest.length>2){parts.unshift(rest.slice(-2));rest=rest.slice(0,-2);}if(rest)parts.unshift(rest);fmt=parts.join(','); }
+    return fmt + dec + ' km';
+  }
+
+  document.getElementById('s-participants').textContent = fmtIN(Array.isArray(regs) ? regs.length : 0);
+  document.getElementById('s-activities').textContent   = fmtIN(totalCount);
+  document.getElementById('s-km').textContent           = fmtKmIN(totalKm);
+  document.getElementById('s-flagged').textContent      = fmtIN(flagCount);
+  document.getElementById('s-today').textContent        = fmtIN(todayCount);
+  document.getElementById('s-connected').textContent    = fmtIN(Array.isArray(conn) ? conn.length : 0);
 
   // Flag badge on nav card
   const fb = document.getElementById('flag-badge');
