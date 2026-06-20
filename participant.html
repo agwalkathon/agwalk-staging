@@ -747,16 +747,33 @@ async function load() {
     // Streak
     var activeDays={};
     myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){var d=(a.activity_date||'').split('T')[0];if(d)activeDays[d]=true;});
+
+    // Use local date string to avoid UTC offset shifting dates (IST = UTC+5:30)
+    function localDateStr(d){
+      var yr=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');
+      return yr+'-'+mo+'-'+dy;
+    }
+
     var streak=0,checkDate=new Date(now);checkDate.setHours(0,0,0,0);
-    if(!activeDays[checkDate.toISOString().split('T')[0]])checkDate.setDate(checkDate.getDate()-1);
-    while(true){var ds=checkDate.toISOString().split('T')[0];if(activeDays[ds]){streak++;checkDate.setDate(checkDate.getDate()-1);}else break;}
+    // If today has no activity, allow checking from yesterday too
+    if(!activeDays[localDateStr(checkDate)])checkDate.setDate(checkDate.getDate()-1);
+    while(true){var ds=localDateStr(checkDate);if(activeDays[ds]){streak++;checkDate.setDate(checkDate.getDate()-1);}else break;}
+
     var sortedDays=Object.keys(activeDays).sort(),best=0,cur=0,prevD=null;
     sortedDays.forEach(function(d){if(prevD){var diff=(new Date(d)-new Date(prevD))/86400000;cur=diff===1?cur+1:1;}else cur=1;best=Math.max(best,cur);prevD=d;});
+
     document.getElementById('streak-num').textContent=(streak>0?'🔥':'')+streak;
     document.getElementById('streak-best-val').textContent=best;
     document.getElementById('streak-msg').textContent=streak>=7?'Amazing streak!':streak>=3?'Keep it going!':streak>0?'Good start!':'Start today!';
+
     var days7=[],labels7=[];
-    for(var di=6;di>=0;di--){var dd=new Date(now);dd.setDate(dd.getDate()-di);dd.setHours(0,0,0,0);var dstr=dd.toISOString().split('T')[0];var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0});labels7.push(di===0?'Today':dayNames[dd.getDay()]);}
+    for(var di=6;di>=0;di--){
+      var dd=new Date(now);dd.setDate(dd.getDate()-di);dd.setHours(0,0,0,0);
+      var dstr=localDateStr(dd);
+      var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0});
+      labels7.push(di===0?'Today':dayNames[dd.getDay()]);
+    }
     document.getElementById('streak-bars').innerHTML=days7.map(function(d){return'<div class="sbar '+(d.isToday?'dim':d.active?'on':'off')+'"></div>';}).join('');
     document.getElementById('streak-labels').innerHTML=labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join('');
 
