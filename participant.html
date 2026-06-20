@@ -14,8 +14,8 @@
     :root{
       --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
       --bg:#0A0C10; --surface:#181C28; --surface2:#22273A;
-      --border:rgba(255,255,255,0.16);
-      --text:#FFFFFF; --muted:rgba(255,255,255,0.78);
+      --border:rgba(255,255,255,0.10);
+      --text:#FFFFFF; --muted:rgba(255,255,255,0.52); --label:rgba(255,255,255,0.35); --dim:rgba(255,255,255,0.20);
       --green:#22C55E; --green-dim:rgba(34,197,94,0.12);
       --blue:#60A5FA; --blue-dim:rgba(96,165,250,0.12);
       --purple:#A78BFA; --purple-dim:rgba(167,139,250,0.12);
@@ -96,7 +96,7 @@
     .ring-emoji{font-size:18px;margin-bottom:3px;}
     .ring-name{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
     .ring-name.br{color:#CD7F32;} .ring-name.si{color:#94A3B8;} .ring-name.go{color:#F59E0B;}
-    .ring-need{font-size:9px;font-weight:600;color:var(--muted);margin-top:2px;text-align:center;line-height:1.3;}
+    .ring-need{font-size:9px;font-weight:600;color:var(--label);margin-top:2px;text-align:center;line-height:1.3;}
     .ring-need.done{color:var(--green);}
 
     /* ── Big metric trio ── */
@@ -110,7 +110,7 @@
     .metric-val.orange{color:var(--brand);}
     .metric-val.green{color:var(--green);}
     .metric-val.blue{color:var(--blue);}
-    .metric-lbl{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
+    .metric-lbl{font-size:9.5px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
 
     /* ── Content area ── */
     .content{flex:1;padding:14px 14px 90px;display:none;}
@@ -118,7 +118,7 @@
     .max-w{max-width:540px;margin:0 auto;}
 
     /* ── Section label ── */
-    .sec{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px;}
+    .sec{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px;}
     .sec:first-child{margin-top:4px;}
 
     /* ── Card ── */
@@ -129,7 +129,7 @@
     .lrow:last-child{border-bottom:none;}
     .lrow-left{flex:1;}
     .lrow-label{font-size:13px;font-weight:600;color:var(--text);}
-    .lrow-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+    .lrow-sub{font-size:10px;color:var(--label);margin-top:2px;}
     .lrow-val{font-size:18px;font-weight:800;color:var(--brand);flex-shrink:0;}
 
     /* ── WHOOP-style activity tile rows ── */
@@ -139,14 +139,14 @@
     .date-row:active{background:var(--surface2);}
     .date-col{flex:1;}
     .date-label{font-size:13px;font-weight:700;color:#fff;}
-    .date-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+    .date-sub{font-size:10px;color:var(--label);margin-top:2px;}
     .date-pts-strip{display:flex;gap:4px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
     .dpill{font-size:9px;font-weight:700;padding:3px 7px;border-radius:7px;white-space:nowrap;}
     .dpill.dist{background:rgba(96,165,250,0.15);color:#60A5FA;}
     .dpill.bonus{background:rgba(245,158,11,0.15);color:#F59E0B;}
     .dpill.chall{background:rgba(34,197,94,0.15);color:#22C55E;}
     .dpill.total{background:var(--brand);color:#fff;}
-    .date-chevron{font-size:10px;color:var(--muted);transition:transform 0.2s;flex-shrink:0;}
+    .date-chevron{font-size:10px;color:var(--label);transition:transform 0.2s;flex-shrink:0;}
     .date-group.open .date-chevron{transform:rotate(180deg);}
     .acts-inner{display:none;border-top:1px solid var(--border);}
     .date-group.open .acts-inner{display:block;}
@@ -165,12 +165,12 @@
     .act-tile-icon.hike{background:#5b21b6;}
     .act-tile-icon.other{background:#374151;}
     .act-tile-body{flex:1;min-width:0;}
-    .act-tile-sport{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+    .act-tile-sport{font-size:11px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:0.5px;}
     .act-tile-name{font-size:13px;font-weight:700;color:#fff;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .act-tile-meta{font-size:10px;color:var(--muted);margin-top:3px;}
     .act-tile-right{text-align:right;flex-shrink:0;}
     .act-tile-dist{font-size:20px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.3px;}
-    .act-tile-dist-lbl{font-size:9px;font-weight:600;color:var(--muted);margin-top:1px;}
+    .act-tile-dist-lbl{font-size:9px;font-weight:600;color:var(--label);margin-top:1px;}
     .act-tile-flag{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;}
     .flag-valid{background:rgba(34,197,94,0.15);color:#22C55E;}
     .flag-bad{background:rgba(239,68,68,0.15);color:#EF4444;}
