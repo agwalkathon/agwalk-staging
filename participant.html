@@ -49,12 +49,22 @@
     .sign-out-btn:active{color:#fff;background:rgba(255,255,255,0.1);}
 
     /* ── Hero profile strip ── */
-    .hero{
+    .hero-profile{
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      padding:16px 18px 16px;
+    }
+    .hero-rings-block{
       background:var(--surface);
       border-bottom:1px solid var(--border);
       padding:16px 18px 18px;
     }
-    .hero-top{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .hero-metrics-block{
+      background:var(--surface2);
+      border-bottom:1px solid var(--border);
+      padding:14px 18px;
+    }
+    .hero-top{display:flex;align-items:center;gap:12px;}
     .avatar{
       width:46px;height:46px;border-radius:50%;
       background:var(--brand);color:#fff;
@@ -191,11 +201,11 @@
     .mc-done{position:absolute;top:4px;right:4px;font-size:7px;font-weight:700;background:var(--brand);color:#fff;padding:1px 5px;border-radius:5px;}
 
     /* ── Standing ── */
-    .standing-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .standing-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);}
     .standing-row:last-child{border-bottom:none;}
-    .standing-rank-big{font-size:32px;font-weight:900;color:var(--brand);min-width:60px;line-height:1;}
-    .standing-info{flex:1;}
-    .standing-cat{font-size:12px;font-weight:700;color:#fff;}
+    .standing-rank-big{font-size:32px;font-weight:900;color:var(--brand);min-width:68px;line-height:1;flex-shrink:0;}
+    .standing-info{flex:1;min-width:0;}
+    .standing-cat{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .standing-sub{font-size:10px;color:var(--muted);margin-top:2px;}
 
     /* ── Pace goals ── */
@@ -312,8 +322,8 @@
   </div>
 </header>
 
-<!-- Hero: profile + medal rings + metrics -->
-<div class="hero">
+<!-- Block 1: Profile -->
+<div class="hero-profile">
   <div class="hero-top">
     <div class="avatar" id="p-initials">?</div>
     <div class="hero-info">
@@ -321,10 +331,11 @@
       <div class="hero-tags" id="p-tags"></div>
     </div>
   </div>
+</div>
 
-  <!-- Medal rings -->
+<!-- Block 2: Medal Rings -->
+<div class="hero-rings-block">
   <div class="rings-row" id="medal-rings">
-    <!-- Bronze -->
     <div class="ring-box">
       <div class="ring-svg-wrap">
         <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill br" id="ring-fill-br" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
@@ -333,7 +344,6 @@
       <div class="ring-name br">Bronze</div>
       <div class="ring-need" id="ring-need-br">—</div>
     </div>
-    <!-- Silver -->
     <div class="ring-box">
       <div class="ring-svg-wrap">
         <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill si" id="ring-fill-si" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
@@ -342,7 +352,6 @@
       <div class="ring-name si">Silver</div>
       <div class="ring-need" id="ring-need-si">—</div>
     </div>
-    <!-- Gold -->
     <div class="ring-box">
       <div class="ring-svg-wrap">
         <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill go" id="ring-fill-go" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
@@ -352,8 +361,10 @@
       <div class="ring-need" id="ring-need-go">—</div>
     </div>
   </div>
+</div>
 
-  <!-- Metrics -->
+<!-- Block 3: Metrics -->
+<div class="hero-metrics-block">
   <div class="metric-trio">
     <div class="metric-box">
       <div class="metric-val orange" id="s-pts-display">—</div>
@@ -390,24 +401,6 @@
         <div class="standing-sub">Team category</div>
       </div>
     </div>
-  </div>
-
-  <div class="sec">Road to Medal</div>
-  <div class="card">
-    <div class="medal-header-row">
-      <div class="medal-current-block">
-        <div class="medal-emoji-big" id="medal-icon">🏅</div>
-        <div class="medal-current-info">
-          <div class="medal-current-lbl">Current Medal</div>
-          <div class="medal-current-name" id="medal-label">—</div>
-        </div>
-      </div>
-      <div class="medal-pts-right">
-        <div class="medal-pts-big" id="medal-pts-big">—</div>
-        <div class="medal-pts-lbl">Total Points</div>
-      </div>
-    </div>
-    <div class="medal-grid" id="medal-progress"></div>
   </div>
 
   <div class="sec">Pace Goals</div>
@@ -696,14 +689,7 @@ async function load() {
     var gKey=(reg.gender||'').toLowerCase()==='female'?'female':'male';
     var bronzeThresh=Number(medals.bronze[gKey])||100,silverThresh=Number(medals.silver[gKey])||150,goldThresh=Number(medals.gold[gKey])||200;
     var myPts=fullPts.total;
-    var currentMedal='None',medalIcon='🏅';
-    if(myPts>=goldThresh){currentMedal='Gold';medalIcon='🥇';}
-    else if(myPts>=silverThresh){currentMedal='Silver';medalIcon='🥈';}
-    else if(myPts>=bronzeThresh){currentMedal='Bronze';medalIcon='🥉';}
-    document.getElementById('medal-icon').textContent=medalIcon;
-    document.getElementById('medal-label').textContent=currentMedal;
     document.getElementById('s-pts-display').textContent=myPts.toFixed(1);
-    document.getElementById('medal-pts-big').textContent=myPts.toFixed(1);
 
     // ── Medal rings ───────────────────────────────────────────────────────────
     var CIRC=213.6; // 2 * π * 34
@@ -716,26 +702,11 @@ async function load() {
       var pctEl=document.getElementById('ring-pct-'+m.id);
       var needEl=document.getElementById('ring-need-'+m.id);
       if(fillEl) fillEl.style.strokeDashoffset=offset;
-      if(pctEl) pctEl.textContent=done?'✓':pct+'%';
-      if(pctEl&&done) pctEl.style.fontSize='22px';
+      if(pctEl){pctEl.textContent=done?'✓':pct+'%';if(done)pctEl.style.fontSize='22px';}
       if(needEl){
         if(done){needEl.textContent='Achieved!';needEl.classList.add('done');}
         else{needEl.textContent='Need '+needed.toFixed(0)+' pts';}
       }
-    });
-
-    var mpWrap=document.getElementById('medal-progress'); mpWrap.innerHTML='';
-    [{emoji:'🥉',name:'Bronze',thresh:bronzeThresh,cls:'br'},{emoji:'🥈',name:'Silver',thresh:silverThresh,cls:'si'},{emoji:'🥇',name:'Gold',thresh:goldThresh,cls:'go'}].forEach(function(m){
-      var pct=Math.min(100,Math.round((myPts/m.thresh)*100)),done=myPts>=m.thresh,needed=Math.max(0,m.thresh-myPts).toFixed(1);
-      var card=document.createElement('div'); card.className='medal-item'+(done?' achieved':'');
-      card.innerHTML=(done?'<div class="mc-done">✓</div>':'')+
-        '<div class="mc-emoji">'+m.emoji+'</div>'+
-        '<div class="mc-name '+m.cls+'">'+m.name+'</div>'+
-        '<div class="mc-pct">'+pct+'%</div>'+
-        '<div class="mc-pts-lbl">'+myPts.toFixed(1)+' / '+m.thresh+'</div>'+
-        '<div class="mc-bar"><div class="mc-fill '+m.cls+'" style="width:'+pct+'%"></div></div>'+
-        '<div class="mc-need">'+(done?'Achieved 🎉':'Need '+needed+' pts')+'</div>';
-      mpWrap.appendChild(card);
     });
 
     // Standing
@@ -896,4 +867,5 @@ load();
 </script>
 </body>
 </html>
+
 
