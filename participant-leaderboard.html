@@ -243,9 +243,237 @@ function norm(s){return String(s||'').trim().toLowerCase();}
 var CONFIG={basePer_km:1,bonus:[{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}]};
 var CHALLENGES=[],SPECIAL_DAYS=[];
 
-function calcBonus(km){var result=0,sorted=CONFIG.bonus.slice().sort(function(a,b){return b.km-a.km;});for(var i=0;i<sorted.length;i++){if(km>=Number(sorted[i].km)){result=Number(sorted[i].points||sorted[i].pts||0);break;}}return result;}
-function checkChallengeSingle(act,ch,cSports){var actDate=(act.activity_date||'').split('T')[0];if(actDate<ch.start_date||actDate>ch.end_date)return false;if(cSports.indexOf(act.sport_type)===-1)return false;var km=(act.distance_meters||0)/1000;if(ch.distance_type==='fixed'||ch.distance_type==='range'){if(km<ch.distance_min-0.1||km>ch.distance_max+0.1)return false;}else{if(km<ch.distance_min)return false;}if((ch.elevation_criteria||0)>0&&(act.elevation_gain||0)<ch.elevation_criteria)return false;if(ch.start_time_criteria&&act.activity_date&&act.activity_date.indexOf('T')>-1){var timeStr=act.activity_date.split('T')[1]||'';if(!timeStr.startsWith('06:30:00')){var actTime=new Date(act.activity_date),actMins=actTime.getHours()*60+actTime.getMinutes(),parts=ch.start_time_criteria.split(':'),critMins=parseInt(parts[0])*60+parseInt(parts[1]||0);if(Math.abs(actMins-critMins)>30)return false;}}return true;}
-function calcFullPts(myActs,gender){var byDay={};myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){var d=(a.activity_date||'').split('T')[0];if(!d)return;if(!byDay[d])byDay[d]=[];byDay[d].push(a);});var totalDistKm=0,totalDistPts=0,totalBonus=0,totalChallenge=0,earnedChallenges={},dayBreakdown={},actBreakdown={};var excludeBonusDays={};CHALLENGES.forEach(function(ch){if(!ch.exclude_normal_bonus)return;for(var day in byDay){if(day>=ch.start_date&&day<=ch.end_date)excludeBonusDays[day]=true;}});for(var day in byDay){var dayKm=0;byDay[day].forEach(function(a){dayKm+=(parseFloat(a.distance_meters)||0)/1000;});dayKm=parseFloat(dayKm.toFixed(4));var isSpecial=SPECIAL_DAYS.indexOf(day)!==-1;if(!isSpecial&&dayKm>21)dayKm=21;dayKm=parseFloat(dayKm.toFixed(4));var base=parseFloat(CONFIG.basePer_km)||1,dPts=parseFloat((dayKm*base).toFixed(2)),bPts=excludeBonusDays[day]?0:calcBonus(dayKm);totalDistKm+=dayKm;totalDistPts+=dPts;totalBonus+=bPts;dayBreakdown[day]={km:dayKm,distPts:dPts,bonusPts:bPts,challenges:[]};}totalDistKm=parseFloat(totalDistKm.toFixed(2));totalDistPts=parseFloat(totalDistPts.toFixed(2));for(var ci=0;ci<CHALLENGES.length;ci++){var ch=CHALLENGES[ci],key='ch_'+(ch.id||ci);if(earnedChallenges[key])continue;var g=(gender||'').toLowerCase(),eligible=ch.eligible==='all'||ch.eligible===g||ch.eligible==='dayshift'||ch.eligible==='nightshift';if(!eligible)continue;var cSports=(Array.isArray(ch.sport_types)&&ch.sport_types.length)?ch.sport_types:['Walk','Run','Hike','Ride'];var chPts=Number(ch.bonus_points)||0,chName=ch.name||'Challenge',awarded=false,awardedDay=null,awardedActId=null;if(ch.activity_scope==='daily'){for(var day in byDay){if(awarded)break;var next=new Date(day+'T00:00:00Z');next.setDate(next.getDate()+1);var nStr=next.toISOString().split('T')[0],inRange=(day>=ch.start_date&&day<=ch.end_date)||(nStr>=ch.start_date&&nStr<=ch.end_date);if(!inRange)continue;var dActs=byDay[day],hasSport=dActs.some(function(a){return cSports.indexOf(a.sport_type)>-1;});if(!hasSport)continue;var dKm=0;dActs.forEach(function(a){if(cSports.indexOf(a.sport_type)>-1)dKm+=(a.distance_meters||0)/1000;});if(ch.distance_type==='fixed'||ch.distance_type==='range'){awarded=dKm>=ch.distance_min-0.1&&dKm<=ch.distance_max+0.1;}else{awarded=dKm>=ch.distance_min;}if(awarded)awardedDay=day;}}else{var validActs=myActs.filter(function(a){return !a.is_flagged;}),perActPts=Number(ch.per_activity_points)||0;if(perActPts>0){for(var ai=0;ai<validActs.length;ai++){var a=validActs[ai];if(checkChallengeSingle(a,ch,cSports)){awarded=true;var actDay=(a.activity_date||'').split('T')[0];totalChallenge+=perActPts;if(actDay&&dayBreakdown[actDay])dayBreakdown[actDay].challenges.push({name:chName,pts:perActPts,actId:a.strava_activity_id});if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};actBreakdown[a.strava_activity_id].challenges.push({name:chName,pts:perActPts});}}if(awarded)earnedChallenges[key]=true;}else{for(var ai=0;ai<validActs.length;ai++){if(awarded)break;var a=validActs[ai];if(checkChallengeSingle(a,ch,cSports)){awarded=true;awardedActId=a.strava_activity_id;awardedDay=(a.activity_date||'').split('T')[0];}}if(awarded){earnedChallenges[key]=true;totalChallenge+=chPts;if(awardedDay&&dayBreakdown[awardedDay])dayBreakdown[awardedDay].challenges.push({name:chName,pts:chPts,actId:awardedActId});if(awardedActId){if(!actBreakdown[awardedActId])actBreakdown[awardedActId]={challenges:[]};actBreakdown[awardedActId].challenges.push({name:chName,pts:chPts});}}}}if(awarded&&ch.activity_scope==='daily'){earnedChallenges[key]=true;totalChallenge+=chPts;if(awardedDay&&dayBreakdown[awardedDay])dayBreakdown[awardedDay].challenges.push({name:chName,pts:chPts,actId:awardedActId});}}myActs.filter(function(a){return !a.is_flagged&&parseFloat(a.manual_bonus)>0;}).forEach(function(a){var mb=parseFloat(a.manual_bonus);totalChallenge+=mb;var day=(a.activity_date||'').split('T')[0];if(dayBreakdown[day])dayBreakdown[day].challenges.push({name:'Manual bonus',pts:mb,actId:a.strava_activity_id});if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};actBreakdown[a.strava_activity_id].challenges.push({name:'Manual bonus',pts:mb});});totalChallenge=parseFloat(totalChallenge.toFixed(2));return{km:totalDistKm,distPts:totalDistPts,bonusPts:totalBonus,challengePts:totalChallenge,total:parseFloat((totalDistPts+totalBonus+totalChallenge).toFixed(2)),dayBreakdown:dayBreakdown,actBreakdown:actBreakdown};}
+function calcBonus(km) {
+  var result = 0;
+  var sorted = CONFIG.bonus.slice().sort(function(a,b){ return b.km - a.km; });
+  for (var i = 0; i < sorted.length; i++) {
+    if (km >= Number(sorted[i].km)) {
+      result = Number(sorted[i].points || sorted[i].pts || 0);
+      break;
+    }
+  }
+  return result;
+}
+
+function checkChallenge(act, challenge) {
+  var actDate = (act.activity_date || '').split('T')[0];
+  if (actDate < challenge.start_date || actDate > challenge.end_date) return false;
+  var sportTypes = Array.isArray(challenge.sport_types) && challenge.sport_types.length
+    ? challenge.sport_types : ['Walk','Run','Hike','Ride'];
+  if (sportTypes.indexOf(act.sport_type) === -1) return false;
+  var km = (act.distance_meters || 0) / 1000;
+  if (challenge.distance_type === 'fixed') {
+    if (km < challenge.distance_min - 0.1 || km > challenge.distance_max + 0.1) return false;
+  } else if (challenge.distance_type === 'range') {
+    if (km < challenge.distance_min || km > challenge.distance_max) return false;
+  } else {
+    if (km < challenge.distance_min) return false;
+  }
+  if ((challenge.elevation_criteria || 0) > 0 && (act.elevation_gain || 0) < challenge.elevation_criteria) return false;
+  if (challenge.start_time_criteria && act.activity_date && act.activity_date.indexOf('T') > -1) {
+    var timeStr = act.activity_date.split('T')[1] || '';
+    var isImported = timeStr.startsWith('06:30:00');
+    if (!isImported) {
+      var actTime = new Date(act.activity_date);
+      var actHour = actTime.getHours(), actMin = actTime.getMinutes();
+      var parts = challenge.start_time_criteria.split(':');
+      var critH = parseInt(parts[0]), critM = parseInt(parts[1] || 0);
+      var actMins = actHour * 60 + actMin, critMins = critH * 60 + critM;
+      if (Math.abs(actMins - critMins) > 30) return false;
+    }
+  }
+  return true;
+}
+
+function calcFullPts(myActs, gender) {
+  var byDay = {};
+  myActs.filter(function(a){ return !a.is_flagged; }).forEach(function(a) {
+    var d = (a.activity_date || '').split('T')[0];
+    if (!d) return;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(a);
+  });
+
+  var totalDistKm = 0.0, totalDistPts = 0.0, totalBonus = 0, totalChallenge = 0;
+  var earnedChallenges = {}, challengeNames = [];
+
+  Object.keys(byDay).forEach(function(day) {
+    var dayActs = byDay[day];
+    var inRangeKm = 0.0, outRangeKm = 0.0;
+
+    var rsChallenge = null;
+    for (var ri = 0; ri < CHALLENGES.length; ri++) {
+      var rc = CHALLENGES[ri];
+      if (rc.range_split && rc.is_active && day >= rc.start_date && day <= rc.end_date) {
+        rsChallenge = rc; break;
+      }
+    }
+
+    dayActs.forEach(function(a) {
+      var actKm = (parseFloat(a.distance_meters) || 0) / 1000.0;
+      if (rsChallenge) {
+        var cST = Array.isArray(rsChallenge.sport_types) && rsChallenge.sport_types.length
+          ? rsChallenge.sport_types : ['Walk','Run','Hike','Ride'];
+        var inRange = cST.indexOf(a.sport_type) > -1
+          && actKm >= (rsChallenge.distance_min - 0.1)
+          && actKm <= rsChallenge.distance_max;
+        if (inRange) { inRangeKm += actKm; return; }
+      }
+      outRangeKm += actKm;
+    });
+
+    var DAILY_CAP = 21;
+    var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
+    inRangeKm  = parseFloat(inRangeKm.toFixed(4));
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+    var combinedKm = inRangeKm + outRangeKm;
+    if (!isSpecialDay && combinedKm > DAILY_CAP) {
+      var excess = combinedKm - DAILY_CAP;
+      var outTrim = Math.min(excess, outRangeKm);
+      outRangeKm = parseFloat((outRangeKm - outTrim).toFixed(4));
+      excess -= outTrim;
+      if (excess > 0) inRangeKm = parseFloat((inRangeKm - excess).toFixed(4));
+    }
+    inRangeKm  = parseFloat(inRangeKm.toFixed(4));
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+
+    var base = parseFloat(CONFIG.basePer_km) || 1;
+    totalDistKm  += inRangeKm + outRangeKm;
+    totalDistPts += parseFloat(((inRangeKm + outRangeKm) * base).toFixed(2));
+    byDay[day]._dayKm     = outRangeKm;
+    byDay[day]._inRangeKm = inRangeKm;
+  });
+
+  // Recalculate bonus — exclude days covered by exclude_normal_bonus challenges
+  var excludeBonusDays = {};
+  for (var ci2 = 0; ci2 < CHALLENGES.length; ci2++) {
+    var c2 = CHALLENGES[ci2];
+    if (!c2.exclude_normal_bonus) continue;
+    Object.keys(byDay).forEach(function(day) {
+      if (day >= c2.start_date && day <= c2.end_date) excludeBonusDays[day] = true;
+    });
+  }
+  totalBonus = 0;
+  Object.keys(byDay).forEach(function(day) {
+    if (!excludeBonusDays[day]) totalBonus += calcBonus(byDay[day]._dayKm || 0);
+  });
+
+  totalDistKm  = parseFloat(totalDistKm.toFixed(2));
+  totalDistPts = parseFloat(totalDistPts.toFixed(2));
+
+  // Challenge bonus
+  for (var ci = 0; ci < CHALLENGES.length; ci++) {
+    var c = CHALLENGES[ci];
+    var key = 'ch_' + (c.id || ci);
+    if (earnedChallenges[key]) continue;
+
+    var g = (gender || '').toLowerCase();
+    var eligible = c.eligible === 'all'
+      || c.eligible === g
+      || c.eligible === 'dayshift'
+      || c.eligible === 'nightshift';
+    if (!eligible) continue;
+
+    var cSportTypes = Array.isArray(c.sport_types) && c.sport_types.length
+      ? c.sport_types : ['Walk','Run','Hike','Ride'];
+    var awarded = false;
+
+    // range_split challenge
+    if (c.range_split) {
+      var inRangePts = 0, inRangeCount = 0;
+      for (var rsi = 0; rsi < myActs.length; rsi++) {
+        var ra = myActs[rsi];
+        if (ra.is_flagged) continue;
+        var raDate = (ra.activity_date || '').split('T')[0];
+        if (raDate < c.start_date || raDate > c.end_date) continue;
+        if (cSportTypes.indexOf(ra.sport_type) === -1) continue;
+        var raKm = (ra.distance_meters || 0) / 1000;
+        if (raKm >= (c.distance_min - 0.1) && raKm <= c.distance_max) {
+          inRangePts += Number(c.bonus_points) || 0;
+          inRangeCount++;
+        }
+      }
+      if (inRangeCount > 0) {
+        earnedChallenges[key] = true;
+        totalChallenge += inRangePts;
+        challengeNames.push(c.name);
+      }
+      continue;
+    }
+
+    // per_activity challenge
+    var perActPts = Number(c.per_activity_points) || 0;
+    if (perActPts > 0) {
+      var count = 0;
+      for (var ai2 = 0; ai2 < myActs.length; ai2++) {
+        if (checkChallenge(myActs[ai2], c)) count++;
+      }
+      if (count > 0) {
+        earnedChallenges[key] = true;
+        totalChallenge += count * perActPts;
+        challengeNames.push(c.name);
+      }
+      continue;
+    }
+
+    if (c.activity_scope === 'daily') {
+      var cDays = Object.keys(byDay).filter(function(d) {
+        return d >= c.start_date && d <= c.end_date;
+      });
+      var cDaysIST = Object.keys(byDay).filter(function(d) {
+        var next = new Date(d + 'T00:00:00Z');
+        next.setDate(next.getDate() + 1);
+        var nextStr = next.toISOString().split('T')[0];
+        return nextStr >= c.start_date && nextStr <= c.end_date && cDays.indexOf(d) === -1;
+      });
+      var allCDays = cDays.concat(cDaysIST);
+      for (var di = 0; di < allCDays.length; di++) {
+        if (awarded) break;
+        var day2 = allCDays[di];
+        var dayActs2 = byDay[day2] || [];
+        var hasMatchingSport = dayActs2.some(function(a){ return cSportTypes.indexOf(a.sport_type) > -1; });
+        if (!hasMatchingSport) continue;
+        var dayTotalKm = 0;
+        dayActs2.forEach(function(a){
+          if (cSportTypes.indexOf(a.sport_type) > -1) dayTotalKm += (a.distance_meters || 0) / 1000;
+        });
+        var qualifies = false;
+        if (c.distance_type === 'fixed' || c.distance_type === 'range') {
+          qualifies = dayTotalKm >= c.distance_min - 0.1 && dayTotalKm <= c.distance_max + 0.1;
+        } else {
+          qualifies = dayTotalKm >= c.distance_min;
+        }
+        if (qualifies) awarded = true;
+      }
+    } else {
+      for (var ai = 0; ai < myActs.length; ai++) {
+        if (checkChallenge(myActs[ai], c)) { awarded = true; break; }
+      }
+    }
+
+    if (awarded) {
+      earnedChallenges[key] = true;
+      totalChallenge += Number(c.bonus_points) || 0;
+      challengeNames.push(c.name);
+    }
+  }
+
+  // Manual bonus
+  myActs.filter(function(a){ return !a.is_flagged && parseFloat(a.manual_bonus) > 0; }).forEach(function(a) {
+    totalChallenge += parseFloat(a.manual_bonus) || 0;
+  });
+
+  totalChallenge = parseFloat(totalChallenge.toFixed(2));
+
+  return {
+    km:          totalDistKm,
+    distPts:     totalDistPts,
+    bonusPts:    totalBonus,
+    challengePts: totalChallenge,
+    total:       parseFloat((totalDistPts + totalBonus + totalChallenge).toFixed(2))
+  };
+}
+
 
 async function fetchAll(url){var all=[],from=0,ps=1000;while(true){var sep=url.indexOf('?')>-1?'&':'?';var res=await fetch(url+sep+'limit='+ps+'&offset='+from,{headers:Object.assign({},HDR,{'Range-Unit':'items','Range':from+'-'+(from+ps-1)})});if(!res.ok)break;var page=await res.json();if(!Array.isArray(page)||page.length===0)break;all=all.concat(page);if(page.length<ps)break;from+=ps;}return all;}
 
