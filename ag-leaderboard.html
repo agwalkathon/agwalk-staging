@@ -1043,15 +1043,37 @@ function toggleExpand(athleteId, gender, trEl) {
       +(inRangeKmExp>0?' <span style="font-size:10px;color:#1565c0;background:#e3f2fd;padding:1px 5px;border-radius:4px;vertical-align:middle">'+inRangeKmExp.toFixed(2)+' in-range</span>':'')
       +(capped?' <span style="font-size:10px;color:#e65100;background:#fff3e0;padding:1px 5px;border-radius:4px;vertical-align:middle">capped</span>':'')
       +(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
-    return '<tr style="background:#fafafa">'
-      +'<td style="padding:9px 14px;font-size:12px;color:#666;font-weight:500;white-space:nowrap">'+day+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px;color:#555;text-align:center;font-weight:600">'+byDay[day].length+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px">'+distLabel+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+dp.toFixed(2)+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+bp+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px;color:#1565c0;font-weight:600">'+(cp>0?'+'+cp:'—')+'</td>'
-      +'<td style="padding:8px 14px;font-size:13px;font-weight:700">+'+tp.toFixed(2)+'</td>'
-      +'</tr>';
+
+    // Build activity sub-rows for this day
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    var sportColors = {Walk:'#e8f5e9|#2e7d32',Run:'#e3f2fd|#1565c0',Hike:'#fff3e0|#e65100',Ride:'#fce4ec|#c62828',VirtualRun:'#e3f2fd|#1565c0',VirtualRide:'#fce4ec|#c62828',MountainBikeRide:'#fce4ec|#c62828'};
+    var actSubRows = byDay[day].map(function(a){
+      var name = (a.activity_name||'').trim() || 'Activity';
+      var nameShort = name.length > 30 ? name.slice(0,29)+'…' : name;
+      var actLink = a.strava_activity_id
+        ? '<a href="https://www.strava.com/activities/'+a.strava_activity_id+'" target="_blank" title="'+name.replace(/"/g,'&quot;')+'" style="color:#E8622A;text-decoration:none;font-weight:500;font-size:12px">'+nameShort+'</a>'
+        : '<span style="font-size:12px;color:#555">'+esc(nameShort)+'</span>';
+      var sc = (sportColors[a.sport_type]||'#f5f5f5|#666').split('|');
+      var badge = '<span style="background:'+sc[0]+';color:'+sc[1]+';padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600">'+esc(a.sport_type||'—')+'</span>';
+      var dist = a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '—';
+      return '<tr style="background:#fff;border-bottom:1px solid #f5f5f5">'\
+        +'<td style="padding:5px 14px 5px 28px;color:#bbb;font-size:11px">↳</td>'\
+        +'<td colspan="2" style="padding:5px 8px">'+actLink+'</td>'\
+        +'<td style="padding:5px 8px">'+badge+'</td>'\
+        +'<td colspan="3" style="padding:5px 14px;font-size:12px;color:#888">'+dist+'</td>'\
+        +'</tr>';
+    }).join('');
+
+    return '<tr style="background:#fafafa;border-top:1px solid #eee">'\
+      +'<td style="padding:9px 14px;font-size:12px;color:#666;font-weight:600;white-space:nowrap">'+day+'</td>'\
+      +'<td style="padding:8px 14px;font-size:12px;color:#555;text-align:center;font-weight:600">'+byDay[day].length+'</td>'\
+      +'<td style="padding:8px 14px;font-size:12px">'+distLabel+'</td>'\
+      +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+dp.toFixed(2)+'</td>'\
+      +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+bp+'</td>'\
+      +'<td style="padding:8px 14px;font-size:12px;color:#1565c0;font-weight:600">'+(cp>0?'+'+cp:'—')+'</td>'\
+      +'<td style="padding:8px 14px;font-size:13px;font-weight:700">+'+tp.toFixed(2)+'</td>'\
+      +'</tr>'\
+      + actSubRows;
   }).join('');
 
   expRow.innerHTML = '<div style="overflow-x:auto;background:#fafafa;border-top:1px solid #eee">'
@@ -1060,53 +1082,17 @@ function toggleExpand(athleteId, gender, trEl) {
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DATE</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:center;letter-spacing:0.5px"># ACTS</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DISTANCE (KM)</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DISTANCE POINTS</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">BONUS POINTS</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">CHALLENGE BONUS</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">TOTAL POINTS</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DIST PTS</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">BONUS PTS</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">CHALLENGE</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">TOTAL PTS</th>'
     +'</tr></thead>'
     +'<tbody>'+dayRows+'</tbody>'
-    +'</table></div>'
-    + buildActivityList(byDay, days);
+    +'</table></div>';
   } catch(err) {
     console.error('Expand build error:', err);
     expRow.innerHTML = '<div style="padding:14px 20px;color:#c62828;font-size:13px">⚠️ Error building breakdown: ' + err.message + '</div>';
   }
-}
-
-function buildActivityList(byDay, days) {
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  var MAX_NAME = 32;
-  var allActs = [];
-  days.forEach(function(d){ byDay[d].forEach(function(a){ allActs.push({day:d, a:a}); }); });
-  if (!allActs.length) return '';
-  var rows = allActs.map(function(item){
-    var a = item.a;
-    var name = (a.activity_name||'').trim() || 'Activity';
-    var nameShort = name.length > MAX_NAME ? name.slice(0, MAX_NAME-1)+'…' : name;
-    var actLink = a.strava_activity_id
-      ? '<a href="https://www.strava.com/activities/'+a.strava_activity_id+'" target="_blank" title="'+name.replace(/"/g,'&quot;')+'" style="color:#E8622A;text-decoration:none;font-weight:500">'+nameShort+'</a>'
-      : '<span>'+nameShort+'</span>';
-    var distStr = a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '—';
-    var sportColors = {Walk:'#e8f5e9|#2e7d32',Run:'#e3f2fd|#1565c0',Hike:'#fff3e0|#e65100',Ride:'#fce4ec|#c62828',VirtualRun:'#e3f2fd|#1565c0',VirtualRide:'#fce4ec|#c62828'};
-    var sc = (sportColors[a.sport_type]||'#f5f5f5|#666').split('|');
-    var typeBadge = '<span style="background:'+sc[0]+';color:'+sc[1]+';padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">'+esc(a.sport_type||'—')+'</span>';
-    return '<tr style="border-bottom:1px solid #f0f0f0">'
-      +'<td style="padding:7px 14px;font-size:11px;color:#aaa;white-space:nowrap">'+item.day+'</td>'
-      +'<td style="padding:7px 14px;font-size:12px;max-width:220px">'+actLink+'</td>'
-      +'<td style="padding:7px 14px">'+typeBadge+'</td>'
-      +'<td style="padding:7px 14px;font-size:12px;color:#555">'+distStr+'</td>'
-      +'</tr>';
-  }).join('');
-  return '<div style="border-top:2px solid #e8e8e8;background:#fff">'
-    +'<div style="padding:8px 14px;font-size:11px;font-weight:700;color:#888;letter-spacing:0.5px;background:#f8f8f8;border-bottom:1px solid #f0f0f0">ACTIVITIES ('+allActs.length+')</div>'
-    +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:380px">'
-    +'<thead><tr style="background:#f8f8f8">'
-    +'<th style="padding:7px 14px;font-size:10px;color:#aaa;text-align:left">DATE</th>'
-    +'<th style="padding:7px 14px;font-size:10px;color:#aaa;text-align:left">ACTIVITY</th>'
-    +'<th style="padding:7px 14px;font-size:10px;color:#aaa;text-align:left">TYPE</th>'
-    +'<th style="padding:7px 14px;font-size:10px;color:#aaa;text-align:left">DISTANCE</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 
 function buildRow(row, i) {
