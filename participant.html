@@ -67,6 +67,28 @@
     .hero-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
     .hero-tag{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:9px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:0.2px;}
 
+    /* ── Medal rings row ── */
+    .rings-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+    .ring-box{display:flex;flex-direction:column;align-items:center;gap:0;}
+    .ring-svg-wrap{position:relative;width:80px;height:80px;flex-shrink:0;}
+    .ring-svg-wrap svg{width:80px;height:80px;transform:rotate(-90deg);}
+    .ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:6;}
+    .ring-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease;}
+    .ring-fill.br{stroke:#CD7F32;}
+    .ring-fill.si{stroke:#94A3B8;}
+    .ring-fill.go{stroke:#F59E0B;}
+    .ring-inner{
+      position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+    }
+    .ring-pct{font-size:16px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px;}
+    .ring-check{font-size:20px;line-height:1;}
+    .ring-emoji{font-size:18px;margin-bottom:3px;}
+    .ring-name{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+    .ring-name.br{color:#CD7F32;} .ring-name.si{color:#94A3B8;} .ring-name.go{color:#F59E0B;}
+    .ring-need{font-size:9px;font-weight:600;color:var(--muted);margin-top:2px;text-align:center;line-height:1.3;}
+    .ring-need.done{color:var(--green);}
+
     /* ── Big metric trio ── */
     .metric-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
     .metric-box{
@@ -290,7 +312,7 @@
   </div>
 </header>
 
-<!-- Hero: profile + big metrics -->
+<!-- Hero: profile + medal rings + metrics -->
 <div class="hero">
   <div class="hero-top">
     <div class="avatar" id="p-initials">?</div>
@@ -299,6 +321,39 @@
       <div class="hero-tags" id="p-tags"></div>
     </div>
   </div>
+
+  <!-- Medal rings -->
+  <div class="rings-row" id="medal-rings">
+    <!-- Bronze -->
+    <div class="ring-box">
+      <div class="ring-svg-wrap">
+        <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill br" id="ring-fill-br" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+        <div class="ring-inner"><span class="ring-pct" id="ring-pct-br">—</span></div>
+      </div>
+      <div class="ring-name br">Bronze</div>
+      <div class="ring-need" id="ring-need-br">—</div>
+    </div>
+    <!-- Silver -->
+    <div class="ring-box">
+      <div class="ring-svg-wrap">
+        <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill si" id="ring-fill-si" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+        <div class="ring-inner"><span class="ring-pct" id="ring-pct-si">—</span></div>
+      </div>
+      <div class="ring-name si">Silver</div>
+      <div class="ring-need" id="ring-need-si">—</div>
+    </div>
+    <!-- Gold -->
+    <div class="ring-box">
+      <div class="ring-svg-wrap">
+        <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="34"/><circle class="ring-fill go" id="ring-fill-go" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+        <div class="ring-inner"><span class="ring-pct" id="ring-pct-go">—</span></div>
+      </div>
+      <div class="ring-name go">Gold</div>
+      <div class="ring-need" id="ring-need-go">—</div>
+    </div>
+  </div>
+
+  <!-- Metrics -->
   <div class="metric-trio">
     <div class="metric-box">
       <div class="metric-val orange" id="s-pts-display">—</div>
@@ -650,6 +705,25 @@ async function load() {
     document.getElementById('s-pts-display').textContent=myPts.toFixed(1);
     document.getElementById('medal-pts-big').textContent=myPts.toFixed(1);
 
+    // ── Medal rings ───────────────────────────────────────────────────────────
+    var CIRC=213.6; // 2 * π * 34
+    [{id:'br',thresh:bronzeThresh},{id:'si',thresh:silverThresh},{id:'go',thresh:goldThresh}].forEach(function(m){
+      var pct=Math.min(100,Math.round((myPts/m.thresh)*100));
+      var done=myPts>=m.thresh;
+      var needed=Math.max(0,m.thresh-myPts);
+      var offset=CIRC-(CIRC*pct/100);
+      var fillEl=document.getElementById('ring-fill-'+m.id);
+      var pctEl=document.getElementById('ring-pct-'+m.id);
+      var needEl=document.getElementById('ring-need-'+m.id);
+      if(fillEl) fillEl.style.strokeDashoffset=offset;
+      if(pctEl) pctEl.textContent=done?'✓':pct+'%';
+      if(pctEl&&done) pctEl.style.fontSize='22px';
+      if(needEl){
+        if(done){needEl.textContent='Achieved!';needEl.classList.add('done');}
+        else{needEl.textContent='Need '+needed.toFixed(0)+' pts';}
+      }
+    });
+
     var mpWrap=document.getElementById('medal-progress'); mpWrap.innerHTML='';
     [{emoji:'🥉',name:'Bronze',thresh:bronzeThresh,cls:'br'},{emoji:'🥈',name:'Silver',thresh:silverThresh,cls:'si'},{emoji:'🥇',name:'Gold',thresh:goldThresh,cls:'go'}].forEach(function(m){
       var pct=Math.min(100,Math.round((myPts/m.thresh)*100)),done=myPts>=m.thresh,needed=Math.max(0,m.thresh-myPts).toFixed(1);
@@ -822,3 +896,4 @@ load();
 </script>
 </body>
 </html>
+
