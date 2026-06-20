@@ -665,9 +665,13 @@ async function load() {
     // Profile
     document.getElementById('p-name').textContent=name.toUpperCase();
     var tags=[];
-    if(reg.gender)tags.push(reg.gender==='Female'?'👩 Female':'👨 Male');
-    if(reg.shift)tags.push('⏰ '+reg.shift);
-    if(reg.leaderboard_team)tags.push('🏙️ '+reg.leaderboard_team);
+    var icoMale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><line x1="14.5" y1="9.5" x2="21" y2="3"/><polyline points="16 3 21 3 21 8"/></svg>';
+    var icoFemale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/></svg>';
+    var icoClock='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    var icoTeam='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    if(reg.gender)tags.push(reg.gender==='Female'?icoFemale+' Female':icoMale+' Male');
+    if(reg.shift)tags.push(icoClock+' '+reg.shift);
+    if(reg.leaderboard_team)tags.push(icoTeam+' '+reg.leaderboard_team);
     document.getElementById('p-tags').innerHTML=tags.map(function(t){return '<span class="hero-tag">'+esc(t)+'</span>';}).join('');
 
     var fullPts=calcFullPts(myActs,reg.gender);
