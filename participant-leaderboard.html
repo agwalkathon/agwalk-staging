@@ -108,17 +108,17 @@
     .rank-col.rn{font-size:14px;color:var(--muted);}
 
     /* row body */
-    .row-body{flex:1;min-width:0;overflow:hidden;}
-    .row-line1{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:5px;}
-    .row-name{font-size:13.5px;font-weight:700;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .you-chip{display:inline-block;background:var(--brand);color:#fff;font-size:7.5px;font-weight:800;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;}
-    .row-pts{display:flex;align-items:baseline;gap:2px;flex-shrink:0;}
+    .row-body{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .row-left{flex:1;min-width:0;}
+    .row-name{font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+    .row-tag-row{display:flex;gap:4px;margin-top:4px;flex-wrap:nowrap;overflow:hidden;}
+    .row-right{flex-shrink:0;text-align:right;}
+    .row-pts{display:flex;align-items:baseline;gap:2px;justify-content:flex-end;}
     .row-medal{font-size:14px;}
     .row-pts-num{font-size:18px;font-weight:900;color:var(--brand);}
     .row-pts-unit{font-size:9.5px;color:var(--muted);font-weight:500;}
-
-    /* line 2: pills */
-    .row-line2{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;overflow:hidden;}
+    .row-pills{display:flex;gap:3px;margin-top:5px;justify-content:flex-end;flex-wrap:nowrap;}
+    .you-chip{display:inline-block;background:var(--brand);color:#fff;font-size:7.5px;font-weight:800;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;}
     .rpill{font-size:9px;font-weight:700;padding:2.5px 7px;border-radius:6px;white-space:nowrap;}
     .rpill.km{background:rgba(96,165,250,0.12);color:var(--blue);}
     .rpill.dist{background:rgba(96,165,250,0.07);color:rgba(96,165,250,0.7);}
@@ -271,20 +271,21 @@ function renderRows(rows){
     row.innerHTML=
       '<div class="rank-col '+rankColCls+'">'+rankIcon+'</div>'+
       '<div class="row-body">'+
-        '<div class="row-line1">'+
+        '<div class="row-left">'+
           '<span class="row-name">'+esc(r.p.full_name||'—')+(isMe?'<span class="you-chip">You</span>':'')+'</span>'+
+          (teamName?'<div class="row-tag-row"><span class="rpill team">'+esc(teamName)+'</span></div>':'')+
+        '</div>'+
+        '<div class="row-right">'+
           '<div class="row-pts">'+
             (rowMedal?'<span class="row-medal">'+rowMedal+'</span>':'')+
             '<span class="row-pts-num">'+r.pts.total.toFixed(1)+'</span>'+
             '<span class="row-pts-unit"> pts</span>'+
           '</div>'+
-        '</div>'+
-        '<div class="row-line2">'+
-          (teamName?'<span class="rpill team">'+esc(teamName)+'</span>':'')+
-          '<span class="rpill km">📏 '+r.pts.km.toFixed(1)+' km</span>'+
-          '<span class="rpill dist">'+r.pts.distPts.toFixed(1)+' dist</span>'+
-          '<span class="rpill bon">⚡+'+r.pts.bonusPts+'</span>'+
-          (r.pts.challengePts>0?'<span class="rpill chal">🎯+'+r.pts.challengePts.toFixed(1)+'</span>':'')+
+          '<div class="row-pills">'+
+            '<span class="rpill km">'+r.pts.km.toFixed(1)+' km</span>'+
+            '<span class="rpill bon">⚡'+r.pts.bonusPts+'</span>'+
+            (r.pts.challengePts>0?'<span class="rpill chal">🎯'+r.pts.challengePts.toFixed(1)+'</span>':'')+
+          '</div>'+
         '</div>'+
       '</div>';
     list.appendChild(row);
@@ -345,5 +346,6 @@ boot();
 </script>
 </body>
 </html>
+
 
 
