@@ -639,27 +639,44 @@ function calcPoints(acts, athleteId, gender) {
 
   Object.keys(byDay).forEach(function(day) {
     var dayActs = byDay[day];
-    var dayKm = 0.0;
-    dayActs.forEach(function(a) {
-      var dm = parseFloat(a.distance_meters) || 0;
-      dayKm += dm / 1000.0;
-    });
-    dayKm = parseFloat(dayKm.toFixed(4));
+    var inRangeKm  = 0.0;  // in-range activities: base pts only, excluded from cap + bonus bracket
+    var outRangeKm = 0.0;  // out-of-range: drives cap + bonus bracket as normal
 
-    // Apply 21 km daily cap unless this date is a configured special day
+    // Determine if any active range_split challenge covers this day
+    var rsChallenge = CHALLENGES.find(function(c) {
+      return c.range_split && c.is_active && day >= c.start_date && day <= c.end_date;
+    });
+
+    dayActs.forEach(function(a) {
+      var actKm = (parseFloat(a.distance_meters) || 0) / 1000.0;
+      if (rsChallenge) {
+        var cST = Array.isArray(rsChallenge.sport_types) && rsChallenge.sport_types.length
+          ? rsChallenge.sport_types : ['Walk','Run','Hike','Ride'];
+        var inRange = cST.includes(a.sport_type)
+          && actKm >= (rsChallenge.distance_min - 0.1)
+          && actKm <= rsChallenge.distance_max;
+        if (inRange) { inRangeKm += actKm; return; }
+      }
+      outRangeKm += actKm;
+    });
+
+    // Apply daily cap to out-of-range sum (skip if challenge overrides cap)
     var DAILY_CAP = 21;
     var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
-    if (!isSpecialDay && dayKm > DAILY_CAP) {
-      dayKm = DAILY_CAP;
-    }
-    dayKm = parseFloat(dayKm.toFixed(4));
+    var ignoreCap = rsChallenge && rsChallenge.ignore_daily_cap;
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+    if (!ignoreCap && !isSpecialDay && outRangeKm > DAILY_CAP) outRangeKm = DAILY_CAP;
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+    inRangeKm  = parseFloat(inRangeKm.toFixed(4));
 
-    totalDistKm += dayKm;
     var base = parseFloat(CONFIG.basePer_km) || 1;
-    var distPts = parseFloat((dayKm * base).toFixed(2));
-    totalDistPts += distPts;
-    totalBonus += dayKm; // placeholder — will subtract exclude_normal_bonus days below
-    byDay[day]._dayKm = dayKm; // cache for challenge pass
+    // In-range: base pts counted separately (no cap, no bracket)
+    totalDistKm  += inRangeKm + outRangeKm;
+    totalDistPts += parseFloat(((inRangeKm + outRangeKm) * base).toFixed(2));
+    totalBonus   += outRangeKm; // placeholder — exclude_normal_bonus pass below uses outRangeKm
+    byDay[day]._dayKm      = outRangeKm; // used for bonus bracket (out-of-range only)
+    byDay[day]._inRangeKm  = inRangeKm;  // cached for expand row
+    byDay[day]._ignoreCap  = ignoreCap;  // cached for expand row label
   });
 
   // Recalculate bonus correctly — first pass to find which days exclude normal bonus
@@ -941,19 +958,37 @@ function toggleExpand(athleteId, gender, trEl) {
 
   var g = (gender||'').toLowerCase();
   var dayRows = days.map(function(day) {
-    var rawKm = 0;
-    byDay[day].forEach(function(a){ rawKm += (parseFloat(a.distance_meters)||0)/1000; });
-    rawKm = parseFloat(rawKm.toFixed(4));
+    var inRangeKmExp  = 0;
+    var outRangeKmExp = 0;
 
-    // Apply 21 km daily cap unless this date is a special day
+    var rsChallenge = CHALLENGES.find(function(c) {
+      return c.range_split && c.is_active && day >= c.start_date && day <= c.end_date;
+    });
+
+    byDay[day].forEach(function(a) {
+      var actKm = (parseFloat(a.distance_meters)||0)/1000;
+      if (rsChallenge) {
+        var cST = Array.isArray(rsChallenge.sport_types) && rsChallenge.sport_types.length
+          ? rsChallenge.sport_types : ['Walk','Run','Hike','Ride'];
+        var inRange = cST.includes(a.sport_type)
+          && actKm >= (rsChallenge.distance_min - 0.1)
+          && actKm <= rsChallenge.distance_max;
+        if (inRange) { inRangeKmExp += actKm; return; }
+      }
+      outRangeKmExp += actKm;
+    });
+
     var DAILY_CAP = 21;
     var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
-    var dayKm = (!isSpecialDay && rawKm > DAILY_CAP) ? DAILY_CAP : rawKm;
-    var capped = (!isSpecialDay && rawKm > DAILY_CAP);
+    var ignoreCap = rsChallenge && rsChallenge.ignore_daily_cap;
+    outRangeKmExp = parseFloat(outRangeKmExp.toFixed(4));
+    var capped = !ignoreCap && !isSpecialDay && outRangeKmExp > DAILY_CAP;
+    var dayKm = capped ? DAILY_CAP : outRangeKmExp;
     dayKm = parseFloat(dayKm.toFixed(2));
+    inRangeKmExp = parseFloat(inRangeKmExp.toFixed(4));
 
     var base = parseFloat(CONFIG.basePer_km)||1;
-    var dp = parseFloat((dayKm*base).toFixed(2));
+    var dp = parseFloat(((inRangeKmExp + dayKm)*base).toFixed(2));
 
     // Check if any challenge excludes normal bonus for this day
     var dayExcludeBonus = CHALLENGES.some(function(c){ return c.exclude_normal_bonus && day >= c.start_date && day <= c.end_date; });
@@ -989,7 +1024,12 @@ function toggleExpand(athleteId, gender, trEl) {
     });
     byDay[day].forEach(function(a){ cp += parseFloat(a.manual_bonus)||0; });
     var tp = parseFloat((dp+bp+cp).toFixed(2));
-    var distLabel = dayKm.toFixed(2)+' km'+(capped?' <span style="font-size:10px;color:#e65100;background:#fff3e0;padding:1px 5px;border-radius:4px;vertical-align:middle">capped</span>':'')+(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
+    var totalDisplayKm = parseFloat((inRangeKmExp + dayKm).toFixed(2));
+    var distLabel = totalDisplayKm.toFixed(2)+' km'
+      +(inRangeKmExp>0?' <span style="font-size:10px;color:#1565c0;background:#e3f2fd;padding:1px 5px;border-radius:4px;vertical-align:middle">'+inRangeKmExp.toFixed(2)+' in-range</span>':'')
+      +(capped?' <span style="font-size:10px;color:#e65100;background:#fff3e0;padding:1px 5px;border-radius:4px;vertical-align:middle">capped</span>':'')
+      +(ignoreCap&&!isSpecialDay?' <span style="font-size:10px;color:#6a1b9a;background:#f3e5f5;padding:1px 5px;border-radius:4px;vertical-align:middle">no cap</span>':'')
+      +(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
     return '<tr style="background:#fafafa">'
       +'<td style="padding:9px 14px;font-size:12px;color:#666;font-weight:500;white-space:nowrap">'+day+'</td>'
       +'<td style="padding:8px 14px;font-size:12px">'+distLabel+'</td>'
