@@ -733,6 +733,7 @@ async function load() {
     document.getElementById('standing-team-rank').textContent=teamRank?ordinal(teamRank):'—';
 
     // ── Pace Goals — dynamic based on medal status ────────────────────────────
+    var now=new Date();
     var EVENT_END=new Date('2026-06-30T23:59:59');
     var daysLeft=Math.max(0,Math.ceil((EVENT_END-now)/(1000*60*60*24)));
     var todayStr=now.toISOString().split('T')[0];
@@ -995,6 +996,7 @@ load();
 </script>
 </body>
 </html>
+
 
 
 
