@@ -709,10 +709,13 @@ async function load() {
       var fillEl=document.getElementById('ring-fill-'+m.id);
       var pctEl=document.getElementById('ring-pct-'+m.id);
       var needEl=document.getElementById('ring-need-'+m.id);
-      if(fillEl) fillEl.style.strokeDashoffset=offset;
-      if(pctEl){pctEl.textContent=done?'✓':pct+'%';if(done)pctEl.style.fontSize='22px';}
+      if(fillEl) fillEl.style.strokeDashoffset=done?0:offset;
+      if(pctEl){
+        if(done){pctEl.textContent='✓';pctEl.style.fontSize='26px';}
+        else{pctEl.textContent=pct+'%';}
+      }
       if(needEl){
-        if(done){needEl.textContent='Achieved!';needEl.classList.add('done');}
+        if(done){needEl.textContent='100%';needEl.style.color='var(--text)';}
         else{needEl.textContent='Need '+needed.toFixed(0)+' pts';}
       }
     });
