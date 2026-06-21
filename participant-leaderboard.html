@@ -568,7 +568,7 @@ function renderRows(rows, prevRanks) {
     var topCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     var rankIcon=i===0?'1':i===1?'2':i===2?'3':'#'+(i+1);
     var rankColCls=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-    var mPts=r.pts.total,rowMedal=mPts>=goldThresh?'👑':mPts>=silverThresh?'💎':mPts>=bronzeThresh?'🏅':'';
+    var mPts=r.pts.total,rowMedal=mPts>=goldThresh?'🥇':mPts>=silverThresh?'🥈':mPts>=bronzeThresh?'🥉':'';
     var teamName=(r.p.leaderboard_team||'').replace(/^Team\s+/i,'');
 
     // Rank movement
