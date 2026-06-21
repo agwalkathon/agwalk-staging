@@ -1065,11 +1065,7 @@ async function load() {
   } catch(e) {
     console.error('Load error:',e.message||e);
     var msg=e.message||String(e)||'Unknown error';
-    // Show big visible error banner on screen for mobile debugging
-    var banner=document.createElement('div');
-    banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:16px;font-size:13px;font-family:monospace;white-space:pre-wrap;word-break:break-all;';
-    banner.textContent='LOAD ERROR:\n'+msg+'\n\nSession: '+JSON.stringify(JSON.parse(localStorage.getItem(\'wk_user\')||\'{}\'),null,2);
-    document.body.prepend(banner);
+    _dbg('ERR='+msg.slice(0,30));
     document.getElementById('act-list').innerHTML='<div class="empty-state"><p>⚠️ '+msg+'</p></div>';
   }
 }
