@@ -365,7 +365,7 @@ var HDR={apikey:ANON,Authorization:'Bearer '+ANON};
 var ME=null,REG=[],ACTS=[],currentTab='shift';
 var bronzeThresh=100,silverThresh=150,goldThresh=200;
 
-function logout(){sessionStorage.removeItem('wk_user');sessionStorage.removeItem('wk_admin');window.location.href='index.html';}
+function logout(){localStorage.removeItem('wk_user');sessionStorage.removeItem('wk_admin');window.location.href='index.html';}
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function norm(s){return String(s||'').trim().toLowerCase();}
 
@@ -819,7 +819,7 @@ function buildTabs(){
 function showSkeletons(){var h='';for(var i=0;i<6;i++)h+='<div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>';document.getElementById('lb-list').innerHTML=h;}
 
 async function boot(){
-  var s=JSON.parse(sessionStorage.getItem('wk_user')||'{}');
+  var s=JSON.parse(localStorage.getItem('wk_user')||'{}');
   if(!s.loggedIn||!s.athleteId){window.location.href='index.html';return;}
   try{
     var results=await Promise.all([
