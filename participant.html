@@ -523,11 +523,11 @@ var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 
 function userGuard() {
-  var s = JSON.parse(sessionStorage.getItem('wk_user') || '{}');
+  var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
   if (!s.loggedIn || s.expires < Date.now() || !s.athleteId) { window.location.href = 'index.html'; return null; }
   return s;
 }
-function logout() { sessionStorage.removeItem('wk_user'); sessionStorage.removeItem('wk_admin'); window.location.href = 'index.html'; }
+function logout() { localStorage.removeItem('wk_user'); sessionStorage.removeItem('wk_admin'); window.location.href = 'index.html'; }
 function esc(v) { return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 function fmtTime(d) { return new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
 function fmtDur(s) { var h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?h+'h '+m+'m':m+'m'; }
