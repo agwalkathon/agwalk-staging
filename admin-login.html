@@ -279,9 +279,16 @@
     fetch(BACKEND_URL + '/admin-verify', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + existingToken }
-    }).then(function(r) { return r.json(); }).then(function(d) {
-      if (d.success) window.location.href = 'admin.html';
-      else sessionStorage.removeItem('wk_admin_token');
+    }).then(function(r) {
+      if (r.ok) {
+        return r.json().then(function(d) {
+          if (d.success) window.location.href = 'admin.html';
+          else sessionStorage.removeItem('wk_admin_token');
+        });
+      } else if (r.status === 401) {
+        sessionStorage.removeItem('wk_admin_token');
+      }
+      // 502/503 Render cold start — do nothing, let user log in normally
     }).catch(function() {});
   }
 
