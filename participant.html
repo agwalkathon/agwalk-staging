@@ -376,13 +376,6 @@
     .predict-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--brand),var(--gold));transition:width 0.6s ease;}
     .predict-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--label);}
 
-    /* ── Catchup Card ── */
-    .catchup-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
-    .catchup-row:last-child{border-bottom:none;}
-    .catchup-rank{font-size:13px;font-weight:700;color:var(--muted);min-width:28px;}
-    .catchup-name{flex:1;font-size:15px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .catchup-gap{font-size:13px;font-weight:700;color:var(--brand);flex-shrink:0;}
-    .catchup-me{background:rgba(232,98,42,0.06);}
 
     /* ── Weekly Chart ── */
     .week-chart-wrap{padding:14px 16px 10px;}
@@ -648,8 +641,6 @@
     </div>
   </div>
 
-  <div class="sec">Catch Up</div>
-  <div class="card" id="catchup-card"><div style="padding:14px;font-size:12px;color:var(--muted)">Loading...</div></div>
 
   <div class="sec">This Week</div>
   <div class="card">
@@ -1121,10 +1112,6 @@ async function load() {
 
     renderPrediction(myPts, bronzeThresh, silverThresh, goldThresh, daysLeft);
 
-    // Catchup — reuse shiftPeersScored already computed above
-    var catchupScored = allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;}).map(function(p){var km=0;(allActsMap[p.strava_athlete_id]||[]).forEach(function(a){km+=(a.distance_meters||0)/1000;});return{p:p,km:km};}).sort(function(a,b){return b.km-a.km;});
-    var myIdxCatchup = catchupScored.findIndex(function(x){return String(x.p.strava_athlete_id)===String(athleteId);});
-    renderCatchup(catchupScored, myIdxCatchup, athleteId);
 
     renderWeeklyChart(validActsForPB);
 
@@ -1260,35 +1247,6 @@ function renderPrediction(myPts, bronzeThresh, silverThresh, goldThresh, daysLef
   if (lblR) lblR.textContent = 'Gold: ' + goldThresh + ' pts';
 }
 
-// ── Catchup ───────────────────────────────────────────────────────────────────
-function renderCatchup(shiftPeersScored, myIdx, athleteId) {
-  var card = document.getElementById('catchup-card');
-  if (!card) return;
-  if (myIdx === -1) { card.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:14px">No peers found.</p>'; return; }
-  card.innerHTML = '';
-  var myKm = shiftPeersScored[myIdx].km;
-  // Show: person above, me, person below — or top 3 if I'm near top
-  var from = Math.max(0, myIdx - 1), to = Math.min(shiftPeersScored.length - 1, myIdx + 1);
-  for (var i = from; i <= to; i++) {
-    var rp = shiftPeersScored[i], isMe = String(rp.p.strava_athlete_id) === String(athleteId);
-    var div = document.createElement('div');
-    div.className = 'catchup-row' + (isMe ? ' catchup-me' : '');
-    var gapText = '';
-    if (isMe) gapText = '<span class="catchup-gap">' + myKm.toFixed(1) + ' km</span>';
-    else if (i < myIdx) gapText = '<span class="catchup-gap" style="color:var(--muted)">+' + Math.abs(rp.km - myKm).toFixed(1) + ' km ahead</span>';
-    else gapText = '<span class="catchup-gap" style="color:var(--green)">-' + Math.abs(rp.km - myKm).toFixed(1) + ' km behind</span>';
-    div.innerHTML = '<span class="catchup-rank">#' + (i + 1) + '</span><span class="catchup-name">' + esc(rp.p.full_name || '—') + (isMe ? ' (You)' : '') + '</span>' + gapText;
-    card.appendChild(div);
-  }
-  // Add motivational line
-  if (myIdx > 0) {
-    var needed = shiftPeersScored[myIdx - 1].km - myKm;
-    var tip = document.createElement('div');
-    tip.style.cssText = 'padding:8px 16px 12px;font-size:11px;color:var(--brand);font-weight:600;';
-    tip.textContent = '💪 Walk ' + needed.toFixed(1) + ' more km to overtake #' + myIdx + '!';
-    card.appendChild(tip);
-  }
-}
 
 // ── Weekly Chart ──────────────────────────────────────────────────────────────
 function renderWeeklyChart(validActs) {
