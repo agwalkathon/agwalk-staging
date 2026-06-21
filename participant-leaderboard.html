@@ -247,7 +247,6 @@
 <div class="lb-tabs">
   <button class="lb-tab active" id="lb-tab-shift" onclick="switchTab('shift')">My Category</button>
   <button class="lb-tab" id="lb-tab-team" onclick="switchTab('team')">My Team</button>
-  <button class="lb-tab" id="lb-tab-week" onclick="switchTab('week')">This Week</button>
   <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
 </div>
 
@@ -569,7 +568,7 @@ function renderRows(rows, prevRanks) {
     var topCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     var rankIcon=i===0?'1':i===1?'2':i===2?'3':'#'+(i+1);
     var rankColCls=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-    var mPts=r.pts.total,rowMedal=mPts>=goldThresh?'🥇':mPts>=silverThresh?'🥈':mPts>=bronzeThresh?'🥉':'';
+    var mPts=r.pts.total,rowMedal=mPts>=goldThresh?'👑':mPts>=silverThresh?'💎':mPts>=bronzeThresh?'🏅':'';
     var teamName=(r.p.leaderboard_team||'').replace(/^Team\s+/i,'');
 
     // Rank movement
@@ -727,10 +726,8 @@ function switchTab(mode){
   currentTab=mode;
   document.getElementById('lb-tab-shift').classList.toggle('active',mode==='shift');
   document.getElementById('lb-tab-team').classList.toggle('active',mode==='team');
-  document.getElementById('lb-tab-week').classList.toggle('active',mode==='week');
   document.getElementById('lb-tab-hof').classList.toggle('active',mode==='hof');
   if(mode==='hof'){renderHallOfFame();return;}
-  if(mode==='week'){renderWeeklyBoard(currentTab==='team'?'team':'shift');return;}
   renderRows(getRows(mode));
 }
 function buildTabs(){
