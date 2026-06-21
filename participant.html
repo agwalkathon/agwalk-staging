@@ -650,16 +650,15 @@ var currentSession=null;
 async function load() {
   var s=userGuard(); if(!s) return; currentSession=s; var athleteId=s.athleteId;
   try {
-    var [regRes,myActs,allActs,cfgRes,chRes,sdRes,medalRes,allRegRes]=await Promise.all([
+    var [regRes,myActs,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
       fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId+'&select=*',{headers:HDR}),
-      fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&order=activity_date.desc'),
-      fetchAll(SUPABASE_URL+'/rest/v1/activities?is_flagged=eq.false&is_deleted=eq.false&select=strava_athlete_id,distance_meters,activity_date'),
+      fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&order=activity_date.desc'),
       fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
-      fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}),
+      fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
       fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
-      fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR}),
-      fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+      fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR})
     ]);
+    var allActs=[],allRegRes=[];
     var cfgRows=await cfgRes.json();
     if(Array.isArray(cfgRows))cfgRows.forEach(function(row){if(row.config_key==='bonus_points')CONFIG_LB.bonus=row.config_value.map(function(b){return{km:Number(b.km),points:Number(b.points||b.pts||0)};});if(row.config_key==='base_points_per_km')CONFIG_LB.basePer_km=parseFloat(row.config_value)||1;});
     var chRows=await chRes.json(); CHALLENGES_LB=Array.isArray(chRows)?chRows:[];
