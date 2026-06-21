@@ -271,10 +271,18 @@
 </div>
 
 <script>
-  // Redirect if already logged in
-  var s = JSON.parse(sessionStorage.getItem('wk_admin') || '{}');
-  if (s.loggedIn && s.expires > Date.now() && (s.role === 'admin' || s.manualAdmin === true)) {
-    window.location.href = 'admin.html';
+  var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
+
+  // Redirect if already logged in (valid JWT in sessionStorage)
+  var existingToken = sessionStorage.getItem('wk_admin_token');
+  if (existingToken) {
+    fetch(BACKEND_URL + '/admin-verify', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + existingToken }
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      if (d.success) window.location.href = 'admin.html';
+      else sessionStorage.removeItem('wk_admin_token');
+    }).catch(function() {});
   }
 
   function tryLogin() {
@@ -291,30 +299,34 @@
 
     btn.classList.add('loading');
     btn.innerHTML = '<i class="ti ti-loader" style="animation:spin .8s linear infinite"></i> Signing in…';
+    err.style.display = 'none';
 
-    // Small delay for UX feel
-    setTimeout(function() {
-      var token = btoa(email + ':' + pass);
-      if (token === 'cHJhQGFyY2dhdGUuY29tOlByYWthc2hAMTIz') {
-        sessionStorage.setItem('wk_admin', JSON.stringify({
-          loggedIn:    true,
-          role:        'admin',
-          manualAdmin: true,
-          name:        'Manual Admin',
-          expires:     Date.now() + 8 * 60 * 60 * 1000
-        }));
+    fetch(BACKEND_URL + '/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success && d.token) {
+        sessionStorage.setItem('wk_admin_token', d.token);
         window.location.href = 'admin.html';
       } else {
         btn.classList.remove('loading');
         btn.innerHTML = '<i class="ti ti-shield-check"></i> Sign in';
         err.style.display = 'block';
-        err.innerHTML = '<i class="ti ti-alert-circle"></i> Invalid email or password';
-        // Re-trigger animation
+        err.innerHTML = '<i class="ti ti-alert-circle"></i> ' + (d.error || 'Invalid email or password');
         err.style.animation = 'none';
         err.offsetHeight;
         err.style.animation = '';
       }
-    }, 400);
+    })
+    .catch(function() {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<i class="ti ti-shield-check"></i> Sign in';
+      err.style.display = 'block';
+      err.innerHTML = '<i class="ti ti-alert-circle"></i> Server error, please try again';
+    });
   }
 
   document.getElementById('login-btn').addEventListener('click', tryLogin);
@@ -322,9 +334,8 @@
     if (e.key === 'Enter') tryLogin();
   });
 
-  // @keyframes spin for loading icon
   var style = document.createElement('style');
-  style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
   document.head.appendChild(style);
 </script>
 </body>
