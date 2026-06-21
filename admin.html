@@ -740,17 +740,19 @@ function toggleQuickAccess() {
 
 const _BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
 function authGuard() {
-  const token = sessionStorage.getItem('wk_admin_token');
+  var token = sessionStorage.getItem('wk_admin_token');
   if (!token) { window.location.href = 'admin-login.html'; return; }
-  fetch(_BACKEND_URL + '/admin-verify', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token }
-  }).then(function(r) {
-    if (r.status === 401) {
+  // Check JWT expiry client-side (middle part of JWT is base64 payload)
+  try {
+    var payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
       sessionStorage.removeItem('wk_admin_token');
       window.location.href = 'admin-login.html';
     }
-  }).catch(function() {});
+  } catch(e) {
+    sessionStorage.removeItem('wk_admin_token');
+    window.location.href = 'admin-login.html';
+  }
 }
 function logout() {
   sessionStorage.removeItem('wk_admin_token');
