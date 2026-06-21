@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log — Arcgate Walkathon 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --brand: #E8622A; --brand-light: #FFF0EA; --brand-mid: #f97d4e;
+      --sidebar-bg: #0F1117; --sidebar-w: 64px; --sidebar-exp: 220px;
+      --page-bg: #F4F6FA; --card-bg: #FFFFFF;
+      --text-primary: #0F1117; --text-secondary: #6B7280; --text-muted: #9CA3AF;
+      --border: rgba(0,0,0,0.07);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px;
+      --font: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--page-bg); color: var(--text-primary); min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); display: flex; flex-direction: column; align-items: center; padding: 16px 0 12px; z-index: 300; transition: width 0.24s cubic-bezier(0.4,0,0.2,1); overflow: hidden; }
+    .sidebar:hover { width: var(--sidebar-exp); }
+    .sb-logo { display: flex; align-items: center; justify-content: flex-start; width: 100%; padding: 4px 14px 20px; text-decoration: none; gap: 10px; flex-shrink: 0; overflow: hidden; }
+    .sb-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .sb-logo-icon img { width: 28px; height: 28px; object-fit: contain; }
+    .sb-logo-full { opacity: 0; transition: opacity 0.18s; flex-shrink: 0; }
+    .sb-logo-full img { height: 22px; width: auto; display: block; }
+    .sidebar:hover .sb-logo-full { opacity: 1; }
+    .sb-section { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.22); padding: 0 14px 6px; width: 100%; opacity: 0; transition: opacity 0.15s; white-space: nowrap; }
+    .sidebar:hover .sb-section { opacity: 1; }
+    .sb-item { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; text-decoration: none; gap: 10px; border-left: 3px solid transparent; transition: all 0.16s; }
+    .sb-item:hover { background: rgba(255,255,255,0.06); border-left-color: rgba(232,98,42,0.5); }
+    .sb-item.active { background: rgba(232,98,42,0.12); border-left-color: var(--brand); }
+    .sb-item i { font-size: 19px; color: rgba(255,255,255,0.38); flex-shrink: 0; width: 28px; text-align: center; transition: color 0.16s; }
+    .sb-item:hover i { color: rgba(255,255,255,0.7); }
+    .sb-item.active i { color: var(--brand); }
+    .sb-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,0.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+    .sb-spacer { flex: 1; }
+    .sb-divider { width: calc(100% - 24px); height: 1px; background: rgba(255,255,255,0.07); margin: 6px 12px; flex-shrink: 0; }
+    .sb-signout { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; gap: 10px; border: none; background: none; cursor: pointer; transition: all 0.16s; }
+    .sb-signout:hover { background: rgba(255,80,80,0.08); }
+    .sb-signout i { font-size: 19px; color: rgba(255,255,255,0.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,0.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+
+    /* Main */
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar-left h1 { font-size: 17px; font-weight: 600; }
+    .topbar-left p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .content { flex: 1; padding: 28px 32px; }
+
+    /* Filters */
+    .filters { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-select, .filter-input {
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); font-family: var(--font);
+      font-size: 13px; background: var(--card-bg); color: var(--text-primary);
+      outline: none; transition: border 0.15s;
+    }
+    .filter-select:focus, .filter-input:focus { border-color: var(--brand); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      background: var(--card-bg); border: 1px solid var(--border);
+      cursor: pointer; font-family: var(--font); transition: all 0.15s;
+    }
+    .btn-ghost:hover { background: #EAECF0; color: var(--text-primary); }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500; color: #fff;
+      background: var(--brand); border: none; cursor: pointer;
+      font-family: var(--font); transition: all 0.15s;
+    }
+    .btn-primary:hover { background: var(--brand-mid); }
+
+    /* Table card */
+    .card { background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; }
+    .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .card-header-left { display: flex; align-items: center; gap: 10px; }
+    .card-header-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--brand-light); color: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .card-header h2 { font-size: 15px; font-weight: 600; }
+    .card-header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; background: #FAFAFA; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid #F9FAFB; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAFA; }
+
+    /* Action badges */
+    .action-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .action-admin_login      { background: #EFF6FF; color: #3B82F6; }
+    .action-bulk_import      { background: #FFF7ED; color: #EA580C; }
+    .action-participant_approved { background: #ECFDF5; color: #059669; }
+    .action-participant_rejected { background: #FEF2F2; color: #DC2626; }
+    .action-default          { background: #F1F5F9; color: #475569; }
+
+    .details-cell { max-width: 320px; }
+    .details-text { font-size: 11px; color: var(--text-muted); font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; cursor: pointer; }
+    .details-text:hover { color: var(--text-primary); }
+
+    .ip-text { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+    .time-text { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+    .empty-state { padding: 60px 24px; text-align: center; color: var(--text-muted); }
+    .empty-state i { font-size: 40px; display: block; margin-bottom: 12px; opacity: 0.25; }
+
+    .site-footer { background: var(--card-bg); border-top: 1px solid var(--border); padding: 16px 32px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+    .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
+
+    @media (max-width: 768px) {
+      .main { margin-left: 56px; }
+      .content { padding: 16px; }
+      .topbar { padding: 0 16px; height: 54px; }
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <a class="sb-logo" href="admin.html">
+    <div class="sb-logo-icon"><img src="logo-icon.png" alt="AW"></div>
+    <div class="sb-logo-full"><img src="logo-horizontal.png" alt="Arcgate Walkathon" style="filter:brightness(0) invert(1);"></div>
+  </a>
+
+  <div class="sb-section">Main</div>
+  <a href="admin.html"               class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+  <a href="activities.html"          class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+  <a href="ag-leaderboard.html"      class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+  <a href="participants.html"        class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+  <a href="participant-requests.html" class="sb-item"><i class="ti ti-user-check"></i><span class="sb-label">Requests</span></a>
+
+  <div class="sb-section" style="margin-top:10px;">Config</div>
+  <a href="ag-config.html"           class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
+  <a href="data-upload.html"         class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+  <a href="email-send.html"          class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+  <a href="audit-log.html"           class="sb-item active"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+
+  <div class="sb-spacer"></div>
+  <div class="sb-divider"></div>
+  <button class="sb-signout" onclick="logout()">
+    <i class="ti ti-logout"></i><span class="sb-label">Sign out</span>
+  </button>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Audit Log</h1>
+      <p>All security-relevant admin actions</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-ghost" onclick="loadLog()"><i class="ti ti-refresh"></i> Refresh</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="filters">
+      <select class="filter-select" id="action-filter" onchange="applyFilter()">
+        <option value="">All actions</option>
+        <option value="admin_login">Admin Login</option>
+        <option value="bulk_import">Bulk Import</option>
+        <option value="participant_approved">Participant Approved</option>
+        <option value="participant_rejected">Participant Rejected</option>
+      </select>
+      <input class="filter-input" type="date" id="date-filter" onchange="applyFilter()" placeholder="Filter by date">
+      <button class="btn-ghost" onclick="clearFilters()"><i class="ti ti-x"></i> Clear</button>
+      <span id="count-label" style="font-size:13px;color:var(--text-muted);margin-left:4px;"></span>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-header-icon"><i class="ti ti-shield-check"></i></div>
+          <div>
+            <h2>Security Events</h2>
+            <div class="card-header-sub">Last 500 events · newest first</div>
+          </div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Details</th>
+              <th>IP Address</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="log-body">
+            <tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span>Arcgate Walkathon 2026 — Admin</span>
+    <span><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></span>
+  </footer>
+</div>
+
+<script src="_nav.js"></script>
+<script>
+authGuard();
+
+var SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBIQk4B6ah0eahE_yZE';
+var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
+
+var allRows = [];
+
+async function loadLog() {
+  var tbody = document.getElementById('log-body');
+  tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>';
+  try {
+    var res = await fetch(
+      SUPABASE_URL + '/rest/v1/audit_log?order=created_at.desc&limit=500',
+      { headers: HDR }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    allRows = await res.json();
+    applyFilter();
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-alert-circle"></i>Failed to load: ' + e.message + '</div></td></tr>';
+  }
+}
+
+function applyFilter() {
+  var action = document.getElementById('action-filter').value;
+  var date   = document.getElementById('date-filter').value;
+  var rows = allRows.filter(function(r) {
+    var matchAction = !action || r.action === action;
+    var matchDate   = !date   || r.created_at.startsWith(date);
+    return matchAction && matchDate;
+  });
+  document.getElementById('count-label').textContent = rows.length + ' event' + (rows.length !== 1 ? 's' : '');
+  renderRows(rows);
+}
+
+function clearFilters() {
+  document.getElementById('action-filter').value = '';
+  document.getElementById('date-filter').value = '';
+  applyFilter();
+}
+
+var ACTION_ICONS = {
+  admin_login:           'ti-login',
+  bulk_import:           'ti-upload',
+  participant_approved:  'ti-user-check',
+  participant_rejected:  'ti-user-x',
+};
+var ACTION_LABELS = {
+  admin_login:           'Admin Login',
+  bulk_import:           'Bulk Import',
+  participant_approved:  'Participant Approved',
+  participant_rejected:  'Participant Rejected',
+};
+
+function renderRows(rows) {
+  var tbody = document.getElementById('log-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-shield"></i>No events found</div></td></tr>';
+    return;
+  }
+  var html = '';
+  rows.forEach(function(r) {
+    var cls   = 'action-' + (r.action in ACTION_LABELS ? r.action : 'default');
+    var icon  = ACTION_ICONS[r.action] || 'ti-activity';
+    var label = ACTION_LABELS[r.action] || r.action;
+    var details = r.details ? JSON.stringify(r.details) : '—';
+    var ip = r.ip ? r.ip.split(',')[0].trim() : '—';
+    var dt = r.created_at ? new Date(r.created_at) : null;
+    var timeStr = dt ? dt.toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }) : '—';
+    html +=
+      '<tr>' +
+      '<td><span class="action-badge ' + cls + '"><i class="ti ' + icon + '"></i>' + label + '</span></td>' +
+      '<td class="details-cell"><div class="details-text" title="' + details.replace(/"/g,'&quot;') + '">' + details + '</div></td>' +
+      '<td><span class="ip-text">' + ip + '</span></td>' +
+      '<td><span class="time-text">' + timeStr + '</span></td>' +
+      '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+loadLog();
+</script>
+</body>
+</html>
