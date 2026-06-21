@@ -218,22 +218,23 @@
 
 <script src="_nav.js"></script>
 <script>
-/* audit-log v3 */
+/* audit-log v4 */
 authGuard();
 
-var BACKEND = 'https://walkathon-backend-hv9j.onrender.com';
-var allRows = [];
+var BACKEND      = 'https://walkathon-backend-hv9j.onrender.com';
+var ADMIN_SECRET = 'agwalk-admin-2026-xK9mPqR7';
+var allRows      = [];
 
-var ICONS = { admin_login:'ti-login', bulk_import:'ti-upload', participant_approved:'ti-user-check', participant_rejected:'ti-user-x' };
+var ICONS  = { admin_login:'ti-login', bulk_import:'ti-upload', participant_approved:'ti-user-check', participant_rejected:'ti-user-x' };
 var LABELS = { admin_login:'Admin Login', bulk_import:'Bulk Import', participant_approved:'Participant Approved', participant_rejected:'Participant Rejected' };
 
 async function loadLog() {
   var tbody = document.getElementById('log-body');
   tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>';
-  var token = sessionStorage.getItem('wk_admin_token');
-  if (!token) { window.location.href = 'admin-login.html'; return; }
   try {
-    var res = await fetch(BACKEND + '/audit-log', { headers: { 'Authorization': 'Bearer ' + token } });
+    var res = await fetch(BACKEND + '/audit-log', {
+      headers: { 'Authorization': 'Bearer ' + ADMIN_SECRET }
+    });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var body = await res.json();
     allRows = Array.isArray(body) ? body : (Array.isArray(body.rows) ? body.rows : []);
@@ -274,25 +275,25 @@ function renderRows(rows) {
     if (!r) continue;
     var action  = r.action ? String(r.action) : '';
     var cls     = LABELS[action] ? 'action-' + action : 'action-default';
-    var icon    = ICONS[action] || 'ti-activity';
+    var icon    = ICONS[action]  || 'ti-activity';
     var label   = LABELS[action] || action || '—';
     var details = r.details ? (typeof r.details === 'string' ? r.details : JSON.stringify(r.details)) : '—';
     var ip      = r.ip ? String(r.ip).split(',')[0].trim() : '—';
     var timeStr = '—';
     if (r.created_at) {
-      try { timeStr = new Date(r.created_at).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }); } catch(e2) {}
+      try { timeStr = new Date(r.created_at).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }); } catch(ex) {}
     }
-    html += '<tr>';
-    html += '<td><span class="action-badge ' + cls + '"><i class="ti ' + icon + '"></i> ' + label + '</span></td>';
-    html += '<td class="details-cell"><div class="details-text" title="' + details.replace(/"/g, '&quot;') + '">' + details + '</div></td>';
-    html += '<td><span class="ip-text">' + ip + '</span></td>';
-    html += '<td><span class="time-text">' + timeStr + '</span></td>';
-    html += '</tr>';
+    html += '<tr>'
+      + '<td><span class="action-badge ' + cls + '"><i class="ti ' + icon + '"></i> ' + label + '</span></td>'
+      + '<td class="details-cell"><div class="details-text" title="' + details.replace(/"/g,'&quot;') + '">' + details + '</div></td>'
+      + '<td><span class="ip-text">' + ip + '</span></td>'
+      + '<td><span class="time-text">' + timeStr + '</span></td>'
+      + '</tr>';
   }
   tbody.innerHTML = html;
 }
 
-loadLog();
+window.addEventListener('DOMContentLoaded', function() { loadLog(); });
 </script>
 </body>
 </html>
