@@ -891,7 +891,7 @@ async function load() {
     var [regRes,myActs,allActs,cfgRes,chRes,sdRes,medalRes,allRegRes]=await Promise.all([
       fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId+'&select=*',{headers:HDR}),
       fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&order=activity_date.desc'),
-      fetchAll(SUPABASE_URL+'/rest/v1/activities?is_flagged=is.false&is_deleted=is.false&select=strava_athlete_id,distance_meters,activity_date'),
+      fetchAll(SUPABASE_URL+'/rest/v1/activities?is_flagged=is.false&is_deleted=is.false&select=strava_athlete_id,distance_meters'),
       fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
       fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
       fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
@@ -971,9 +971,9 @@ async function load() {
     // Standing
     var allReg=allRegRes,myGenderN=(reg.gender||'').toLowerCase(),myShiftN=(reg.shift||'').toLowerCase();
     var myTeamN=(reg.leaderboard_team||'').toLowerCase(),isNight=myShiftN.indexOf('night')>-1,isFemale=myGenderN==='female';
-    var allActsMap={};
-    allActs.forEach(function(a){if(!allActsMap[a.strava_athlete_id])allActsMap[a.strava_athlete_id]=[];allActsMap[a.strava_athlete_id].push(a);});
-    function rankIn(peers){var scored=peers.map(function(p){var acts=allActsMap[p.strava_athlete_id]||[],km=0;acts.forEach(function(a){km+=(a.distance_meters||0)/1000;});return{id:p.strava_athlete_id,km:km};}).sort(function(a,b){return b.km-a.km;});var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});return pos>=0?pos+1:null;}
+    var allKmMap={};
+    allActs.forEach(function(a){var id=a.strava_athlete_id;allKmMap[id]=(allKmMap[id]||0)+(parseFloat(a.distance_meters)||0)/1000;});
+    function rankIn(peers){var scored=peers.map(function(p){return{id:p.strava_athlete_id,km:allKmMap[p.strava_athlete_id]||0};}).sort(function(a,b){return b.km-a.km;});var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});return pos>=0?pos+1:null;}
     var shiftPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;});
     var teamPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),pt=(p.leaderboard_team||'').toLowerCase();return pt===myTeamN&&(pg==='female')===isFemale;});
     var shiftRank=rankIn(shiftPeers),teamRank=rankIn(teamPeers);
@@ -1018,10 +1018,8 @@ async function load() {
       // Gold achieved — performance + rivalry card
       var daysElapsed=Math.max(1,(now-new Date('2026-06-01'))/86400000);
       var avgKmDay=fullPts.km/daysElapsed;
-      var goldActsMap={};
-      allActs.forEach(function(a){if(!goldActsMap[a.strava_athlete_id])goldActsMap[a.strava_athlete_id]=[];goldActsMap[a.strava_athlete_id].push(a);});
       var shiftPeersG=allRegRes.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return(ps.indexOf('night')>-1)===isNight&&(pg==='female')===isFemale;});
-      var shiftScoredG=shiftPeersG.map(function(p){var km=0;(goldActsMap[p.strava_athlete_id]||[]).forEach(function(a){km+=(a.distance_meters||0)/1000;});return{id:p.strava_athlete_id,name:p.full_name,km:km};}).sort(function(a,b){return b.km-a.km;});
+      var shiftScoredG=shiftPeersG.map(function(p){return{id:p.strava_athlete_id,name:p.full_name,km:allKmMap[p.strava_athlete_id]||0};}).sort(function(a,b){return b.km-a.km;});
       var myRankG=shiftScoredG.findIndex(function(x){return String(x.id)===String(athleteId);})+1;
       var totalG=shiftScoredG.length;
       var pctRank=totalG>0?myRankG/totalG:0.5;
@@ -1150,9 +1148,7 @@ async function load() {
     document.getElementById('streak-labels').innerHTML=labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join('');
 
     // Rivals
-    var rivalActsMap={};
-    allActs.forEach(function(a){if(!rivalActsMap[a.strava_athlete_id])rivalActsMap[a.strava_athlete_id]=[];rivalActsMap[a.strava_athlete_id].push(a);});
-    var shiftPeersScored=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;}).map(function(p){var acts=rivalActsMap[p.strava_athlete_id]||[],km=0;acts.forEach(function(a){km+=(a.distance_meters||0)/1000;});return{p:p,km:km};}).sort(function(a,b){return b.km-a.km;});
+    var shiftPeersScored=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;}).map(function(p){return{p:p,km:allKmMap[p.strava_athlete_id]||0};}).sort(function(a,b){return b.km-a.km;});
     var myRivalIdx=shiftPeersScored.findIndex(function(x){return String(x.p.strava_athlete_id)===String(athleteId);});
     var rivalsCard=document.getElementById('rivals-card'); rivalsCard.innerHTML='';
     if(myRivalIdx===-1){rivalsCard.innerHTML='<p style="font-size:12px;color:var(--muted);padding:14px">No peers found.</p>';}
