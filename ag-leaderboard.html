@@ -704,20 +704,23 @@ function calcPoints(acts, athleteId, gender, shift) {
         for (var ti = 0; ti < sorted.length; ti++) {
           var a = sorted[ti];
           if (tcActMap[day][a.strava_activity_id]) continue; // already claimed by another challenge
-          var chkResult = checkChallenge(a, c);
-          console.log('[TC] checkChallenge', c.name, 'act', a.strava_activity_id, (a.distance_meters/1000).toFixed(2)+'km', 'actDate:', (a.activity_date||'').split('T')[0], 'c.start_date:', c.start_date, 'result:', chkResult);
-          if (chkResult) {
-            tcActMap[day][a.strava_activity_id] = {
-              km: parseFloat(a.distance_meters || 0) / 1000,
-              challenge: c
-            };
-            break;
-          }
+          if (a.is_flagged) continue;
+          var tcKm     = parseFloat(a.distance_meters || 0) / 1000;
+          var tcMin    = parseFloat(c.distance_min) || 0;
+          var tcMax    = parseFloat(c.distance_max) || 0;
+          var tcType   = c.distance_type || 'fixed';
+          var tcSports = (Array.isArray(c.sport_types) && c.sport_types.length) ? c.sport_types : ['Walk','Run','Hike','Ride'];
+          if (tcSports.indexOf(a.sport_type) === -1) continue;
+          var tcPass = false;
+          if (tcType === 'fixed')      tcPass = tcKm >= tcMin - 0.1 && tcKm <= tcMax + 0.1;
+          else if (tcType === 'range') tcPass = tcKm >= tcMin && tcKm <= tcMax;
+          else                         tcPass = tcKm >= tcMin;
+          if (!tcPass) continue;
+          tcActMap[day][a.strava_activity_id] = { km: tcKm, challenge: c };
+          break;
         }
       });
     });
-
-  console.log('[TC] tcDays:', JSON.stringify(tcDays), 'tcActMap keys:', JSON.stringify(Object.keys(tcActMap)));
   Object.keys(byDay).forEach(function(day) {
     var dayActs      = byDay[day];
     var isSpecialDay = SPECIAL_DAYS.indexOf(day) !== -1;
