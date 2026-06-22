@@ -1535,10 +1535,7 @@ async function load() {
             '<div class="gold-sub">'+Math.round(myPts)+' pts · ~'+projectedPts2+' pts projected</div></div>'+
           '</div>'+
           '<div class="gold-quote"><div class="gold-quote-text">&ldquo;'+bq+'&rdquo;</div></div>'+
-          '<div class="gold-stats">'+
-            '<div class="gold-stat"><div class="gold-stat-val" style="color:#F4A84A">'+avgKmDay2.toFixed(1)+' km</div><div class="gold-stat-lbl">Daily avg</div></div>'+
-            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--silver)">'+daysLeft+' days left</div><div class="gold-stat-lbl">Keep pushing</div></div>'+
-          '</div>';
+          '';
         paceCard.appendChild(bdiv);
       }
 
@@ -1555,10 +1552,7 @@ async function load() {
             '<div class="gold-sub">'+Math.round(myPts)+' pts · ~'+projectedPts2+' pts projected</div></div>'+
           '</div>'+
           '<div class="gold-quote"><div class="gold-quote-text">&ldquo;'+sq+'&rdquo;</div></div>'+
-          '<div class="gold-stats">'+
-            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--silver)">'+avgKmDay2.toFixed(1)+' km</div><div class="gold-stat-lbl">Daily avg</div></div>'+
-            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--gold)">'+daysLeft+' days left</div><div class="gold-stat-lbl">Go for Gold!</div></div>'+
-          '</div>';
+          '';
         paceCard.appendChild(sdiv);
       }
 
@@ -1642,15 +1636,6 @@ async function load() {
     }
     document.getElementById('streak-bars').innerHTML=days7.map(function(d){return'<div class="sbar '+(d.isToday?'dim':d.active?'on':'off')+'"></div>';}).join('');
     document.getElementById('streak-labels').innerHTML=labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join('');
-
-    // Rivals
-    var rivalActsMap={};
-    allActs.forEach(function(a){if(!rivalActsMap[a.strava_athlete_id])rivalActsMap[a.strava_athlete_id]=[];rivalActsMap[a.strava_athlete_id].push(a);});
-    var shiftPeersScored=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;}).map(function(p){var acts=rivalActsMap[p.strava_athlete_id]||[],km=0;acts.forEach(function(a){km+=(a.distance_meters||0)/1000;});return{p:p,km:km};}).sort(function(a,b){return b.km-a.km;});
-    var myRivalIdx=shiftPeersScored.findIndex(function(x){return String(x.p.strava_athlete_id)===String(athleteId);});
-    // rivals-card removed
-    if(myRivalIdx===-1){rivalsCard.innerHTML='<p style="font-size:12px;color:var(--muted);padding:14px">No peers found.</p>';}
-    else{var showFrom=Math.max(0,myRivalIdx-2),showTo=Math.min(shiftPeersScored.length-1,myRivalIdx+2);for(var ri=showFrom;ri<=showTo;ri++){var rp=shiftPeersScored[ri],isMe=ri===myRivalIdx,rankNum=ri+1,div=document.createElement('div');div.className='rival-row'+(isMe?' rival-me':'');var badgeCls=ri<myRivalIdx?'rb-ahead':isMe?'rb-you':'rb-behind';var gapHtml=isMe?'<span class="rival-gap gap-me">'+rp.km.toFixed(1)+' km</span>':ri<myRivalIdx?'<span class="rival-gap gap-up">+'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km ahead</span>':'<span class="rival-gap gap-dn">-'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km behind</span>';div.innerHTML='<span class="rival-badge '+badgeCls+'">#'+rankNum+'</span><span class="rival-name">'+esc(rp.p.full_name||'—')+(isMe?' (You)':'')+'</span>'+gapHtml;rivalsCard.appendChild(div);}}
 
     // Challenges
     var chCard=document.getElementById('challenges-card');
