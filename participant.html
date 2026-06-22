@@ -992,6 +992,7 @@ async function load() {
     var chRows=await chRes.json(); CHALLENGES_LB=Array.isArray(chRows)?chRows:[];
     var sdRows=await sdRes.json(); SPECIAL_DAYS_LB=Array.isArray(sdRows)?sdRows.map(function(x){return x.special_date;}):[];
     var regs=await regRes.json(); var reg=Array.isArray(regs)&&regs.length?regs[0]:{};
+    LB_ME=reg; // Share reg data with LB — no extra fetch needed
     var name=reg.full_name||s.name||'Participant';
 
     // Profile
@@ -1081,6 +1082,10 @@ async function load() {
           fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
         ]);
         allActs=allActsRaw; allRegRes=allRegRaw;
+        // Feed leaderboard tab from same data — no extra API calls
+        LB_REG=allRegRaw;
+        LB_ACTS=allActsRaw;
+        if(LB_ME&&!_lbReady){_lbReady=true;lbRender();}
       }catch(e2){console.warn('Ranking load failed:',e2);return;}
 
     // Standing
@@ -1355,7 +1360,7 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
 
 function toggleDay(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
 
-var _lbLoaded=false;
+var _lbLoaded=false,_lbReady=false;
 function showTab(tab){
   document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'block':'none';
   document.getElementById('tab-activities').style.display=tab==='activities'?'block':'none';
@@ -1368,7 +1373,11 @@ function showTab(tab){
   var isDash=tab==='dashboard';
   document.querySelector('.hero-rings-block').style.display=isDash?'':'none';
   document.querySelector('.hero-metrics-block').style.display=isDash?'':'none';
-  if(tab==='leaderboard'&&!_lbLoaded){_lbLoaded=true;lbBoot();}
+  if(tab==='leaderboard'&&!_lbLoaded){
+    _lbLoaded=true;
+    if(_lbReady){lbRender();}  // data already loaded — instant render
+    else{lbBoot();}             // fallback: Phase 2 not done yet, fetch directly
+  }
 }
 
 function refreshData(){
@@ -1605,37 +1614,35 @@ function buildTabs(){
 }
 function showSkeletons(){var h='';for(var i=0;i<6;i++)h+='<div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>';document.getElementById('lb-list').innerHTML=h;}
 
-async function lbBoot(){
+function lbRender(){
+  // Pure render — zero API calls. Uses LB_ME/LB_REG/LB_ACTS already in memory.
   var s=JSON.parse(localStorage.getItem('wk_user')||'{}');
-  if(!s.loggedIn||!s.athleteId){return;}
   try{
-    var results=await Promise.all([
-      fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+s.athleteId+'&select=*',{headers:HDR}),
-      fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
-      fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain'),
-      fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
-      fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
-      fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
-      fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR})
-    ]);
-    var myRegs=await results[0].json();
-    LB_ME=(Array.isArray(myRegs)&&myRegs.length)?myRegs[0]:{strava_athlete_id:s.athleteId};
-    LB_REG=results[1]; LB_ACTS=results[2];
-    var cfgRows=await results[3].json();
-    if(Array.isArray(cfgRows))cfgRows.forEach(function(row){if(row.config_key==='bonus_points')CONFIG_LB.bonus=row.config_value.map(function(b){return{km:Number(b.km),points:Number(b.points||b.pts||0)};});if(row.config_key==='base_points_per_km')CONFIG_LB.basePer_km=parseFloat(row.config_value)||1;});
-    var chRows=await results[4].json(); CHALLENGES_LB=Array.isArray(chRows)?chRows:[];
-    var sdRows=await results[5].json(); SPECIAL_DAYS_LB=Array.isArray(sdRows)?sdRows.map(function(x){return x.special_date;}):[];
-    var medalRows=await results[6].json();
-    if(Array.isArray(medalRows)&&medalRows.length&&medalRows[0].config_value){var mt=medalRows[0].config_value,gKey=((LB_ME.gender||'').toLowerCase()==='female')?'female':'male';LB_bronzeThresh=Number(mt.bronze&&mt.bronze[gKey]||100);LB_silverThresh=Number(mt.silver&&mt.silver[gKey]||150);LB_goldThresh=Number(mt.gold&&mt.gold[gKey]||200);}
-    var name=LB_ME.full_name||s.name||'Participant';
+    var name=(LB_ME&&LB_ME.full_name)||s.name||'Participant';
     document.getElementById('lb-my-name').textContent=name.toUpperCase();
-    var initials=name.split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
-      var tags=[];if(LB_ME.gender)tags.push(LB_ME.gender);if(LB_ME.shift)tags.push(LB_ME.shift);if(LB_ME.leaderboard_team)tags.push(LB_ME.leaderboard_team);
+    var tags=[];if(LB_ME&&LB_ME.gender)tags.push(LB_ME.gender);if(LB_ME&&LB_ME.shift)tags.push(LB_ME.shift);if(LB_ME&&LB_ME.leaderboard_team)tags.push(LB_ME.leaderboard_team);
     document.getElementById('lb-my-tags').innerHTML=tags.map(function(t){return'<span class="my-tag">'+esc(t)+'</span>';}).join('');
     buildTabs(); renderRows(getRows(LB_currentTab));
     var allRows=getRows(LB_currentTab),myRow=allRows.find(function(r){return String(r.p.strava_athlete_id)===String(s.athleteId);});
     document.getElementById('lb-my-pts').textContent=myRow?myRow.pts.total.toFixed(1):'—';
-  }catch(e){console.error('Leaderboard boot error:',e);document.getElementById('lb-list').innerHTML='<div class="empty-box"><div class="ei">⚠️</div><p>Could not load leaderboard.<br>Tap refresh to try again.</p></div>';}
+  }catch(e){console.error('lbRender error:',e);}
+}
+async function lbBoot(){
+  // Fallback: only called if user taps Leaderboard before Phase 2 finishes.
+  // Fetches only the 2 large tables (config already loaded in Phase 1).
+  var s=JSON.parse(localStorage.getItem('wk_user')||'{}');
+  if(!s.loggedIn||!s.athleteId){return;}
+  try{
+    showSkeletons();
+    var [regAll,actsAll]=await Promise.all([
+      fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
+      fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain')
+    ]);
+    LB_REG=regAll; LB_ACTS=actsAll;
+    // LB_ME already set from Phase 1 reg; CONFIG_LB already set from Phase 1 config
+    _lbReady=true;
+    lbRender();
+  }catch(e){console.error('lbBoot error:',e);document.getElementById('lb-list').innerHTML='<div class="empty-box"><div class="ei">⚠️</div><p>Could not load.<br>Tap refresh.</p></div>';}
 }
 
 function lbClearCache() {
@@ -1661,7 +1668,7 @@ function lbClearCache() {
   }
 }
 
-function lbRefresh(){showSkeletons();lbBoot().finally(function(){});}
+function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
 // lbBoot called by showTab
 
 </script>
