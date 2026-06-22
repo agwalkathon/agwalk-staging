@@ -467,7 +467,7 @@ function applyFilters() {
         return a.strava_athlete_id == r.p.strava_athlete_id && a.sport_type === sport && !a.is_flagged;
       });
       if (filteredActs.length === 0) return null;
-      var pts = calcPoints(filteredActs, r.p.strava_athlete_id);
+      var pts = calcPoints(filteredActs, r.p.strava_athlete_id, r.p.gender, r.p.shift);
       return { p: r.p, pts: pts };
     }).filter(function(r){ return r && r.pts.totalPts > 0; });
     rows.sort(function(a,b){ return b.pts.totalPts - a.pts.totalPts; });
@@ -621,7 +621,7 @@ function filterReg(reg, board) {
   });
 }
 
-function calcPoints(acts, athleteId, gender) {
+function calcPoints(acts, athleteId, gender, shift) {
   // Group by day
   var byDay = {};
   acts.filter(function(a){ return a.strava_athlete_id===athleteId; }).forEach(function(a) {
@@ -711,10 +711,11 @@ function calcPoints(acts, athleteId, gender) {
     var key = 'ch_' + (c.id || ci);
     if (earnedChallenges.has(key)) continue;
 
-    var eligible = c.eligible === 'all'
-      || c.eligible === (gender || '').toLowerCase()
-      || c.eligible === 'dayshift'
-      || c.eligible === 'nightshift';
+    var elig = c.eligible || 'all';
+    var eligible = elig === 'all'
+      || elig === (gender || '').toLowerCase()
+      || (elig === 'dayshift'  && (shift||'').toLowerCase().includes('day'))
+      || (elig === 'nightshift' && (shift||'').toLowerCase().includes('night'));
     if (!eligible) continue;
 
     var awarded = false;
