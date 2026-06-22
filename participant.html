@@ -56,13 +56,13 @@
     .hero-rings-block{
       background:var(--surface);
       border-bottom:1px solid var(--border);
-      padding:16px 18px 18px;
+      padding:20px 16px 18px;
     }
     .hero-metrics-block{
       background:var(--surface2);
       border-bottom:1px solid var(--border);
       padding:14px 18px;
-    }
+    padding:16px 16px 20px;}
     .hero-top{display:flex;align-items:center;gap:12px;}
     .avatar{
       width:46px;height:46px;border-radius:50%;
@@ -103,7 +103,7 @@
     .metric-box{
       background:var(--surface);border:1px solid var(--border);
       border-radius:var(--radius-sm);
-      padding:16px 12px;text-align:center;
+      padding:18px 12px 16px;text-align:center;
     }
     .metric-val{font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.5px;}
     .metric-val.orange{color:var(--brand);}
@@ -720,7 +720,7 @@ async function load() {
       var needEl=document.getElementById('ring-need-'+m.id);
       if(fillEl) fillEl.style.strokeDashoffset=done?0:offset;
       if(pctEl){
-        if(done){pctEl.textContent='100%';pctEl.style.fontSize='20px';}
+        if(done){pctEl.textContent='100%';pctEl.style.fontSize='';}
         else{pctEl.textContent=pct+'%';pctEl.style.fontSize='';}
       }
       if(needEl){
