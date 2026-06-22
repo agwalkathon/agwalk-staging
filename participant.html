@@ -1937,8 +1937,8 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
     // Use scored km (capped, range-split adjusted) not raw sum
     var scoredKm=db.km||0;
     var rawKm=dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.distance_meters||0)/1000;},0);
-    // Challenge pts: use dayBreakdown only (actBreakdown challenges are already included there)
-    var chPts=parseFloat((db.challenges||[]).reduce(function(s,ch){return s+(ch.pts||0);},0).toFixed(2));
+    // Challenge pts: sum actBreakdown for all activities this day — matches tile badges exactly
+    var chPts=parseFloat(dayActs.reduce(function(s,a){var ab=actBreakdown[a.strava_activity_id];return s+(ab?ab.challenges.reduce(function(s2,c){return s2+(c.pts||0);},0):0);},0).toFixed(2));
     var dayTotal=parseFloat((db.distPts+db.bonusPts+chPts).toFixed(2));
     var dateObj=new Date(date+'T00:00:00');
     var dW=dateObj.toLocaleDateString('en-IN',{weekday:'long'});
