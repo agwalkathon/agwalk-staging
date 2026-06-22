@@ -1465,7 +1465,7 @@ async function load() {
     var gKey=(reg.gender||'').toLowerCase()==='female'?'female':'male';
     var bronzeThresh=Number(medals.bronze[gKey])||100,silverThresh=Number(medals.silver[gKey])||150,goldThresh=Number(medals.gold[gKey])||200;
     var myPts=fullPts.total;
-    document.getElementById('s-pts-display').textContent=Math.round(myPts);
+    var sptEl=document.getElementById('s-pts-display');if(sptEl)sptEl.textContent=Math.round(myPts);
 
     // ── Medal rings ───────────────────────────────────────────────────────────
     var CIRC=270.2; // 2 * π * 43
