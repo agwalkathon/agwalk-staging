@@ -144,6 +144,13 @@
     .lrow-label{font-size:15px;font-weight:600;color:var(--text);}
     .lrow-sub{font-size:12px;color:var(--label);margin-top:2px;}
     .lrow-val{font-size:16px;font-weight:700;color:var(--brand);flex-shrink:0;}
+    /* Stat cards grid */
+    .stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
+    .stat-card-item{background:var(--surface);border-radius:var(--radius-sm);padding:16px 14px;}
+    .stat-card-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+    .stat-card-val{font-size:20px;font-weight:800;color:var(--brand);line-height:1;letter-spacing:-0.3px;}
+    .stat-card-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:6px;}
+    .stat-card-sub{font-size:11px;color:var(--label);margin-top:3px;}
 
     /* ── WHOOP-style activity tile rows ── */
     #act-list{display:grid;gap:8px;}
@@ -668,14 +675,22 @@
   </div>
 
   <div class="sec">Stats</div>
-  <div class="card">
-    <div class="lrow">
-      <div class="lrow-left"><div class="lrow-label">Avg Pace</div><div class="lrow-sub">min/km across valid activities</div></div>
-      <div class="lrow-val" id="s-pace">—</div>
+  <div class="stat-cards">
+    <div class="stat-card-item">
+      <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="stat-card-val" id="s-pace">—</div>
+      <div class="stat-card-label">Avg Pace</div>
+      <div class="stat-card-sub">min/km</div>
     </div>
-    <div class="lrow">
-      <div class="lrow-left"><div class="lrow-label">Moving Time</div><div class="lrow-sub">total active time</div></div>
-      <div class="lrow-val" id="s-movetime">—</div>
+    <div class="stat-card-item">
+      <div class="stat-card-icon" style="background:rgba(96,165,250,0.12);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="stat-card-val" style="color:var(--blue);" id="s-movetime">—</div>
+      <div class="stat-card-label">Moving Time</div>
+      <div class="stat-card-sub">total active</div>
     </div>
   </div>
 
