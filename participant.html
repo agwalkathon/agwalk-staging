@@ -1387,14 +1387,18 @@ function refreshData(){
   load().finally(function(){icon.classList.remove('spinning');});
 }
 
+// ── Leaderboard shared vars (declared here so Phase 1 can populate them) ──
+var LB_ME=null,LB_REG=[],LB_ACTS=[],LB_currentTab='shift';
+var LB_bronzeThresh=100,LB_silverThresh=150,LB_goldThresh=200;
+function norm(s){return String(s||'').trim().toLowerCase();}
+
 (function(){var hash=window.location.hash.replace('#','');if(hash==='activities'||hash==='dashboard'||hash==='you'||hash==='leaderboard')showTab(hash);})();
 load();
 </script>
 
 <script>
 /* ── Embedded Leaderboard Logic ── */
-var LB_ME=null,LB_REG=[],LB_ACTS=[],LB_currentTab='shift';
-var LB_bronzeThresh=100,LB_silverThresh=150,LB_goldThresh=200;
+// LB_ME/LB_REG/LB_ACTS/LB_*Thresh declared in main script above
 
 
 
@@ -1625,7 +1629,11 @@ function lbRender(){
     buildTabs(); renderRows(getRows(LB_currentTab));
     var allRows=getRows(LB_currentTab),myRow=allRows.find(function(r){return String(r.p.strava_athlete_id)===String(s.athleteId);});
     document.getElementById('lb-my-pts').textContent=myRow?myRow.pts.total.toFixed(1):'—';
-  }catch(e){console.error('lbRender error:',e);}
+  }catch(e){
+    console.error('lbRender error:',e);
+    var el=document.getElementById('lb-list');
+    if(el)el.innerHTML='<div class="empty-box"><div class="ei">⚠️</div><p>'+e.message+'</p></div>';
+  }
 }
 async function lbBoot(){
   // Fallback: only called if user taps Leaderboard before Phase 2 finishes.
