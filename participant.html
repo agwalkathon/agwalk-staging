@@ -1183,47 +1183,44 @@ function calcFullPts(myActs, gender) {
   Object.keys(byDay).forEach(function(day) {
     var dayActs   = byDay[day];
     var isSpecial = SPECIAL_DAYS_LB.indexOf(day) !== -1;
-    var tcDay     = twoChallengeDays[day] || null;
+    var isTcDay = tcDays[day] || false;
 
-    if (tcDay) {
+    if (isTcDay) {
       // ── Two-challenges-same-day mode ──────────────────────────
-      var tcActId      = tcDay.act.strava_activity_id;
-      var tcQualKm     = parseFloat(tcDay.act.distance_meters || 0) / 1000;
-      var tcConflict   = conflictingActIds[day] || {};
-      var tcPoolKm     = 0;
-      var tcConflictKm = 0;
-      dayActs.forEach(function(a) {
-        if (a.strava_activity_id === tcActId) return;
-        if (tcConflict[a.strava_activity_id]) { tcConflictKm += parseFloat(a.distance_meters||0)/1000; return; }
-        tcPoolKm += parseFloat(a.distance_meters || 0) / 1000;
-      });
-      // 21km cap
-      var combined = tcQualKm + tcConflictKm + tcPoolKm;
-      if (!isSpecial && combined > DAILY_CAP) {
-        var excess   = combined - DAILY_CAP;
-        var poolTrim = Math.min(excess, tcPoolKm);
-        tcPoolKm -= poolTrim; excess -= poolTrim;
-        if (excess > 0) { var ctrim = Math.min(excess, tcConflictKm); excess -= ctrim; }
-        if (excess > 0) tcQualKm -= excess;
+      var tcMap      = tcActMap[day] || {};
+      var tcBonusPts = 0;
+      var allDayKm   = 0;
+      dayActs.forEach(function(a){ allDayKm += parseFloat(a.distance_meters||0)/1000; });
+
+      var qualKmTotal = 0;
+      Object.keys(tcMap).forEach(function(aid){ qualKmTotal += tcMap[aid].km; });
+      var remainKm = allDayKm - qualKmTotal;
+
+      if (!isSpecial && allDayKm > DAILY_CAP) {
+        var excess  = allDayKm - DAILY_CAP;
+        var remTrim = Math.min(excess, remainKm);
+        remainKm   -= remTrim; excess -= remTrim;
+        if (excess > 0) qualKmTotal -= excess;
       }
-      tcQualKm = Math.max(0, parseFloat(tcQualKm.toFixed(4)));
-      tcPoolKm = Math.max(0, parseFloat(tcPoolKm.toFixed(4)));
+      remainKm    = Math.max(0, parseFloat(remainKm.toFixed(4)));
+      qualKmTotal = Math.max(0, parseFloat(qualKmTotal.toFixed(4)));
 
       var base2     = parseFloat(CONFIG_LB.basePer_km) || 1;
-      var dayDistKm = tcQualKm + tcPoolKm;
+      var dayDistKm = qualKmTotal + remainKm;
       totalDistKm  += dayDistKm;
       totalDistPts += parseFloat((dayDistKm * base2).toFixed(2));
-      var tcBp      = calcBonus(tcQualKm) + calcBonus(tcPoolKm);
-      totalBonus   += tcBp;
 
-      byDay[day]._outRangeKm = tcPoolKm;
+      Object.keys(tcMap).forEach(function(aid){ tcBonusPts += calcBonus(tcMap[aid].km); });
+      tcBonusPts += calcBonus(remainKm);
+      totalBonus += tcBonusPts;
+
+      byDay[day]._outRangeKm = remainKm;
       byDay[day]._inRangeKm  = 0;
-      byDay[day]._tcQualKm   = tcQualKm;
-      byDay[day]._tcPoolKm   = tcPoolKm;
-      byDay[day]._tcActId    = tcActId;
+      byDay[day]._tcMap      = tcMap;
+      byDay[day]._tcRemainKm = remainKm;
       dayBreakdown[day] = {
         km: dayDistKm, distPts: parseFloat((dayDistKm * base2).toFixed(2)),
-        bonusPts: tcBp, challenges: [], inRangeKm: 0, capped: (!isSpecial && combined > DAILY_CAP)
+        bonusPts: tcBonusPts, challenges: [], inRangeKm: 0, capped: (!isSpecial && allDayKm > DAILY_CAP)
       };
       return;
     }
@@ -1297,16 +1294,15 @@ function calcFullPts(myActs, gender) {
     var key   = 'ch_' + (c.id || c.name);
 
     if (atype === 'two-challenges-same-day') {
-      Object.keys(twoChallengeDays).forEach(function(day) {
-        if (twoChallengeDays[day].challenge.id === c.id) {
-          totalChallenge += bp2; earnedChallenges[key] = true; earnedPts[key] = (earnedPts[key]||0) + bp2;
-          if (dayBreakdown[day]) dayBreakdown[day].challenges.push({name:cName, pts:bp2, actId:twoChallengeDays[day].act.strava_activity_id});
-          var tcAid = twoChallengeDays[day].act.strava_activity_id;
-          if (tcAid) {
-            if (!actBreakdown[tcAid]) actBreakdown[tcAid] = {challenges:[]};
-            actBreakdown[tcAid].challenges.push({name:cName, pts:bp2});
+      Object.keys(tcActMap).forEach(function(day) {
+        Object.keys(tcActMap[day]).forEach(function(aid) {
+          if (tcActMap[day][aid].challenge.id === c.id) {
+            totalChallenge += bp2; earnedChallenges[key] = true; earnedPts[key] = (earnedPts[key]||0) + bp2;
+            if (dayBreakdown[day]) dayBreakdown[day].challenges.push({name:cName, pts:bp2, actId:aid});
+            if (!actBreakdown[aid]) actBreakdown[aid] = {challenges:[]};
+            actBreakdown[aid].challenges.push({name:cName, pts:bp2});
           }
-        }
+        });
       });
       return;
     }
