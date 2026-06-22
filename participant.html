@@ -1046,12 +1046,19 @@ function tileClass(t) {
     function renderIcon(t){var m={'Walk':icoWalk,'Run':icoRun,'VirtualRun':icoRun,'Ride':icoRide,'VirtualRide':icoRide,'MountainBikeRide':icoRide,'Hike':icoHike};return m[t]||icoBolt;}
 
 function calcBonus(km) {
-  var result=0,sorted=CONFIG_LB.bonus.slice().sort(function(a,b){return b.km-a.km;});
-  for(var i=0;i<sorted.length;i++){if(km>=Number(sorted[i].km)){result=Number(sorted[i].points||sorted[i].pts||0);break;}}
+  var result = 0;
+  var sorted = CONFIG_LB.bonus.slice().sort(function(a,b){ return b.km-a.km; });
+  for (var i=0; i<sorted.length; i++) {
+    var bracketKm  = Number(sorted[i].km) || 0;
+    var bracketPts = (sorted[i].points !== undefined ? Number(sorted[i].points) : Number(sorted[i].pts)) || 0;
+    if (km >= bracketKm) { result = bracketPts; break; }
+  }
   return result;
 }
+
 function checkChallengeSingle(act, ch, cSports) {
-  var actDate = (act.activity_date||'').split('T')[0];
+  if (!act.activity_date) return false;
+  var actDate = act.activity_date.split('T')[0];
   if (actDate < ch.start_date || actDate > ch.end_date) return false;
   if (cSports.indexOf(act.sport_type) === -1) return false;
   var km = (act.distance_meters||0) / 1000;
@@ -1065,7 +1072,8 @@ function checkChallengeSingle(act, ch, cSports) {
   if ((ch.elevation_criteria||0) > 0 && (act.elevation_gain||0) < ch.elevation_criteria) return false;
   if (ch.start_time_criteria && act.activity_date && act.activity_date.indexOf('T') > -1) {
     var timeStr = act.activity_date.split('T')[1] || '';
-    if (!timeStr.startsWith('06:30:00')) {
+    var isImported = timeStr.startsWith('06:30:00');
+    if (!isImported) {
       var actTime = new Date(act.activity_date);
       var actMins = actTime.getHours()*60 + actTime.getMinutes();
       var parts = ch.start_time_criteria.split(':');
@@ -1075,152 +1083,211 @@ function checkChallengeSingle(act, ch, cSports) {
   }
   return true;
 }
+
 function calcFullPts(myActs, gender) {
-  // ── Exact same logic as ag-leaderboard calcPoints ──────────────────────────
+  // ── Exact port of ag-leaderboard calcPoints — single source of truth ──
   var athleteId = myActs.length ? myActs[0].strava_athlete_id : null;
   var byDay = {};
-  myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){
-    var d=(a.activity_date||'').split('T')[0]; if(!d)return;
-    if(!byDay[d])byDay[d]=[]; byDay[d].push(a);
+  myActs.filter(function(a){ return !a.is_flagged; }).forEach(function(a) {
+    var d = (a.activity_date||'').split('T')[0];
+    if (!d) return;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(a);
   });
-  var totalDistKm=0,totalDistPts=0,totalBonus=0,totalChallenge=0;
-  var earnedChallenges={},earnedPts={},dayBreakdown={},actBreakdown={};
-  var DAILY_CAP=21;
 
-  // ── Day loop: range_split + 21km cap (matches ag-leaderboard exactly) ──
-  Object.keys(byDay).forEach(function(day){
-    var dayActs=byDay[day];
-    var inRangeKm=0,outRangeKm=0;
-    var rsChallenge=null;
-    for(var ri=0;ri<CHALLENGES_LB.length;ri++){
-      var c=CHALLENGES_LB[ri];
-      if(c.range_split&&c.is_active&&day>=c.start_date&&day<=c.end_date){rsChallenge=c;break;}
+  var totalDistKm  = 0.0;
+  var totalDistPts = 0.0;
+  var totalBonus   = 0;
+  var totalChallenge = 0;
+  var earnedChallenges = {};  // plain object (participant.html doesn't have Set polyfill issues)
+  var earnedPts = {};
+  var dayBreakdown = {};      // for Activities tab display
+  var actBreakdown = {};      // for activity tile badge
+
+  // ── Day loop ──
+  Object.keys(byDay).forEach(function(day) {
+    var dayActs = byDay[day];
+    var inRangeKm = 0.0, outRangeKm = 0.0;
+
+    var rsChallenge = null;
+    for (var ri = 0; ri < CHALLENGES_LB.length; ri++) {
+      var rc = CHALLENGES_LB[ri];
+      if (rc.range_split && rc.is_active && day >= rc.start_date && day <= rc.end_date) { rsChallenge = rc; break; }
     }
-    dayActs.forEach(function(a){
-      var actKm=(parseFloat(a.distance_meters)||0)/1000;
-      if(rsChallenge){
-        var cST=(Array.isArray(rsChallenge.sport_types)&&rsChallenge.sport_types.length)?rsChallenge.sport_types:['Walk','Run','Hike','Ride'];
-        var inR=cST.indexOf(a.sport_type)>-1&&actKm>=(rsChallenge.distance_min-0.1)&&actKm<=rsChallenge.distance_max;
-        if(inR){inRangeKm+=actKm;return;}
+
+    dayActs.forEach(function(a) {
+      var actKm = (parseFloat(a.distance_meters)||0) / 1000.0;
+      if (rsChallenge) {
+        var cST = (Array.isArray(rsChallenge.sport_types) && rsChallenge.sport_types.length)
+          ? rsChallenge.sport_types : ['Walk','Run','Hike','Ride'];
+        var inR = cST.indexOf(a.sport_type) > -1
+          && actKm >= (rsChallenge.distance_min - 0.1)
+          && actKm <= rsChallenge.distance_max;
+        if (inR) { inRangeKm += actKm; return; }
       }
-      outRangeKm+=actKm;
+      outRangeKm += actKm;
     });
-    var isSpecial=SPECIAL_DAYS_LB.indexOf(day)!==-1;
-    inRangeKm=parseFloat(inRangeKm.toFixed(4)); outRangeKm=parseFloat(outRangeKm.toFixed(4));
-    var combinedKm=inRangeKm+outRangeKm;
-    if(!isSpecial&&combinedKm>DAILY_CAP){
-      var excess=combinedKm-DAILY_CAP;
-      var outTrim=Math.min(excess,outRangeKm); outRangeKm=parseFloat((outRangeKm-outTrim).toFixed(4)); excess-=outTrim;
-      if(excess>0)inRangeKm=parseFloat((inRangeKm-excess).toFixed(4));
+
+    var DAILY_CAP = 21;
+    var isSpecial = SPECIAL_DAYS_LB.indexOf(day) !== -1;
+    inRangeKm  = parseFloat(inRangeKm.toFixed(4));
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+    var combinedKm = inRangeKm + outRangeKm;
+    if (!isSpecial && combinedKm > DAILY_CAP) {
+      var excess = combinedKm - DAILY_CAP;
+      var outTrim = Math.min(excess, outRangeKm);
+      outRangeKm = parseFloat((outRangeKm - outTrim).toFixed(4)); excess -= outTrim;
+      if (excess > 0) inRangeKm = parseFloat((inRangeKm - excess).toFixed(4));
     }
-    inRangeKm=parseFloat(inRangeKm.toFixed(4)); outRangeKm=parseFloat(outRangeKm.toFixed(4));
-    var base=parseFloat(CONFIG_LB.basePer_km)||1;
-    var dayDistKm=inRangeKm+outRangeKm;
-    totalDistKm+=dayDistKm;
-    totalDistPts+=parseFloat((dayDistKm*base).toFixed(2));
-    byDay[day]._dayKm=outRangeKm; byDay[day]._inRangeKm=inRangeKm;
-    dayBreakdown[day]={km:dayDistKm,distPts:parseFloat((dayDistKm*base).toFixed(2)),bonusPts:0,challenges:[]};
+    inRangeKm  = parseFloat(inRangeKm.toFixed(4));
+    outRangeKm = parseFloat(outRangeKm.toFixed(4));
+
+    var base = parseFloat(CONFIG_LB.basePer_km) || 1;
+    var dayDistKm = inRangeKm + outRangeKm;
+    totalDistKm  += dayDistKm;
+    totalDistPts += parseFloat((dayDistKm * base).toFixed(2));
+    byDay[day]._dayKm     = outRangeKm;
+    byDay[day]._inRangeKm = inRangeKm;
+    dayBreakdown[day] = { km: dayDistKm, distPts: parseFloat((dayDistKm*base).toFixed(2)), bonusPts: 0, challenges: [] };
   });
 
-  // ── Bonus: exclude days with exclude_normal_bonus challenges ──
-  var excludeBonusDays={};
-  CHALLENGES_LB.forEach(function(c){
-    if(!c.exclude_normal_bonus)return;
-    Object.keys(byDay).forEach(function(day){if(day>=c.start_date&&day<=c.end_date)excludeBonusDays[day]=true;});
-  });
-  Object.keys(byDay).forEach(function(day){
-    if(!excludeBonusDays[day]){
-      var bPts=calcBonus(byDay[day]._dayKm||0);
-      totalBonus+=bPts;
-      if(dayBreakdown[day])dayBreakdown[day].bonusPts=bPts;
+  // ── Bonus pass ──
+  var excludeBonusDays = {};
+  for (var ci2 = 0; ci2 < CHALLENGES_LB.length; ci2++) {
+    if (!CHALLENGES_LB[ci2].exclude_normal_bonus) continue;
+    Object.keys(byDay).forEach(function(day) {
+      if (day >= CHALLENGES_LB[ci2].start_date && day <= CHALLENGES_LB[ci2].end_date) excludeBonusDays[day] = true;
+    });
+  }
+  totalBonus = 0;
+  Object.keys(byDay).forEach(function(day) {
+    if (!excludeBonusDays[day]) {
+      var bp = calcBonus(byDay[day]._dayKm || 0);
+      totalBonus += bp;
+      if (dayBreakdown[day]) dayBreakdown[day].bonusPts = bp;
     }
   });
 
-  totalDistKm=parseFloat(totalDistKm.toFixed(2));
-  totalDistPts=parseFloat(totalDistPts.toFixed(2));
+  totalDistKm  = parseFloat(totalDistKm.toFixed(2));
+  totalDistPts = parseFloat(totalDistPts.toFixed(2));
 
-  // ── Challenge scoring (matches ag-leaderboard exactly) ──
-  for(var ci=0;ci<CHALLENGES_LB.length;ci++){
-    var ch=CHALLENGES_LB[ci],key='ch_'+(ch.id||ci);
-    if(earnedChallenges[key])continue;
-    var g=(gender||'').toLowerCase();
-    var eligible=ch.eligible==='all'||ch.eligible===g||ch.eligible==='dayshift'||ch.eligible==='nightshift';
-    if(!eligible)continue;
-    var cSports=(Array.isArray(ch.sport_types)&&ch.sport_types.length)?ch.sport_types:['Walk','Run','Hike','Ride'];
-    var chPts=Number(ch.bonus_points)||0,chName=ch.name||'Challenge';
+  // ── Challenge scoring — exact port of ag-leaderboard ──
+  for (var ci = 0; ci < CHALLENGES_LB.length; ci++) {
+    var ch = CHALLENGES_LB[ci];
+    var key = 'ch_' + (ch.id || ci);
+    if (earnedChallenges[key]) continue;
 
-    // Range-split challenge
-    if(ch.range_split){
-      var inRangePts=0,inRangeCount=0;
-      myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){
-        var raDate=(a.activity_date||'').split('T')[0];
-        if(raDate<ch.start_date||raDate>ch.end_date)return;
-        if(cSports.indexOf(a.sport_type)<0)return;
-        var raKm=(a.distance_meters||0)/1000;
-        if(raKm>=(ch.distance_min-0.1)&&raKm<=ch.distance_max){inRangePts+=Number(ch.bonus_points)||0;inRangeCount++;}
+    var g = (gender||'').toLowerCase();
+    var eligible = ch.eligible === 'all' || ch.eligible === g
+      || ch.eligible === 'dayshift' || ch.eligible === 'nightshift';
+    if (!eligible) continue;
+
+    var cSports = (Array.isArray(ch.sport_types) && ch.sport_types.length)
+      ? ch.sport_types : ['Walk','Run','Hike','Ride'];
+    var chPts = Number(ch.bonus_points) || 0;
+    var chName = ch.name || 'Challenge';
+
+    // Range-split
+    if (ch.range_split) {
+      var inRangePts = 0, inRangeCount = 0;
+      myActs.filter(function(a){ return !a.is_flagged; }).forEach(function(a) {
+        var raDate = (a.activity_date||'').split('T')[0];
+        if (raDate < ch.start_date || raDate > ch.end_date) return;
+        if (cSports.indexOf(a.sport_type) < 0) return;
+        var raKm = (a.distance_meters||0) / 1000;
+        if (raKm >= (ch.distance_min - 0.1) && raKm <= ch.distance_max) {
+          inRangePts += Number(ch.bonus_points) || 0;
+          inRangeCount++;
+          var raDay = raDate;
+          if (dayBreakdown[raDay]) dayBreakdown[raDay].challenges.push({name:chName, pts:Number(ch.bonus_points)||0, actId:a.strava_activity_id});
+          if (!actBreakdown[a.strava_activity_id]) actBreakdown[a.strava_activity_id] = {challenges:[]};
+          actBreakdown[a.strava_activity_id].challenges.push({name:chName, pts:Number(ch.bonus_points)||0});
+        }
       });
-      if(inRangeCount>0){earnedChallenges[key]=true;earnedPts[key]=inRangePts;totalChallenge+=inRangePts;}
+      if (inRangeCount > 0) { earnedChallenges[key] = true; earnedPts[key] = inRangePts; totalChallenge += inRangePts; }
       continue;
     }
 
-    // Per-activity challenge — count qualifying acts, award perActPts each (matches ag-leaderboard)
-    var perActPts=Number(ch.per_activity_points)||0;
-    if(perActPts>0){
-      var qualActs=myActs.filter(function(a){return !a.is_flagged&&checkChallengeSingle(a,ch,cSports);});
-      if(qualActs.length>0){
-        var paTotal=0;
-        qualActs.forEach(function(a){
-          paTotal+=perActPts;
-          var actDay=(a.activity_date||'').split('T')[0];
-          if(actDay&&dayBreakdown[actDay])dayBreakdown[actDay].challenges.push({name:chName,pts:perActPts,actId:a.strava_activity_id});
-          if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};
-          actBreakdown[a.strava_activity_id].challenges.push({name:chName,pts:perActPts});
+    // Per-activity challenge
+    var perActPts = Number(ch.per_activity_points) || 0;
+    if (perActPts > 0) {
+      var qualActs = myActs.filter(function(a){ return !a.is_flagged && checkChallengeSingle(a, ch, cSports); });
+      if (qualActs.length > 0) {
+        var paTotal = 0;
+        qualActs.forEach(function(a) {
+          paTotal += perActPts;
+          var actDay = (a.activity_date||'').split('T')[0];
+          if (actDay && dayBreakdown[actDay]) dayBreakdown[actDay].challenges.push({name:chName, pts:perActPts, actId:a.strava_activity_id});
+          if (!actBreakdown[a.strava_activity_id]) actBreakdown[a.strava_activity_id] = {challenges:[]};
+          actBreakdown[a.strava_activity_id].challenges.push({name:chName, pts:perActPts});
         });
-        totalChallenge+=paTotal;
-        earnedChallenges[key]=true;earnedPts[key]=paTotal;
+        totalChallenge += paTotal;
+        earnedChallenges[key] = true; earnedPts[key] = paTotal;
       }
       continue;
     }
 
     // One-time challenge
-    var awarded=false,awardedDay=null,awardedActId=null;
-    if(ch.activity_scope==='daily'){
-      var cDays=Object.keys(byDay).filter(function(d){return d>=ch.start_date&&d<=ch.end_date;});
-      var cDaysIST=Object.keys(byDay).filter(function(d){var nx=new Date(d+'T00:00:00Z');nx.setDate(nx.getDate()+1);var ns=nx.toISOString().split('T')[0];return ns>=ch.start_date&&ns<=ch.end_date&&cDays.indexOf(d)<0;});
-      cDays.concat(cDaysIST).forEach(function(day){
-        if(awarded)return;
-        var dActs=byDay[day]||[],hasSport=dActs.some(function(a){return cSports.indexOf(a.sport_type)>-1;});
-        if(!hasSport)return;
-        var dKm=0;dActs.forEach(function(a){if(cSports.indexOf(a.sport_type)>-1)dKm+=(a.distance_meters||0)/1000;});
-        if(ch.distance_type==='fixed'||ch.distance_type==='range'){if(dKm>=ch.distance_min-0.1&&dKm<=ch.distance_max+0.1)awarded=true;}
-        else{if(dKm>=ch.distance_min)awarded=true;}
-        if(awarded)awardedDay=day;
+    var awarded = false, awardedDay = null, awardedActId = null;
+    if (ch.activity_scope === 'daily') {
+      var cDays = Object.keys(byDay).filter(function(d){ return d >= ch.start_date && d <= ch.end_date; });
+      var cDaysIST = Object.keys(byDay).filter(function(d) {
+        var nx = new Date(d + 'T00:00:00Z'); nx.setDate(nx.getDate()+1);
+        var ns = nx.toISOString().split('T')[0];
+        return ns >= ch.start_date && ns <= ch.end_date && cDays.indexOf(d) < 0;
+      });
+      cDays.concat(cDaysIST).forEach(function(day) {
+        if (awarded) return;
+        var dActs = byDay[day] || [];
+        var hasSport = dActs.some(function(a){ return cSports.indexOf(a.sport_type) > -1; });
+        if (!hasSport) return;
+        var dKm = 0;
+        dActs.forEach(function(a){ if (cSports.indexOf(a.sport_type) > -1) dKm += (a.distance_meters||0)/1000; });
+        var qualifies = (ch.distance_type === 'fixed' || ch.distance_type === 'range')
+          ? (dKm >= ch.distance_min - 0.1 && dKm <= ch.distance_max + 0.1)
+          : (dKm >= ch.distance_min);
+        if (qualifies) { awarded = true; awardedDay = day; }
       });
     } else {
-      for(var ai=0;ai<myActs.length;ai++){
-        if(!myActs[ai].is_flagged&&checkChallengeSingle(myActs[ai],ch,cSports)){awarded=true;awardedActId=myActs[ai].strava_activity_id;awardedDay=(myActs[ai].activity_date||'').split('T')[0];break;}
+      // Single activity scope — FIRST matching activity only
+      for (var ai = 0; ai < myActs.length; ai++) {
+        if (!myActs[ai].is_flagged && checkChallengeSingle(myActs[ai], ch, cSports)) {
+          awarded = true;
+          awardedActId = myActs[ai].strava_activity_id;
+          awardedDay = (myActs[ai].activity_date||'').split('T')[0];
+          break;
+        }
       }
     }
-    if(awarded){
-      earnedChallenges[key]=true;earnedPts[key]=chPts;totalChallenge+=chPts;
-      if(awardedDay&&dayBreakdown[awardedDay])dayBreakdown[awardedDay].challenges.push({name:chName,pts:chPts,actId:awardedActId});
-      if(awardedActId){if(!actBreakdown[awardedActId])actBreakdown[awardedActId]={challenges:[]};actBreakdown[awardedActId].challenges.push({name:chName,pts:chPts});}
+
+    if (awarded) {
+      earnedChallenges[key] = true; earnedPts[key] = chPts; totalChallenge += chPts;
+      if (awardedDay && dayBreakdown[awardedDay]) dayBreakdown[awardedDay].challenges.push({name:chName, pts:chPts, actId:awardedActId});
+      if (awardedActId) {
+        if (!actBreakdown[awardedActId]) actBreakdown[awardedActId] = {challenges:[]};
+        actBreakdown[awardedActId].challenges.push({name:chName, pts:chPts});
+      }
     }
   }
 
   // Manual bonus
-  myActs.filter(function(a){return !a.is_flagged&&parseFloat(a.manual_bonus)>0;}).forEach(function(a){
-    var mb=parseFloat(a.manual_bonus);totalChallenge+=mb;
-    var day=(a.activity_date||'').split('T')[0];
-    if(dayBreakdown[day])dayBreakdown[day].challenges.push({name:'Manual bonus',pts:mb,actId:a.strava_activity_id});
-    if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};
-    actBreakdown[a.strava_activity_id].challenges.push({name:'Manual bonus',pts:mb});
+  myActs.filter(function(a){ return !a.is_flagged && parseFloat(a.manual_bonus) > 0; }).forEach(function(a) {
+    var mb = parseFloat(a.manual_bonus);
+    totalChallenge += mb;
+    var day = (a.activity_date||'').split('T')[0];
+    if (dayBreakdown[day]) dayBreakdown[day].challenges.push({name:'Manual bonus', pts:mb, actId:a.strava_activity_id});
+    if (!actBreakdown[a.strava_activity_id]) actBreakdown[a.strava_activity_id] = {challenges:[]};
+    actBreakdown[a.strava_activity_id].challenges.push({name:'Manual bonus', pts:mb});
   });
 
-  totalChallenge=parseFloat(totalChallenge.toFixed(2));
-  return {km:totalDistKm,distPts:totalDistPts,bonusPts:totalBonus,challengePts:totalChallenge,
-    total:parseFloat((totalDistPts+totalBonus+totalChallenge).toFixed(2)),
-    dayBreakdown:dayBreakdown,actBreakdown:actBreakdown,earnedPts:earnedPts,earnedChallenges:earnedChallenges};
+  totalChallenge = parseFloat(totalChallenge.toFixed(2));
+  return {
+    km: totalDistKm, distPts: totalDistPts, bonusPts: totalBonus,
+    challengePts: totalChallenge,
+    total: parseFloat((totalDistPts + totalBonus + totalChallenge).toFixed(2)),
+    dayBreakdown: dayBreakdown, actBreakdown: actBreakdown,
+    earnedPts: earnedPts, earnedChallenges: earnedChallenges
+  };
 }
 async function fetchAll(url) {
   var all=[],from=0,ps=1000;
