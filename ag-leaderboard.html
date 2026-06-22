@@ -704,7 +704,9 @@ function calcPoints(acts, athleteId, gender, shift) {
         for (var ti = 0; ti < sorted.length; ti++) {
           var a = sorted[ti];
           if (tcActMap[day][a.strava_activity_id]) continue; // already claimed by another challenge
-          if (checkChallenge(a, c)) {
+          var chkResult = checkChallenge(a, c);
+          console.log('[TC] checkChallenge', c.name, 'act', a.strava_activity_id, (a.distance_meters/1000).toFixed(2)+'km', 'actDate:', (a.activity_date||'').split('T')[0], 'c.start_date:', c.start_date, 'result:', chkResult);
+          if (chkResult) {
             tcActMap[day][a.strava_activity_id] = {
               km: parseFloat(a.distance_meters || 0) / 1000,
               challenge: c
