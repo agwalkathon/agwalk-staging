@@ -50,6 +50,15 @@
     .spinning{animation:spin 1s linear infinite;}
     .sign-out-btn{font-size:13px;color:var(--muted);background:rgba(255,255,255,0.12);border:1px solid var(--border);cursor:pointer;padding:6px 12px;border-radius:20px;font-family:var(--font);font-weight:600;transition:all 0.15s;}
     .sign-out-btn:active{color:#fff;background:rgba(255,255,255,0.1);}
+    .hdr-avatar{width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0.5px;border:2px solid rgba(232,98,42,0.5);flex-shrink:0;cursor:default;}
+    .tab-you-profile{background:var(--surface);border-radius:var(--radius);padding:20px 16px;margin-bottom:12px;}
+    .tab-you-avatar{width:72px;height:72px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;letter-spacing:0.5px;border:3px solid rgba(232,98,42,0.5);margin:0 auto 14px;}
+    .tab-you-name{font-size:20px;font-weight:800;color:#fff;text-align:center;letter-spacing:-0.3px;}
+    .tab-you-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+    .tab-you-detail-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .tab-you-detail-row:last-child{border-bottom:none;}
+    .tab-you-detail-lbl{font-size:13px;color:var(--muted);font-weight:500;}
+    .tab-you-detail-val{font-size:14px;font-weight:700;color:var(--text);}
 
     /* ── Hero profile strip ── */
     .hero-profile{
@@ -104,7 +113,7 @@
     .ring-need.done{color:var(--green);}
 
     /* ── Big metric trio ── */
-    .metric-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .metric-trio{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
     .metric-box{
       background:var(--surface);border:none;
       border-radius:var(--radius-sm);
@@ -318,7 +327,7 @@
       position:fixed;bottom:0;left:0;right:0;
       background:var(--surface);
       border-top:1px solid var(--border);
-      display:grid;grid-template-columns:1fr 1fr 1fr;
+      display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
       padding-bottom:max(14px,env(safe-area-inset-bottom));
       z-index:200;
     }
@@ -341,17 +350,18 @@
 
 <header class="header">
   <div class="hdr-left">
-    <button class="icon-btn" id="refresh-btn" onclick="refreshData()" title="Refresh">
-      <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
-        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-      </svg>
-    </button>
+    <div class="hdr-avatar" id="hdr-avatar" onclick="showTab('you');return false;">PM</div>
   </div>
   <div class="hdr-center">
     <img src="logo-white.png" alt="Arcgate Walkathon" class="hdr-logo-img">
   </div>
   <div class="hdr-right">
+    <button class="icon-btn" id="refresh-btn" onclick="refreshData()" title="Refresh" style="margin-right:2px;">
+      <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
+        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+      </svg>
+    </button>
     <button class="icon-btn" onclick="logout()" title="Sign out">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -361,12 +371,6 @@
     </button>
   </div>
 </header>
-
-<!-- Block 1: Profile -->
-<div class="hero-profile">
-  <div class="hero-name" id="p-name">—</div>
-  <div class="hero-tags" id="p-tags"></div>
-</div>
 
 <!-- Block 2: Medal Rings -->
 <div class="hero-rings-block">
@@ -504,6 +508,60 @@
 </div>
 </div>
 
+<!-- You tab -->
+<div class="content" id="tab-you">
+<div class="max-w">
+  <div class="tab-you-profile">
+    <div class="tab-you-avatar" id="you-avatar">PM</div>
+    <div class="tab-you-name" id="you-name">—</div>
+    <div class="tab-you-tags" id="you-tags"></div>
+  </div>
+
+  <div class="sec">Profile Details</div>
+  <div class="card">
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Employee Code</span>
+      <span class="tab-you-detail-val" id="you-emp-code">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Email</span>
+      <span class="tab-you-detail-val" id="you-email">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Gender</span>
+      <span class="tab-you-detail-val" id="you-gender">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Shift</span>
+      <span class="tab-you-detail-val" id="you-shift">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Team</span>
+      <span class="tab-you-detail-val" id="you-team">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">T-Shirt Size</span>
+      <span class="tab-you-detail-val" id="you-tshirt">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Project Lead</span>
+      <span class="tab-you-detail-val" id="you-project-lead">—</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:8px;">
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Strava Profile</span>
+      <a id="you-strava-link" href="#" target="_blank" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none;">View ↗</a>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:0 4px;">
+    <button onclick="logout()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;letter-spacing:0.3px;">Sign Out</button>
+  </div>
+</div>
+</div>
+
 <nav class="bottom-nav">
   <a class="bnav-item active" id="bnav-dashboard" href="#" onclick="showTab('dashboard');return false;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -516,6 +574,10 @@
   <a class="bnav-item" id="bnav-leaderboard" href="participant-leaderboard.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     Leaderboard
+  </a>
+  <a class="bnav-item" id="bnav-you" href="#" onclick="showTab('you');return false;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    You
   </a>
 </nav>
 
@@ -672,16 +734,32 @@ async function load() {
     var name=reg.full_name||s.name||'Participant';
 
     // Profile
-    document.getElementById('p-name').textContent=name.toUpperCase();
-    var tags=[];
+    // Avatar initials from name
+    var initials=(function(){var parts=(name||'').trim().split(/\s+/);if(parts.length>=2)return(parts[0][0]+(parts[parts.length-1][0])).toUpperCase();return(parts[0]||'?')[0].toUpperCase();})();
+    var avatarEl=document.getElementById('hdr-avatar');if(avatarEl)avatarEl.textContent=initials;
+    var youAvatarEl=document.getElementById('you-avatar');if(youAvatarEl)youAvatarEl.textContent=initials;
+    var youNameEl=document.getElementById('you-name');if(youNameEl)youNameEl.textContent=name.toUpperCase();
+    // Populate You tab fields
+    if(document.getElementById('you-emp-code'))document.getElementById('you-emp-code').textContent=reg.emp_code||'—';
+    if(document.getElementById('you-email'))document.getElementById('you-email').textContent=reg.email||'—';
+    if(document.getElementById('you-gender'))document.getElementById('you-gender').textContent=reg.gender||'—';
+    if(document.getElementById('you-shift'))document.getElementById('you-shift').textContent=reg.shift||'—';
+    if(document.getElementById('you-team'))document.getElementById('you-team').textContent=reg.leaderboard_team||'—';
+    if(document.getElementById('you-tshirt'))document.getElementById('you-tshirt').textContent=reg.tshirt_size||'—';
+    if(document.getElementById('you-project-lead'))document.getElementById('you-project-lead').textContent=reg.project_lead||'—';
+    var stravaLink=document.getElementById('you-strava-link');
+    if(stravaLink){var surl=reg.strava_profile_url||('https://www.strava.com/athletes/'+s.athleteId);stravaLink.href=surl;}
+    // Tags for You tab (same as hero tags)
     var icoMale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><line x1="14.5" y1="9.5" x2="21" y2="3"/><polyline points="16 3 21 3 21 8"/></svg>';
     var icoFemale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/></svg>';
     var icoClock='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
     var icoTeam='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    var tags=[];
     if(reg.gender)tags.push(reg.gender==='Female'?icoFemale+' Female':icoMale+' Male');
     if(reg.shift)tags.push(icoClock+' '+reg.shift);
     if(reg.leaderboard_team)tags.push(icoTeam+' '+reg.leaderboard_team);
-    document.getElementById('p-tags').innerHTML=tags.map(function(t){var sp=t.indexOf('</svg>');return sp>=0?'<span class="hero-tag">'+t.substring(0,sp+6)+' '+esc(t.substring(sp+6).trim())+'</span>':'<span class="hero-tag">'+esc(t)+'</span>';}).join('');
+    var tagHtml=tags.map(function(t){var sp=t.indexOf('</svg>');return sp>=0?'<span class="hero-tag">'+t.substring(0,sp+6)+' '+esc(t.substring(sp+6).trim())+'</span>':'<span class="hero-tag">'+esc(t)+'</span>';}).join('');
+    var youTagsEl=document.getElementById('you-tags');if(youTagsEl)youTagsEl.innerHTML=tagHtml;
 
     var fullPts=calcFullPts(myActs,reg.gender);
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
@@ -1019,12 +1097,14 @@ function toggleDay(id){var el=document.getElementById(id);if(el)el.classList.tog
 function showTab(tab){
   document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'block':'none';
   document.getElementById('tab-activities').style.display=tab==='activities'?'block':'none';
+  document.getElementById('tab-you').style.display=tab==='you'?'block':'none';
   document.getElementById('bnav-dashboard').classList.toggle('active',tab==='dashboard');
   document.getElementById('bnav-activities').classList.toggle('active',tab==='activities');
   document.getElementById('bnav-leaderboard').classList.remove('active');
+  document.getElementById('bnav-you').classList.toggle('active',tab==='you');
   var isDash=tab==='dashboard';
-  document.querySelector('.hero-rings-block').style.display=isDash?'':'none';
-  document.querySelector('.hero-metrics-block').style.display=isDash?'':'none';
+  document.querySelector('.hero-rings-block').style.display=(isDash)?'':'none';
+  document.querySelector('.hero-metrics-block').style.display=(isDash)?'':'none';
 }
 
 function refreshData(){
@@ -1034,7 +1114,7 @@ function refreshData(){
   load().finally(function(){icon.classList.remove('spinning');});
 }
 
-(function(){var hash=window.location.hash.replace('#','');if(hash==='activities'||hash==='dashboard')showTab(hash);})();
+(function(){var hash=window.location.hash.replace('#','');if(hash==='activities'||hash==='dashboard'||hash==='you')showTab(hash);})();
 load();
 </script>
   <script>
