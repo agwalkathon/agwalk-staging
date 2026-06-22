@@ -1163,20 +1163,22 @@ function calcFullPts(myActs, gender) {
       continue;
     }
 
-    // Per-activity challenge
+    // Per-activity challenge — count qualifying acts, award perActPts each (matches ag-leaderboard)
     var perActPts=Number(ch.per_activity_points)||0;
     if(perActPts>0){
-      var awarded2=false,paTotal=0;
-      myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){
-        if(!checkChallengeSingle(a,ch,cSports))return;
-        awarded2=true; paTotal+=perActPts;
-        var actDay=(a.activity_date||'').split('T')[0];
-        totalChallenge+=perActPts;
-        if(actDay&&dayBreakdown[actDay])dayBreakdown[actDay].challenges.push({name:chName,pts:perActPts,actId:a.strava_activity_id});
-        if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};
-        actBreakdown[a.strava_activity_id].challenges.push({name:chName,pts:perActPts});
-      });
-      if(awarded2){earnedChallenges[key]=true;earnedPts[key]=paTotal;}
+      var qualActs=myActs.filter(function(a){return !a.is_flagged&&checkChallengeSingle(a,ch,cSports);});
+      if(qualActs.length>0){
+        var paTotal=0;
+        qualActs.forEach(function(a){
+          paTotal+=perActPts;
+          var actDay=(a.activity_date||'').split('T')[0];
+          if(actDay&&dayBreakdown[actDay])dayBreakdown[actDay].challenges.push({name:chName,pts:perActPts,actId:a.strava_activity_id});
+          if(!actBreakdown[a.strava_activity_id])actBreakdown[a.strava_activity_id]={challenges:[]};
+          actBreakdown[a.strava_activity_id].challenges.push({name:chName,pts:perActPts});
+        });
+        totalChallenge+=paTotal;
+        earnedChallenges[key]=true;earnedPts[key]=paTotal;
+      }
       continue;
     }
 
