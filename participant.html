@@ -140,6 +140,18 @@
     .lrow-label{font-size:15px;font-weight:600;color:var(--text);}
     .lrow-sub{font-size:12px;color:var(--label);margin-top:2px;}
     .lrow-val{font-size:16px;font-weight:700;color:var(--brand);flex-shrink:0;}
+    /* Interesting Facts */
+    .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
+    .fact-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 14px;}
+    .fact-icon{font-size:20px;margin-bottom:8px;}
+    .fact-val{font-size:17px;font-weight:800;color:#fff;line-height:1.2;}
+    .fact-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
+    /* Milestones */
+    .milestones-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+    .milestone{display:flex;align-items:center;gap:7px;background:var(--surface);border-radius:20px;padding:7px 12px;opacity:0.35;transition:opacity 0.3s;}
+    .milestone.earned{opacity:1;}
+    .milestone-ico{font-size:16px;line-height:1;}
+    .milestone-lbl{font-size:12px;font-weight:700;color:#fff;}
     /* Stat cards grid */
     .stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
     .stat-card-item{background:var(--surface);border-radius:var(--radius-sm);padding:16px 14px;}
@@ -651,20 +663,6 @@
     </div>
   </div>
 
-  <div class="sec">My Standing</div>
-  <div class="standing-grid">
-    <div class="standing-card">
-      <div class="standing-rank-big" id="standing-shift-rank">—</div>
-      <div class="standing-cat" id="standing-shift-label">—</div>
-      <div class="standing-sub">Shift</div>
-    </div>
-    <div class="standing-card">
-      <div class="standing-rank-big" id="standing-team-rank">—</div>
-      <div class="standing-cat" id="standing-team-label">—</div>
-      <div class="standing-sub">Team</div>
-    </div>
-  </div>
-
   <div class="sec">Pace Goals</div>
   <div class="card" id="pace-card">
     <!-- dynamically rendered by JS -->
@@ -688,6 +686,25 @@
       <div class="stat-card-label">Moving Time</div>
       <div class="stat-card-sub">total active</div>
     </div>
+  </div>
+
+  <div class="sec">Interesting Facts</div>
+  <div class="facts-grid" id="facts-grid">
+    <div class="fact-card"><div class="fact-icon">🗺️</div><div class="fact-val" id="fact-dist-eq">—</div><div class="fact-lbl">Distance equivalent</div></div>
+    <div class="fact-card"><div class="fact-icon">🔥</div><div class="fact-val" id="fact-cal">—</div><div class="fact-lbl">Calories burned</div></div>
+    <div class="fact-card"><div class="fact-icon">👣</div><div class="fact-val" id="fact-steps">—</div><div class="fact-lbl">Est. steps</div></div>
+    <div class="fact-card"><div class="fact-icon">🌱</div><div class="fact-val" id="fact-carbon">—</div><div class="fact-lbl">CO₂ offset (kg)</div></div>
+  </div>
+
+  <div class="sec">Milestones</div>
+  <div class="milestones-wrap" id="milestones-wrap">
+    <div class="milestone" id="ms-first"><span class="milestone-ico">🏁</span><span class="milestone-lbl">First Activity</span></div>
+    <div class="milestone" id="ms-50km"><span class="milestone-ico">📍</span><span class="milestone-lbl">50 km</span></div>
+    <div class="milestone" id="ms-100km"><span class="milestone-ico">💯</span><span class="milestone-lbl">100 km</span></div>
+    <div class="milestone" id="ms-200km"><span class="milestone-ico">🚀</span><span class="milestone-lbl">200 km</span></div>
+    <div class="milestone" id="ms-streak7"><span class="milestone-ico">🔥</span><span class="milestone-lbl">7-Day Streak</span></div>
+    <div class="milestone" id="ms-longact"><span class="milestone-ico">⚡</span><span class="milestone-lbl">20km+ Activity</span></div>
+    <div class="milestone" id="ms-earlybird"><span class="milestone-ico">🌅</span><span class="milestone-lbl">Early Bird</span></div>
   </div>
 
   <div class="sec">Activity Streak</div>
@@ -750,6 +767,21 @@
     <button class="lb-tab active" id="lb-tab-shift" onclick="switchTab('shift')">My Category</button>
     <button class="lb-tab" id="lb-tab-team" onclick="switchTab('team')">My Team</button>
     <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
+  </div>
+  <!-- My Standing (moved from Dashboard) -->
+  <div style="padding:12px 20px 0;">
+    <div class="standing-grid">
+      <div class="standing-card">
+        <div class="standing-rank-big" id="standing-shift-rank">—</div>
+        <div class="standing-cat" id="standing-shift-label">—</div>
+        <div class="standing-sub">Shift</div>
+      </div>
+      <div class="standing-card">
+        <div class="standing-rank-big" id="standing-team-rank">—</div>
+        <div class="standing-cat" id="standing-team-label">—</div>
+        <div class="standing-sub">Team</div>
+      </div>
+    </div>
   </div>
   <div class="lb-legend"><span>Tap any card to see points breakdown</span></div>
   <div class="lb-content">
@@ -1029,6 +1061,67 @@ async function load() {
     var mts='—';if(totalMovingSec>0){var mh=Math.floor(totalMovingSec/3600),mm=Math.floor((totalMovingSec%3600)/60);mts=mh>0?mh+'h '+mm+'m':mm+'m';}
     document.getElementById('s-movetime').textContent=mts;
 
+    // ── Interesting Facts (pure math from myActs — zero extra API calls) ──
+    (function(){
+      var totalKm=totalDistM/1000;
+      // Distance equivalent — Indian city pairs
+      var routes=[
+        {km:6,label:'Connaught Place → India Gate'},
+        {km:13,label:'Delhi Airport → Connaught Place'},
+        {km:25,label:'Delhi → Gurgaon'},
+        {km:65,label:'Delhi → Alwar'},
+        {km:120,label:'Delhi → Agra (halfway)'},
+        {km:233,label:'Delhi → Jaipur'},
+        {km:500,label:'Delhi → Lucknow'},
+        {km:820,label:'Delhi → Mumbai (quarter)'},
+        {km:1400,label:'Delhi → Chennai'}
+      ];
+      var eq=routes[0];
+      for(var ri=0;ri<routes.length;ri++){if(totalKm>=routes[ri].km)eq=routes[ri];}
+      var eqEl=document.getElementById('fact-dist-eq');
+      if(eqEl)eqEl.textContent=eq.label;
+      // Calories: ~60 kcal per km walking
+      var cal=Math.round(totalKm*60);
+      var calEl=document.getElementById('fact-cal');
+      if(calEl)calEl.textContent=cal>=1000?(cal/1000).toFixed(1)+'k kcal':cal+' kcal';
+      // Steps: avg 1350 steps/km
+      var steps=Math.round(totalKm*1350);
+      var stEl=document.getElementById('fact-steps');
+      if(stEl)stEl.textContent=steps>=1000?Math.round(steps/1000)+'k steps':steps+' steps';
+      // Carbon offset: walking instead of car ~0.21 kg CO2/km saved
+      var co2=(totalKm*0.21).toFixed(1);
+      var coEl=document.getElementById('fact-carbon');
+      if(coEl)coEl.textContent=co2+' kg';
+    })();
+
+    // ── Milestones ──
+    (function(){
+      var validA=myActs.filter(function(a){return !a.is_flagged;});
+      var totalKm=totalDistM/1000;
+      var hasAny=validA.length>0;
+      // Longest single activity km
+      var longestKm=validA.reduce(function(mx,a){return Math.max(mx,(a.distance_meters||0)/1000);},0);
+      // Early bird: any activity starting before 6am
+      var earlyBird=validA.some(function(a){var h=new Date(a.activity_date).getHours();return h<6;});
+      // 7-day streak check (reuse streak-num)
+      var streakEl=document.getElementById('streak-num');
+      var bestStreakEl=document.getElementById('streak-best-val');
+      var bestStreak=bestStreakEl?parseInt(bestStreakEl.textContent)||0:0;
+      var ms=[
+        {id:'ms-first', earned:hasAny},
+        {id:'ms-50km',  earned:totalKm>=50},
+        {id:'ms-100km', earned:totalKm>=100},
+        {id:'ms-200km', earned:totalKm>=200},
+        {id:'ms-streak7',earned:bestStreak>=7},
+        {id:'ms-longact',earned:longestKm>=20},
+        {id:'ms-earlybird',earned:earlyBird}
+      ];
+      ms.forEach(function(m){
+        var el=document.getElementById(m.id);
+        if(el&&m.earned)el.classList.add('earned');
+      });
+    })();
+
     var tod={morning:0,afternoon:0,evening:0,night:0};
     validActs.forEach(function(a){var n=(a.activity_name||'').toLowerCase();if(n.indexOf('morning')>-1)tod.morning++;else if(n.indexOf('afternoon')>-1)tod.afternoon++;else if(n.indexOf('evening')>-1)tod.evening++;else if(n.indexOf('night')>-1)tod.night++;});
     document.getElementById('tod-morning').textContent=tod.morning;
@@ -1178,13 +1271,56 @@ async function load() {
       paceCard.appendChild(div);
 
     } else {
-      // Not gold — show only uncompleted medal rows + today bonus
-    var icoCalPace='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
-    var icoBronze='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F4A84A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
-    var icoSilver='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8D8E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
-    var icoGold='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
-    var icoPaceBolt='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
-    var icoPaceChk='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(34,197,94,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      // Not gold — show motivation card for achieved medals + remaining targets
+      var daysElapsed2=Math.max(1,(now-new Date('2026-06-01'))/86400000);
+      var avgKmDay2=fullPts.km/daysElapsed2;
+      var projectedPts2=(myPts+(avgKmDay2*daysLeft)).toFixed(0);
+      var icoCalPace='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      var icoBronze='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F4A84A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
+      var icoSilver='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8D8E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
+      var icoGold='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg>';
+      var icoPaceBolt='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+      var icoPaceChk='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(34,197,94,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+      // Bronze achieved motivation card
+      if(myPts>=bronzeThresh){
+        var BQUOTES=['You earned Bronze! Silver is within reach — keep going.','Bronze locked in. Now aim higher. Silver is closer than you think.','Great start! Bronze is yours. Push for Silver next.'];
+        var bq=BQUOTES[Math.floor(Math.random()*BQUOTES.length)];
+        var bdiv=document.createElement('div');bdiv.className='gold-card';
+        bdiv.style.borderLeft='3px solid #F4A84A';
+        bdiv.innerHTML=
+          '<div class="gold-top">'+
+            '<div class="gold-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F4A84A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg></div>'+
+            '<div><div class="gold-title" style="color:#F4A84A">Bronze Achieved!</div>'+
+            '<div class="gold-sub">'+Math.round(myPts)+' pts · ~'+projectedPts2+' pts projected</div></div>'+
+          '</div>'+
+          '<div class="gold-quote"><div class="gold-quote-text">&ldquo;'+bq+'&rdquo;</div></div>'+
+          '<div class="gold-stats">'+
+            '<div class="gold-stat"><div class="gold-stat-val" style="color:#F4A84A">'+avgKmDay2.toFixed(1)+' km</div><div class="gold-stat-lbl">Daily avg</div></div>'+
+            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--silver)">'+daysLeft+' days left</div><div class="gold-stat-lbl">Keep pushing</div></div>'+
+          '</div>';
+        paceCard.appendChild(bdiv);
+      }
+
+      // Silver achieved motivation card
+      if(myPts>=silverThresh){
+        var SQUOTES=['Silver secured! Gold is the last frontier — you can do this.','Silver is yours! One final push to Gold. You\'re so close.','Amazing effort! Silver achieved. Gold is within your reach.'];
+        var sq=SQUOTES[Math.floor(Math.random()*SQUOTES.length)];
+        var sdiv=document.createElement('div');sdiv.className='gold-card';
+        sdiv.style.borderLeft='3px solid #C8D8E8';
+        sdiv.innerHTML=
+          '<div class="gold-top">'+
+            '<div class="gold-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8D8E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg></div>'+
+            '<div><div class="gold-title" style="color:#C8D8E8">Silver Achieved!</div>'+
+            '<div class="gold-sub">'+Math.round(myPts)+' pts · ~'+projectedPts2+' pts projected</div></div>'+
+          '</div>'+
+          '<div class="gold-quote"><div class="gold-quote-text">&ldquo;'+sq+'&rdquo;</div></div>'+
+          '<div class="gold-stats">'+
+            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--silver)">'+avgKmDay2.toFixed(1)+' km</div><div class="gold-stat-lbl">Daily avg</div></div>'+
+            '<div class="gold-stat"><div class="gold-stat-val" style="color:var(--gold)">'+daysLeft+' days left</div><div class="gold-stat-lbl">Go for Gold!</div></div>'+
+          '</div>';
+        paceCard.appendChild(sdiv);
+      }
 
       paceCard.appendChild(paceRow('rgba(96,165,250,0.12)',icoCalPace,daysLeft+' days remaining','Event ends June 30','Jun 30','var(--muted)'));
 
