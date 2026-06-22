@@ -1423,9 +1423,8 @@ async function load() {
     var myTeamN=(reg.leaderboard_team||'').toLowerCase(),isNight=myShiftN.indexOf('night')>-1,isFemale=myGenderN==='female';
     var allActsMap={};
     allActs.forEach(function(a){if(!allActsMap[a.strava_athlete_id])allActsMap[a.strava_athlete_id]=[];allActsMap[a.strava_athlete_id].push(a);});
-    var allKmMap={};
-    allActs.forEach(function(a){var id=a.strava_athlete_id;allKmMap[id]=(allKmMap[id]||0)+(parseFloat(a.distance_meters)||0)/1000;});
-    function rankIn(peers){var scored=peers.map(function(p){var acts=allActsMap[p.strava_athlete_id]||[],km=0;acts.forEach(function(a){km+=(a.distance_meters||0)/1000;});return{id:p.strava_athlete_id,km:km};}).sort(function(a,b){return b.km-a.km;});var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});return pos>=0?pos+1:null;}
+    // rankIn uses calcFullPts so standing card rank matches leaderboard rank exactly
+    function rankIn(peers){var scored=peers.map(function(p){var acts=allActsMap[p.strava_athlete_id]||[];return{id:p.strava_athlete_id,pts:calcFullPts(acts,p.gender).total};}).filter(function(x){return x.pts>0;}).sort(function(a,b){return b.pts-a.pts;});var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});return pos>=0?pos+1:null;}
     var shiftPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;});
     var teamPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),pt=(p.leaderboard_team||'').toLowerCase();return pt===myTeamN&&(pg==='female')===isFemale;});
     var shiftRank=rankIn(shiftPeers),teamRank=rankIn(teamPeers);
