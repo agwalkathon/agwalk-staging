@@ -728,14 +728,6 @@
     <div class="streak-day-labels" id="streak-labels"></div>
   </div>
 
-  <div class="sec">Activity Times</div>
-  <div class="tod-grid">
-    <div class="tod-card"><div class="tod-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,80,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M17.66 6.34l-1.41 1.41"/><path d="M12 6a6 6 0 0 1 6 6H6a6 6 0 0 1 6-6z"/><path d="M3 18h18"/></svg></div><div class="tod-val" id="tod-morning">—</div><div class="tod-lbl">Morning</div></div>
-    <div class="tod-card"><div class="tod-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,80,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div><div class="tod-val" id="tod-afternoon">—</div><div class="tod-lbl">Afternoon</div></div>
-    <div class="tod-card"><div class="tod-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(232,98,42,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M17.66 6.34l-1.41 1.41"/><path d="M12 6a6 6 0 0 1 6 6H6a6 6 0 0 1 6-6z"/><path d="M3 18h18"/></svg></div><div class="tod-val" id="tod-evening">—</div><div class="tod-lbl">Evening</div></div>
-    <div class="tod-card"><div class="tod-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><div class="tod-val" id="tod-night">—</div><div class="tod-lbl">Night</div></div>
-  </div>
-
   <div class="sec">CHALLENGES</div>
   <div class="card" id="challenges-card"><div class="empty-state" style="padding:18px"><p>Loading...</p></div></div>
 
@@ -844,45 +836,6 @@
     <div class="tab-you-tags" id="you-tags"></div>
   </div>
 
-  <div class="sec">Profile Details</div>
-  <div class="card">
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Employee Code</span>
-      <span class="tab-you-detail-val" id="you-emp-code">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Email</span>
-      <span class="tab-you-detail-val" id="you-email">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Gender</span>
-      <span class="tab-you-detail-val" id="you-gender">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Shift</span>
-      <span class="tab-you-detail-val" id="you-shift">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Team</span>
-      <span class="tab-you-detail-val" id="you-team">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">T-Shirt Size</span>
-      <span class="tab-you-detail-val" id="you-tshirt">—</span>
-    </div>
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Project Lead</span>
-      <span class="tab-you-detail-val" id="you-project-lead">—</span>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:8px;">
-    <div class="tab-you-detail-row">
-      <span class="tab-you-detail-lbl">Strava Profile</span>
-      <a id="you-strava-link" href="#" target="_blank" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none;">View ↗</a>
-    </div>
-  </div>
-
   <!-- Card 1: Event Progress -->
   <div class="sec">Event Progress</div>
   <div class="you-cards">
@@ -949,7 +902,52 @@
     </div>
   </div>
 
-  <div style="margin-top:24px;padding:0 4px;">
+  <!-- Profile Details — collapsed by default -->
+  <div style="margin-top:8px;">
+    <button onclick="(function(){var el=document.getElementById('you-profile-details');var ico=document.getElementById('you-profile-chevron');var open=el.style.display!=='none';el.style.display=open?'none':'block';ico.style.transform=open?'':'rotate(180deg)';})();"
+      style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface);border:none;border-radius:var(--radius-sm);color:var(--muted);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;text-transform:uppercase;letter-spacing:0.8px;">
+      <span>Profile Details</span>
+      <svg id="you-profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="you-profile-details" style="display:none;">
+      <div class="card" style="margin-top:4px;border-radius:0 0 var(--radius-sm) var(--radius-sm);">
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Employee Code</span>
+          <span class="tab-you-detail-val" id="you-emp-code">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Email</span>
+          <span class="tab-you-detail-val" id="you-email">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Gender</span>
+          <span class="tab-you-detail-val" id="you-gender">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Shift</span>
+          <span class="tab-you-detail-val" id="you-shift">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Team</span>
+          <span class="tab-you-detail-val" id="you-team">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">T-Shirt Size</span>
+          <span class="tab-you-detail-val" id="you-tshirt">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Project Lead</span>
+          <span class="tab-you-detail-val" id="you-project-lead">—</span>
+        </div>
+        <div class="tab-you-detail-row">
+          <span class="tab-you-detail-lbl">Strava Profile</span>
+          <a id="you-strava-link" href="#" target="_blank" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none;">View ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:0 4px;">
     <button onclick="logout()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;letter-spacing:0.3px;">Sign Out</button>
   </div>
 </div>
