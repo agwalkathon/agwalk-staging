@@ -1946,38 +1946,7 @@ async function load() {
       }catch(e2){console.warn('Ranking load failed:',e2);return;}
 
     // Standing
-    var allReg=allRegRes,myGenderN=(reg.gender||'').toLowerCase(),myShiftN=(reg.shift||'').toLowerCase();
-    var myTeamN=(reg.leaderboard_team||'').toLowerCase(),isNight=myShiftN.indexOf('night')>-1,isFemale=myGenderN==='female';
-    var allActsMap={};
-    allActs.forEach(function(a){if(!allActsMap[a.strava_athlete_id])allActsMap[a.strava_athlete_id]=[];allActsMap[a.strava_athlete_id].push(a);});
-    // rankIn uses calcFullPts so standing card rank matches leaderboard rank exactly
-    function rankIn(peers){var scored=peers.map(function(p){var acts=allActsMap[p.strava_athlete_id]||[];return{id:p.strava_athlete_id,pts:calcFullPts(acts,p.gender).total};}).filter(function(x){return x.pts>0;}).sort(function(a,b){return b.pts-a.pts;});var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});return pos>=0?pos+1:null;}
-    var shiftPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;});
-    // Team peers must exclude top 3 individual performers — same as team leaderboard tab
-    var excl=computeTeamExclusions();
-    var exSet=isFemale?excl.female:excl.male;
-    var teamPeers=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),pt=(p.leaderboard_team||'').toLowerCase();return pt===myTeamN&&(pg==='female')===isFemale&&exSet.indexOf(String(p.strava_athlete_id))===-1;});
-    var shiftRank=rankIn(shiftPeers),teamRank=rankIn(teamPeers);
-    function ordinal(n){if(!n)return'—';var sfx=['th','st','nd','rd'],v=n%100;var s=sfx[(v-20)%10]||sfx[v]||sfx[0];return n+'<span class="rank-sup">'+s+'</span>';}
-    var shiftLabel=isNight?'Nightshift · '+(isFemale?'Female':'Male'):'Dayshift · '+(isFemale?'Female':'Male');
-    var teamLabel=(reg.leaderboard_team||'Team')+' · '+(isFemale?'Female':'Male');
-    document.getElementById('standing-shift-label').textContent=shiftLabel;
-    document.getElementById('standing-shift-rank').innerHTML=shiftRank?ordinal(shiftRank):'—';
-    document.getElementById('standing-team-label').textContent=teamLabel;
-    document.getElementById('standing-team-rank').innerHTML=teamRank?ordinal(teamRank):'—';
-    // ── Show/hide team rank card based on individual rank ─────────────────
-    // If participant is Top 3 on their individual board → excluded from team
-    // board, so hide team card and expand shift card to full width
-    var isTop3Individual = shiftRank && shiftRank <= 3;
-    var standingGrid = document.querySelector('.standing-grid');
-    var teamCard = document.getElementById('standing-team-rank').closest('.standing-card');
-    if(isTop3Individual){
-      if(teamCard) teamCard.style.display='none';
-      if(standingGrid) standingGrid.style.gridTemplateColumns='1fr';
-    } else {
-      if(teamCard) teamCard.style.display='';
-      if(standingGrid) standingGrid.style.gridTemplateColumns='1fr 1fr';
-    }
+    renderStanding();
     })();
     // ─────────────────────────────────────────────────────────────────────
 
@@ -2480,6 +2449,66 @@ var LB_ME=null,LB_REG=[],LB_ACTS=[],LB_currentTab='shift';
 var LB_bronzeThresh=100,LB_silverThresh=150,LB_goldThresh=200;
 function norm(s){return String(s||'').trim().toLowerCase();}
 
+function renderStanding() {
+  try {
+    var reg = LB_ME || {};
+    var athleteId = reg.strava_athlete_id || (currentSession && currentSession.athleteId);
+    if (!athleteId || !LB_REG || !LB_REG.length) return;
+
+    var allReg=LB_REG,myGenderN=norm(reg.gender),myShiftN=norm(reg.shift);
+    var myTeamN=norm(reg.leaderboard_team),isNight=myShiftN.indexOf('night')>-1,isFemale=myGenderN==='female'||myGenderN==='f';
+    var allActsMap={};
+    LB_ACTS.forEach(function(a){if(!allActsMap[a.strava_athlete_id])allActsMap[a.strava_athlete_id]=[];allActsMap[a.strava_athlete_id].push(a);});
+
+    // rankIn uses calcFullPts so standing card rank matches leaderboard rank exactly
+    function rankIn(peers){
+      var scored=peers.map(function(p){
+        var acts=allActsMap[p.strava_athlete_id]||[];
+        return{id:p.strava_athlete_id,pts:calcFullPts(acts,p.gender).total};
+      }).filter(function(x){return x.pts>0;}).sort(function(a,b){return b.pts-a.pts;});
+      var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});
+      return pos>=0?pos+1:null;
+    }
+
+    var shiftPeers=allReg.filter(function(p){
+      var pg=norm(p.gender),ps=norm(p.shift);
+      return ps.indexOf('night')>-1===isNight&&(pg==='female'||pg==='f')===isFemale;
+    });
+
+    // Team peers must exclude top 3 individual performers — same as team leaderboard tab
+    var excl=computeTeamExclusions();
+    var exSet=isFemale?excl.female:excl.male;
+    var teamPeers=allReg.filter(function(p){
+      var pg=norm(p.gender),pt=norm(p.leaderboard_team);
+      return pt===myTeamN&&(pg==='female'||pg==='f')===isFemale&&exSet.indexOf(String(p.strava_athlete_id))===-1;
+    });
+
+    var shiftRank=rankIn(shiftPeers),teamRank=rankIn(teamPeers);
+    function ordinal(n){if(!n)return'—';var sfx=['th','st','nd','rd'],v=n%100;var s=sfx[(v-20)%10]||sfx[v]||sfx[0];return n+'<span class="rank-sup">'+s+'</span>';}
+    var shiftLabel=isNight?'Nightshift · '+(isFemale?'Female':'Male'):'Dayshift · '+(isFemale?'Female':'Male');
+    var teamLabel=(reg.leaderboard_team||'Team')+' · '+(isFemale?'Female':'Male');
+
+    var sLabelEl = document.getElementById('standing-shift-label'); if (sLabelEl) sLabelEl.textContent=shiftLabel;
+    var sRankEl = document.getElementById('standing-shift-rank'); if (sRankEl) sRankEl.innerHTML=shiftRank?ordinal(shiftRank):'—';
+    var tLabelEl = document.getElementById('standing-team-label'); if (tLabelEl) tLabelEl.textContent=teamLabel;
+    var tRankEl = document.getElementById('standing-team-rank'); if (tRankEl) tRankEl.innerHTML=teamRank?ordinal(teamRank):'—';
+
+    // ── Show/hide team rank card based on individual rank ─────────────────
+    var isTop3Individual = shiftRank && shiftRank <= 3;
+    var standingGrid = document.querySelector('.standing-grid');
+    var teamCard = tRankEl ? tRankEl.closest('.standing-card') : null;
+    if(isTop3Individual){
+      if(teamCard) teamCard.style.display='none';
+      if(standingGrid) standingGrid.style.gridTemplateColumns='1fr';
+    } else {
+      if(teamCard) teamCard.style.display='';
+      if(standingGrid) standingGrid.style.gridTemplateColumns='1fr 1fr';
+    }
+  } catch(e) {
+    console.warn('renderStanding failed:', e);
+  }
+}
+
 (function(){var hash=window.location.hash.replace('#','');if(hash==='activities'||hash==='dashboard'||hash==='you'||hash==='leaderboard')showTab(hash);})();
 function clearPWACache(){
   if('caches' in window){
@@ -2760,6 +2789,7 @@ function lbRender(){
   // Pure render — zero API calls. Uses LB_ME/LB_REG/LB_ACTS already in memory.
   var s=JSON.parse(localStorage.getItem('wk_user')||'{}');
   try{
+    renderStanding();
     var name=(LB_ME&&LB_ME.full_name)||s.name||'Participant';
     document.getElementById('lb-my-name').textContent=name.toUpperCase();
     var tags=[];if(LB_ME&&LB_ME.gender)tags.push(LB_ME.gender);if(LB_ME&&LB_ME.shift)tags.push(LB_ME.shift);if(LB_ME&&LB_ME.leaderboard_team)tags.push(LB_ME.leaderboard_team);
