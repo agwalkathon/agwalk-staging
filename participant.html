@@ -2721,8 +2721,8 @@ function refreshData(isPull){
       return;
     }
 
-    // Only active if we are scrolled to the top
-    if (window.scrollY === 0 && e.touches.length === 1) {
+    // Only active if we are scrolled to the top and touch starts in the header region
+    if (window.scrollY === 0 && e.touches.length === 1 && e.touches[0].clientY <= 80) {
       ptrStartY = e.touches[0].clientY;
       ptrActive = true;
     } else {
