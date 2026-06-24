@@ -2193,7 +2193,8 @@ async function load() {
     var flaggedCount=myActs.filter(function(a){return a.is_flagged;}).length;
     var uniqueDays=new Set(myActs.filter(function(a){return !a.is_flagged;}).map(function(a){return(a.activity_date||'').split('T')[0];})).size;
     document.getElementById('act-section-title').textContent=uniqueDays+' Days \u00b7 '+myActs.length+' Activities'+(flaggedCount?' \u00b7 '+flaggedCount+' Flagged':'');
-
+    // Render Activities List
+    renderActivities(myActs, fullPts.dayBreakdown, fullPts.actBreakdown, reg.gender);
 
     // ── All Phase 1 content rendered — now safe to dismiss splash ────────────
     hideSplash();
