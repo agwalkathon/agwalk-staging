@@ -2206,11 +2206,39 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
 function toggleDay(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
 
 var _lbLoaded=false,_lbReady=false;
+// ── Tab order for swipe navigation ────────────────────────────────────────
+var TAB_ORDER = ['dashboard','activities','leaderboard','you'];
+var _currentTab = 'dashboard';
+
 function showTab(tab){
-  document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'block':'none';
-  document.getElementById('tab-activities').style.display=tab==='activities'?'block':'none';
-  document.getElementById('tab-you').style.display=tab==='you'?'block':'none';
-  document.getElementById('tab-leaderboard').style.display=tab==='leaderboard'?'block':'none';
+  var prevTab = _currentTab;
+  _currentTab = tab;
+  var prevIdx = TAB_ORDER.indexOf(prevTab);
+  var nextIdx = TAB_ORDER.indexOf(tab);
+  var dir = nextIdx > prevIdx ? 1 : -1; // 1 = going right, -1 = going left
+
+  TAB_ORDER.forEach(function(t){
+    var el = document.getElementById('tab-' + t);
+    if (!el) return;
+    if (t === tab) {
+      // Slide in the new tab
+      el.style.display = 'block';
+      el.style.transform = 'translateX(' + (dir * 40) + 'px)';
+      el.style.opacity = '0';
+      el.style.transition = 'none';
+      requestAnimationFrame(function(){
+        el.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+        el.style.transform = 'translateX(0)';
+        el.style.opacity = '1';
+      });
+    } else {
+      el.style.display = 'none';
+      el.style.transform = '';
+      el.style.opacity = '';
+      el.style.transition = '';
+    }
+  });
+
   document.getElementById('bnav-dashboard').classList.toggle('active',tab==='dashboard');
   document.getElementById('bnav-activities').classList.toggle('active',tab==='activities');
   document.getElementById('bnav-leaderboard').classList.toggle('active',tab==='leaderboard');
@@ -2222,6 +2250,43 @@ function showTab(tab){
     else{lbBoot();}             // fallback: Phase 2 not done yet, fetch directly
   }
 }
+
+// ── Swipe Gesture for Tab Navigation ──────────────────────────────────────
+(function(){
+  var touchStartX = 0, touchStartY = 0;
+  var touchEndX   = 0, touchEndY   = 0;
+  var MIN_SWIPE_X = 55;   // minimum horizontal px to count as a swipe
+  var MAX_ANGLE   = 0.55; // tan(~29°) — prevents vertical scrolls triggering swipe
+
+  document.addEventListener('touchstart', function(e){
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e){
+    touchEndX = e.changedTouches[0].clientX;
+    touchEndY = e.changedTouches[0].clientY;
+    var dx = touchEndX - touchStartX;
+    var dy = touchEndY - touchStartY;
+    var absDx = Math.abs(dx);
+    var absDy = Math.abs(dy);
+
+    // Ignore if: too short, mostly vertical, or started in the bottom nav zone
+    if (absDx < MIN_SWIPE_X) return;
+    if (absDy / absDx > MAX_ANGLE) return;
+    if (touchStartY > window.innerHeight - 80) return; // bottom nav area
+
+    var idx = TAB_ORDER.indexOf(_currentTab);
+    if (dx < 0) {
+      // Swipe left → go to next tab
+      if (idx < TAB_ORDER.length - 1) showTab(TAB_ORDER[idx + 1]);
+    } else {
+      // Swipe right → go to previous tab
+      if (idx > 0) showTab(TAB_ORDER[idx - 1]);
+    }
+  }, { passive: true });
+})();
+// ──────────────────────────────────────────────────────────────────────────
 
 function refreshData(){
   var icon=document.getElementById('refresh-icon'); icon.classList.add('spinning');
