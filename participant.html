@@ -1130,7 +1130,7 @@ function openStravaProfile(){
 
   <!-- Connect with Strava Button -->
   <div style="margin-top:16px; margin-bottom:8px;">
-    <a id="btn-strava-connect" class="btn-strava-connect" href="#">
+    <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)" onclick="handleStravaConnect(event)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
       </svg>
@@ -1225,6 +1225,7 @@ function openStravaProfile(){
 
 <script>
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var BACKEND      = 'https://walkathon-backend-hv9j.onrender.com';
 var CONFIG_LB    = { basePer_km: 1, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}] };
 var CHALLENGES_LB   = [];
 var SPECIAL_DAYS_LB = [];
@@ -1740,13 +1741,54 @@ async function load() {
     var stravaLink=document.getElementById('you-strava-link');
     if(stravaLink){var surl=reg.strava_profile_url||('https://www.strava.com/athletes/'+s.athleteId);stravaLink.href=surl;}
 
-    // Wire up Connect with Strava OAuth URL dynamically
-    var btnStrava = document.getElementById('btn-strava-connect');
-    if (btnStrava) {
-      var CLIENT_ID = '29159';
-      var REDIRECT = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/index.html';
-      btnStrava.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT) + '&response_type=code&scope=read,activity:read&state=walkathon2026';
-    }
+    // Wire up Connect with Strava OAuth handler
+    window.handleStravaConnect = async function(e) {
+      if (e) e.preventDefault();
+      var btn = document.getElementById('btn-strava-connect');
+      if (!btn) return;
+      
+      var athleteId = reg.strava_athlete_id || (currentSession && currentSession.athleteId);
+      if (!athleteId) {
+        alert('Employee data not loaded. Please log in again.');
+        return;
+      }
+      
+      var originalText = btn.innerHTML;
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.7';
+      btn.innerHTML = 'Verifying connection status...';
+      
+      try {
+        var res = await fetch(BACKEND + '/check-authorized', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ athlete_id: athleteId })
+        });
+        var d = await res.json();
+        
+        if (d.success && d.authorized) {
+          alert('Your Strava account is already connected and syncing activities!');
+          btn.style.pointerEvents = '';
+          btn.style.opacity = '';
+          btn.innerHTML = originalText;
+        } else {
+          // Redirect to Strava OAuth
+          var CLIENT_ID = '29159';
+          var REDIRECT = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/index.html';
+          window.location.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + 
+            '&redirect_uri=' + encodeURIComponent(REDIRECT) + 
+            '&response_type=code&scope=read,activity:read&state=walkathon2026';
+        }
+      } catch (err) {
+        // Fallback: if check fails, redirect to Strava anyway
+        console.warn('Connection check failed:', err);
+        var CLIENT_ID = '29159';
+        var REDIRECT = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/index.html';
+        window.location.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + 
+          '&redirect_uri=' + encodeURIComponent(REDIRECT) + 
+          '&response_type=code&scope=read,activity:read&state=walkathon2026';
+      }
+    };
     // Tags for You tab (same as hero tags)
     var icoMale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><line x1="14.5" y1="9.5" x2="21" y2="3"/><polyline points="16 3 21 3 21 8"/></svg>';
     var icoFemale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/></svg>';
