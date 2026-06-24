@@ -2283,6 +2283,7 @@ var _currentTab = 'dashboard';
 
 function showTab(tab){
   var prevTab = _currentTab;
+  if (prevTab === tab) return; // No-op if clicking already active tab
   _currentTab = tab;
   var prevIdx = TAB_ORDER.indexOf(prevTab);
   var nextIdx = TAB_ORDER.indexOf(tab);
@@ -2292,17 +2293,20 @@ function showTab(tab){
     var el = document.getElementById('tab-' + t);
     if (!el) return;
     if (t === tab) {
-      // Slide in the new tab
+      el.classList.add('active');
       el.style.display = 'block';
+      el.style.transition = 'none';
       el.style.transform = 'translateX(' + (dir * 40) + 'px)';
       el.style.opacity = '0';
-      el.style.transition = 'none';
-      requestAnimationFrame(function(){
-        el.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
-        el.style.transform = 'translateX(0)';
-        el.style.opacity = '1';
-      });
+      
+      // Force reflow/layout sync so the browser registers the display: block & opacity: 0 state
+      void el.offsetHeight;
+      
+      el.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+      el.style.transform = 'translateX(0)';
+      el.style.opacity = '1';
     } else {
+      el.classList.remove('active');
       el.style.display = 'none';
       el.style.transform = '';
       el.style.opacity = '';
@@ -2314,6 +2318,7 @@ function showTab(tab){
   document.getElementById('bnav-activities').classList.toggle('active',tab==='activities');
   document.getElementById('bnav-leaderboard').classList.toggle('active',tab==='leaderboard');
   document.getElementById('bnav-you').classList.toggle('active',tab==='you');
+
   // rings + metrics now inside dashboard tab — no separate show/hide needed
   if(tab==='leaderboard'&&!_lbLoaded){
     _lbLoaded=true;
