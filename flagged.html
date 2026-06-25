@@ -374,7 +374,7 @@ td button.btn:last-child {
       <table>
         <thead><tr>
           <th>Athlete</th><th>Activity</th><th>Type</th><th>Date & time</th>
-          <th>Distance</th><th>Avg speed</th><th>Flag reason</th><th>Actions</th>
+          <th>Distance</th><th>Pace</th><th>Flag reason</th><th>Actions</th>
         </tr></thead>
         <tbody id="flagged-body"><tr class="loading-row"><td colspan="8">Loading...</td></tr></tbody>
       </table>
@@ -430,6 +430,7 @@ var _BU='https://walkathon-backend-hv9j.onrender.com';function authGuard(){var t
 function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
 function fmtTime(d) { return new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
 function bc(t) { if(t==='Walk') return 'badge-walk'; if(t==='Run'||t==='VirtualRun') return 'badge-run'; if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide') return 'badge-ride'; return 'badge-hike'; }
+function fmtPS(ms,t){if(!ms)return'—';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}
 authGuard();
 var currentTab='flagged', regMap={}, currentId=null, allActivities = [];
 function switchTab(t){ 
@@ -506,7 +507,7 @@ function applyFilters() {
       + '<td><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '—') + '</span></td>'
       + '<td>' + fmtDate(a.activity_date) + ' ' + fmtTime(a.activity_date) + '</td>'
       + '<td>' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '—') + '</td>'
-      + '<td>' + (a.avg_speed ? (a.avg_speed * 3.6).toFixed(1) + ' km/h' : '—') + '</td>'
+      + '<td>' + fmtPS(a.avg_speed, a.sport_type) + '</td>'
       + '<td><span class="flag-reason">' + (a.flag_reason || '—') + '</span></td>'
       + '<td>' + actions + '</td>'
       + '</tr>';
