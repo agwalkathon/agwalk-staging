@@ -546,6 +546,32 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .nav-grid { grid-template-columns: 1fr; }
     }
+
+    /* Health Monitoring Panel Styles */
+    .health-status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+    .health-card {
+      transition: all 0.2s ease;
+    }
+    .health-card:hover {
+      background: rgba(255,255,255,0.02) !important;
+      border-color: var(--brand) !important;
+      box-shadow: 0 4px 15px rgba(232,98,42,0.05);
+      transform: translateY(-1px);
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body>
@@ -638,69 +664,139 @@
       </div>
     </div>
 
-    <!-- ── Quick Nav ── -->
-    <div style="margin-bottom:20px">
-      <div id="quick-access-header" onclick="toggleQuickAccess()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;user-select:none">
-        <span style="font-size:13px;font-weight:600;color:var(--text-primary)">Quick access</span>
-        <span id="quick-access-chevron" style="font-size:12px;color:#888;transition:transform .2s">▼</span>
+    <!-- ── System Health & Monitoring ── -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-header-left">
+          <div class="card-header-icon"><i class="ti ti-server"></i></div>
+          <div>
+            <h2>System Health & Status</h2>
+            <div class="card-header-sub">Real-time status of backend services and databases</div>
+          </div>
+        </div>
+        <button class="btn btn-sm" id="btn-refresh-health" onclick="checkAllSystemsHealth()" style="font-size:12px;padding:6px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--brand);color:#fff;border:none;border-radius:6px;">
+          <i class="ti ti-refresh"></i> Refresh Status
+        </button>
       </div>
-      <div id="quick-access-body" style="display:none;margin-top:8px">
-    <div class="nav-grid">
-      <a href="activities.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-run"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Activities</div>
-          <div class="nav-card-desc">Filter, review and manage all logged workouts</div>
+      
+      <div style="padding:20px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;">
+          
+          <!-- Render Backend Card -->
+          <div class="health-card" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-cpu" style="color:var(--brand);font-size:16px;"></i> Backend (Render)
+              </span>
+              <span id="health-backend-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-backend-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-backend-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-backend-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-backend-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-backend-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supabase DB Card -->
+          <div class="health-card" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-database" style="color:#059669;font-size:16px;"></i> Supabase DB
+              </span>
+              <span id="health-supabase-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-supabase-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-supabase-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-supabase-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-supabase-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-supabase-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub API Card -->
+          <div class="health-card" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-brand-github" style="color:#7C3AED;font-size:16px;"></i> GitHub API
+              </span>
+              <span id="health-github-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-github-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-github-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-github-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-github-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-github-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Strava Gateway Card -->
+          <div class="health-card" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-brand-strava" style="color:#FC4C02;font-size:16px;"></i> Strava Sync
+              </span>
+              <span id="health-strava-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Queue / Kill Switch:</span>
+                <span id="health-strava-queue" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-strava-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-strava-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-strava-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Diagnostic Logs:</span>
+                <span id="health-strava-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-      </a>
-      <a href="flagged-rules.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-flag"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Flagged Activities</div>
-          <div class="nav-card-desc">Review and manage flagged or deleted workouts</div>
-        </div>
-        <span class="nav-card-badge" id="flagged-badge">—</span>
-      </a>
-      <a href="ag-leaderboard.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-trophy"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Leaderboard</div>
-          <div class="nav-card-desc">Team and individual rankings with cap logic</div>
-        </div>
-      </a>
-      <a href="participants.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-users"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Participants</div>
-          <div class="nav-card-desc">Manage registered Arcgate employees</div>
-        </div>
-        <span class="nav-card-badge badge-info" id="part-badge">—</span>
-      </a>
-      <a href="participant-requests.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-user-check"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Requests</div>
-          <div class="nav-card-desc">Approve or reject new registration requests</div>
-        </div>
-      </a>
-      <a href="ag-config.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-settings-2"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Config & Rules</div>
-          <div class="nav-card-desc">Flag rules, special days, challenge settings</div>
-        </div>
-        <span class="nav-card-badge" id="flag-badge">—</span>
-      </a>
-      <a href="data-upload.html" class="nav-card">
-        <div class="nav-card-icon"><i class="ti ti-upload"></i></div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Data Upload</div>
-          <div class="nav-card-desc">Batch import activities via CSV / Excel</div>
-        </div>
-      </a>
+      </div>
     </div>
-      </div><!-- /quick-access-body -->
-    </div><!-- /quick-access wrapper -->
 
     <!-- ── Recent Activity Feed ── -->
     <div class="card">
@@ -775,10 +871,12 @@ function logout() {
 
 // ── Helpers ──
 function fmtDate(d) {
-  return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+  var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
+  return new Date(naive).toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
 }
 function fmtTime(d) {
-  return new Date(d).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+  var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
+  return new Date(naive).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
 }
 function fmtDist(m) {
   if (!m) return '—';
@@ -875,14 +973,16 @@ async function load() {
   document.getElementById('s-today').textContent        = fmtIN(todayCount);
   document.getElementById('s-connected').textContent    = fmtIN(Array.isArray(conn) ? conn.length : 0);
 
-  // Flag badge on nav card
+  // Flag badge on nav card (guarded)
   const fb = document.getElementById('flag-badge');
-  if (flagCount) {
-    fb.textContent = flagCount + ' flagged';
-    fb.className = 'nav-card-badge badge-flag';
-  } else {
-    fb.textContent = 'All clear';
-    fb.className = 'nav-card-badge badge-ok';
+  if (fb) {
+    if (flagCount) {
+      fb.textContent = flagCount + ' flagged';
+      fb.className = 'nav-card-badge badge-flag';
+    } else {
+      fb.textContent = 'All clear';
+      fb.className = 'nav-card-badge badge-ok';
+    }
   }
   const flb = document.getElementById('flagged-badge');
   if (flb) {
@@ -894,7 +994,10 @@ async function load() {
       flb.className = 'nav-card-badge badge-ok';
     }
   }
-  document.getElementById('part-badge').textContent = (Array.isArray(conn) ? conn.length : 0) + ' connected';
+  const pb = document.getElementById('part-badge');
+  if (pb) {
+    pb.textContent = (Array.isArray(conn) ? conn.length : 0) + ' connected';
+  }
 
   // ── Render activity feed ──
   const feed = document.getElementById('activity-feed');
@@ -926,6 +1029,185 @@ async function load() {
 }
 
 load();
+checkAllSystemsHealth();
+setInterval(checkAllSystemsHealth, 30000);
+
+async function checkAllSystemsHealth() {
+  const refreshBtn = document.getElementById('btn-refresh-health');
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="ti ti-loader spin"></i> Checking...';
+  }
+
+  const nowStr = new Date().toLocaleString('en-IN');
+
+  function updateUI(service, ok, latency, reason) {
+    const badge = document.getElementById(`health-${service}-badge`);
+    const checked = document.getElementById(`health-${service}-checked`);
+    const latencyEl = document.getElementById(`health-${service}-latency`);
+    const downEl = document.getElementById(`health-${service}-down`);
+    const reasonEl = document.getElementById(`health-${service}-reason`);
+    const reasonBox = document.getElementById(`health-${service}-reason-box`);
+
+    if (checked) checked.textContent = nowStr;
+
+    if (ok) {
+      if (badge) {
+        badge.textContent = 'ONLINE';
+        badge.className = 'health-status-badge badge-ok';
+      }
+      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : '—';
+      
+      const lastDown = localStorage.getItem(`health_${service}_last_down`);
+      if (downEl) downEl.textContent = lastDown || 'None';
+      
+      const lastReason = localStorage.getItem(`health_${service}_down_reason`);
+      if (lastReason && reasonEl && reasonBox) {
+        reasonEl.textContent = lastReason;
+        reasonBox.style.display = 'flex';
+      } else if (reasonBox) {
+        reasonBox.style.display = 'none';
+      }
+    } else {
+      if (badge) {
+        badge.textContent = 'OFFLINE';
+        badge.className = 'health-status-badge badge-flag';
+      }
+      if (latencyEl) latencyEl.textContent = '-';
+      
+      localStorage.setItem(`health_${service}_last_down`, nowStr);
+      localStorage.setItem(`health_${service}_down_reason`, reason || 'Unknown Error');
+      
+      if (downEl) downEl.textContent = nowStr;
+      if (reasonEl) reasonEl.textContent = reason || 'Unknown Error';
+      if (reasonBox) reasonBox.style.display = 'flex';
+    }
+  }
+
+  // 1. Check Render Backend
+  const startBackend = performance.now();
+  let backendOk = false, backendReason = '', latencyBackend = null;
+  try {
+    const res = await fetch(_BACKEND_URL + '/');
+    latencyBackend = Math.round(performance.now() - startBackend);
+    if (res.ok) {
+      backendOk = true;
+    } else {
+      backendReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    backendReason = err.message || 'Network Error';
+  }
+  updateUI('backend', backendOk, latencyBackend, backendReason);
+
+  // 2. Check Supabase DB
+  const startSupabase = performance.now();
+  let supabaseOk = false, supabaseReason = '', latencySupabase = null;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/registration?limit=1', { headers: HDR });
+    latencySupabase = Math.round(performance.now() - startSupabase);
+    if (res.ok) {
+      supabaseOk = true;
+    } else {
+      supabaseReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    supabaseReason = err.message || 'Network Error';
+  }
+  updateUI('supabase', supabaseOk, latencySupabase, supabaseReason);
+
+  // 3. Check GitHub API
+  const startGithub = performance.now();
+  let githubOk = false, githubReason = '', latencyGithub = null;
+  try {
+    const res = await fetch('https://api.github.com/zen');
+    latencyGithub = Math.round(performance.now() - startGithub);
+    if (res.ok) {
+      githubOk = true;
+    } else {
+      githubReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    githubReason = err.message || 'Network Error';
+  }
+  updateUI('github', githubOk, latencyGithub, githubReason);
+
+  // 4. Check Strava API Status via Backend
+  let stravaOk = false, stravaReason = '', queueInfo = '—';
+  const token = sessionStorage.getItem('wk_admin_token');
+  if (!token) {
+    stravaReason = 'Admin token missing or not logged in';
+    updateUI('strava', false, null, stravaReason);
+  } else {
+    try {
+      const res = await fetch(_BACKEND_URL + '/admin/strava-status', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          stravaOk = true;
+          const killSwitch = data.killSwitchActive ? 'SUSPENDED' : 'ACTIVE';
+          queueInfo = `${data.queueSize} items / ${killSwitch}`;
+          const isWorking = data.status && data.status.state === 'working';
+          
+          const badge = document.getElementById('health-strava-badge');
+          if (badge) {
+            if (data.killSwitchActive) {
+              badge.textContent = 'SUSPENDED';
+              badge.className = 'health-status-badge badge-info';
+            } else if (isWorking) {
+              badge.textContent = 'ONLINE';
+              badge.className = 'health-status-badge badge-ok';
+            } else {
+              badge.textContent = 'ERROR';
+              badge.className = 'health-status-badge badge-flag';
+            }
+          }
+          
+          document.getElementById('health-strava-queue').textContent = queueInfo;
+          
+          const stravaChecked = document.getElementById('health-strava-checked');
+          if (stravaChecked) stravaChecked.textContent = nowStr;
+
+          const lastDown = localStorage.getItem('health_strava_last_down');
+          const downEl = document.getElementById('health-strava-down');
+          if (downEl) downEl.textContent = lastDown || 'None';
+
+          const reasonEl = document.getElementById('health-strava-reason');
+          const reasonBox = document.getElementById('health-strava-reason-box');
+          
+          if (data.status && data.status.lastError) {
+            if (reasonEl) reasonEl.textContent = `${data.status.lastError} (${new Date(data.status.lastErrorTime).toLocaleTimeString('en-IN')})`;
+            if (reasonBox) reasonBox.style.display = 'flex';
+          } else {
+            const lastReason = localStorage.getItem('health_strava_down_reason');
+            if (lastReason) {
+              if (reasonEl) reasonEl.textContent = lastReason;
+              if (reasonBox) reasonBox.style.display = 'flex';
+            } else if (reasonBox) {
+              reasonBox.style.display = 'none';
+            }
+          }
+        } else {
+          stravaReason = data.error || 'Failed to fetch status';
+          updateUI('strava', false, null, stravaReason);
+        }
+      } else {
+        stravaReason = `HTTP ${res.status}: ${res.statusText}`;
+        updateUI('strava', false, null, stravaReason);
+      }
+    } catch (err) {
+      stravaReason = err.message || 'Network Error';
+      updateUI('strava', false, null, stravaReason);
+    }
+  }
+
+  if (refreshBtn) {
+    refreshBtn.disabled = false;
+    refreshBtn.innerHTML = '<i class="ti ti-refresh"></i> Refresh Status';
+  }
+}
 
 // ── Realtime ──
 (function startRealtime() {
