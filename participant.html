@@ -1332,6 +1332,13 @@ function checkChallengeSingle(act, c) {
     if (km < dMin) return false;
   }
 
+  // Elevation criteria — activity must meet minimum elevation gain
+  var elevReq = parseFloat(c.elevation_criteria) || 0;
+  if (elevReq > 0) {
+    var actElev = parseFloat(act.elevation_gain || 0);
+    if (actElev < elevReq) return false;
+  }
+
   // Start time criteria — activity must start AT OR BEFORE this time
   if (c.start_time_criteria) {
     var timeStr = (act.activity_date || '').split('T')[1] || '';
@@ -1347,7 +1354,7 @@ function checkChallengeSingle(act, c) {
   return true;
 }
 
-function calcFullPts(myActs, gender) {
+function calcFullPts(myActs, gender, shift) {
   var athleteId = myActs.length ? myActs[0].strava_athlete_id : null;
 
   // ── Step 1: filter valid activities ────────────────────────────
@@ -1363,12 +1370,16 @@ function calcFullPts(myActs, gender) {
   });
 
   // ── Step 3: eligible challenges ────────────────────────────────
+  var _shiftN = (shift || '').toLowerCase();
+  var _isNightShift = _shiftN.indexOf('night') > -1;
   var myChallenges = (Array.isArray(CHALLENGES_LB) ? CHALLENGES_LB : []).filter(function(c) {
     if (!c.is_active) return false;
     var elig = (c.eligible || 'all').toLowerCase();
-    if (elig === 'all') return true;
-    if (elig === 'male'   && (gender || '').toLowerCase() === 'male')   return true;
-    if (elig === 'female' && (gender || '').toLowerCase() === 'female') return true;
+    if (elig === 'all')        return true;
+    if (elig === 'male'      && (gender || '').toLowerCase() === 'male')   return true;
+    if (elig === 'female'    && (gender || '').toLowerCase() === 'female') return true;
+    if (elig === 'dayshift'  && !_isNightShift) return true;
+    if (elig === 'nightshift' && _isNightShift) return true;
     return false;
   });
 
@@ -1886,7 +1897,7 @@ async function load() {
       },500);
 
       // Medal prediction
-      var fullP=calcFullPts(validA,reg.gender);
+      var fullP=calcFullPts(validA,reg.gender,reg.shift);
       var myPtsNow=fullP.total;
       var daysElapsed=Math.max(1,(nowD-EVENT_START)/86400000);
       var daysLeft=Math.max(0,Math.ceil((EVENT_END-nowD)/86400000));
@@ -1962,7 +1973,7 @@ async function load() {
       }
     })();
 
-    var fullPts=calcFullPts(myActs,reg.gender);
+    var fullPts=calcFullPts(myActs,reg.gender,reg.shift);
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
     document.getElementById('s-dist').textContent=Math.round(fullPts.km);
     document.getElementById('s-acts').textContent=validCount;
@@ -2799,7 +2810,7 @@ function renderStanding() {
     function rankIn(peers){
       var scored=peers.map(function(p){
         var acts=allActsMap[p.strava_athlete_id]||[];
-        return{id:p.strava_athlete_id,pts:calcFullPts(acts,p.gender).total};
+        return{id:p.strava_athlete_id,pts:calcFullPts(acts,p.gender,p.shift).total};
       }).filter(function(x){return x.pts>0;}).sort(function(a,b){return b.pts-a.pts;});
       var pos=scored.findIndex(function(x){return String(x.id)===String(athleteId);});
       return pos>=0?pos+1:null;
@@ -2841,7 +2852,7 @@ function renderStanding() {
     }
 
     var myActs = LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(athleteId);});
-    var currentPoints = calcFullPts(myActs, reg.gender).total;
+    var currentPoints = calcFullPts(myActs, reg.gender, reg.shift).total;
     checkMilestoneNotifications(athleteId, shiftRank, currentPoints, reg.gender, myActs, reg);
   } catch(e) {
     console.warn('renderStanding failed:', e);
@@ -3080,7 +3091,7 @@ load().finally(function(){ hideSplash(); });
 function computeTeamExclusions(){
   function boardRows(filterFn){
     return LB_REG.filter(filterFn).map(function(p){
-      return {p:p,pts:calcFullPts(LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(p.strava_athlete_id);}),p.gender)};
+      return {p:p,pts:calcFullPts(LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(p.strava_athlete_id);}),p.gender,p.shift)};
     }).filter(function(r){return r.pts.total>0;}).sort(function(a,b){return b.pts.total-a.pts.total;});
   }
   var dsF = boardRows(function(p){var g=norm(p.gender),s=norm(p.shift);return g==='female'&&s.indexOf('day')>-1;});
