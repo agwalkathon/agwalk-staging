@@ -360,8 +360,9 @@ tr:hover td{background:#FAFAFA}
         <span class="chip">📅 June 1–30</span>
         
       </div>
-      <div class="filter-actions">
+      <div class="filter-actions" style="display:flex;align-items:center;gap:8px">
         <button class="btn-refresh" onclick="doRefresh()">🔄 Refresh</button>
+        <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">📥 Export Activities</button>
         <a href="ag-config.html" class="btn-config">⚙️ Config</a>
       </div>
     </div>
@@ -972,6 +973,7 @@ function calcPoints(acts, athleteId, gender, shift) {
 }
 
 var allActivities = [];
+var allRegistrations = [];
 
 async function doRefresh() {
   var btn = document.querySelector('.btn-refresh');
@@ -996,6 +998,7 @@ async function loadAll() {
   await Promise.all([loadConfig(), loadChallenges(), loadSpecialDays()]);
   var [reg, acts] = await Promise.all([loadRegistration(), loadActivities()]);
   allActivities = acts; // store globally for sport filter
+  allRegistrations = reg; // store globally for activity export
 
   var boardMap = {
     'dayshift-male':'dm', 'dayshift-female':'df', 'nightshift-all':'ns',
@@ -1037,6 +1040,8 @@ async function loadAll() {
   // ────────────────────────────────────────────────────────────────────────
 
     applyFilters();
+    var expBtn = document.getElementById('export-activities-btn');
+    if (expBtn) expBtn.style.display = allActivities.length ? 'inline-block' : 'none';
   } catch(err) {
     console.error('loadAll error:', err);
     document.getElementById('lb-body').innerHTML = '<div style="text-align:center;padding:60px;color:#c62828;font-size:14px">❌ Error loading data: '+err.message+'</div>';
@@ -1270,6 +1275,114 @@ function updateStats(rows, board) {
   document.getElementById('stat-bronze').textContent = bronzes;
   document.getElementById('stat-medals').textContent = golds + silvers + bronzes;
   document.getElementById('stat-km').textContent     = fmtIndian(km)+' km';
+}
+
+function exportActivitiesCSV() {
+  if (!allActivities.length || !allRegistrations.length) {
+    alert('No activity data loaded yet.');
+    return;
+  }
+
+  // 1. Group activities by athlete for batch points computation
+  var actsByAthlete = {};
+  allActivities.forEach(function(a) {
+    if (!actsByAthlete[a.strava_athlete_id]) actsByAthlete[a.strava_athlete_id] = [];
+    actsByAthlete[a.strava_athlete_id].push(a);
+  });
+
+  // 2. Compute actBreakdowns for all athletes
+  var globalActBreakdowns = {};
+  allRegistrations.forEach(function(p) {
+    var athleteActs = actsByAthlete[p.strava_athlete_id] || [];
+    if (!athleteActs.length) return;
+    try {
+      var ptsResult = calcPoints(allActivities, p.strava_athlete_id, p.gender, p.shift);
+      Object.assign(globalActBreakdowns, ptsResult.actBreakdown || {});
+    } catch(err) {
+      console.error('Error calculating details for athlete ' + p.strava_athlete_id, err);
+    }
+  });
+
+  // 3. Map registrations for fast lookup
+  var regMap = {};
+  allRegistrations.forEach(function(p) {
+    regMap[String(p.strava_athlete_id).trim()] = p;
+  });
+
+  // 4. Build CSV rows
+  var headers = [
+    'Date', 'Employee Code', 'Athlete Name', 'Team', 'Shift', 'Gender',
+    'Activity Name', 'Sport Type', 'Distance (km)', 'Manual Bonus Points',
+    'Challenge Points', 'Challenges Earned', 'Status', 'Flag Reason'
+  ];
+
+  // Map activities to rows
+  var dataRows = allActivities.map(function(a) {
+    var p = regMap[String(a.strava_athlete_id).trim()] || {};
+    var date = (a.activity_date || '').split('T')[0] || '';
+    var dist = a.distance_meters ? (a.distance_meters / 1000).toFixed(2) : '0.00';
+    
+    // Pull challenge breakdown from calculated state
+    var ab = globalActBreakdowns[a.strava_activity_id];
+    var chPts = 0;
+    var chNames = '';
+    if (ab && Array.isArray(ab.challenges)) {
+      chPts = ab.challenges.reduce(function(sum, ch) { return sum + (parseFloat(ch.pts) || 0); }, 0);
+      chNames = ab.challenges.map(function(ch) { return ch.name; }).join('; ');
+    }
+    
+    var mb = parseFloat(a.manual_bonus) || 0;
+    var status = a.is_flagged ? 'Flagged' : 'Valid';
+
+    return {
+      date: date,
+      row: [
+        date,
+        p.emp_code || '',
+        p.full_name || 'Unknown',
+        p.leaderboard_team || 'No Team',
+        p.shift || '',
+        p.gender || '',
+        a.activity_name || 'Activity',
+        a.sport_type || '',
+        dist,
+        mb.toFixed(2),
+        chPts.toFixed(2),
+        chNames,
+        status,
+        a.flag_reason || ''
+      ]
+    };
+  });
+
+  // Sort rows by date ascending
+  dataRows.sort(function(a, b) {
+    return a.date.localeCompare(b.date);
+  });
+
+  // Convert to CSV string with proper escaping
+  var csvLines = [
+    headers.map(function(h) { return '"' + h.replace(/"/g, '""') + '"'; }).join(',')
+  ];
+  
+  dataRows.forEach(function(item) {
+    var escaped = item.row.map(function(val) {
+      var s = String(val == null ? '' : val).replace(/"/g, '""');
+      return '"' + s + '"';
+    }).join(',');
+    csvLines.push(escaped);
+  });
+
+  var csvContent = csvLines.join('\n');
+  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'date_wise_activities_' + new Date().toISOString().slice(0, 10) + '.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 loadAll();
