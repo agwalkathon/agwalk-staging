@@ -1101,6 +1101,7 @@ function renderBoard(rows, board) {
 }
 
 function toggleExpand(athleteId, gender, trEl) {
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   var expId = 'exp-' + athleteId;
   var existing = document.getElementById(expId);
 
@@ -1167,7 +1168,6 @@ function toggleExpand(athleteId, gender, trEl) {
       +(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
 
     // Build activity sub-rows for this day — hidden by default, toggled by clicking date row
-    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     var sportColors = {Walk:'#e8f5e9|#2e7d32',Run:'#e3f2fd|#1565c0',Hike:'#fff3e0|#e65100',Ride:'#fce4ec|#c62828',VirtualRun:'#e3f2fd|#1565c0',VirtualRide:'#fce4ec|#c62828',MountainBikeRide:'#fce4ec|#c62828'};
     var dayActsId = 'acts-' + athleteId + '-' + day.replace(/-/g,'');
     var actSubRows = byDay[day].map(function(a){
@@ -1215,7 +1215,12 @@ function toggleExpand(athleteId, gender, trEl) {
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DIST PTS</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">BONUS PTS</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">CHALLENGE</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">TOTAL PTS</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">'
+    +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    +    '<span>TOTAL PTS</span>'
+    +    '<button onclick="exportAthleteDailyCSV(\''+athleteId+'\')" style="background:#E8622A;color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;line-height:1.2">📥 Export</button>'
+    +  '</div>'
+    +'</th>'
     +'</tr></thead>'
     +'<tbody>'+dayRows+'</tbody>'
     +'</table></div>';
@@ -1379,6 +1384,52 @@ function exportActivitiesCSV() {
   var link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', 'date_wise_activities_' + new Date().toISOString().slice(0, 10) + '.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function exportAthleteDailyCSV(athleteId) {
+  var reg = allRegistrations.find(function(r) { return String(r.strava_athlete_id) === String(athleteId); });
+  var athleteName = reg ? (reg.full_name || 'Athlete') : 'Athlete';
+  var shift = reg ? (reg.shift || 'Dayshift') : 'Dayshift';
+  var gender = reg ? (reg.gender || 'Male') : 'Male';
+
+  var ptsDetail = calcPoints(allActivities, athleteId, gender, shift);
+  var dayBreakdown = ptsDetail.dayBreakdown;
+  var byDay = ptsDetail.byDay;
+  var days = Object.keys(byDay).sort();
+
+  var headers = ['Date', 'Activities Count', 'Distance (km)', 'Capped', 'Distance Points', 'Bonus Points', 'Challenge Points', 'Total Points', 'Challenges Completed'];
+  var rows = days.map(function(day) {
+    var db = dayBreakdown[day] || { km: 0, distPts: 0, bonusPts: 0, challenges: [], capped: false };
+    var cp = db.challenges.reduce(function(sum, c) { return sum + (c.pts || 0); }, 0);
+    var tp = db.distPts + db.bonusPts + cp;
+    var chNames = db.challenges.map(function(c) { return c.name; }).join('; ');
+    
+    return [
+      day,
+      byDay[day].length,
+      db.km.toFixed(2),
+      db.capped ? 'Yes' : 'No',
+      db.distPts.toFixed(2),
+      db.bonusPts.toFixed(2),
+      cp.toFixed(2),
+      tp.toFixed(2),
+      chNames
+    ].map(function(val) {
+      return '"' + String(val).replace(/"/g, '""') + '"';
+    }).join(',');
+  });
+
+  var csvContent = [headers.map(function(h) { return '"' + h + '"'; }).join(',')].concat(rows).join('\n');
+  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url;
+  var sanitizedName = athleteName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  link.setAttribute('download', sanitizedName + '_daily_breakdown_' + new Date().toISOString().slice(0, 10) + '.csv');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
