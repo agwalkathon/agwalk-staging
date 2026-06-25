@@ -1820,6 +1820,9 @@ function cacheClear(athleteId) {
   console.log('[Cache] Cleared for athlete', athleteId);
 }
 // ────────────────────────────────────────────────────────────────────────────
+// One-time cache migration: remove old ranking_acts key (missing strava_activity_id)
+try { localStorage.removeItem('agwalk_ranking_acts'); } catch(e) {}
+
 var currentSession=null;
 
 async function load(isBackgroundRefresh) {
