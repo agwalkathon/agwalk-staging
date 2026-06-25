@@ -783,6 +783,9 @@ function calcPoints(acts, athleteId, gender, shift) {
 
       var base2     = parseFloat(CONFIG.basePer_km) || 1;
       var dayDistKm = qualKmTotal + remainKm;
+      if (!isSpecialDay && dayDistKm > DAILY_CAP) {
+        dayDistKm = DAILY_CAP;
+      }
       totalDistKm  += dayDistKm;
       totalDistPts += parseFloat((dayDistKm * base2).toFixed(2));
 
