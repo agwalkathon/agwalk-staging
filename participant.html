@@ -1822,7 +1822,7 @@ function cacheClear(athleteId) {
 // ────────────────────────────────────────────────────────────────────────────
 var currentSession=null;
 
-async function load() {
+async function load(isBackgroundRefresh) {
   // Handle Strava OAuth callback
   var oauthCode = new URLSearchParams(window.location.search).get('code');
   if (oauthCode) {
@@ -1881,7 +1881,7 @@ async function load() {
     var _allFromCache = _cachedReg && _cachedActs && _cachedCfg && _cachedCh && _cachedSd && _cachedMedal;
 
     // Fetch fresh in background if any cache was used
-    if (_allFromCache) {
+    if (_allFromCache && !isBackgroundRefresh) {
       setTimeout(function(){
         Promise.all([
           fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId+'&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
@@ -1890,7 +1890,10 @@ async function load() {
           fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
           fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('medals',d);})
-        ]).catch(function(e){console.warn('[Cache] Background refresh failed:', e);});
+        ]).then(function(){
+          console.log('[Cache] Phase 1 background refresh complete. Re-rendering dashboard UI...');
+          load(true);
+        }).catch(function(e){console.warn('[Cache] Background refresh failed:', e);});
       }, 200);
     }
 
@@ -2328,12 +2331,19 @@ async function load() {
           allActsRaw = _cachedRankActs;
           allRegRaw  = _cachedRankReg;
           // Background refresh
-          setTimeout(function(){
-            Promise.all([
-              fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain').then(function(d){cacheSet('ranking_acts',d);}),
-              fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team').then(function(d){cacheSet('ranking_reg',d);})
-            ]).catch(function(e){console.warn('[Cache] Ranking background refresh failed:', e);});
-          }, 500);
+          if (!isBackgroundRefresh) {
+            setTimeout(function(){
+              Promise.all([
+                fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&select=strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain'),
+                fetchAll(SUPABASE_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+              ]).then(function(results){
+                console.log('[Cache] Phase 2 background refresh complete. Re-rendering...');
+                cacheSet('ranking_acts', results[0]);
+                cacheSet('ranking_reg', results[1]);
+                load(true);
+              }).catch(function(e){console.warn('[Cache] Ranking background refresh failed:', e);});
+            }, 500);
+          }
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
@@ -2347,7 +2357,7 @@ async function load() {
         // Feed leaderboard tab from same data — no extra API calls
         LB_REG=allRegRaw;
         LB_ACTS=allActsRaw;
-        if(LB_ME&&!_lbReady){_lbReady=true;lbRender();}
+        if(LB_ME){_lbReady=true;lbRender();}
       }catch(e2){console.warn('Ranking load failed:',e2);return;}
 
     // Standing
@@ -3267,7 +3277,7 @@ function getRows(mode){
   if(!LB_ME)return[];
   var myGender=norm(LB_ME.gender),myShift=norm(LB_ME.shift),myTeam=norm(LB_ME.leaderboard_team),isNight=myShift.indexOf('night')>-1,isFemale=myGender==='female'||myGender==='f';
   var filtered=LB_REG.filter(function(p){var pg=norm(p.gender),ps=norm(p.shift),pt=norm(p.leaderboard_team),pIsFemale=pg==='female'||pg==='f';if(pIsFemale!==isFemale)return false;if(mode==='team')return pt===myTeam;return ps.indexOf('night')>-1===isNight;});
-  var rows=filtered.map(function(p){return{p:p,pts:calcFullPts(LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(p.strava_athlete_id);}),p.gender)};}).filter(function(r){return r.pts.total>0;}).sort(function(a,b){return b.pts.total-a.pts.total;});
+  var rows=filtered.map(function(p){return{p:p,pts:calcFullPts(LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(p.strava_athlete_id);}),p.gender,p.shift)};}).filter(function(r){return r.pts.total>0;}).sort(function(a,b){return b.pts.total-a.pts.total;});
   // Apply team exclusions for team tab
   if(mode==='team'){
     var excl=computeTeamExclusions();
@@ -3534,7 +3544,7 @@ function lbRender(){
         var cutoffStr=cutoff.toISOString().split('T')[0];
         var oldActs=LB_ACTS.filter(function(a){return(a.activity_date||'').split('T')[0]<=cutoffStr;});
         var myGd=norm(LB_ME.gender),myShd=norm(LB_ME.shift),isNd=myShd.indexOf('night')>-1,isFd=myGd==='female'||myGd==='f';
-        var oldRows=LB_REG.filter(function(q){var pg=norm(q.gender),ps=norm(q.shift),pt=norm(q.leaderboard_team),pIsFemale=pg==='female'||pg==='f';if(pIsFemale!==isFd)return false;return LB_currentTab==='team'?pt===norm(LB_ME.leaderboard_team):ps.indexOf('night')>-1===isNd;}).map(function(q){return{id:String(q.strava_athlete_id),pts:calcFullPts(oldActs.filter(function(a){return String(a.strava_athlete_id)===String(q.strava_athlete_id);}),q.gender).total};}).filter(function(r){return r.pts>0;}).sort(function(a,b){return b.pts-a.pts;});
+        var oldRows=LB_REG.filter(function(q){var pg=norm(q.gender),ps=norm(q.shift),pt=norm(q.leaderboard_team),pIsFemale=pg==='female'||pg==='f';if(pIsFemale!==isFd)return false;return LB_currentTab==='team'?pt===norm(LB_ME.leaderboard_team):ps.indexOf('night')>-1===isNd;}).map(function(q){return{id:String(q.strava_athlete_id),pts:calcFullPts(oldActs.filter(function(a){return String(a.strava_athlete_id)===String(q.strava_athlete_id);}),q.gender,q.shift).total};}).filter(function(r){return r.pts>0;}).sort(function(a,b){return b.pts-a.pts;});
         var oldRank=oldRows.findIndex(function(r){return r.id===String(meId);})+1;
         var rmEl=document.getElementById('lb-rank-move');
         if(rmEl&&curRank>0){
