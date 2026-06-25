@@ -519,8 +519,8 @@ async function fetchAllRows(baseUrl,hdrs){var all=[],pageSize=1000,from=0;while(
 function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}
 function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
-function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
-function fmtTime(d) { return new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+function fmtDate(d) { var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d; return new Date(naive).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtTime(d) { var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d; return new Date(naive).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
 function bc(t) { if(t==='Walk') return 'badge-walk'; if(t==='Run'||t==='VirtualRun') return 'badge-run'; if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide') return 'badge-ride'; return 'badge-hike'; }
 function fmtPS(ms,t){if(!ms)return'—';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}
 
