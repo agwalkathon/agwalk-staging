@@ -318,6 +318,56 @@ td button.btn:last-child {
     </div>
     <button class="btn-recheck" onclick="recheckAll()">🔍 Re-run Auto-flag</button>
   </div>
+  <div class="filter-bar">
+    <h3>Filter Activities</h3>
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label>Participant Name</label>
+        <input type="text" id="athlete-name" placeholder="Search participant name..." oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Activity Type</label>
+        <select id="sport-filter" onchange="applyFilters()">
+          <option value="">All types</option>
+          <option value="Walk">Walk</option>
+          <option value="Run">Run</option>
+          <option value="Ride">Ride</option>
+          <option value="Hike">Hike</option>
+          <option value="VirtualRun">Virtual Run</option>
+          <option value="VirtualRide">Virtual Ride</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Flag Reason</label>
+        <select id="flag-reason-filter" onchange="applyFilters()">
+          <option value="">All reasons</option>
+          <optgroup label="── Manual Review ──">
+            <option>Manual Review - Distance Issue</option>
+            <option>Manual Review - Pace Issue</option>
+          </optgroup>
+          <optgroup label="── Manual Flags ──">
+            <option>Not Our Participant</option>
+            <option>Less than 1 km</option>
+            <option>Treadmill</option>
+            <option>Workout</option>
+            <option>Elapsed Time Issue</option>
+            <option>Pace Issue (Bike/Cycle)</option>
+            <option>Shared (no proof)</option>
+            <option>Indoor Run/Walk</option>
+            <option>More than 2 Activities</option>
+            <option>Suspicious Activity</option>
+            <option>Ride / Cycling</option>
+            <option>Distance Cropped - GPS Glitch</option>
+            <option>Distance Issue</option>
+            <option>GPS Glitch</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-ghost" onclick="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
   <div class="summary warn" id="summary">Loading...</div>
   <div class="card">
     <div class="table-wrap">
@@ -381,8 +431,16 @@ function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN',{day:'2-digi
 function fmtTime(d) { return new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
 function bc(t) { if(t==='Walk') return 'badge-walk'; if(t==='Run'||t==='VirtualRun') return 'badge-run'; if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide') return 'badge-ride'; return 'badge-hike'; }
 authGuard();
-var currentTab='flagged', regMap={}, currentId=null;
-function switchTab(t){ currentTab=t; document.getElementById('tab-flagged').classList.toggle('active',t==='flagged'); document.getElementById('tab-deleted').classList.toggle('active',t==='deleted'); loadData(); }
+var currentTab='flagged', regMap={}, currentId=null, allActivities = [];
+function switchTab(t){ 
+  currentTab=t; 
+  document.getElementById('tab-flagged').classList.toggle('active',t==='flagged'); 
+  document.getElementById('tab-deleted').classList.toggle('active',t==='deleted'); 
+  document.getElementById('athlete-name').value = '';
+  document.getElementById('sport-filter').value = '';
+  document.getElementById('flag-reason-filter').value = '';
+  loadData(); 
+}
 function checkDistField(){ var v=document.getElementById('flag-reason-select').value; document.getElementById('dist-field').classList.toggle('show',v==='Distance Cropped - GPS Glitch'); }
 function openFlagModal(id,name,reason){ currentId=id; document.getElementById('modal-sub').textContent='Activity by: '+name; document.getElementById('flag-reason-select').value=reason||''; document.getElementById('flag-modal').classList.add('show'); }
 function closeModal(){ document.getElementById('flag-modal').classList.remove('show'); document.getElementById('flag-reason-select').value=''; document.getElementById('dist-field').classList.remove('show'); document.getElementById('corrected-distance').value=''; currentId=null; }
@@ -397,7 +455,8 @@ async function confirmFlag(){
 }
 async function doAction(id,action,reason){
   await fetch(BACKEND_URL+'/flag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity_id:id,action:action,flag_reason:reason})});
-  var row=document.getElementById('row-'+id); if(row) row.remove();
+  allActivities = allActivities.filter(function(a) { return a.id !== id; });
+  applyFilters();
 }
 async function recheckAll(){
   if(!confirm('Re-run auto-flag on all activities?')) return;
@@ -405,6 +464,59 @@ async function recheckAll(){
   btn.innerHTML='<span class="spinner-inline"></span>Running...'; btn.disabled=true;
   await fetch(BACKEND_URL+'/recheck-flags',{method:'POST',headers:{'Content-Type':'application/json'}});
   setTimeout(function(){ btn.innerHTML='🔍 Re-run Auto-flag'; btn.disabled=false; loadData(); },6000);
+}
+function applyFilters() {
+  var nameQuery = (document.getElementById('athlete-name').value || '').trim().toLowerCase();
+  var sportQuery = document.getElementById('sport-filter').value;
+  var reasonQuery = document.getElementById('flag-reason-filter').value;
+
+  var filtered = allActivities.filter(function(a) {
+    var name = regMap[String(a.strava_athlete_id).trim()] || 'Unknown';
+    if (nameQuery && name.toLowerCase().indexOf(nameQuery) === -1) return false;
+    if (sportQuery && a.sport_type !== sportQuery) return false;
+    if (reasonQuery && a.flag_reason !== reasonQuery) return false;
+    return true;
+  });
+
+  var sum = document.getElementById('summary');
+  if (currentTab === 'flagged') {
+    sum.className = filtered.length ? 'summary warn' : 'summary ok';
+    sum.textContent = filtered.length ? '⚠️ ' + filtered.length + ' activit' + (filtered.length === 1 ? 'y' : 'ies') + ' flagged for review' : '✅ No flagged activities match the filters!';
+  } else {
+    sum.className = 'summary info';
+    sum.textContent = '🗑️ ' + filtered.length + ' deleted activit' + (filtered.length === 1 ? 'y' : 'ies') + '— can be restored anytime';
+  }
+
+  if (!filtered.length) {
+    document.getElementById('flagged-body').innerHTML = '<tr class="loading-row"><td colspan="8">No matching activities found</td></tr>';
+    return;
+  }
+
+  document.getElementById('flagged-body').innerHTML = filtered.map(function(a) {
+    var name = regMap[String(a.strava_athlete_id).trim()] || 'Unknown';
+    var safeReason = (a.flag_reason || '').replace(/'/g, "\\'");
+    var actions = currentTab === 'flagged'
+      ? '<button class="btn btn-orange" onclick="openFlagModal(' + a.id + ',\'' + name + '\',\'' + safeReason + '\')">✏️ Edit</button>'
+        + '<button class="btn btn-green" onclick="doAction(' + a.id + ',\'unflag\',\'\')">✅ Clear</button>'
+        + '<button class="btn btn-red" onclick="doAction(' + a.id + ',\'delete\',\'' + safeReason + '\')">🗑️ Delete</button>'
+      : '<button class="btn btn-blue" onclick="doAction(' + a.id + ',\'restore\',\'\')">↩️ Restore</button>';
+    return '<tr id="row-' + a.id + '">'
+      + '<td><a href="https://www.strava.com/athletes/' + a.strava_athlete_id + '" target="_blank" class="ath">' + name + '</a></td>'
+      + '<td><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link">' + (a.activity_name || '—') + '</a></td>'
+      + '<td><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '—') + '</span></td>'
+      + '<td>' + fmtDate(a.activity_date) + ' ' + fmtTime(a.activity_date) + '</td>'
+      + '<td>' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '—') + '</td>'
+      + '<td>' + (a.avg_speed ? (a.avg_speed * 3.6).toFixed(1) + ' km/h' : '—') + '</td>'
+      + '<td><span class="flag-reason">' + (a.flag_reason || '—') + '</span></td>'
+      + '<td>' + actions + '</td>'
+      + '</tr>';
+  }).join('');
+}
+function clearFilters() {
+  document.getElementById('athlete-name').value = '';
+  document.getElementById('sport-filter').value = '';
+  document.getElementById('flag-reason-filter').value = '';
+  applyFilters();
 }
 async function loadData(){
   document.getElementById('flagged-body').innerHTML='<tr class="loading-row"><td colspan="8">Loading...</td></tr>';
@@ -420,29 +532,8 @@ async function loadData(){
       ?SUPABASE_URL+'/rest/v1/activities?is_flagged=eq.true&is_deleted=eq.false&order=activity_date.desc'
       :SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.true&order=activity_date.desc';
     var acts = await fetchAllRows(url, HDR);
-    var sum=document.getElementById('summary');
-    if(currentTab==='flagged'){ sum.className=acts.length?'summary warn':'summary ok'; sum.textContent=acts.length?'⚠️ '+acts.length+' activit'+(acts.length===1?'y':'ies')+' flagged for review':'✅ No flagged activities — everything looks clean!'; }
-    else { sum.className='summary info'; sum.textContent='🗑️ '+acts.length+' deleted activit'+(acts.length===1?'y':'ies')+'— can be restored anytime'; }
-    if(!acts.length){ document.getElementById('flagged-body').innerHTML='<tr class="loading-row"><td colspan="8">'+(currentTab==='flagged'?'🎉 No flagged activities!':'No deleted activities')+'</td></tr>'; return; }
-    document.getElementById('flagged-body').innerHTML=acts.map(function(a){
-      var name=regMap[String(a.strava_athlete_id).trim()]||'Unknown';
-      var safeReason=(a.flag_reason||'').replace(/'/g,"\\'");
-      var actions=currentTab==='flagged'
-        ?'<button class="btn btn-orange" onclick="openFlagModal('+a.id+',\''+name+'\',\''+safeReason+'\')">✏️ Edit</button>'
-         +'<button class="btn btn-green" onclick="doAction('+a.id+',\'unflag\',\'\')">✅ Clear</button>'
-         +'<button class="btn btn-red" onclick="doAction('+a.id+',\'delete\',\''+safeReason+'\')">🗑️ Delete</button>'
-        :'<button class="btn btn-blue" onclick="doAction('+a.id+',\'restore\',\'\')">↩️ Restore</button>';
-      return '<tr id="row-'+a.id+'">'
-        +'<td><a href="https://www.strava.com/athletes/'+a.strava_athlete_id+'" target="_blank" class="ath">'+name+'</a></td>'
-        +'<td><a href="https://www.strava.com/activities/'+a.strava_activity_id+'" target="_blank" class="act-link">'+(a.activity_name||'—')+'</a></td>'
-        +'<td><span class="badge '+bc(a.sport_type)+'">'+(a.sport_type||'—')+'</span></td>'
-        +'<td>'+fmtDate(a.activity_date)+' '+fmtTime(a.activity_date)+'</td>'
-        +'<td>'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—')+'</td>'
-        +'<td>'+(a.avg_speed?(a.avg_speed*3.6).toFixed(1)+' km/h':'—')+'</td>'
-        +'<td><span class="flag-reason">'+(a.flag_reason||'—')+'</span></td>'
-        +'<td>'+actions+'</td>'
-        +'</tr>';
-    }).join('');
+    allActivities = acts;
+    applyFilters();
   } catch(e) {
     console.error(e);
     document.getElementById('flagged-body').innerHTML='<tr class="loading-row"><td colspan="8" style="color:#c62828">Error loading data. Please try again.</td></tr>';
