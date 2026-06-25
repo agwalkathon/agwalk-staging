@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -653,6 +653,14 @@
           <div class="nav-card-desc">Filter, review and manage all logged workouts</div>
         </div>
       </a>
+      <a href="flagged.html" class="nav-card">
+        <div class="nav-card-icon"><i class="ti ti-flag"></i></div>
+        <div class="nav-card-body">
+          <div class="nav-card-title">Flagged Activities</div>
+          <div class="nav-card-desc">Review and manage flagged or deleted workouts</div>
+        </div>
+        <span class="nav-card-badge" id="flagged-badge">—</span>
+      </a>
       <a href="ag-leaderboard.html" class="nav-card">
         <div class="nav-card-icon"><i class="ti ti-trophy"></i></div>
         <div class="nav-card-body">
@@ -875,6 +883,16 @@ async function load() {
   } else {
     fb.textContent = 'All clear';
     fb.className = 'nav-card-badge badge-ok';
+  }
+  const flb = document.getElementById('flagged-badge');
+  if (flb) {
+    if (flagCount) {
+      flb.textContent = flagCount + ' flagged';
+      flb.className = 'nav-card-badge badge-flag';
+    } else {
+      flb.textContent = 'All clear';
+      flb.className = 'nav-card-badge badge-ok';
+    }
   }
   document.getElementById('part-badge').textContent = (Array.isArray(conn) ? conn.length : 0) + ' connected';
 
