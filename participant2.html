@@ -621,6 +621,23 @@ var SPECIAL_DAYS_LB = [];
 var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBIQk4B6ah0eahE_yZE';
 var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 
+function safeSetText(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function safeSetHtml(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.innerHTML = val;
+}
+function safeToggleClass(id, className, force) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle(className, force);
+}
+function safeSetStyle(id, prop, val) {
+  var el = document.getElementById(id);
+  if (el) el.style[prop] = val;
+}
+
 function userGuard() {
   var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
   if (!s.loggedIn || s.expires < Date.now() || !s.athleteId) { window.location.href = 'index.html'; return null; }
@@ -769,7 +786,7 @@ async function load() {
     var name=String(reg.full_name||s.name||'Participant');
 
     // Profile
-    document.getElementById('p-name').textContent=name.toUpperCase();
+    safeSetText('p-name', name.toUpperCase());
     var tags=[];
     var icoMale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><line x1="14.5" y1="9.5" x2="21" y2="3"/><polyline points="16 3 21 3 21 8"/></svg>';
     var icoFemale='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/></svg>';
@@ -778,28 +795,28 @@ async function load() {
     if(reg.gender)tags.push(reg.gender==='Female'?icoFemale+' Female':icoMale+' Male');
     if(reg.shift)tags.push(icoClock+' '+reg.shift);
     if(reg.leaderboard_team)tags.push(icoTeam+' '+reg.leaderboard_team);
-    document.getElementById('p-tags').innerHTML=tags.map(function(t){var sp=t.indexOf('</svg>');return sp>=0?'<span class="hero-tag">'+t.substring(0,sp+6)+' '+esc(t.substring(sp+6).trim())+'</span>':'<span class="hero-tag">'+esc(t)+'</span>';}).join('');
+    safeSetHtml('p-tags', tags.map(function(t){var sp=t.indexOf('</svg>');return sp>=0?'<span class="hero-tag">'+t.substring(0,sp+6)+' '+esc(t.substring(sp+6).trim())+'</span>':'<span class="hero-tag">'+esc(t)+'</span>';}).join(''));
 
     var fullPts=calcFullPts(myActs,reg.gender);
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
-    document.getElementById('s-dist').textContent=Math.round(fullPts.km);
-    document.getElementById('s-acts').textContent=validCount;
+    safeSetText('s-dist', Math.round(fullPts.km));
+    safeSetText('s-acts', validCount);
 
     var validActs=myActs.filter(function(a){return !a.is_flagged;});
     var totalMovingSec=validActs.reduce(function(s,a){return s+(a.moving_time_seconds||0);},0);
     var totalDistM=validActs.reduce(function(s,a){return s+(a.distance_meters||0);},0);
     var avgPaceStr='—';
     if(totalDistM>0){var psk=totalMovingSec/(totalDistM/1000),pmin=Math.floor(psk/60),psec=Math.round(psk%60);avgPaceStr=pmin+':'+(psec<10?'0':'')+psec;}
-    document.getElementById('s-pace').textContent=avgPaceStr;
+    safeSetText('s-pace', avgPaceStr);
     var mts='—';if(totalMovingSec>0){var mh=Math.floor(totalMovingSec/3600),mm=Math.floor((totalMovingSec%3600)/60);mts=mh>0?mh+'h '+mm+'m':mm+'m';}
-    document.getElementById('s-movetime').textContent=mts;
+    safeSetText('s-movetime', mts);
 
     var tod={morning:0,afternoon:0,evening:0,night:0};
     validActs.forEach(function(a){var n=(a.activity_name||'').toLowerCase();if(n.indexOf('morning')>-1)tod.morning++;else if(n.indexOf('afternoon')>-1)tod.afternoon++;else if(n.indexOf('evening')>-1)tod.evening++;else if(n.indexOf('night')>-1)tod.night++;});
-    document.getElementById('tod-morning').textContent=tod.morning;
-    document.getElementById('tod-afternoon').textContent=tod.afternoon;
-    document.getElementById('tod-evening').textContent=tod.evening;
-    document.getElementById('tod-night').textContent=tod.night;
+    safeSetText('tod-morning', tod.morning);
+    safeSetText('tod-afternoon', tod.afternoon);
+    safeSetText('tod-evening', tod.evening);
+    safeSetText('tod-night', tod.night);
 
     // Medals
     var medalData=await medalRes.json();
@@ -808,7 +825,7 @@ async function load() {
     var gKey=(reg.gender||'').toLowerCase()==='female'?'female':'male';
     var bronzeThresh=Number(medals.bronze[gKey])||100,silverThresh=Number(medals.silver[gKey])||150,goldThresh=Number(medals.gold[gKey])||200;
     var myPts=fullPts.total;
-    document.getElementById('s-pts-display').textContent=Math.round(myPts);
+    safeSetText('s-pts-display', Math.round(myPts));
 
     // ── Medal rings ───────────────────────────────────────────────────────────
     var CIRC=270.2; // 2 * π * 43
@@ -854,10 +871,10 @@ async function load() {
     function ordinal(n){if(!n)return'—';var sfx=['th','st','nd','rd'],v=n%100;var s=sfx[(v-20)%10]||sfx[v]||sfx[0];return n+'<span class="rank-sup">'+s+'</span>';}
     var shiftLabel=isNight?'Nightshift · '+(isFemale?'Female':'Male'):'Dayshift · '+(isFemale?'Female':'Male');
     var teamLabel=(reg.leaderboard_team||'Team')+' · '+(isFemale?'Female':'Male');
-    document.getElementById('standing-shift-label').textContent=shiftLabel;
-    document.getElementById('standing-shift-rank').innerHTML=shiftRank?ordinal(shiftRank):'—';
-    document.getElementById('standing-team-label').textContent=teamLabel;
-    document.getElementById('standing-team-rank').innerHTML=teamRank?ordinal(teamRank):'—';
+    safeSetText('standing-shift-label', shiftLabel);
+    safeSetHtml('standing-shift-rank', shiftRank?ordinal(shiftRank):'—');
+    safeSetText('standing-team-label', teamLabel);
+    safeSetHtml('standing-team-rank', teamRank?ordinal(teamRank):'—');
 
     // ── Pace Goals — dynamic based on medal status ────────────────────────────
     var now=new Date();
@@ -1006,9 +1023,9 @@ async function load() {
       prevD=d;
     });
 
-    document.getElementById('streak-num').textContent=(streakIsLive&&streak>0?'🔥':'')+streak;
-    document.getElementById('streak-best-val').textContent=best;
-    document.getElementById('streak-msg').textContent=streakIsLive?(streak>=7?'Amazing streak!':streak>=3?'Keep it going!':'Good start!'):(lastActiveDay?'Last active '+lastActiveDay:'Start today!');
+    safeSetText('streak-num', (streakIsLive&&streak>0?'🔥':'')+streak);
+    safeSetText('streak-best-val', best);
+    safeSetText('streak-msg', streakIsLive?(streak>=7?'Amazing streak!':streak>=3?'Keep it going!':'Good start!'):(lastActiveDay?'Last active '+lastActiveDay:'Start today!'));
 
     var days7=[],labels7=[];
     for(var di=6;di>=0;di--){
@@ -1018,15 +1035,18 @@ async function load() {
       days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0});
       labels7.push(di===0?'Today':dayNames[dd.getDay()]);
     }
-    document.getElementById('streak-bars').innerHTML=days7.map(function(d){return'<div class="sbar '+(d.isToday?'dim':d.active?'on':'off')+'"></div>';}).join('');
-    document.getElementById('streak-labels').innerHTML=labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join('');
+    safeSetHtml('streak-bars', days7.map(function(d){return'<div class="sbar '+(d.isToday?'dim':d.active?'on':'off')+'"></div>';}).join(''));
+    safeSetHtml('streak-labels', labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join(''));
 
     // Rivals
     var shiftPeersScored=allReg.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return ps.indexOf('night')>-1===isNight&&(pg==='female')===isFemale;}).map(function(p){return{p:p,km:allKmMap[p.strava_athlete_id]||0};}).sort(function(a,b){return b.km-a.km;});
     var myRivalIdx=shiftPeersScored.findIndex(function(x){return String(x.p.strava_athlete_id)===String(athleteId);});
-    var rivalsCard=document.getElementById('rivals-card'); rivalsCard.innerHTML='';
-    if(myRivalIdx===-1){rivalsCard.innerHTML='<p style="font-size:12px;color:var(--muted);padding:14px">No peers found.</p>';}
-    else{var showFrom=Math.max(0,myRivalIdx-2),showTo=Math.min(shiftPeersScored.length-1,myRivalIdx+2);for(var ri=showFrom;ri<=showTo;ri++){var rp=shiftPeersScored[ri],isMe=ri===myRivalIdx,rankNum=ri+1,div=document.createElement('div');div.className='rival-row'+(isMe?' rival-me':'');var badgeCls=ri<myRivalIdx?'rb-ahead':isMe?'rb-you':'rb-behind';var gapHtml=isMe?'<span class="rival-gap gap-me">'+rp.km.toFixed(1)+' km</span>':ri<myRivalIdx?'<span class="rival-gap gap-up">+'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km ahead</span>':'<span class="rival-gap gap-dn">-'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km behind</span>';div.innerHTML='<span class="rival-badge '+badgeCls+'">#'+rankNum+'</span><span class="rival-name">'+esc(rp.p.full_name||'—')+(isMe?' (You)':'')+'</span>'+gapHtml;rivalsCard.appendChild(div);}}
+    var rivalsCard=document.getElementById('rivals-card');
+    if (rivalsCard) {
+      rivalsCard.innerHTML='';
+      if(myRivalIdx===-1){rivalsCard.innerHTML='<p style="font-size:12px;color:var(--muted);padding:14px">No peers found.</p>';}
+      else{var showFrom=Math.max(0,myRivalIdx-2),showTo=Math.min(shiftPeersScored.length-1,myRivalIdx+2);for(var ri=showFrom;ri<=showTo;ri++){var rp=shiftPeersScored[ri],isMe=ri===myRivalIdx,rankNum=ri+1,div=document.createElement('div');div.className='rival-row'+(isMe?' rival-me':'');var badgeCls=ri<myRivalIdx?'rb-ahead':isMe?'rb-you':'rb-behind';var gapHtml=isMe?'<span class="rival-gap gap-me">'+rp.km.toFixed(1)+' km</span>':ri<myRivalIdx?'<span class="rival-gap gap-up">+'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km ahead</span>':'<span class="rival-gap gap-dn">-'+Math.abs(rp.km-shiftPeersScored[myRivalIdx].km).toFixed(1)+' km behind</span>';div.innerHTML='<span class="rival-badge '+badgeCls+'">#'+rankNum+'</span><span class="rival-name">'+esc(rp.p.full_name||'—')+(isMe?' (You)':'')+'</span>'+gapHtml;rivalsCard.appendChild(div);}}
+    }
 
     // Challenges
     var chCard=document.getElementById('challenges-card');
@@ -1113,21 +1133,23 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
 function toggleDay(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
 
 function showTab(tab){
-  document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'block':'none';
-  document.getElementById('tab-activities').style.display=tab==='activities'?'block':'none';
-  document.getElementById('bnav-dashboard').classList.toggle('active',tab==='dashboard');
-  document.getElementById('bnav-activities').classList.toggle('active',tab==='activities');
-  document.getElementById('bnav-leaderboard').classList.remove('active');
+  safeSetStyle('tab-dashboard', 'display', tab==='dashboard'?'block':'none');
+  safeSetStyle('tab-activities', 'display', tab==='activities'?'block':'none');
+  safeToggleClass('bnav-dashboard', 'active', tab==='dashboard');
+  safeToggleClass('bnav-activities', 'active', tab==='activities');
+  var blEl = document.getElementById('bnav-leaderboard'); if (blEl) blEl.classList.remove('active');
   var isDash=tab==='dashboard';
-  document.querySelector('.hero-rings-block').style.display=isDash?'':'none';
-  document.querySelector('.hero-metrics-block').style.display=isDash?'':'none';
+  var hrEl = document.querySelector('.hero-rings-block'); if (hrEl) hrEl.style.display = isDash?'':'none';
+  var hmEl = document.querySelector('.hero-metrics-block'); if (hmEl) hmEl.style.display = isDash?'':'none';
 }
 
 
 function clearCacheAndReload() {
   var btn = document.getElementById('clear-cache-btn');
-  btn.style.opacity = '0.4';
-  btn.style.pointerEvents = 'none';
+  if (btn) {
+    btn.style.opacity = '0.4';
+    btn.style.pointerEvents = 'none';
+  }
   if ('caches' in window) {
     caches.keys().then(function(names) {
       return Promise.all(names.map(function(name) { return caches.delete(name); }));
