@@ -8,13 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Participants — Arcgate Walkathon 2026</title>
+  <title>Participants â€” Arcgate Walkathon 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
 
-/* ── Sidebar ── */
+/* â”€â”€ Sidebar â”€â”€ */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;align-items:center;padding:16px 0 12px;z-index:300;transition:width .24s cubic-bezier(.4,0,.2,1);overflow:hidden}
 .sidebar:hover{width:var(--sidebar-exp)}
 .sb-logo{display:flex;align-items:center;width:100%;padding:4px 14px 20px;text-decoration:none;gap:10px;flex-shrink:0}
@@ -44,7 +44,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 .sb-signout .sb-label{color:rgba(255,255,255,.3)}
 .sb-signout:hover .sb-label{color:#ff6b6b}
 
-/* ── Layout ── */
+/* â”€â”€ Layout â”€â”€ */
 .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
 .topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
 .topbar-left h1{font-size:17px;font-weight:600;color:var(--text-primary)}
@@ -53,10 +53,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 .topbar-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--page-bg);transition:all .15s}
 .topbar-back:hover{background:#EAECF0;color:var(--text-primary)}
 
-/* ── Content fills remaining space, pushing footer down ── */
+/* â”€â”€ Content fills remaining space, pushing footer down â”€â”€ */
 .content{flex:1;padding:28px 32px;width:100%;display:flex;flex-direction:column}
 
-/* ── Stats grid ── */
+/* â”€â”€ Stats grid â”€â”€ */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;flex-shrink:0}
 .stat-card{background:var(--card-bg);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border);display:flex;align-items:center;gap:16px;transition:transform .18s,box-shadow .18s}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
@@ -69,14 +69,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 .stat-val{font-size:26px;font-weight:700;line-height:1;color:var(--text-primary)}
 .stat-lbl{font-size:12px;color:var(--text-secondary);margin-top:3px}
 
-/* ── Toolbar (filter bar above table) ── */
+/* â”€â”€ Toolbar (filter bar above table) â”€â”€ */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
 .toolbar input,.toolbar select{padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--card-bg);font-family:var(--font);color:var(--text-primary);transition:border-color .15s}
 .toolbar input{width:260px}
 .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--brand)}
 .count-badge{margin-left:auto;font-size:12px;color:var(--text-muted);white-space:nowrap}
 
-/* ── Table card ── */
+/* â”€â”€ Table card â”€â”€ */
 .card{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column}
 .table-wrap{overflow-x:auto;flex:1}
 table{width:100%;border-collapse:collapse;min-width:900px}
@@ -85,22 +85,22 @@ td{padding:11px 16px;font-size:13px;border-bottom:1px solid #F9FAFB;vertical-ali
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#FAFAFA}
 
-/* ── Badges ── */
+/* â”€â”€ Badges â”€â”€ */
 .badge,.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .badge.ok,.pill-clean{background:#ECFDF5;color:#059669}
 .badge.warn{background:#FFF7ED;color:#EA580C}
 .badge.conn{background:#EFF6FF;color:#3B82F6}
 
-/* ── Role dropdown ── */
+/* â”€â”€ Role dropdown â”€â”€ */
 .role-select{padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font);background:var(--page-bg);color:var(--text-primary);cursor:pointer}
 .role-select:focus{outline:none;border-color:var(--brand)}
 .muted{font-size:11px;color:var(--text-muted);margin-top:2px}
 
-/* ── Links ── */
+/* â”€â”€ Links â”€â”€ */
 .ath{color:var(--brand);text-decoration:none;font-weight:500}
 .ath:hover{text-decoration:underline}
 
-/* ── Tab Bar Styles ── */
+/* â”€â”€ Tab Bar Styles â”€â”€ */
 .tab-bar {
   display: flex;
   gap: 12px;
@@ -133,7 +133,7 @@ tr:hover td{background:#FAFAFA}
   font-weight: 600;
 }
 
-/* ── Button Styles ── */
+/* â”€â”€ Button Styles â”€â”€ */
 .btn {
   padding: 8px 16px;
   border: none;
@@ -187,15 +187,15 @@ tr:hover td{background:#FAFAFA}
   color: #fff;
 }
 
-/* ── Footer ── */
+/* â”€â”€ Footer â”€â”€ */
 .site-footer{width:100%;background:var(--card-bg);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;font-family:var(--font);color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box}
 .site-footer a{color:var(--brand);text-decoration:none;margin-left:14px}
 .site-footer a:hover{text-decoration:underline}
 
-/* ── Spinner ── */
+/* â”€â”€ Spinner â”€â”€ */
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── Responsive ── */
+/* â”€â”€ Responsive â”€â”€ */
 @media(max-width:1100px){.stats-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){
   .sidebar{width:56px}.main{margin-left:56px;flex-direction:column}
@@ -211,7 +211,7 @@ tr:hover td{background:#FAFAFA}
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
+<!-- â”€â”€ Sidebar â”€â”€ -->
 <aside class="sidebar">
   <div class="sb-section">Main</div>
   <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
@@ -219,7 +219,7 @@ tr:hover td{background:#FAFAFA}
   <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
   <a href="athletedtl.html" class="sb-item active"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
   <div class="sb-section" style="margin-top:10px;">Config</div>
-  <a href="ag-config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
+  <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
   <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
   <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
 <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
@@ -229,7 +229,7 @@ tr:hover td{background:#FAFAFA}
   <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
 </aside>
 
-<!-- ── Main ── -->
+<!-- â”€â”€ Main â”€â”€ -->
 <div class="main">
 
   <header class="topbar">
@@ -262,28 +262,28 @@ tr:hover td{background:#FAFAFA}
         <div class="stat-card">
           <div class="stat-icon orange"><i class="ti ti-users"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-total">—</div>
+            <div class="stat-val" id="s-total">â€”</div>
             <div class="stat-lbl">Total registered</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple"><i class="ti ti-brand-strava"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-connected">—</div>
+            <div class="stat-val" id="s-connected">â€”</div>
             <div class="stat-lbl">Strava connected</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green"><i class="ti ti-run"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-active">—</div>
+            <div class="stat-val" id="s-active">â€”</div>
             <div class="stat-lbl">Have activities</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon blue"><i class="ti ti-map-pin"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-km">—</div>
+            <div class="stat-val" id="s-km">â€”</div>
             <div class="stat-lbl">Total km</div>
           </div>
         </div>
@@ -395,7 +395,7 @@ tr:hover td{background:#FAFAFA}
               </tr>
             </thead>
             <tbody id="participants-body">
-              <tr><td colspan="10" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+              <tr><td colspan="10" style="text-align:center;padding:48px;color:var(--text-muted)">Loadingâ€¦</td></tr>
             </tbody>
           </table>
         </div>
@@ -405,7 +405,7 @@ tr:hover td{background:#FAFAFA}
     <!-- New Requests Container Tab -->
     <div id="requests-container" style="display:none;">
       <div class="note" style="background:#FFF7ED;border:1px solid #FFEDD5;color:#C2410C;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:20px;line-height:1.5;">
-        Approval requires the participant's <strong>Strava Athlete ID</strong>. After approval, the request is added to the registration table with role <strong>user</strong>, then the participant can login using Existing Participant → Connect with Strava.
+        Approval requires the participant's <strong>Strava Athlete ID</strong>. After approval, the request is added to the registration table with role <strong>user</strong>, then the participant can login using Existing Participant â†’ Connect with Strava.
       </div>
 
       <!-- Stats Grid -->
@@ -413,28 +413,28 @@ tr:hover td{background:#FAFAFA}
         <div class="stat-card">
           <div class="stat-icon orange"><i class="ti ti-history"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-req-total">—</div>
+            <div class="stat-val" id="s-req-total">â€”</div>
             <div class="stat-lbl">Total requests</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple"><i class="ti ti-loader"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-req-pending">—</div>
+            <div class="stat-val" id="s-req-pending">â€”</div>
             <div class="stat-lbl">Pending</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green"><i class="ti ti-circle-check"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-req-approved">—</div>
+            <div class="stat-val" id="s-req-approved">â€”</div>
             <div class="stat-lbl">Approved</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon red"><i class="ti ti-circle-x"></i></div>
           <div class="stat-body">
-            <div class="stat-val" id="s-req-rejected">—</div>
+            <div class="stat-val" id="s-req-rejected">â€”</div>
             <div class="stat-lbl">Rejected</div>
           </div>
         </div>
@@ -473,7 +473,7 @@ tr:hover td{background:#FAFAFA}
   </div><!-- /content -->
 
   <footer class="site-footer">
-    <span>© 2026 Arcgate Walkathon</span>
+    <span>Â© 2026 Arcgate Walkathon</span>
     <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
   </footer>
 
@@ -519,16 +519,16 @@ function renderRows(rows) {
     ? rows.map((p, i) => `<tr>
         <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
         <td>
-          <a class="ath" target="_blank" href="https://www.strava.com/athletes/${p.strava_athlete_id}">${esc(p.full_name || '—')}</a>
+          <a class="ath" target="_blank" href="https://www.strava.com/athletes/${p.strava_athlete_id}">${esc(p.full_name || 'â€”')}</a>
           <div class="muted">${esc(p.email || '')}</div>
         </td>
         <td>${roleDrop(p)}</td>
-        <td>${esc(p.leaderboard_team || '—')}</td>
-        <td>${esc(p.shift || '—')}</td>
-        <td>${esc(p.gender || '—')}</td>
+        <td>${esc(p.leaderboard_team || 'â€”')}</td>
+        <td>${esc(p.shift || 'â€”')}</td>
+        <td>${esc(p.gender || 'â€”')}</td>
         <td>
           <div style="display:flex;align-items:center;gap:6px;">
-            <span class="badge ${p.connected ? 'conn' : 'warn'}">${p.connected ? '✓ Connected' : 'Not yet'}</span>
+            <span class="badge ${p.connected ? 'conn' : 'warn'}">${p.connected ? 'âœ“ Connected' : 'Not yet'}</span>
             ${p.connected ? `<a href="javascript:void(0)" onclick="revokeStrava('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Revoke</a>` : ''}
           </div>
         </td>
@@ -539,7 +539,7 @@ function renderRows(rows) {
           </div>
         </td>
         <td>
-          ${p.connected ? `<a href="javascript:void(0)" id="sync-btn-${p.strava_athlete_id}" onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: var(--brand); text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232, 98, 42, 0.2); background: rgba(232, 98, 42, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(232,98,42,0.15)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='rgba(232,98,42,0.05)';this.style.borderColor='rgba(232, 98, 42, 0.2)'">Sync</a>` : '—'}
+          ${p.connected ? `<a href="javascript:void(0)" id="sync-btn-${p.strava_athlete_id}" onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: var(--brand); text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232, 98, 42, 0.2); background: rgba(232, 98, 42, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(232,98,42,0.15)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='rgba(232,98,42,0.05)';this.style.borderColor='rgba(232, 98, 42, 0.2)'">Sync</a>` : 'â€”'}
         </td>
         <td><span class="badge ${p.cnt > 0 ? 'ok' : 'warn'}">${p.cnt > 0 ? 'Active' : 'Pending'}</span></td>
       </tr>`).join('')
@@ -570,7 +570,7 @@ async function saveRole(id, newRole) {
   const old  = sel.dataset.current;
   if (!confirm('Change role to ' + newRole + '?')) { sel.value = old; return; }
   try {
-    note.textContent = 'Saving…';
+    note.textContent = 'Savingâ€¦';
     const r = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + encodeURIComponent(id), {
       method: 'PATCH',
       headers: { ...HDR, Prefer: 'return=representation' },
@@ -583,11 +583,11 @@ async function saveRole(id, newRole) {
     const row = allRows.find(x => String(x.strava_athlete_id) === String(id));
     if (row) row.role = newRole;
     sel.dataset.current = newRole;
-    note.textContent = 'Saved ✅';
+    note.textContent = 'Saved âœ…';
     setTimeout(() => { note.textContent = ''; }, 2500);
   } catch(e) {
     sel.value = old;
-    note.textContent = 'Not saved ❌';
+    note.textContent = 'Not saved âŒ';
     alert('Role not saved: ' + e.message);
   }
 }
@@ -647,12 +647,12 @@ async function updateRateLimitDashboard() {
       currentKillSwitchState = d.killSwitchActive;
       const ksBtn = document.getElementById('kill-switch-btn');
       if (currentKillSwitchState) {
-        ksBtn.textContent = '▶️ Resume Strava API Calls';
+        ksBtn.textContent = 'â–¶ï¸ Resume Strava API Calls';
         ksBtn.style.background = 'rgba(16, 185, 129, 0.1)';
         ksBtn.style.color = '#10B981';
         ksBtn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
       } else {
-        ksBtn.textContent = '🛑 Stop Strava API Calls';
+        ksBtn.textContent = 'ðŸ›‘ Stop Strava API Calls';
         ksBtn.style.background = 'rgba(239, 68, 68, 0.1)';
         ksBtn.style.color = '#EF4444';
         ksBtn.style.border = '1px solid rgba(239, 68, 68, 0.2)';
@@ -707,13 +707,13 @@ async function updateRateLimitDashboard() {
         banner.style.background = 'rgba(245, 158, 11, 0.08)';
         banner.style.border = '1px solid rgba(245, 158, 11, 0.15)';
         banner.style.color = '#F59E0B';
-        icon.textContent = '⚠';
+        icon.textContent = 'âš ';
         text.textContent = 'Strava API calls are suspended by Administrator';
       } else if (status.state === 'error') {
         banner.style.background = 'rgba(239, 68, 68, 0.08)';
         banner.style.border = '1px solid rgba(239, 68, 68, 0.15)';
         banner.style.color = '#EF4444';
-        icon.textContent = '❌';
+        icon.textContent = 'âŒ';
         
         const dateStr = status.lastErrorTime ? new Date(status.lastErrorTime).toLocaleTimeString() : '';
         text.textContent = `API Call Failed: ${status.lastError || 'Unknown error'} ${dateStr ? 'at ' + dateStr : ''}`;
@@ -721,7 +721,7 @@ async function updateRateLimitDashboard() {
         banner.style.background = 'rgba(16, 185, 129, 0.08)';
         banner.style.border = '1px solid rgba(16, 185, 129, 0.15)';
         banner.style.color = '#10B981';
-        icon.textContent = '✓';
+        icon.textContent = 'âœ“';
         text.textContent = 'Strava API calls are working fine';
       }
     }
@@ -788,7 +788,7 @@ async function syncActivities(athleteId, name) {
     const d = await res.json();
     if (!res.ok || !d.success) throw new Error(d.error || 'Failed to sync');
     
-    btn.textContent = 'Success ✅';
+    btn.textContent = 'Success âœ…';
     btn.style.color = '#10B981';
     btn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
     btn.style.background = 'rgba(16, 185, 129, 0.05)';
@@ -797,7 +797,7 @@ async function syncActivities(athleteId, name) {
     
     await loadParticipants();
   } catch(e) {
-    btn.textContent = 'Failed ❌';
+    btn.textContent = 'Failed âŒ';
     btn.style.color = '#EF4444';
     btn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
     btn.style.background = 'rgba(239, 68, 68, 0.05)';
@@ -902,7 +902,7 @@ function exportCSV() {
   a.click(); URL.revokeObjectURL(url);
 }
 
-// ── Tab Management and Merged Requests Logic ──
+// â”€â”€ Tab Management and Merged Requests Logic â”€â”€
 
 let currentTab = 'participants';
 function switchTab(t) {
@@ -931,7 +931,7 @@ function switchTab(t) {
 let allRequestRows = [];
 
 function fmtReqDate(d) { 
-  return d ? new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'; 
+  return d ? new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'â€”'; 
 }
 
 async function loadRequests() {
@@ -1020,14 +1020,14 @@ function renderRequestRows(rows) {
       <td>${r.id}</td>
       <td>${getStatusBadge(st)}</td>
       <td><strong>${esc(r.full_name)}</strong></td>
-      <td>${esc(r.emp_code || '—')}</td>
-      <td>${esc(r.gender || '—')}</td>
-      <td>${esc(r.event_name || '—')}</td>
-      <td>${esc(r.email || '—')}</td>
-      <td>${esc(r.whatsapp || '—')}</td>
-      <td>${esc(r.shift || '—')}</td>
-      <td>${esc(r.team_lead || '—')}</td>
-      <td>${esc(r.tshirt_size || '—')}</td>
+      <td>${esc(r.emp_code || 'â€”')}</td>
+      <td>${esc(r.gender || 'â€”')}</td>
+      <td>${esc(r.event_name || 'â€”')}</td>
+      <td>${esc(r.email || 'â€”')}</td>
+      <td>${esc(r.whatsapp || 'â€”')}</td>
+      <td>${esc(r.shift || 'â€”')}</td>
+      <td>${esc(r.team_lead || 'â€”')}</td>
+      <td>${esc(r.tshirt_size || 'â€”')}</td>
       <td>${fmtReqDate(r.created_at)}</td>
       <td><div style="display:flex;gap:6px;">${actions}</div></td>
     </tr>`;
@@ -1052,14 +1052,14 @@ async function approveRequest(id) {
     });
     const d = await res.json();
     if (d.success) { 
-      alert(`✅ Approved! ${r.full_name} (Athlete ID: ${d.athlete_id}) can now sign in with Strava.`); 
+      alert(`âœ… Approved! ${r.full_name} (Athlete ID: ${d.athlete_id}) can now sign in with Strava.`); 
       loadRequests(); 
       loadParticipants();
     } else {
       throw new Error(d.error || 'Unknown error');
     }
   } catch(e) { 
-    alert('❌ Error: ' + e.message); 
+    alert('âŒ Error: ' + e.message); 
   }
 }
 
@@ -1086,7 +1086,7 @@ async function rejectRequest(id) {
       throw new Error(d.error || 'Unknown error');
     }
   } catch(e) { 
-    alert('❌ Error: ' + e.message); 
+    alert('âŒ Error: ' + e.message); 
   }
 }
 
