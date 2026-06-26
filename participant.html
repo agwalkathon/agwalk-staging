@@ -2221,7 +2221,12 @@ async function load(isBackgroundRefresh) {
         var d = await res.json();
         if (d.success && d.authorized) {
           window.setStravaConnectedState();
+          window.isStravaConnected = true;
+        } else {
+          window.isStravaConnected = false;
         }
+        updateInAppNotificationBanner();
+        renderNotifications();
       } catch (err) {
         console.warn('Silent connection check failed:', err);
       }
