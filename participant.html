@@ -354,20 +354,80 @@
     .acts-inner{display:none;border-top:1px solid var(--border);}
     .date-group.open .acts-inner{display:block;}
 
+    /* WHOOP Date Row Styles */
+    .whoop-date-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .whoop-date-num {
+      font-size: 19px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+    }
+    .whoop-date-month {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--brand);
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .whoop-stats-box {
+      display: flex;
+      flex: 1;
+      gap: 16px;
+      margin-left: 12px;
+      align-items: center;
+    }
+    .whoop-stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .whoop-stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .whoop-stat-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+
     /* ── WHOOP-style act tile ── */
     .act-tile{display:flex;align-items:center;gap:12px;padding:12px 24px 12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;}
     .act-tile:last-child{border-bottom:none;}
     .act-tile-icon{
-      height:32px;padding-left:12px;border-radius:8px;flex-shrink:0;
+      height:32px;padding:0 12px;border-radius:8px;flex-shrink:0;
       display:flex;align-items:center;justify-content:flex-start;gap:6px;
       font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.3px;
-      width:145px;box-sizing:border-box;
+      width:auto;min-width:145px;box-sizing:border-box;
     }
     .act-tile-icon.walk{background:#10B981;}
     .act-tile-icon.run{background:#0082F0;}
     .act-tile-icon.ride{background:#D97706;}
     .act-tile-icon.hike{background:#8B5CF6;}
     .act-tile-icon.other{background:#4B5563;}
+
+    /* Sporty activity card borders and backgrounds */
+    .act-tile.walk { border-left: 4px solid #10B981; background: rgba(16, 185, 129, 0.03); }
+    .act-tile.run  { border-left: 4px solid #0082F0; background: rgba(0, 130, 240, 0.03); }
+    .act-tile.ride { border-left: 4px solid #D97706; background: rgba(217, 119, 6, 0.03); }
+    .act-tile.hike { border-left: 4px solid #8B5CF6; background: rgba(139, 92, 246, 0.03); }
+    .act-tile.other { border-left: 4px solid #4B5563; background: rgba(75, 85, 99, 0.03); }
+
     .act-tile-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
     .act-tile-sport{font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.5px;}
     .act-tile-name{font-size:12px;font-weight:500;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1164,6 +1224,17 @@ document.addEventListener('click', function(e) {
     <div class="tab-you-tags" id="you-tags"></div>
   </div>
 
+  <!-- Connect with Strava Button (Moved here) -->
+  <div style="margin-top:12px; margin-bottom:16px;">
+    <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)" onclick="handleStravaConnect(event)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
+      </svg>
+      Connect with Strava
+    </a>
+    <div id="strava-connect-msg" style="margin-top: 8px; font-size: 13px; font-weight: 500; display: none; padding: 10px 12px; border-radius: 8px; border: 1px solid transparent; text-align: center;"></div>
+  </div>
+
   <!-- Card 1: Event Progress -->
   <div class="sec">Event Progress</div>
   <div class="you-cards">
@@ -1252,16 +1323,7 @@ document.addEventListener('click', function(e) {
     </div>
   </div>
 
-  <!-- Connect with Strava Button -->
-  <div style="margin-top:16px; margin-bottom:8px;">
-    <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)" onclick="handleStravaConnect(event)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
-      </svg>
-      Connect with Strava
-    </a>
-    <div id="strava-connect-msg" style="margin-top: 8px; font-size: 13px; font-weight: 500; display: none; padding: 10px 12px; border-radius: 8px; border: 1px solid transparent; text-align: center;"></div>
-  </div>
+
 
   <!-- Profile Details — collapsed by default -->
   <div style="margin-top:8px;">
@@ -2904,10 +2966,18 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
 
     var group=document.createElement('div'); group.className='date-group' + (dayActs.length > 1 ? ' multi-activity' : ''); group.id='dg-'+gi;
     var dateRow=document.createElement('div'); dateRow.className='date-row';
-    dateRow.innerHTML='<div class="date-col"><div class="date-label">'+esc(dateStr)+'<span style="color:var(--muted);font-weight:500;font-size:14px;"> | '+actCountStr+'</span></div></div>'+
-      '<div style="font-size:13px;font-weight:700;color:var(--muted);margin-right:4px;white-space:nowrap;display:flex;align-items:center;">'+
-        esc(dayDistStr)+' | '+esc(dayStepsStr)+
-      '</div>'+
+    
+    var shortMonth = dM.substring(0, 3).toUpperCase();
+    dateRow.innerHTML =
+      '<div class="whoop-date-box">' +
+        '<span class="whoop-date-num">' + dN + '</span>' +
+        '<span class="whoop-date-month">' + esc(shortMonth) + '</span>' +
+      '</div>' +
+      '<div class="whoop-stats-box">' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + (daySteps >= 1000 ? (daySteps/1000).toFixed(1).replace('.0','') + 'k' : daySteps) + '</span><span class="whoop-stat-lbl">STEPS</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + actCountStr.replace('x', '') + '</span><span class="whoop-stat-lbl">ACTS</span></div>' +
+      '</div>' +
       '<div class="date-chevron">▼</div>';
     dateRow.addEventListener('click',(function(id){return function(){toggleDay(id);}})('dg-'+gi));
     group.appendChild(dateRow);
@@ -2924,17 +2994,15 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
       var actUrl='https://www.strava.com/activities/'+a.strava_activity_id;
       var tc=tileClass(a.sport_type),isFlag=a.is_flagged;
       var timeStr=(a.activity_date&&a.activity_date.indexOf('T')>-1)?fmtTime(a.activity_date, a.start_time):'';
-      var item=document.createElement('div'); item.className='act-tile';
+      var item=document.createElement('div'); item.className='act-tile ' + tc;
       item.innerHTML=
-        '<div class="act-tile-icon '+tc+'">'+renderIcon(a.sport_type)+' <span>'+sportStr+' · '+stepsStr+'</span></div>'+
+        '<div class="act-tile-icon '+tc+'">'+renderIcon(a.sport_type)+' <span>'+sportStr+' · '+stepsStr+' Steps</span></div>'+
         '<div class="act-tile-body">'+
           '<a class="act-tile-name" href="'+actUrl+'" target="_blank" style="text-decoration:none;color:#fff;font-size:14px;font-weight:700;">'+esc(a.activity_name||'Activity')+'</a>'+
           '<div class="act-tile-meta">'+(timeStr?timeStr+' · ':'')+dur+' · '+ps+'</div>'+
         '</div>'+
         '<div class="act-tile-right">'+
-          '<div class="act-tile-dist">'+km+'</div>'+
-          '<div class="act-tile-dist-lbl">km</div>'+
-          (function(){var ab2=actBreakdown[a.strava_activity_id]||{challenges:[]};var ac=ab2.challenges||[];var acp=ac.reduce(function(s,c){return s+(c.pts||0);},0);return acp>0?'<div style="font-size:10px;font-weight:700;color:var(--gold);margin-top:2px;">+'+acp.toFixed(1)+' ch</div>':'';})()+
+          '<div class="act-tile-dist">'+km+' <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:lowercase;margin-left:2px;">km</span></div>'+
           '<div class="act-tile-flag '+(isFlag?'flag-bad':'flag-valid')+'">'+(isFlag?'⚑ Flagged':'✓ Valid')+'</div>'+
         '</div>'+
         '<div class="act-tile-bar '+tc+'"></div>';
@@ -3263,10 +3331,10 @@ var _activeInsight  = null;   // {key, title, body, emoji}
  * it changes (notifications use their DB id, recovery/insight use a daily key).
  */
 function _bannerDismissed(key) {
-  try { return localStorage.getItem('agwalk_banner_dismiss_' + key) === '1'; } catch(e) { return false; }
+  try { return localStorage.getItem('agdismiss_banner_dismiss_' + key) === '1'; } catch(e) { return false; }
 }
 function _markBannerDismissed(key) {
-  try { localStorage.setItem('agwalk_banner_dismiss_' + key, '1'); } catch(e) {}
+  try { localStorage.setItem('agdismiss_banner_dismiss_' + key, '1'); } catch(e) {}
 }
 
 function dismissInAppBanner(e) {
@@ -3275,7 +3343,26 @@ function dismissInAppBanner(e) {
   if (!banner) return;
   // Read which key is currently shown
   var key = banner.getAttribute('data-banner-key') || '';
-  if (key) _markBannerDismissed(key);
+  if (key) {
+    _markBannerDismissed(key);
+    if (key.indexOf('notif_') === 0) {
+      var notifId = key.substring(6);
+      fetch(BACKEND + '/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: notifId })
+      }).catch(function(err){});
+      
+      // Also update local list so we don't count it unread in dropdown badge
+      for (var i = 0; i < _notificationsList.length; i++) {
+        if (String(_notificationsList[i].id || _notificationsList[i].created_at || i) === notifId) {
+          _notificationsList[i].is_read = true;
+          break;
+        }
+      }
+      renderNotifications();
+    }
+  }
   // Slide out, then re-evaluate (might show the next item)
   banner.classList.add('hiding');
   setTimeout(function() {
@@ -3529,9 +3616,9 @@ async function clearNotifications(e) {
 
 async function checkMilestoneNotifications(athleteId, currentRank, currentPoints, currentGender, myActs, reg) {
   try {
-    var keyRank = 'agwalk_prev_rank_' + athleteId;
-    var keyMedals = 'agwalk_prev_medals_' + athleteId;
-    var keyChallenges = 'agwalk_prev_challenges_' + athleteId;
+    var keyRank = 'agprev_prev_rank_' + athleteId;
+    var keyMedals = 'agprev_prev_medals_' + athleteId;
+    var keyChallenges = 'agprev_prev_challenges_' + athleteId;
 
     var prevRank = localStorage.getItem(keyRank);
     var prevMedalsRaw = localStorage.getItem(keyMedals);
@@ -3794,6 +3881,11 @@ function renderRows(rows, prevRanks) {
   }
 
   rows.forEach(function(r, i) {
+    var isMe = String(r.p.strava_athlete_id) === meId;
+    if (isMe && myRank > 3) {
+      return; // Skip rendering user at their actual position since they are pinned after Rank 3
+    }
+    
     var rowEl = buildRowElement(r, i, false);
     list.appendChild(rowEl);
     
