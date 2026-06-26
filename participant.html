@@ -3347,6 +3347,7 @@ function clearPWACache(){
 }
 
 var _notificationsList = [];
+var _notificationsLoaded = false;
 var _activeRecovery = null;   // {key, title, sub, chips}
 var _activeInsight  = null;   // {key, title, body, emoji}
 
@@ -3516,7 +3517,11 @@ async function loadNotifications() {
     var data = await res.json();
     if (data.success && Array.isArray(data.notifications)) {
       _notificationsList = data.notifications;
+      _notificationsLoaded = true;
       renderNotifications();
+      if (typeof myActs !== 'undefined' && myActs && myActs.length > 0) {
+        renderStanding();
+      }
     }
   } catch (e) {
     console.warn('Failed to load notifications:', e);
@@ -3574,7 +3579,9 @@ function renderNotifications() {
     });
   }
 
-  var unreadCount = displayList.filter(function(n) { return !n.is_read; }).length;
+  // Filter displayList to only show unread notifications in the dropdown list
+  var unreadList = displayList.filter(function(n) { return !n.is_read; });
+  var unreadCount = unreadList.length;
   
   if (badge) {
     if (unreadCount > 0) {
@@ -3584,14 +3591,14 @@ function renderNotifications() {
     }
   }
 
-  if (displayList.length === 0) {
+  if (unreadList.length === 0) {
     listEl.innerHTML = '';
     listEl.style.display = 'none';
     emptyEl.style.display = 'block';
   } else {
     emptyEl.style.display = 'none';
     listEl.style.display = 'block';
-    listEl.innerHTML = displayList.map(function(n) {
+    listEl.innerHTML = unreadList.map(function(n) {
       var emoji = n.is_virtual ? '🧡' : getNotifEmoji(n.title, n.body);
       var timeStr = n.is_virtual ? 'Action Required' : timeAgo(n.created_at);
       
@@ -3629,17 +3636,20 @@ async function clearNotifications(e) {
     });
     var data = await res.json();
     if (data.success) {
-      _notificationsList = [];
+      _notificationsList.forEach(function(n) { n.is_read = true; });
       renderNotifications();
     }
   } catch (e) {
     console.warn('Failed to clear notifications:', e);
-    _notificationsList = [];
+    _notificationsList.forEach(function(n) { n.is_read = true; });
     renderNotifications();
   }
 }
 
 async function checkMilestoneNotifications(athleteId, currentRank, currentPoints, currentGender, myActs, reg) {
+  // Wait until historical notifications are loaded from DB to prevent race condition/duplicate triggers
+  if (!_notificationsLoaded) return;
+
   try {
     var keyRank = 'agprev_prev_rank_' + athleteId;
     var keyMedals = 'agprev_prev_medals_' + athleteId;
@@ -3669,7 +3679,11 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     // Newly unlocked medals
     for (var i = 0; i < currentMedals.length; i++) {
       var mKey = currentMedals[i];
-      if (prevMedals.indexOf(mKey) === -1) {
+      var searchTitle = mKey === 'medal_bronze' ? 'Bronze Medal' : mKey === 'medal_silver' ? 'Silver Medal' : 'Gold Medal';
+      var alreadyNotifiedDb = _notificationsList.some(function(n) {
+        return n.title && n.title.indexOf(searchTitle) !== -1;
+      });
+      if (prevMedals.indexOf(mKey) === -1 && !alreadyNotifiedDb) {
         await fetch(BACKEND + '/push/trigger', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -3686,7 +3700,10 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
         var qualifies = myActs.some(function(act) { return checkChallengeSingle(act, c); });
         if (qualifies) {
           completedChallenges.push(c.id);
-          if (prevChallenges.indexOf(c.id) === -1) {
+          var alreadyNotifiedDb = _notificationsList.some(function(n) {
+            return n.title && n.title.indexOf(c.name) !== -1;
+          });
+          if (prevChallenges.indexOf(c.id) === -1 && !alreadyNotifiedDb) {
             fetch(BACKEND + '/push/trigger', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
