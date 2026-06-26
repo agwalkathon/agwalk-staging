@@ -2996,6 +2996,12 @@ async function load(isBackgroundRefresh) {
       myActs.forEach(function(a) {
         var mb = parseFloat(a.manual_bonus) || 0;
         if (mb > 0) {
+          // If this manual bonus corresponds to an existing challenge, skip it to prevent duplicates
+          var matchedCh = CHALLENGES_LB.find(function(ch) {
+            return ch.name === a.description;
+          });
+          if (matchedCh) return;
+
           var date = (a.activity_date || '').split('T')[0];
           combined.push({
             id: 'manual_' + a.strava_activity_id,
