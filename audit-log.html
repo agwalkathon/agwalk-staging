@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audit Log — Arcgate Walkathon 2026</title>
+  <title>Audit Log â€” Arcgate Walkathon 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -144,7 +144,7 @@
   <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
 
   <div class="sb-section" style="margin-top:10px;">Config</div>
-  <a href="ag-config.html"           class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
+  <a href="config.html"           class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
   <a href="data-upload.html"         class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
   <a href="email-send.html"          class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
   <a href="audit-log.html"           class="sb-item active"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
@@ -188,7 +188,7 @@
           <div class="card-header-icon"><i class="ti ti-shield-check"></i></div>
           <div>
             <h2>Security Events</h2>
-            <div class="card-header-sub">Last 500 events · newest first</div>
+            <div class="card-header-sub">Last 500 events Â· newest first</div>
           </div>
         </div>
       </div>
@@ -203,7 +203,7 @@
             </tr>
           </thead>
           <tbody id="log-body">
-            <tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>
+            <tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>
           </tbody>
         </table>
       </div>
@@ -211,14 +211,14 @@
   </div>
 
   <footer class="site-footer">
-    <span>Arcgate Walkathon 2026 — Admin</span>
+    <span>Arcgate Walkathon 2026 â€” Admin</span>
     <span><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></span>
   </footer>
 </div>
 
 <script>
 /* audit-log v5 */
-// Inline authGuard — no _nav.js dependency
+// Inline authGuard â€” no _nav.js dependency
 var _BU = 'https://walkathon-backend-hv9j.onrender.com';
 function authGuard() {
   var t = sessionStorage.getItem('wk_admin_token');
@@ -249,7 +249,7 @@ var LABELS = { admin_login:'Admin Login', bulk_import:'Bulk Import', participant
 
 async function loadLog() {
   var tbody = document.getElementById('log-body');
-  tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>';
   try {
     var res = await fetch(_BU + '/audit-log', {
       headers: { 'Authorization': 'Bearer ' + ADMIN_SECRET }
@@ -295,10 +295,10 @@ function renderRows(rows) {
     var action  = r.action ? String(r.action) : '';
     var cls     = LABELS[action] ? 'action-' + action : 'action-default';
     var icon    = ICONS[action]  || 'ti-activity';
-    var label   = LABELS[action] || action || '—';
-    var details = r.details ? (typeof r.details === 'string' ? r.details : JSON.stringify(r.details)) : '—';
-    var ip      = r.ip ? String(r.ip).split(',')[0].trim() : '—';
-    var timeStr = '—';
+    var label   = LABELS[action] || action || 'â€”';
+    var details = r.details ? (typeof r.details === 'string' ? r.details : JSON.stringify(r.details)) : 'â€”';
+    var ip      = r.ip ? String(r.ip).split(',')[0].trim() : 'â€”';
+    var timeStr = 'â€”';
     if (r.created_at) {
       try { timeStr = new Date(r.created_at).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }); } catch(ex) {}
     }
