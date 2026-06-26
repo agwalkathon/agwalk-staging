@@ -93,10 +93,24 @@
     .note a:hover{color:#E8622A;}
     .note span{color:rgba(255,255,255,0.1);margin:0 4px;}
 
-    .field-hint{margin-top:7px;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.2px;}
-    .hint-code{font-family:'Courier New',monospace;color:rgba(232,98,42,0.7);font-weight:600;letter-spacing:1px;}
-
-    .points,.distance,.rank,td,th{font-variant-numeric:tabular-nums;}
+    .resend-container {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .resend-link {
+      color: #E8622A;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .resend-link.disabled {
+      color: rgba(255, 255, 255, 0.25);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -106,15 +120,44 @@
   <h1>Healthy Arcgatians.<br><span style="display:block;margin-top:6px;"><em>Stronger Arcgate.</em></span></h1>
   <p class="sub">A whole month to move, connect and grow — one kilometre at a time.</p>
 
-  <div class="auth">
+  <div class="auth" style="opacity: 0;">
     <div class="login-card">
-      <div class="login-title">Participant Login</div>
-      <div class="field-wrap">
-        <label>Employee Code</label>
-        <input type="text" id="emp-code" placeholder="EMP-05-00123-PM" autocomplete="off" autocapitalize="characters" spellcheck="false">
-        <div class="field-hint">Format: <span class="hint-code">EMP-05-00123-PM</span></div>
+      <div class="login-title" id="login-card-title">Participant Login</div>
+      
+      <!-- Stage 1: Employee Code -->
+      <div id="stage-emp">
+        <div class="field-wrap">
+          <label>Employee Code</label>
+          <input type="text" id="emp-code" placeholder="EMP-05-00123-PM" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <div class="field-hint">Format: <span class="hint-code">EMP-05-00123-PM</span></div>
+        </div>
+        <button class="btn-login" id="btn-login" onclick="doLogin()">View My Dashboard</button>
       </div>
-      <button class="btn-login" id="btn-login" onclick="doLogin()">View My Dashboard</button>
+
+      <!-- Stage 2: Email OTP Request -->
+      <div id="stage-email-request" class="hidden">
+        <div class="field-wrap">
+          <label for="email-input">Registered Email</label>
+          <input type="email" id="email-input" placeholder="yourname@arcgate.com" autocomplete="email" spellcheck="false">
+          <div class="field-hint">Enter your registered walkathon email address</div>
+        </div>
+        <button class="btn-login" id="btn-send" onclick="sendOTP()">Send OTP Code</button>
+      </div>
+
+      <!-- Stage 3: Email OTP Verification -->
+      <div id="stage-email-verify" class="hidden">
+        <div class="field-wrap">
+          <label for="otp-input">Verification Code</label>
+          <input type="text" id="otp-input" placeholder="123456" autocomplete="one-time-code" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          <div class="field-hint">Enter the 6-digit code sent to your email</div>
+        </div>
+        <button class="btn-login" id="btn-verify" onclick="verifyOTP()">Verify & Login</button>
+        <div class="resend-container">
+          Didn't receive code? <span id="resend-timer" class="resend-link disabled">Resend OTP</span>
+        </div>
+      </div>
+
+      <!-- General Feedback -->
       <div class="proc" id="proc"><div class="spinner"></div><span id="proc-text">Verifying...</span></div>
       <div class="err" id="err"></div>
     </div>
@@ -125,7 +168,7 @@
       <a href="terms.html">Terms</a> <span>·</span>
       <a href="admin-login.html">Admin</a> <span>·</span>
       <a href="new-participant.html">New Participant</a> <span>·</span>
-      <a href="email-login.html">Login with Email</a>
+      <a href="#" id="toggle-method-link" onclick="toggleMethod(event)">Login with Email OTP</a>
     </p>
   </div>
 </div>
@@ -138,18 +181,221 @@ var BACKEND='https://walkathon-backend-hv9j.onrender.com';
 var REDIRECT=window.location.origin+window.location.pathname;
 var AUTH_URL='https://www.strava.com/oauth/authorize?client_id='+CLIENT_ID+'&redirect_uri='+encodeURIComponent(REDIRECT)+'&response_type=code&scope=read,activity:read&state=walkathon2026';
 
+var currentMethod = 'emp_code';
+var countdownInterval = null;
+var resendCooldown = 60; // 60 seconds
+
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
+
 function showErr(msg){
   document.getElementById('proc').style.display='none';
   document.getElementById('btn-login').disabled=false;
+  document.getElementById('btn-send').disabled=false;
+  document.getElementById('btn-verify').disabled=false;
   var el=document.getElementById('err');
   el.innerHTML=msg;
   el.style.display='block';
 }
+
 function showProc(text){
   document.getElementById('btn-login').disabled=true;
+  document.getElementById('btn-send').disabled=true;
+  document.getElementById('btn-verify').disabled=true;
   document.getElementById('proc').style.display='flex';
   document.getElementById('proc-text').textContent=text;
   document.getElementById('err').style.display='none';
+}
+
+function hideProc() {
+  document.getElementById('btn-login').disabled=false;
+  document.getElementById('btn-send').disabled=false;
+  document.getElementById('btn-verify').disabled=false;
+  document.getElementById('proc').style.display='none';
+}
+
+function switchUI(method) {
+  currentMethod = method;
+  var empStage = document.getElementById('stage-emp');
+  var reqStage = document.getElementById('stage-email-request');
+  var verStage = document.getElementById('stage-email-verify');
+  var toggleLink = document.getElementById('toggle-method-link');
+  var titleEl = document.getElementById('login-card-title');
+  
+  // Clear status
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('proc').style.display = 'none';
+  
+  // Re-enable
+  document.getElementById('btn-login').disabled = false;
+  document.getElementById('btn-send').disabled = false;
+  document.getElementById('btn-verify').disabled = false;
+  
+  if (method === 'emp_code') {
+    empStage.classList.remove('hidden');
+    reqStage.classList.add('hidden');
+    verStage.classList.add('hidden');
+    if (toggleLink) toggleLink.textContent = 'Login with Email OTP';
+    if (titleEl) titleEl.textContent = 'Participant Login';
+  } else {
+    empStage.classList.add('hidden');
+    reqStage.classList.remove('hidden');
+    verStage.classList.add('hidden');
+    if (toggleLink) toggleLink.textContent = 'Login with Employee Code';
+    if (titleEl) titleEl.textContent = 'Email OTP Login';
+  }
+}
+
+function toggleMethod(e) {
+  if (e) e.preventDefault();
+  if (currentMethod === 'emp_code') {
+    switchUI('email_otp');
+  } else {
+    switchUI('emp_code');
+  }
+}
+
+async function checkLoginMethod() {
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?config_key=eq.login_method&select=config_value', { headers: HDR });
+    var data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      var method = data[0].config_value;
+      switchUI(method);
+    } else {
+      switchUI('emp_code');
+    }
+  } catch (e) {
+    console.error('Error fetching login method config:', e);
+    switchUI('emp_code');
+  }
+  var authCard = document.querySelector('.auth');
+  if (authCard) {
+    authCard.style.opacity = '1';
+    authCard.style.transition = 'opacity 0.25s ease-in-out';
+  }
+}
+checkLoginMethod();
+
+async function sendOTP(){
+  var email = document.getElementById('email-input').value.trim();
+  var inp = document.getElementById('email-input');
+  inp.classList.remove('err-field');
+  document.getElementById('err').style.display='none';
+
+  if (!email || !validateEmail(email)) {
+    inp.classList.add('err-field');
+    inp.focus();
+    showErr('❌ Please enter a valid email address.');
+    return;
+  }
+
+  showProc('Sending OTP to your email...');
+  try {
+    var res = await fetch(BACKEND + '/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await res.json();
+    if (!d.success) {
+      if (d.error === 'not_found') {
+        showErr('⛔ <strong>Email not found.</strong><br>This email is not registered. Please register first.');
+      } else if (d.error === 'smtp_not_configured') {
+        showErr('⚠️ <strong>Email service not ready.</strong><br>Brevo key is not configured. Contact pra@arcgate.com');
+      } else {
+        showErr('❌ <strong>Failed to send OTP.</strong><br>Please try again later.');
+      }
+      return;
+    }
+
+    // Success: transition to OTP verification screen
+    hideProc();
+    document.getElementById('stage-email-request').classList.add('hidden');
+    document.getElementById('stage-email-verify').classList.remove('hidden');
+    document.getElementById('otp-input').focus();
+    startResendTimer();
+  } catch (e) {
+    showErr('❌ Connection error. Please check your network and try again.');
+  }
+}
+
+async function verifyOTP(){
+  var email = document.getElementById('email-input').value.trim();
+  var otp = document.getElementById('otp-input').value.trim();
+  var inp = document.getElementById('otp-input');
+  inp.classList.remove('err-field');
+  document.getElementById('err').style.display='none';
+
+  if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
+    inp.classList.add('err-field');
+    inp.focus();
+    showErr('❌ Please enter the 6-digit numeric OTP.');
+    return;
+  }
+
+  showProc('Verifying OTP...');
+  try {
+    var res = await fetch(BACKEND + '/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, otp: otp })
+    });
+    var d = await res.json();
+    if (!d.success) {
+      if (d.error === 'expired') {
+        showErr('⏳ <strong>OTP Expired.</strong><br>Your login code has expired. Please request a new one.');
+      } else if (d.error === 'incorrect') {
+        showErr('❌ <strong>Incorrect OTP.</strong><br>The code you entered is invalid. Please check and try again.');
+      } else if (d.error === 'invalid_or_expired') {
+        showErr('⚠️ <strong>Session invalid.</strong><br>No active request found for this email. Please request OTP again.');
+      } else {
+        showErr('❌ <strong>Verification failed.</strong><br>Please try again.');
+      }
+      return;
+    }
+
+    showProc('Loading your dashboard...');
+    localStorage.setItem('wk_user', JSON.stringify({
+      loggedIn: true,
+      role: 'user',
+      athleteId: d.athlete_id,
+      name: d.name || 'Participant',
+      expires: Date.now() + (8 * 60 * 60 * 1000)
+    }));
+    window.location.replace('participant.html');
+  } catch (e) {
+    showErr('❌ Connection error. Please try again.');
+  }
+}
+
+function startResendTimer() {
+  var timerEl = document.getElementById('resend-timer');
+  var secondsLeft = resendCooldown;
+  
+  timerEl.classList.add('disabled');
+  timerEl.onclick = null;
+  timerEl.textContent = 'Resend OTP in ' + secondsLeft + 's';
+
+  if (countdownInterval) clearInterval(countdownInterval);
+  
+  countdownInterval = setInterval(function() {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      clearInterval(countdownInterval);
+      timerEl.classList.remove('disabled');
+      timerEl.textContent = 'Resend OTP';
+      timerEl.onclick = function() {
+        sendOTP();
+      };
+    } else {
+      timerEl.textContent = 'Resend OTP in ' + secondsLeft + 's';
+    }
+  }, 1000);
+}
+
+function validateEmail(email) {
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
 
 async function doLogin(){
@@ -192,6 +438,12 @@ async function doLogin(){
 // Allow Enter key
 document.getElementById('emp-code').addEventListener('keydown',function(e){
   if(e.key==='Enter') doLogin();
+});
+document.getElementById('email-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') sendOTP();
+});
+document.getElementById('otp-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') verifyOTP();
 });
 
 // Handle Strava OAuth callback (for future use)
