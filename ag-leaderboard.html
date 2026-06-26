@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -976,15 +976,39 @@ function calcPoints(acts, athleteId, gender, shift) {
     }
   }
 
+  var processedManualActIds = new Set();
+
   myChallenges.forEach(function(c) {
+    var bp = parseFloat(c.bonus_points) || 0;
+    var cName = c.name || 'Challenge';
+
+    if (c.distance_type === 'manual') {
+      // 🎁 MANUAL CHALLENGE FLOW
+      myActs.forEach(function(a) {
+        if (a.description === cName && (parseFloat(a.manual_bonus) > 0)) {
+          totalChallenge += bp;
+          challengeNames.push(cName);
+          processedManualActIds.add(String(a.strava_activity_id));
+          
+          var d = (a.activity_date || '').split('T')[0];
+          if (dayBreakdown[d]) {
+            dayBreakdown[d].challenges.push({name: cName, pts: bp, actId: a.strava_activity_id});
+          }
+          if (!actBreakdown[a.strava_activity_id]) {
+            actBreakdown[a.strava_activity_id] = {challenges:[]};
+          }
+          actBreakdown[a.strava_activity_id].challenges.push({name: cName, pts: bp});
+          applyMaxBaseCap(c, d, a.strava_activity_id);
+        }
+      });
+      return;
+    }
+
     var atype = c.range_split ? 'range-split'
       : c.exclude_normal_bonus ? 'per-act-no-bonus'
       : (c.award_type === 'two-challenges-same-day') ? 'two-challenges-same-day'
       : (parseFloat(c.per_activity_points) > 0 || c.award_type === 'per-act') ? 'per-act'
       : 'one-time';
-
-    var bp = parseFloat(c.bonus_points) || 0;
-    var cName = c.name || 'Challenge';
 
     if (atype === 'two-challenges-same-day') {
       Object.keys(tcActMap).forEach(function(day) {
@@ -1092,6 +1116,7 @@ function calcPoints(acts, athleteId, gender, shift) {
 
   // ── Step 7: manual bonus ────────────────────────────────────────
   myActs.forEach(function(a) {
+    if (processedManualActIds.has(String(a.strava_activity_id))) return;
     var mb = parseFloat(a.manual_bonus) || 0;
     if (!mb) return;
     totalChallenge += mb;
