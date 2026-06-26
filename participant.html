@@ -1446,14 +1446,27 @@ function checkChallengeSingle(act, c) {
 
   // Start time criteria — activity must start AT OR BEFORE this time
   if (c.start_time_criteria) {
-    var timeStr = (act.activity_date || '').split('T')[1] || '';
-    if (timeStr && !timeStr.startsWith('06:30:00')) {
-      var parts    = c.start_time_criteria.split(':');
-      var critMins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
-      var tParts   = timeStr.split(':');
-      var actMins  = parseInt(tParts[0]) * 60 + parseInt(tParts[1] || 0);
-      if (actMins > critMins) return false;
+    // If it's an imported activity (no start_time stored, or it has common placeholder times), skip the time check
+    var timeStr = act.start_time || (act.activity_date || '').split('T')[1] || '';
+    if (!timeStr || timeStr.startsWith('06:30:00') || timeStr.startsWith('17:30:00') || timeStr.startsWith('18:30:00')) {
+      return true;
     }
+    
+    // Clean up AM/PM in criteria if present
+    var critStr = c.start_time_criteria.toUpperCase();
+    var isPM = critStr.indexOf('PM') > -1;
+    var isAM = critStr.indexOf('AM') > -1;
+    var cleanCrit = critStr.replace('AM', '').replace('PM', '').trim();
+    
+    var parts = cleanCrit.split(':');
+    var hr = parseInt(parts[0]) || 0;
+    if (isPM && hr < 12) hr += 12;
+    if (isAM && hr === 12) hr = 0;
+    var critMins = hr * 60 + parseInt(parts[1] || 0);
+    
+    var tParts   = timeStr.split(':');
+    var actMins  = parseInt(tParts[0]) * 60 + parseInt(tParts[1] || 0);
+    if (actMins > critMins) return false;
   }
 
   return true;
