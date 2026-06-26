@@ -1162,7 +1162,7 @@ async function load() {
 
 load();
 checkAllSystemsHealth();
-setInterval(checkAllSystemsHealth, 30000);
+setInterval(checkAllSystemsHealth, 60000);
 
 const healthHistory = {
   backend: [],
@@ -1238,13 +1238,6 @@ async function checkAllSystemsHealth() {
         if (reasonBox) {
           const labelSpan = reasonBox.querySelector('span');
           if (labelSpan) labelSpan.textContent = 'Outage Reason:';
-        }
-        
-        const lastReason = localStorage.getItem(`health_${service}_down_reason`);
-        if (lastReason && reasonEl && reasonBox) {
-          reasonEl.textContent = lastReason;
-          reasonBox.style.display = 'flex';
-        } else if (reasonBox) {
           reasonBox.style.display = 'none';
         }
       }
@@ -1321,7 +1314,7 @@ async function checkAllSystemsHealth() {
   }
   updateUI('supabase', supabaseOk, latencySupabase, supabaseReason, supabaseCustomStatus);
 
-  // 3. Check GitHub API
+  // 3. Check GitHub API (with server status fallback)
   const startGithub = performance.now();
   let githubOk = false, githubReason = '', latencyGithub = null;
   try {
@@ -1333,7 +1326,23 @@ async function checkAllSystemsHealth() {
       githubReason = `HTTP ${res.status}: ${res.statusText}`;
     }
   } catch (err) {
-    githubReason = err.message || 'Network Error';
+    // Direct check failed, fallback to backend health proxy check
+    try {
+      const fallbackRes = await fetch(_BACKEND_URL + '/health');
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.github === 'online') {
+          githubOk = true;
+          githubReason = 'Direct check rate-limited (bypassed via Server)';
+        } else {
+          githubReason = `Direct: ${err.message}. Proxy: GitHub reported offline.`;
+        }
+      } else {
+        githubReason = `Direct: ${err.message}. Proxy status: ${fallbackRes.status}`;
+      }
+    } catch (fallbackErr) {
+      githubReason = `Direct: ${err.message}. Proxy check failed: ${fallbackErr.message}`;
+    }
   }
   updateUI('github', githubOk, latencyGithub, githubReason);
 
