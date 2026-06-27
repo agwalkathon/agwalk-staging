@@ -1876,7 +1876,7 @@ function safeSetStyle(id, prop, val) {
 
 function userGuard() {
   var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
-  if (!s.loggedIn || s.expires < Date.now() || !s.athleteId) { window.location.href = 'index.html'; return null; }
+  if (!s.loggedIn || !s.athleteId) { window.location.href = 'index.html'; return null; }
   return s;
 }
 function logout() { localStorage.removeItem('wk_user'); sessionStorage.removeItem('wk_admin'); window.location.href = 'index.html'; }
