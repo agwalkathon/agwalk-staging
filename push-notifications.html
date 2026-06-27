@@ -189,12 +189,14 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
             <th style="padding: 12px 16px; font-weight: 600; color: var(--sub);">Name</th>
             <th style="padding: 12px 16px; font-weight: 600; color: var(--sub);">Email</th>
             <th style="padding: 12px 16px; font-weight: 600; color: var(--sub);">Athlete ID</th>
+            <th style="padding: 12px 16px; font-weight: 600; color: var(--sub);">Device</th>
             <th style="padding: 12px 16px; font-weight: 600; color: var(--sub);">Subscribed On</th>
+            <th style="padding: 12px 16px; font-weight: 600; color: var(--sub); text-align: right;">Action</th>
           </tr>
         </thead>
         <tbody id="subscribers-list-body">
           <tr>
-            <td colspan="4" style="padding: 20px; text-align: center; color: var(--sub);">Loading subscribers...</td>
+            <td colspan="6" style="padding: 20px; text-align: center; color: var(--sub);">Loading subscribers...</td>
           </tr>
         </tbody>
       </table>
@@ -453,18 +455,40 @@ async function loadSubscribers() {
             '<td style="padding: 12px 16px; font-weight: 600;">' + esc(s.name) + '</td>' +
             '<td style="padding: 12px 16px; color: var(--sub);">' + esc(s.email) + '</td>' +
             '<td style="padding: 12px 16px; font-family: monospace; color: var(--sub);">' + esc(s.athlete_id) + '</td>' +
+            '<td style="padding: 12px 16px; color: var(--sub);">' + esc(s.device_name || 'Unknown Device') + '</td>' +
             '<td style="padding: 12px 16px; color: var(--sub);">' + dateStr + '</td>' +
+            '<td style="padding: 12px 16px; text-align: right;">' +
+              '<button class="btn btn-sm btn-ghost" onclick="deleteSubscriber(\'' + s.athlete_id + '\')" style="color: #dc2626; padding: 4px 8px; font-size: 11px;">Remove</button>' +
+            '</td>' +
           '</tr>';
         }).join('');
       } else {
-        tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--sub);">No subscribed devices found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--sub);">No subscribed devices found.</td></tr>';
       }
     } else {
-      tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #c62828;">Failed to load subscribers.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #c62828;">Failed to load subscribers.</td></tr>';
     }
   } catch (e) {
     var tbody = document.getElementById('subscribers-list-body');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #c62828;">Error loading subscribers: ' + e.message + '</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #c62828;">Error loading subscribers: ' + e.message + '</td></tr>';
+  }
+}
+
+async function deleteSubscriber(athleteId) {
+  if (!confirm('Are you sure you want to remove this subscribed device? This will allow them to re-subscribe.')) return;
+  try {
+    var r = await fetch(BU + '/push/subscribers/' + athleteId, {
+      method: 'DELETE'
+    });
+    var j = await r.json();
+    if (j.success) {
+      alert('Subscription removed successfully!');
+      loadSubscribers();
+    } else {
+      alert('Failed to remove: ' + (j.error || 'unknown'));
+    }
+  } catch(e) {
+    alert('Error: ' + e.message);
   }
 }
 
