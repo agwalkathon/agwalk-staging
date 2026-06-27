@@ -3828,7 +3828,17 @@ function showDateDetails(dateStr) {
             '<div class="detail-item"><span class="detail-label">Pace</span><span class="detail-value">' + ps + '</span></div>' +
             '<div class="detail-item"><span class="detail-label">Moving Time</span><span class="detail-value">' + dur + '</span></div>' +
             '<div class="detail-item"><span class="detail-label">Elapsed Time</span><span class="detail-value">' + ela + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Avg Heart Rate</span><span class="detail-value">' + (a.avg_heart_rate ? Math.round(a.avg_heart_rate) + ' bpm' : '—') + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Max Heart Rate</span><span class="detail-value">' + (a.max_heart_rate ? Math.round(a.max_heart_rate) + ' bpm' : '—') + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Avg Cadence</span><span class="detail-value">' + (a.avg_cadence ? Math.round(a.avg_cadence) + ' rpm' : '—') + '</span></div>' +
             '<div class="detail-item"><span class="detail-label">Device</span><span class="detail-value">' + esc(device) + '</span></div>' +
+          '</div>' +
+          '<div class="detail-divider"></div>' +
+          '<div id="splits-area-' + a.strava_activity_id + '" style="margin-top: 12px; margin-bottom: 12px;">' +
+            '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Splits (per km)</div>' +
+            '<div style="padding:16px 0;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">' +
+              '<i class="ti ti-loader spin"></i> Loading splits…' +
+            '</div>' +
           '</div>' +
           '<div class="detail-divider"></div>' +
           '<div class="detail-status-row">' +
@@ -3854,6 +3864,76 @@ function toggleActCard(actId) {
   var card = document.getElementById('dac-' + actId);
   if (card) {
     card.classList.toggle('open');
+    if (card.classList.contains('open')) {
+      loadSplitsForActivity(actId);
+    }
+  }
+}
+
+async function loadSplitsForActivity(actId) {
+  var area = document.getElementById('splits-area-' + actId);
+  if (!area || area.getAttribute('data-loaded') === 'true') return;
+
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/activity_splits?activity_id=eq.' + actId + '&order=split_number.asc', { headers: HDR });
+    if (!res.ok) throw new Error('Failed to fetch splits');
+    var splits = await res.json();
+    
+    if (!splits || splits.length === 0) {
+      area.innerHTML = 
+        '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Splits (per km)</div>' +
+        '<div style="font-size:13px;color:var(--muted);padding:8px 0;">No splits data available.</div>';
+      area.setAttribute('data-loaded', 'true');
+      return;
+    }
+
+    var tableHtml = 
+      '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Splits (per km)</div>' +
+      '<div class="splits-table-wrapper" style="overflow-x:auto; border:1px solid var(--border); border-radius:8px; background:rgba(0,0,0,0.15);">' +
+        '<table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left; color:var(--text);">' +
+          '<thead>' +
+            '<tr style="border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--muted); font-weight:700;">' +
+              '<th style="padding:8px 10px;">Split #</th>' +
+              '<th style="padding:8px 10px;">Distance</th>' +
+              '<th style="padding:8px 10px;">Pace</th>' +
+              '<th style="padding:8px 10px; text-align:center;">Avg HR</th>' +
+              '<th style="padding:8px 10px; text-align:center;">Cadence</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>';
+
+    splits.forEach(function(s) {
+      var distKm = s.distance_meters ? (s.distance_meters / 1000).toFixed(2) + ' km' : '—';
+      var paceStr = '—';
+      if (s.distance_meters && s.moving_time_seconds) {
+        var paceSeconds = (s.moving_time_seconds / s.distance_meters) * 1000;
+        var min = Math.floor(paceSeconds / 60);
+        var sec = Math.round(paceSeconds % 60);
+        if (sec === 60) { min++; sec = 0; }
+        paceStr = min + ':' + (sec < 10 ? '0' : '') + sec + ' /km';
+      }
+      var hrVal = s.average_heartrate ? Math.round(s.average_heartrate) + ' bpm' : '—';
+      var cadVal = s.average_cadence ? Math.round(s.average_cadence) + ' rpm' : '—';
+
+      tableHtml += 
+        '<tr style="border-bottom:1px solid var(--border);">' +
+          '<td style="padding:8px 10px; font-weight:700; color:var(--text-secondary);">#' + s.split_number + '</td>' +
+          '<td style="padding:8px 10px;">' + distKm + '</td>' +
+          '<td style="padding:8px 10px; color:var(--brand); font-weight:600;">' + paceStr + '</td>' +
+          '<td style="padding:8px 10px; text-align:center;">' + hrVal + '</td>' +
+          '<td style="padding:8px 10px; text-align:center;">' + cadVal + '</td>' +
+        '</tr>';
+    });
+
+    tableHtml += '</tbody></table></div>';
+    area.innerHTML = tableHtml;
+    area.setAttribute('data-loaded', 'true');
+  } catch(err) {
+    console.error('Error loading splits:', err);
+    area.innerHTML = 
+      '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Splits (per km)</div>' +
+      '<div style="font-size:13px;color:#EF4444;padding:8px 0;cursor:pointer;" onclick="loadSplitsForActivity(\'' + actId + '\')">Failed to load splits. Click to retry.</div>';
+    area.removeAttribute('data-loaded');
   }
 }
 
