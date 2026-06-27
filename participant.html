@@ -1950,7 +1950,23 @@ document.addEventListener('click', function(e) {
 <script>
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var BACKEND      = 'https://walkathon-backend-hv9j.onrender.com';
-var CONFIG_LB    = { basePer_km: 1, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}] };
+var CONFIG_LB    = { 
+  basePer_km: 1, 
+  bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}],
+  feed_config: {
+    rules: {
+      allow_standard_activities: true,
+      allow_medals: true,
+      allow_distance_clubs: true,
+      allow_rank_top1: true,
+      allow_flagged_activities: false
+    },
+    filters: {
+      minimum_activity_distance_km: 1.0,
+      allowed_sports: ["Walk", "Run", "Hike", "Ride"]
+    }
+  }
+};
 var CHALLENGES_LB   = [];
 var SPECIAL_DAYS_LB = [];
 var CURRENT_ACTS = null;
@@ -2718,7 +2734,19 @@ async function load(isBackgroundRefresh) {
       medalData   = await medalRes.json(); cacheSet('medals', medalData);
     }
     var allActs=[],allRegRes=[];
-    if(Array.isArray(cfgRows))cfgRows.forEach(function(row){if(row.config_key==='bonus_points')CONFIG_LB.bonus=row.config_value.map(function(b){return{km:Number(b.km),points:Number(b.points||b.pts||0)};});if(row.config_key==='base_points')CONFIG_LB.basePer_km=parseFloat(row.config_value.per_km||1);if(row.config_key==='base_points_per_km')CONFIG_LB.basePer_km=parseFloat(row.config_value)||1;if(row.config_key==='announcements_enabled'){CONFIG_LB.announcements_enabled=(row.config_value===true||row.config_value==='true');}});
+    if(Array.isArray(cfgRows)) {
+      cfgRows.forEach(function(row){
+        if(row.config_key==='bonus_points') CONFIG_LB.bonus=row.config_value.map(function(b){return{km:Number(b.km),points:Number(b.points||b.pts||0)};});
+        if(row.config_key==='base_points') CONFIG_LB.basePer_km=parseFloat(row.config_value.per_km||1);
+        if(row.config_key==='base_points_per_km') CONFIG_LB.basePer_km=parseFloat(row.config_value)||1;
+        if(row.config_key==='announcements_enabled') CONFIG_LB.announcements_enabled=(row.config_value===true||row.config_value==='true');
+        if(row.config_key==='feed_config') {
+          try {
+            CONFIG_LB.feed_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
+          } catch(e) { console.error("Failed to parse feed_config:", e); }
+        }
+      });
+    }
     initializeFeedTab(CONFIG_LB.announcements_enabled);
     if (CONFIG_LB.announcements_enabled) {
       loadFeed().catch(function(e) { console.warn('Failed initial loadFeed:', e); });
@@ -5104,6 +5132,37 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
   if (window._checkingMilestones) return;
   window._checkingMilestones = true;
 
+  async function triggerAchievement(triggerKey, vars) {
+    if (!athleteId) return;
+
+    // 1. Dispatch Push Notification
+    fetch(BACKEND + '/push/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trigger_key: triggerKey, athlete_id: athleteId, vars: vars })
+    }).catch(function(err){});
+
+    // 2. Dispatch Feed Announcement (if allowed by feed_config rules)
+    var isAllowed = false;
+    var rules = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules) ? CONFIG_LB.feed_config.rules : {};
+
+    if (triggerKey.indexOf('medal_') === 0 && rules.allow_medals) {
+      isAllowed = true;
+    } else if (triggerKey.indexOf('club_') === 0 && rules.allow_distance_clubs) {
+      isAllowed = true;
+    } else if (triggerKey === 'rank_top1' && rules.allow_rank_top1) {
+      isAllowed = true;
+    }
+
+    if (isAllowed) {
+      fetch(BACKEND + '/feed/announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trigger_key: triggerKey, athlete_id: athleteId, vars: vars })
+      }).catch(function(err){});
+    }
+  }
+
   try {
     var keyRank = 'agprev_prev_rank_' + athleteId;
     var keyMedals = 'agprev_prev_medals_' + athleteId;
@@ -5138,11 +5197,7 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
         return n.title && n.title.indexOf(searchTitle) !== -1;
       });
       if (prevMedals.indexOf(mKey) === -1 && !alreadyNotifiedDb) {
-        await fetch(BACKEND + '/push/trigger', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trigger_key: mKey, athlete_id: athleteId })
-        }).catch(function(err){});
+        await triggerAchievement(mKey);
       }
     }
 
@@ -5173,18 +5228,12 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
           return n.title && n.title.indexOf(club.title) !== -1;
         });
         if (prevClubs.indexOf(club.key) === -1 && !alreadyNotifiedDb) {
-          await fetch(BACKEND + '/push/trigger', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ trigger_key: club.key, athlete_id: athleteId })
-          }).catch(function(err){});
+          await triggerAchievement(club.key);
           prevClubs.push(club.key);
           localStorage.setItem(keyClubs, JSON.stringify(prevClubs));
         }
       }
     }
-
-
 
     // Completed challenges
     var completedChallenges = [];
@@ -5198,11 +5247,7 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
             return n.title && n.title.indexOf(c.name) !== -1;
           });
           if (prevChallenges.indexOf(c.id) === -1 && !alreadyNotifiedDb) {
-            fetch(BACKEND + '/push/trigger', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ trigger_key: 'challenge_bonus', athlete_id: athleteId, vars: { name: c.name } })
-            }).catch(function(err){});
+            triggerAchievement('challenge_bonus', { name: c.name });
           }
         }
       });
@@ -5214,17 +5259,9 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
       var pRank = parseInt(prevRank, 10);
       if (cRank < pRank) {
         var tKey = cRank === 1 ? 'rank_top1' : 'rank_improved';
-        fetch(BACKEND + '/push/trigger', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trigger_key: tKey, athlete_id: athleteId, vars: { rank: String(cRank) } })
-        }).catch(function(err){});
+        triggerAchievement(tKey, { rank: String(cRank) });
       } else if (cRank > pRank) {
-        fetch(BACKEND + '/push/trigger', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trigger_key: 'rank_dropped', athlete_id: athleteId, vars: { rank: String(cRank) } })
-        }).catch(function(err){});
+        triggerAchievement('rank_dropped', { rank: String(cRank) });
       }
     }
 
