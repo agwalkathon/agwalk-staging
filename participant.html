@@ -3805,6 +3805,29 @@ function showDateDetails(dateStr) {
     var cardId = 'dac-' + a.strava_activity_id;
     var expandByDefault = (dayActs.length === 1);
 
+    var gridItems = [];
+    if (km && parseFloat(km) > 0) gridItems.push({ label: 'Distance', val: km + ' km' });
+    if (ps && ps !== '—' && ps !== '') gridItems.push({ label: 'Pace', val: ps });
+    if (dur && dur !== '—' && dur !== '') gridItems.push({ label: 'Moving Time', val: dur });
+    if (ela && ela !== '—' && ela !== '') gridItems.push({ label: 'Elapsed Time', val: ela });
+    if (a.avg_heart_rate && parseFloat(a.avg_heart_rate) > 0) gridItems.push({ label: 'Avg Heart Rate', val: Math.round(a.avg_heart_rate) + ' bpm' });
+    if (a.max_heart_rate && parseFloat(a.max_heart_rate) > 0) gridItems.push({ label: 'Max Heart Rate', val: Math.round(a.max_heart_rate) + ' bpm' });
+    if (a.avg_cadence && parseFloat(a.avg_cadence) > 0) gridItems.push({ label: 'Avg Cadence', val: Math.round(a.avg_cadence * 2) + ' steps/min' });
+    if (a.steps && parseInt(a.steps) > 0) gridItems.push({ label: 'Strava Steps', val: parseInt(a.steps).toLocaleString('en-IN') });
+    if (a.distance_meters && parseFloat(a.distance_meters) > 0) {
+      var calcSteps = Math.round((a.distance_meters / 1000) * 1350);
+      gridItems.push({ label: 'Calculated Steps', val: calcSteps.toLocaleString('en-IN') });
+    }
+    if (a.elevation_gain && parseFloat(a.elevation_gain) > 0) gridItems.push({ label: 'Elevation', val: Math.round(a.elevation_gain) + ' m' });
+    if (a.calories && parseFloat(a.calories) > 0) gridItems.push({ label: 'Calories', val: Math.round(a.calories) + ' kcal' });
+    var devName = a.device_name || a.device || '';
+    if (devName && devName !== '—' && devName !== '') gridItems.push({ label: 'Device', val: esc(devName) });
+
+    var gridHtml = '';
+    gridItems.forEach(function(item) {
+      gridHtml += '<div class="detail-item"><span class="detail-label">' + item.label + '</span><span class="detail-value">' + item.val + '</span></div>';
+    });
+
     html +=
       '<div class="detail-act-card' + (expandByDefault ? ' open' : '') + '" id="' + cardId + '">' +
         // Collapsed Header
@@ -3823,16 +3846,7 @@ function showDateDetails(dateStr) {
         // Expanded Body
         '<div class="detail-act-body">' +
           '<div class="detail-grid">' +
-            '<div class="detail-item"><span class="detail-label">Sport Type - Activity Name</span><span class="detail-value">' + esc(sportStr + ' - ' + actName) + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Date Start Time</span><span class="detail-value">' + esc(dateStartTimeStr) + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Distance</span><span class="detail-value">' + km + ' km</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Pace</span><span class="detail-value">' + ps + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Moving Time</span><span class="detail-value">' + dur + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Elapsed Time</span><span class="detail-value">' + ela + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Avg Heart Rate</span><span class="detail-value">' + (a.avg_heart_rate ? Math.round(a.avg_heart_rate) + ' bpm' : '—') + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Max Heart Rate</span><span class="detail-value">' + (a.max_heart_rate ? Math.round(a.max_heart_rate) + ' bpm' : '—') + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Avg Cadence</span><span class="detail-value">' + (a.avg_cadence ? Math.round(a.avg_cadence) + ' rpm' : '—') + '</span></div>' +
-            '<div class="detail-item"><span class="detail-label">Device</span><span class="detail-value">' + esc(device) + '</span></div>' +
+            gridHtml +
           '</div>' +
           '<div class="detail-divider"></div>' +
           '<div id="splits-area-' + a.strava_activity_id + '" style="margin-top: 12px; margin-bottom: 12px;">' +
