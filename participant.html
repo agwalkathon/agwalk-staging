@@ -2783,6 +2783,12 @@ async function load(isBackgroundRefresh) {
         }
       });
     }
+    if (window.enforceForceInstallPWA) {
+      window.enforceForceInstallPWA();
+    }
+    if (window.checkPushSubscriptionState) {
+      window.checkPushSubscriptionState();
+    }
     initializeFeedTab(CONFIG_LB.announcements_enabled);
     if (CONFIG_LB.announcements_enabled) {
       loadFeed().catch(function(e) { console.warn('Failed initial loadFeed:', e); });
@@ -5839,6 +5845,7 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
     }
 
     async function checkPushSubscriptionState() {
+      window.checkPushSubscriptionState = checkPushSubscriptionState;
       var card = document.getElementById('push-notifications-card');
       var desc = document.getElementById('push-status-desc');
       var btn = document.getElementById('btn-enable-push');
@@ -5850,6 +5857,13 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
       var forceModal = document.getElementById('force-push-modal');
       var forceDesc = document.getElementById('force-push-modal-desc');
       var forceBtn = document.getElementById('btn-force-push-action');
+
+      var rules = (CONFIG_LB && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules) ? CONFIG_LB.feed_config.rules : {};
+      var forcePush = rules.force_push_notifications === true || rules.force_push_notifications === 'true';
+
+      if (forceModal && !forcePush) {
+        forceModal.style.display = 'none';
+      }
 
       // 1. If iOS but not standalone PWA, guide user to Add to Home Screen
       if (isIOS && !isStandalone) {
@@ -5867,7 +5881,7 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
         };
         btn.onclick = showIosTip;
 
-        if (forceModal && forceDesc && forceBtn) {
+        if (forceModal && forceDesc && forceBtn && forcePush) {
           forceModal.style.display = 'flex';
           forceDesc.textContent = 'iOS users must add this app to their Home Screen as a PWA to enable push notifications.';
           forceBtn.textContent = 'Show PWA Guide';
@@ -5930,7 +5944,7 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
             btn.style.background = '#9CA3AF';
             btn.style.cursor = 'default';
 
-            if (forceModal && forceDesc && forceBtn) {
+            if (forceModal && forceDesc && forceBtn && forcePush) {
               forceModal.style.display = 'flex';
               forceDesc.textContent = 'Push alerts are blocked by your browser settings. To receive real-time notifications, please reset site permission blocks in your browser settings.';
               forceBtn.textContent = 'Blocked';
@@ -5946,7 +5960,7 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
             btn.style.cursor = 'pointer';
             btn.onclick = enablePushNotifications;
 
-            if (forceModal && forceDesc && forceBtn) {
+            if (forceModal && forceDesc && forceBtn && forcePush) {
               forceModal.style.display = 'flex';
               forceDesc.textContent = 'To receive instant activity sync confirmations, milestone medal unlocks, and leaderboard rank alerts, please enable push notifications.';
               forceBtn.textContent = '🔔 Enable Notifications';
@@ -6296,13 +6310,22 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
   </div>
 
   <script>
-  (function enforceForceInstallPWA() {
+  function enforceForceInstallPWA() {
+    window.enforceForceInstallPWA = enforceForceInstallPWA;
+    var rules = (CONFIG_LB && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules) ? CONFIG_LB.feed_config.rules : {};
+    var forcePwa = rules.force_pwa_install === true || rules.force_pwa_install === 'true';
+
+    var overlay = document.getElementById('pwa-force-install-overlay');
+    if (overlay && !forcePwa) {
+      overlay.style.display = 'none';
+      return;
+    }
+
     var ua = navigator.userAgent || '';
     var isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
     var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
     if (isMobile && !isStandalone) {
-      var overlay = document.getElementById('pwa-force-install-overlay');
       if (overlay) {
         overlay.style.display = 'flex';
       }
@@ -6336,7 +6359,8 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
         }
       }
     }
-  })();
+  }
+  enforceForceInstallPWA();
   </script>
 
 </body>
