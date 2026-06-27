@@ -3596,6 +3596,97 @@ async function loadFeed() {
   }
 }
 
+function renderFeed() {
+  var list = document.getElementById('feed-list');
+  if (!list) return;
+  if (!_feedData.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📢</div><p>No announcements yet. Check back later!</p></div>';
+    return;
+  }
+
+  list.innerHTML = _feedData.map(function(item) {
+    var timeStr = timeAgo(item.created_at);
+    var emojis = [
+      { type: 'like', char: '👍' },
+      { type: 'fire', char: '🔥' },
+      { type: 'clap', char: '👏' },
+      { type: 'power', char: '💪' }
+    ];
+    
+    var reactionButtonsHtml = emojis.map(function(emo) {
+      var count = item.reaction_counts[emo.type] || 0;
+      var active = item.my_reactions.indexOf(emo.type) > -1;
+      var activeClass = active ? 'active' : '';
+      return `
+        <button class="feed-react-btn ${activeClass}" onclick="reactToAnnouncement('${item.id}', '${emo.type}')">
+          <span class="emoji">${emo.char}</span>
+          <span class="count">${count}</span>
+        </button>
+      `;
+    }).join('');
+
+    var iconHtml = '📢';
+    if (item.type === 'milestone') iconHtml = '🏅';
+    else if (item.type === 'achievement') iconHtml = '🏆';
+    else if (item.type === 'birthday') iconHtml = '🎂';
+
+    return `
+      <div class="feed-card type-${item.type}">
+        <div class="feed-card-header">
+          <div class="feed-card-icon">${iconHtml}</div>
+          <div class="feed-card-meta">
+            <div class="feed-card-title">${esc(item.title)}</div>
+            <div class="feed-card-time">${timeStr}</div>
+          </div>
+        </div>
+        <div class="feed-card-body">
+          ${formatMarkdown(item.body)}
+        </div>
+        <div class="feed-card-actions">
+          ${reactionButtonsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function reactToAnnouncement(announcementId, reactionType) {
+  var athleteId = currentSession ? currentSession.athleteId : '';
+  if (!athleteId) return;
+
+  var item = _feedData.find(function(x) { return x.id === announcementId; });
+  if (item) {
+    var idx = item.my_reactions.indexOf(reactionType);
+    if (idx > -1) {
+      item.my_reactions.splice(idx, 1);
+      if (item.reaction_counts[reactionType] > 0) item.reaction_counts[reactionType]--;
+    } else {
+      item.my_reactions.push(reactionType);
+      item.reaction_counts[reactionType] = (item.reaction_counts[reactionType] || 0) + 1;
+    }
+    renderFeed();
+  }
+
+  try {
+    var res = await fetch(BACKEND + '/announcements/react', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        announcement_id: announcementId,
+        athlete_id: athleteId,
+        reaction_type: reactionType
+      })
+    });
+    var d = await res.json();
+    if (!d.success) {
+      loadFeed();
+    }
+  } catch(e) {
+    console.warn('Failed to react:', e);
+    loadFeed();
+  }
+}
+
 function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
   dayBreakdown=dayBreakdown||{}; actBreakdown=actBreakdown||{};
   CURRENT_ACTS = acts;
