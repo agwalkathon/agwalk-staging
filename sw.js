@@ -29,8 +29,8 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('push', function(event) {
   var data = {};
-  try { data = event.data ? event.data.json() : {}; } catch(e) { data = { title: 'Arcgate Walkathon', body: event.data ? event.data.text() : '' }; }
-  var title   = data.title || 'Arcgate Walkathon 2026';
+  try { data = event.data ? event.data.json() : {}; } catch(e) { data = { title: 'Walkathon Alert', body: event.data ? event.data.text() : '' }; }
+  var title   = data.title || 'Walkathon Alert';
   var options = {
     body:    data.body || '',
     icon:    '/agwalk/logo-icon.png',
