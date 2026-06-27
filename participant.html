@@ -959,6 +959,224 @@
   .feed-react-btn .count {
     font-variant-numeric: tabular-nums;
   }
+
+  /* ── Date Details View Screen ── */
+  #date-details-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: var(--bg);
+    z-index: 500;
+    transform: translate3d(100%, 0, 0);
+    transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow-y: auto;
+    padding: max(14px, env(safe-area-inset-top)) 20px 90px;
+  }
+  #date-details-view.visible {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .details-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 10px 0;
+    z-index: 10;
+  }
+  .details-hdr .icon-btn {
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px 8px 0;
+    border-radius: 8px;
+  }
+  .details-hdr .icon-btn:active {
+    color: #fff;
+  }
+  .details-hdr .icon-btn svg {
+    margin-right: 6px;
+  }
+  #details-date-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Collapsible Activity Cards styling */
+  .detail-act-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+  }
+  .detail-act-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255,255,255,0.01);
+  }
+  .detail-act-hdr:active {
+    background: rgba(255,255,255,0.03);
+  }
+  .detail-act-hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+  }
+  .detail-act-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .detail-act-icon.walk { background: rgba(34,197,94,0.15); color: var(--green); }
+  .detail-act-icon.run { background: rgba(232,98,42,0.15); color: var(--brand); }
+  .detail-act-icon.hike { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .detail-act-icon.ride { background: rgba(96,165,250,0.15); color: var(--blue); }
+
+  .detail-act-title-wrap {
+    min-width: 0;
+    flex: 1;
+  }
+  .detail-act-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .detail-act-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .detail-act-hdr-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .detail-act-chevron {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.25s ease;
+  }
+
+  .detail-act-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+    padding: 0 16px;
+  }
+
+  .detail-act-card.open .detail-act-body {
+    max-height: 1000px;
+    padding-bottom: 20px;
+  }
+  .detail-act-card.open .detail-act-chevron {
+    transform: rotate(180deg);
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .detail-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--label);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .detail-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 4px;
+    word-break: break-word;
+  }
+  .detail-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+  .detail-status-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    align-self: flex-start;
+  }
+  .status-badge.valid {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,0.2);
+  }
+  .status-badge.invalid {
+    background: rgba(239,68,68,0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239,68,68,0.2);
+  }
+  .flag-reason-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ef4444;
+    margin-top: 4px;
+    background: rgba(239,68,68,0.06);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed rgba(239,68,68,0.15);
+    word-break: break-word;
+  }
 </style>
 </head>
 <body>
@@ -1586,12 +1804,31 @@ document.addEventListener('click', function(e) {
   </a>
 </nav>
 
+<!-- Date Details sliding view screen -->
+<div id="date-details-view">
+  <div class="max-w">
+    <div class="details-hdr">
+      <button onclick="goBackToActivities()" class="icon-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span style="margin-left: 6px; font-size: 15px; font-weight: 600; font-family: var(--font);">Back</span>
+      </button>
+      <div id="details-date-title">Date</div>
+      <div style="width: 50px;"></div>
+    </div>
+    <div id="details-content-area"></div>
+  </div>
+</div>
+
 <script>
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var BACKEND      = 'https://walkathon-backend-hv9j.onrender.com';
 var CONFIG_LB    = { basePer_km: 1, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}] };
 var CHALLENGES_LB   = [];
 var SPECIAL_DAYS_LB = [];
+var CURRENT_ACTS = null;
+var CURRENT_DAY_BREAKDOWN = null;
+var CURRENT_ACT_BREAKDOWN = null;
+var CURRENT_GENDER = null;
 var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 
@@ -3331,99 +3568,13 @@ async function loadFeed() {
   }
 }
 
-function renderFeed() {
-  var list = document.getElementById('feed-list');
-  if (!list) return;
-  if (!_feedData.length) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📢</div><p>No announcements yet. Check back later!</p></div>';
-    return;
-  }
-
-  list.innerHTML = _feedData.map(function(item) {
-    var timeStr = timeAgo(item.created_at);
-    var emojis = [
-      { type: 'like', char: '👍' },
-      { type: 'fire', char: '🔥' },
-      { type: 'clap', char: '👏' },
-      { type: 'power', char: '💪' }
-    ];
-    
-    var reactionButtonsHtml = emojis.map(function(emo) {
-      var count = item.reaction_counts[emo.type] || 0;
-      var active = item.my_reactions.indexOf(emo.type) > -1;
-      var activeClass = active ? 'active' : '';
-      return `
-        <button class="feed-react-btn ${activeClass}" onclick="reactToAnnouncement('${item.id}', '${emo.type}')">
-          <span class="emoji">${emo.char}</span>
-          <span class="count">${count}</span>
-        </button>
-      `;
-    }).join('');
-
-    var iconHtml = '📢';
-    if (item.type === 'milestone') iconHtml = '🏅';
-    else if (item.type === 'achievement') iconHtml = '🏆';
-    else if (item.type === 'birthday') iconHtml = '🎂';
-
-    return `
-      <div class="feed-card type-${item.type}">
-        <div class="feed-card-header">
-          <div class="feed-card-icon">${iconHtml}</div>
-          <div class="feed-card-meta">
-            <div class="feed-card-title">${esc(item.title)}</div>
-            <div class="feed-card-time">${timeStr}</div>
-          </div>
-        </div>
-        <div class="feed-card-body">
-          ${formatMarkdown(item.body)}
-        </div>
-        <div class="feed-card-actions">
-          ${reactionButtonsHtml}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-async function reactToAnnouncement(announcementId, reactionType) {
-  var athleteId = currentSession ? currentSession.athleteId : '';
-  if (!athleteId) return;
-
-  var item = _feedData.find(function(x) { return x.id === announcementId; });
-  if (item) {
-    var idx = item.my_reactions.indexOf(reactionType);
-    if (idx > -1) {
-      item.my_reactions.splice(idx, 1);
-      if (item.reaction_counts[reactionType] > 0) item.reaction_counts[reactionType]--;
-    } else {
-      item.my_reactions.push(reactionType);
-      item.reaction_counts[reactionType] = (item.reaction_counts[reactionType] || 0) + 1;
-    }
-    renderFeed();
-  }
-
-  try {
-    var res = await fetch(BACKEND + '/announcements/react', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        announcement_id: announcementId,
-        athlete_id: athleteId,
-        reaction_type: reactionType
-      })
-    });
-    var d = await res.json();
-    if (!d.success) {
-      loadFeed();
-    }
-  } catch(e) {
-    console.warn('Failed to react:', e);
-    loadFeed();
-  }
-}
-
 function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
   dayBreakdown=dayBreakdown||{}; actBreakdown=actBreakdown||{};
+  CURRENT_ACTS = acts;
+  CURRENT_DAY_BREAKDOWN = dayBreakdown;
+  CURRENT_ACT_BREAKDOWN = actBreakdown;
+  CURRENT_GENDER = gender;
+
   var list=document.getElementById('act-list');
   if(!acts.length){list.innerHTML='<div class="empty-state"><div class="icon">'+icoRun+'<p>No activities yet.<br>Save a walk or run on Strava — it will appear here.</p></div>';return;}
   var flaggedCount=acts.filter(function(a){return a.is_flagged;}).length;
@@ -3433,25 +3584,18 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
   list.innerHTML='';
   dateOrder.forEach(function(date,gi){
     var dayActs=groups[date],db=dayBreakdown[date]||{km:0,distPts:0,bonusPts:0,challenges:[]};
-    // Use scored km (capped, range-split adjusted) not raw sum
-    var scoredKm=db.km||0;
     var rawKm=dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.distance_meters||0)/1000;},0);
-    // Challenge pts: sum actBreakdown for all activities this day — matches tile badges exactly
     var chPts=parseFloat(dayActs.reduce(function(s,a){var ab=actBreakdown[a.strava_activity_id];return s+(ab?ab.challenges.reduce(function(s2,c){return s2+(c.pts||0);},0):0);},0).toFixed(2));
-    var dayTotal=parseFloat((db.distPts+db.bonusPts+chPts).toFixed(2));
     var dateObj=new Date(date+'T00:00:00');
     var dN=dateObj.getDate();
     var dM=dateObj.toLocaleDateString('en-US',{month:'long'});
-    var dateStr=dM+' '+dN;
     var actCountStr=dayActs.length+'x';
     var daySteps=Math.round(rawKm*1350);
-    var dayStepsStr=daySteps>=1000?(daySteps/1000).toFixed(1).replace('.0','')+'k Steps':daySteps+' Steps';
-    var dayDistStr=(rawKm%1===0?Math.round(rawKm):rawKm.toFixed(2))+' KM';
+    var shortMonth = dM.substring(0, 3).toUpperCase();
 
     var group=document.createElement('div'); group.className='date-group' + (dayActs.length > 1 ? ' multi-activity' : ''); group.id='dg-'+gi;
     var dateRow=document.createElement('div'); dateRow.className='date-row';
     
-    var shortMonth = dM.substring(0, 3).toUpperCase();
     dateRow.innerHTML =
       '<div class="whoop-date-box">' +
         '<span class="whoop-date-num">' + dN + '</span>' +
@@ -3463,46 +3607,138 @@ function renderActivities(acts,dayBreakdown,actBreakdown,gender) {
         '<div class="whoop-stat-item"><span class="whoop-stat-val">' + (daySteps >= 1000 ? (daySteps/1000).toFixed(1).replace('.0','') + 'k' : daySteps) + '</span><span class="whoop-stat-lbl">STEPS</span></div>' +
         '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>' +
       '</div>' +
-      '<div class="date-chevron">▼</div>';
-    dateRow.addEventListener('click',(function(id){return function(){toggleDay(id);}})('dg-'+gi));
+      '<div class="date-chevron">❯</div>';
+    
+    // Clicking the Date Card takes the user to the details view screen
+    dateRow.addEventListener('click', (function(d){return function(){showDateDetails(d);}})(date));
     group.appendChild(dateRow);
-    var inner=document.createElement('div'); inner.className='acts-inner';
-    dayActs.forEach(function(a){
-      var rawActKm=a.distance_meters?(a.distance_meters/1000):0;
-      var km=rawActKm.toFixed(2);
-      var actSteps=Math.round(rawActKm*1350);
-      var stepsStr=actSteps>=1000?(actSteps/1000).toFixed(1).replace('.0','')+'k':actSteps;
-      var sportStr=(a.sport_type||'Activity').toUpperCase();
-      
-      var dur=a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—';
-      var ps=fmtPS(a.avg_speed,a.sport_type);
-      var actUrl='https://www.strava.com/activities/'+a.strava_activity_id;
-      var tc=tileClass(a.sport_type),isFlag=a.is_flagged;
-      var timeStr=(a.activity_date&&a.activity_date.indexOf('T')>-1)?fmtTime(a.activity_date, a.start_time):'';
-      
-      var ab = actBreakdown[a.strava_activity_id];
-      var actChPts = ab ? ab.challenges.reduce(function(s, c) { return s + (c.pts || 0); }, 0) : 0;
-      
-      var item=document.createElement('div'); item.className='act-tile ' + tc;
-      item.innerHTML=
-        '<div class="act-tile-icon '+tc+'">'+renderIcon(a.sport_type)+' <span>'+sportStr+' · '+stepsStr+' Steps</span></div>'+
-        '<div class="act-tile-body">'+
-          '<a class="act-tile-name" href="'+actUrl+'" target="_blank" style="text-decoration:none;color:#fff;font-size:14px;font-weight:700;">'+esc(a.activity_name||'Activity')+'</a>'+
-          '<div class="act-tile-meta">'+(timeStr?timeStr+' · ':'')+dur+' · '+ps+'</div>'+
-        '</div>'+
-        '<div class="act-tile-right">'+
-          '<div class="act-tile-dist">'+km+' <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:lowercase;margin-left:2px;">km</span></div>'+
-          '<div class="act-tile-flag '+(isFlag?'flag-bad':'flag-valid')+'">'+(isFlag?'⚑ Flagged':'✓ Valid')+'</div>'+
-          (actChPts > 0 ? '<div class="act-tile-chpts" style="font-size:11px;font-weight:800;color:#ff9800;margin-top:4px;">🎯 +' + Math.round(actChPts) + ' pts</div>' : '') +
-        '</div>'+
-        '<div class="act-tile-bar '+tc+'"></div>';
-      inner.appendChild(item);
-    });
-    group.appendChild(inner); list.appendChild(group);
+    list.appendChild(group);
   });
 }
 
-function toggleDay(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+function showDateDetails(dateStr) {
+  var detailsView = document.getElementById('date-details-view');
+  var titleEl = document.getElementById('details-date-title');
+  var contentEl = document.getElementById('details-content-area');
+  if (!detailsView || !contentEl) return;
+
+  // 1. Format date for the header title (e.g. Thursday, June 25)
+  try {
+    var dateObj = new Date(dateStr + 'T00:00:00');
+    var weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    var month = dateObj.toLocaleDateString('en-US', { month: 'long' });
+    var dN = dateObj.getDate();
+    if (titleEl) {
+      titleEl.textContent = weekday + ', ' + month + ' ' + dN;
+    }
+  } catch(e) {
+    if (titleEl) titleEl.textContent = dateStr;
+  }
+
+  // 2. Find activities for this day
+  var dayActs = (CURRENT_ACTS || []).filter(function(a) {
+    return getISTDate(a.activity_date) === dateStr;
+  });
+
+  if (!dayActs.length) {
+    contentEl.innerHTML = '<div class="empty-state"><p>No activities found for this date.</p></div>';
+    detailsView.classList.add('visible');
+    return;
+  }
+
+  // 3. Render each activity as a beautiful collapsible card
+  var html = '';
+  dayActs.forEach(function(a) {
+    var sportStr = toTitleCaseDetail(a.sport_type || 'Activity');
+    var actName = a.activity_name || 'Activity';
+    var tc = tileClass(a.sport_type);
+    
+    // Formatting values
+    var km = a.base_km ? a.base_km.toFixed(2) : (a.distance_meters ? (a.distance_meters/1000).toFixed(2) : '0.00');
+    var dur = a.moving_time_seconds ? fmtDur(a.moving_time_seconds) : '—';
+    var ela = a.elapsed_time_seconds ? fmtDur(a.elapsed_time_seconds) : '—';
+    var ps = fmtPS(a.avg_speed, a.sport_type);
+    var device = a.device_name || '—';
+    
+    // Format Date Start Time (e.g., 25 Jun 2026 at 06:15 PM)
+    var dateStartTimeStr = '—';
+    var timePart = '';
+    try {
+      var dt = new Date(a.activity_date);
+      var datePart = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      timePart = a.start_time ? fmtTime(a.activity_date, a.start_time) : (a.activity_date.indexOf('T') > -1 ? fmtTime(a.activity_date, '00:00:00') : '');
+      dateStartTimeStr = datePart + (timePart ? ' at ' + timePart : '');
+    } catch(e) {}
+
+    var isFlag = a.is_flagged;
+    var cardId = 'dac-' + a.strava_activity_id;
+
+    html +=
+      '<div class="detail-act-card" id="' + cardId + '">' +
+        // Collapsed Header
+        '<div class="detail-act-hdr" onclick="toggleActCard(\'' + a.strava_activity_id + '\')">' +
+          '<div class="detail-act-hdr-left">' +
+            '<div class="detail-act-icon ' + tc + '">' + renderIcon(a.sport_type) + '</div>' +
+            '<div class="detail-act-title-wrap">' +
+              '<div class="detail-act-name">' + esc(sportStr + ' - ' + actName) + '</div>' +
+              '<div class="detail-act-sub">' + (timePart ? 'Started at ' + timePart : sportStr) + ' &middot; ' + km + ' km</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="detail-act-hdr-right">' +
+            '<div class="detail-act-chevron">▼</div>' +
+          '</div>' +
+        '</div>' +
+        // Expanded Body
+        '<div class="detail-act-body">' +
+          '<div class="detail-grid">' +
+            '<div class="detail-item"><span class="detail-label">Sport Type - Activity Name</span><span class="detail-value">' + esc(sportStr + ' - ' + actName) + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Date Start Time</span><span class="detail-value">' + esc(dateStartTimeStr) + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Distance</span><span class="detail-value">' + km + ' km</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Pace</span><span class="detail-value">' + ps + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Moving Time</span><span class="detail-value">' + dur + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Elapsed Time</span><span class="detail-value">' + ela + '</span></div>' +
+            '<div class="detail-item"><span class="detail-label">Device</span><span class="detail-value">' + esc(device) + '</span></div>' +
+          '</div>' +
+          '<div class="detail-divider"></div>' +
+          '<div class="detail-status-row">' +
+            '<div class="detail-item">' +
+              '<span class="detail-label">Activity Status</span>' +
+              '<span class="status-badge ' + (isFlag ? 'invalid' : 'valid') + '">' + (isFlag ? '⚑ Invalid' : '✓ Valid') + '</span>' +
+            '</div>' +
+            (isFlag ? 
+            '<div class="detail-item" style="margin-top: 4px;">' +
+              '<span class="detail-label">Flag Reason</span>' +
+              '<span class="flag-reason-text">' + esc(a.flag_reason || 'Under review') + '</span>' +
+            '</div>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  });
+
+  contentEl.innerHTML = html;
+  detailsView.classList.add('visible');
+}
+
+function toggleActCard(actId) {
+  var card = document.getElementById('dac-' + actId);
+  if (card) {
+    card.classList.toggle('open');
+  }
+}
+
+function goBackToActivities() {
+  var detailsView = document.getElementById('date-details-view');
+  if (detailsView) {
+    detailsView.classList.remove('visible');
+  }
+}
+
+function toTitleCaseDetail(str) {
+  if (!str) return '';
+  return str.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
 
 var _lbLoaded=false,_lbReady=false;
 // ── Tab order for swipe navigation ────────────────────────────────────────
@@ -3609,6 +3845,15 @@ function showTab(tab){
 
     var dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) < MIN_SWIPE_X) return; // too short
+
+    var detailsView = document.getElementById('date-details-view');
+    if (detailsView && detailsView.classList.contains('visible')) {
+      if (dx > 0) { // swipe right -> go back
+        goBackToActivities();
+      }
+      _swipeDir = null;
+      return;
+    }
 
     var idx = TAB_ORDER.indexOf(_currentTab);
     if (dx < 0) {
