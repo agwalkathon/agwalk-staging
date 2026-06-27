@@ -5897,9 +5897,14 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
           card.style.display = 'flex';
           desc.textContent = 'Push alerts are active 🟢';
           btn.textContent = 'Active';
-          btn.disabled = true;
+          btn.disabled = false;
           btn.style.background = '#059669';
-          btn.style.cursor = 'default';
+          btn.style.cursor = 'pointer';
+          btn.onclick = async function() {
+            btn.disabled = true;
+            btn.textContent = 'Registering...';
+            await enablePushNotifications();
+          };
           if (forceModal) forceModal.style.display = 'none';
           sendSubscriptionToBackend(sub);
         } else {
@@ -6035,7 +6040,8 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
     }
 
     async function sendSubscriptionToBackend(sub) {
-      var athleteId = currentSession ? currentSession.athleteId : '';
+      var s = currentSession || JSON.parse(localStorage.getItem('wk_user') || '{}');
+      var athleteId = s.athleteId || '';
       if (!athleteId) return;
 
       try {
@@ -6054,7 +6060,8 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
     }
 
     async function togglePrivateProfile(isChecked) {
-      var athleteId = currentSession ? currentSession.athleteId : '';
+      var s = currentSession || JSON.parse(localStorage.getItem('wk_user') || '{}');
+      var athleteId = s.athleteId || '';
       if (!athleteId) return;
 
       try {
