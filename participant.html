@@ -5805,10 +5805,21 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
         var publicKey = keyJson.publicKey;
 
         var reg = await navigator.serviceWorker.ready;
-        var sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(publicKey)
-        });
+        var convertedKey = urlBase64ToUint8Array(publicKey);
+        var sub;
+        try {
+          console.log('[Push] Attempting subscribe with Uint8Array');
+          sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedKey
+          });
+        } catch (subErr) {
+          console.warn('[Push] Uint8Array subscribe failed, retrying with ArrayBuffer:', subErr);
+          sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedKey.buffer
+          });
+        }
 
         if (sub) {
           await sendSubscriptionToBackend(sub);
