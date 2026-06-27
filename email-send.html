@@ -257,22 +257,40 @@ tr:hover td{background:#FAFAFA}
         <div class="card-head-left"><span>⚙️</span><h2>Email Configuration</h2></div>
       </div>
       <div class="card-body">
-        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff8f5;border:1.5px solid #E8622A;border-radius:10px;margin-bottom:20px">
-          <div style="width:20px;height:20px;background:#0B60FF;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">B</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#E8622A">Powered by Brevo</div>
-            <div style="font-size:12px;color:#888">HTTP-based email API — send to any address, no domain verification needed</div>
+        <div style="margin-bottom:20px;">
+          <div class="field">
+            <label>Email Provider</label>
+            <select id="smtp-provider" onchange="toggleProviderFields()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:#1b1d20;color:#fff;">
+              <option value="brevo">Brevo API (HTTP)</option>
+              <option value="smtp">Gmail SMTP / Custom SMTP</option>
+            </select>
           </div>
         </div>
-        <div class="field-grid">
-          <div class="field" style="grid-column:span 2">
-            <label>Brevo API Key</label>
-            <input type="password" id="smtp-brevo_key" placeholder="xkeysib-xxxxxxxxxxxxxxxxxxxxxxxx">
+
+        <!-- Brevo Config Fields -->
+        <div id="brevo-fields" style="display:block;margin-bottom:20px;">
+          <div class="field-grid">
+            <div class="field" style="grid-column:span 2">
+              <label>Brevo API Key</label>
+              <input type="password" id="smtp-brevo_key" placeholder="xkeysib-xxxxxxxxxxxxxxxxxxxxxxxx">
+            </div>
           </div>
+        </div>
+
+        <!-- Custom SMTP / Gmail Config Fields -->
+        <div id="smtp-fields" style="display:none;margin-bottom:20px;">
+          <div class="field-grid">
+            <div class="field"><label>SMTP Host</label><input type="text" id="smtp-host" placeholder="smtp.gmail.com"></div>
+            <div class="field"><label>SMTP Port</label><input type="number" id="smtp-port" placeholder="587"></div>
+            <div class="field"><label>SMTP Username / Email</label><input type="text" id="smtp-user" placeholder="your-email@gmail.com"></div>
+            <div class="field"><label>SMTP Password (or App Password)</label><input type="password" id="smtp-pass" placeholder="your-app-password"></div>
+          </div>
+        </div>
+
+        <!-- Common Sender Info -->
+        <div class="field-grid" style="margin-bottom:20px;">
           <div class="field"><label>From Name</label><input type="text" id="smtp-from_name" placeholder="Arcgate Walkathon 2026"></div>
-          <div class="field"><label>From Email <span style="font-size:10px;color:#aaa;font-weight:400">(verified sender in Brevo)</span></label>
-            <input type="text" id="smtp-from_email" placeholder="walkathon@arcgate.com">
-          </div>
+          <div class="field"><label>From Email</label><input type="text" id="smtp-from_email" placeholder="walkathon@arcgate.com"></div>
           <div class="field"><label>Reply-To Email</label><input type="text" id="smtp-reply" placeholder="walkathon@arcgate.com"></div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -285,9 +303,9 @@ tr:hover td{background:#FAFAFA}
         </div>
         <div style="margin-top:20px;padding:14px 16px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;line-height:1.9">
           <strong>Setup steps:</strong><br>
-          1. Get API key from <a href="https://app.brevo.com/settings/keys/api" target="_blank" style="color:#E8622A">Brevo → SMTP &amp; API → API Keys</a><br>
-          2. Add a verified sender email at <a href="https://app.brevo.com/senders" target="_blank" style="color:#E8622A">Brevo → Senders</a> (confirm the email link they send)<br>
-          3. Paste API key above → Save → Send Test Email
+          1. <strong>Brevo API</strong>: Paste API key, set From Email (verified sender in Brevo).<br>
+          2. <strong>Gmail SMTP</strong>: Set host to <code>smtp.gmail.com</code>, port to <code>587</code>, user to your Gmail address, and pass to a generated <strong>Google App Password</strong> (requires 2-Step Verification enabled in Google Account).<br>
+          3. Save → Send Test Email to verify connection.
         </div>
       </div>
     </div>
@@ -595,17 +613,29 @@ function switchTab(name) {
 }
 
 // ── SMTP Config ────────────────────────────────────────
+function toggleProviderFields() {
+  var prov = document.getElementById('smtp-provider').value;
+  if (prov === 'smtp') {
+    document.getElementById('brevo-fields').style.display = 'none';
+    document.getElementById('smtp-fields').style.display = 'block';
+  } else {
+    document.getElementById('brevo-fields').style.display = 'block';
+    document.getElementById('smtp-fields').style.display = 'none';
+  }
+}
+
 async function loadSmtp() {
   try {
     var r = await fetch('https://walkathon-backend-hv9j.onrender.com/get-smtp');
     var d = await r.json();
     if (d.success && d.data && d.data.config) {
       var s = d.data.config;
-      var fields = ['brevo_key','from_name','from_email','reply'];
+      var fields = ['provider','brevo_key','host','port','user','pass','from_name','from_email','reply'];
       fields.forEach(function(k) {
         var el = document.getElementById('smtp-' + k);
         if (el && s[k] != null) el.value = s[k];
       });
+      toggleProviderFields();
     }
   } catch(e) {
     console.warn('loadSmtp:', e.message);
@@ -615,7 +645,7 @@ async function loadSmtp() {
 async function saveSmtp() {
   setBtnLoading('smtp-save-btn', true, '💾 Save Settings');
   setStatus('smtp-status', 'wait', '⏳ Saving...');
-  var fields = ['brevo_key','from_name','from_email','reply'];
+  var fields = ['provider','brevo_key','host','port','user','pass','from_name','from_email','reply'];
   var cfg = {};
   fields.forEach(function(k) {
     var el = document.getElementById('smtp-' + k);
