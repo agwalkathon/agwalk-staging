@@ -3544,6 +3544,7 @@ function initializeFeedTab(enabled) {
 
 var _feedLoaded = false;
 var _feedData = [];
+var _feedVisibleCount = 10;
 
 function formatMarkdown(text) {
   if (!text) return '';
@@ -3565,6 +3566,10 @@ async function loadFeed() {
     var d = await res.json();
     if (d.success && Array.isArray(d.feed)) {
       _feedData = d.feed;
+      _feedData.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+      _feedVisibleCount = 10;
       if (list) {
         renderFeed();
       }
@@ -3604,8 +3609,19 @@ function renderFeed() {
     return;
   }
 
-  list.innerHTML = _feedData.map(function(item) {
+  var visibleActs = _feedData.slice(0, _feedVisibleCount);
+  var html = visibleActs.map(function(item) {
     var timeStr = timeAgo(item.created_at);
+    
+    // Exact date time stamp format (e.g., 27 Jun at 11:45 AM)
+    var dateTimeStr = '';
+    try {
+      var dt = new Date(item.created_at);
+      var datePart = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+      var timePart = dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      dateTimeStr = datePart + ' at ' + timePart;
+    } catch(e) {}
+
     var emojis = [
       { type: 'like', char: '👍' },
       { type: 'fire', char: '🔥' },
@@ -3636,7 +3652,7 @@ function renderFeed() {
           <div class="feed-card-icon">${iconHtml}</div>
           <div class="feed-card-meta">
             <div class="feed-card-title">${esc(item.title)}</div>
-            <div class="feed-card-time">${timeStr}</div>
+            <div class="feed-card-time">${timeStr}${dateTimeStr ? ' &middot; ' + dateTimeStr : ''}</div>
           </div>
         </div>
         <div class="feed-card-body">
@@ -3648,6 +3664,38 @@ function renderFeed() {
       </div>
     `;
   }).join('');
+
+  if (_feedData.length > _feedVisibleCount) {
+    html += `
+      <div class="show-more-wrap" style="text-align: center; margin: 24px 0 12px 0;">
+        <button class="show-more-btn" onclick="showMoreAnnouncements()" style="
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #fff;
+          padding: 10px 24px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          backdrop-filter: blur(8px);
+        "
+        onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.2)';this.style.transform='translateY(-1px)';"
+        onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform='translateY(0)';"
+        >
+          Show More
+        </button>
+      </div>
+    `;
+  }
+
+  list.innerHTML = html;
+}
+
+function showMoreAnnouncements() {
+  _feedVisibleCount += 10;
+  renderFeed();
 }
 
 async function reactToAnnouncement(announcementId, reactionType) {
