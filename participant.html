@@ -5900,11 +5900,7 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
           btn.disabled = false;
           btn.style.background = '#059669';
           btn.style.cursor = 'pointer';
-          btn.onclick = async function() {
-            btn.disabled = true;
-            btn.textContent = 'Registering...';
-            await enablePushNotifications();
-          };
+          btn.onclick = disablePushNotifications;
           if (forceModal) forceModal.style.display = 'none';
           sendSubscriptionToBackend(sub);
         } else {
@@ -6010,6 +6006,47 @@ function lbRefresh(){showSkeletons();if(_lbReady){lbRender();}else{lbBoot();}}
         btn.style.background = 'var(--brand)';
         btn.style.cursor = 'pointer';
         alert('Failed to register notifications: ' + err.message);
+      }
+    }
+
+    async function disablePushNotifications() {
+      var desc = document.getElementById('push-status-desc');
+      var btn = document.getElementById('btn-enable-push');
+      if (!btn || !desc) return;
+
+      if (!confirm('Would you like to disable push notifications on this device?')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Disabling...';
+
+      try {
+        var reg = await navigator.serviceWorker.ready;
+        var sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          await sub.unsubscribe();
+        }
+
+        // Notify backend
+        var s = currentSession || JSON.parse(localStorage.getItem('wk_user') || '{}');
+        var athleteId = s.athleteId || '';
+        if (athleteId) {
+          await fetch(BACKEND + '/push/subscribers/' + athleteId, {
+            method: 'DELETE'
+          });
+        }
+
+        desc.textContent = 'Tap Enable to get real-time updates';
+        btn.textContent = 'Enable';
+        btn.disabled = false;
+        btn.style.background = 'var(--brand)';
+        btn.style.cursor = 'pointer';
+        btn.onclick = enablePushNotifications;
+        console.log('[Push] Subscription disabled successfully');
+      } catch(err) {
+        console.error('[Push] Disabling failed:', err);
+        alert('Failed to disable notifications: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Active';
       }
     }
 
