@@ -4882,7 +4882,9 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
 }
 
 // Show splash screen on every page load until all resources/data are preloaded
-load().finally(function(){ hideSplash(); });
+window.addEventListener('DOMContentLoaded', function() {
+  load().finally(function(){ hideSplash(); });
+});
 </script>
 
 <script>
