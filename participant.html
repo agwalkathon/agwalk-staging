@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -4878,7 +4878,7 @@ async function loadFeed(isSilent) {
 
   try {
     var athleteId = currentSession ? currentSession.athleteId : '';
-    var res = await fetch(BACKEND + '/announcements?athlete_id=' + encodeURIComponent(athleteId));
+    var res = await fetch(BACKEND + '/announcements?athlete_id=' + encodeURIComponent(athleteId) + '&_t=' + Date.now());
     var d = await res.json();
     if (d.success && Array.isArray(d.feed)) {
       var sortedNewFeed = d.feed;
