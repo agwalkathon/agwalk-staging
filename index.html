@@ -85,6 +85,7 @@
     .proc{display:none;align-items:center;justify-content:center;gap:10px;padding:14px;font-size:13px;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;}
     .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
     .err{display:none;margin-top:12px;padding:12px 14px;border-radius:11px;font-size:12px;line-height:1.6;background:rgba(220,38,38,0.1);color:#fca5a5;border:1px solid rgba(220,38,38,0.18);}
+    .success{display:none;margin-top:12px;padding:12px 14px;border-radius:11px;font-size:12px;line-height:1.6;background:rgba(16,185,129,0.1);color:#a7f3d0;border:1px solid rgba(16,185,129,0.18);text-align:center;}
 
 
 
@@ -164,6 +165,7 @@
       <!-- General Feedback -->
       <div class="proc" id="proc"><div class="spinner"></div><span id="proc-text">Verifying...</span></div>
       <div class="err" id="err"></div>
+      <div class="success" id="success"></div>
     </div>
 
     <p class="note">
@@ -190,10 +192,19 @@ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){retur
 
 function showErr(msg){
   document.getElementById('proc').style.display='none';
+  document.getElementById('success').style.display='none';
   document.getElementById('btn-login').disabled=false;
   document.getElementById('btn-send').disabled=false;
   document.getElementById('btn-verify').disabled=false;
   var el=document.getElementById('err');
+  el.innerHTML=msg;
+  el.style.display='block';
+}
+
+function showSuccess(msg){
+  document.getElementById('proc').style.display='none';
+  document.getElementById('err').style.display='none';
+  var el=document.getElementById('success');
   el.innerHTML=msg;
   el.style.display='block';
 }
@@ -205,6 +216,7 @@ function showProc(text){
   document.getElementById('proc').style.display='flex';
   document.getElementById('proc-text').textContent=text;
   document.getElementById('err').style.display='none';
+  document.getElementById('success').style.display='none';
 }
 
 function hideProc() {
@@ -224,6 +236,7 @@ function switchUI(method) {
   
   // Clear status
   document.getElementById('err').style.display = 'none';
+  document.getElementById('success').style.display = 'none';
   document.getElementById('proc').style.display = 'none';
   
   // Re-enable
@@ -315,6 +328,7 @@ async function sendOTP(){
     document.getElementById('stage-email-verify').classList.remove('hidden');
     document.getElementById('otp-input').focus();
     startResendTimer();
+    showSuccess('🎉 <strong>OTP Sent!</strong><br>Check your email inbox for the verification code.');
   } catch (e) {
     showErr('❌ Connection error. Please check your network and try again.');
   }
@@ -326,6 +340,7 @@ async function verifyOTP(){
   var inp = document.getElementById('otp-input');
   inp.classList.remove('err-field');
   document.getElementById('err').style.display='none';
+  document.getElementById('success').style.display='none';
 
   if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
     inp.classList.add('err-field');
