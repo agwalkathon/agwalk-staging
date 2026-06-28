@@ -5029,13 +5029,22 @@ function renderCommunityPulse() {
 
   // 4. Virtual Journey (Kashmir to Kanyakumari - 3600 km)
   var targetRouteKm = 3600;
-  var journeyPct = Math.min(100, Math.round((totalKm / targetRouteKm) * 100));
+  var laps = Math.floor(totalKm / targetRouteKm);
+  var currentLapKm = totalKm % targetRouteKm;
+  var journeyPct = Math.round((currentLapKm / targetRouteKm) * 100);
+  var k2kSub = laps > 0 
+    ? `${laps} Lap${laps === 1 ? '' : 's'} Done (${currentLapKm.toFixed(0)}/3600 km)` 
+    : `${totalKm.toFixed(0)} / ${targetRouteKm} km`;
   
   // 5. Peak Active Hour
   var hourCounts = {};
   validActs.forEach(function(a) {
     var tStr = a.activity_date_time_ist || a.activity_date;
     if (!tStr) return;
+    // Skip default/placeholder time values (e.g. 23:00, 00:00, 18:30, 17:30)
+    if (tStr.match(/T(23:00:00|23:01:00|00:00:00|18:30:00|17:30:00|23:00:01)/)) {
+      return;
+    }
     var match = tStr.match(/[T ](\d{2}):/);
     if (match) {
       var hr = parseInt(match[1]);
@@ -5117,7 +5126,7 @@ function renderCommunityPulse() {
         <span class="pulse-card-icon">🗺️</span>
       </div>
       <div class="pulse-card-val">${journeyPct}%</div>
-      <div class="pulse-card-sub">${totalKm.toFixed(0)} / ${targetRouteKm} km</div>
+      <div class="pulse-card-sub">${k2kSub}</div>
     </div>
   `;
   
