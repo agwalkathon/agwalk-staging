@@ -1898,7 +1898,7 @@ document.addEventListener('click', function(e) {
           <span class="tab-you-detail-lbl">Strava Profile</span>
           <a id="you-strava-link" href="#" target="_blank" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none;">View ↗</a>
         </div>
-        <div class="tab-you-detail-row" style="align-items:center;">
+        <div class="tab-you-detail-row" id="you-private-row" style="align-items:center;">
           <span class="tab-you-detail-lbl">Private Profile 🔒</span>
           <label class="toggle-switch" style="position:relative;display:inline-block;width:40px;height:22px;">
             <input type="checkbox" id="you-private-toggle" onchange="togglePrivateProfile(this.checked)" style="opacity:0;width:0;height:0;">
@@ -2813,9 +2813,14 @@ async function load(isBackgroundRefresh) {
     if(document.getElementById('you-team'))document.getElementById('you-team').textContent=reg.leaderboard_team||'—';
     if(document.getElementById('you-tshirt'))document.getElementById('you-tshirt').textContent=reg.tshirt_size||'—';
     if(document.getElementById('you-project-lead'))document.getElementById('you-project-lead').textContent=reg.project_lead||'—';
+    var allowPrivate = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.allow_private_profiles !== undefined) ? CONFIG_LB.feed_config.rules.allow_private_profiles : true;
+    var privateRow = document.getElementById('you-private-row');
+    if (privateRow) {
+      privateRow.style.display = allowPrivate ? 'flex' : 'none';
+    }
     var privateToggle = document.getElementById('you-private-toggle');
     if (privateToggle) {
-      privateToggle.checked = reg.is_private === true || reg.is_private === 'true';
+      privateToggle.checked = (reg.is_private === true || reg.is_private === 'true') && allowPrivate;
     }
     var stravaLink=document.getElementById('you-strava-link');
     if(stravaLink){var surl=reg.strava_profile_url||('https://www.strava.com/athletes/'+s.athleteId);stravaLink.href=surl;}
@@ -3866,15 +3871,19 @@ function renderFeed() {
     return 0;
   }
 
+  var usePriority = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.priority_feed_sorting !== undefined) ? CONFIG_LB.feed_config.rules.priority_feed_sorting : true;
+
   filteredFeed.sort(function(a, b) {
     var dateA = new Date(a.created_at);
     var dateB = new Date(b.created_at);
-    var diffMs = Math.abs(dateA - dateB);
-    if (diffMs <= 2000) {
-      var priA = getFeedItemPriority(a);
-      var priB = getFeedItemPriority(b);
-      if (priA !== priB) {
-        return priB - priA; // Higher priority goes first
+    if (usePriority) {
+      var diffMs = Math.abs(dateA - dateB);
+      if (diffMs <= 2000) {
+        var priA = getFeedItemPriority(a);
+        var priB = getFeedItemPriority(b);
+        if (priA !== priB) {
+          return priB - priA; // Higher priority goes first
+        }
       }
     }
     return dateB - dateA;
@@ -3893,29 +3902,39 @@ function renderFeed() {
       dateTimeStr = datePart + ' at ' + timePart;
     } catch(e) {}
 
+    var postSpecific = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.post_specific_reactions !== undefined) ? CONFIG_LB.feed_config.rules.post_specific_reactions : true;
     var emojis = [];
-    if (item.type === 'activity') {
-      emojis = [
-        { type: 'like', char: '👍' },
-        { type: 'clap', char: '👏' }
-      ];
-    } else if (item.type === 'milestone') {
-      emojis = [
-        { type: 'fire', char: '🔥' },
-        { type: 'celebrate', char: '🎉' },
-        { type: 'awesome', char: '🙌' }
-      ];
-    } else if (item.type === 'achievement') {
-      emojis = [
-        { type: 'crown', char: '👑' },
-        { type: 'power', char: '⚡' },
-        { type: 'fire', char: '🔥' }
-      ];
+    if (postSpecific) {
+      if (item.type === 'activity') {
+        emojis = [
+          { type: 'like', char: '👍' },
+          { type: 'clap', char: '👏' }
+        ];
+      } else if (item.type === 'milestone') {
+        emojis = [
+          { type: 'fire', char: '🔥' },
+          { type: 'celebrate', char: '🎉' },
+          { type: 'awesome', char: '🙌' }
+        ];
+      } else if (item.type === 'achievement') {
+        emojis = [
+          { type: 'crown', char: '👑' },
+          { type: 'power', char: '⚡' },
+          { type: 'fire', char: '🔥' }
+        ];
+      } else {
+        emojis = [
+          { type: 'like', char: '👍' },
+          { type: 'fire', char: '🔥' },
+          { type: 'clap', char: '👏' },
+          { type: 'power', char: '💪' }
+        ];
+      }
     } else {
       emojis = [
         { type: 'like', char: '👍' },
-        { type: 'fire', char: '🔥' },
         { type: 'clap', char: '👏' },
+        { type: 'fire', char: '🔥' },
         { type: 'power', char: '💪' }
       ];
     }
@@ -4010,11 +4029,12 @@ function renderFeed() {
                   <span class="stat-val">${durationStr}</span>
                 </div>
               `);
+              var smartPace = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.smart_pace_filter !== undefined) ? CONFIG_LB.feed_config.rules.smart_pace_filter : true;
               var isRunOrCycle = sportLower.indexOf('run') > -1 || 
                                  sportLower.indexOf('ride') > -1 || 
                                  sportLower.indexOf('cycling') > -1 || 
                                  sportLower.indexOf('bike') > -1;
-              if (isRunOrCycle) {
+              if (isRunOrCycle || !smartPace) {
                 statsCols.push(`
                   <div class="stat-item">
                     <span class="stat-label">Pace</span>
@@ -4022,7 +4042,8 @@ function renderFeed() {
                   </div>
                 `);
               }
-              if (calcSteps > 0) {
+              var showStepsRule = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.show_steps !== undefined) ? CONFIG_LB.feed_config.rules.show_steps : true;
+              if (calcSteps > 0 && showStepsRule) {
                 statsCols.push(`
                   <div class="stat-item">
                     <span class="stat-label">Steps</span>
@@ -4031,7 +4052,8 @@ function renderFeed() {
                 `);
               }
               var elevGain = parseFloat(act.elevation_gain || 0);
-              if (elevGain > 0) {
+              var showElevRule = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.feed_config && CONFIG_LB.feed_config.rules && CONFIG_LB.feed_config.rules.show_elevation !== undefined) ? CONFIG_LB.feed_config.rules.show_elevation : true;
+              if (elevGain > 0 && showElevRule) {
                 statsCols.push(`
                   <div class="stat-item">
                     <span class="stat-label">Elev Gain</span>
