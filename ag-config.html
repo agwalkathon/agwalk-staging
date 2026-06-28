@@ -188,7 +188,7 @@ tr:hover td{background:#FAFAFA}
 <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
 <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
 <div class="sb-section" style="margin-top:10px;">Config</div>
-<a href="ag-config.html" class="sb-item active"><i class="ti ti-settings-2"></i><span class="sb-label">Settings</span></a>
+<a href="config.html" class="sb-item active"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
     <a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
 <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
 <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
@@ -298,6 +298,64 @@ function toggleManualList(){var b=document.getElementById("body-manuallist"),c=d
 function toggleSection(id){var b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);if(!b)return;var o=b.classList.contains('open');b.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o)}
 function showSaved(id){var el=document.getElementById(id);if(el){el.style.display='inline';setTimeout(function(){el.style.display='none'},2500)}}
 function renderBonusRows(){document.getElementById('bonus-rows').innerHTML=bonusData.map(function(b,i){return '<tr><td>'+b.km+' km</td><td><input type="number" value="'+b.pts+'" id="bp-'+i+'" min="0"></td></tr>'}).join('')}
+async function loadPWARestrictions() {
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var rows = await r.json();
+    if (rows && rows.length > 0) {
+      var config = JSON.parse(rows[0].config_value);
+      if (config && config.rules) {
+        var p = document.getElementById('rule-force-push');
+        if (p) p.checked = (config.rules.force_push_notifications === true || config.rules.force_push_notifications === 'true');
+        var w = document.getElementById('rule-force-pwa');
+        if (w) w.checked = (config.rules.force_pwa_install === true || config.rules.force_pwa_install === 'true');
+      }
+    }
+  } catch(e) {
+    console.error('Failed to load PWA restrictions:', e);
+  }
+}
+async function savePWARestrictions() {
+  try {
+    var forcePush = !!document.getElementById('rule-force-push').checked;
+    var forcePwa = !!document.getElementById('rule-force-pwa').checked;
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var rows = await r.json();
+    var config = { rules: {}, filters: {} };
+    var rowId = null;
+    if (rows && rows.length > 0) {
+      rowId = rows[0].id;
+      config = JSON.parse(rows[0].config_value);
+    }
+    if (!config.rules) config.rules = {};
+    config.rules.force_push_notifications = forcePush;
+    config.rules.force_pwa_install = forcePwa;
+    var payload = {
+      config_value: JSON.stringify(config),
+      updated_at: new Date().toISOString()
+    };
+    var url = SB_URL + '/rest/v1/leaderboard_config';
+    var method = 'POST';
+    if (rowId) {
+      url += '?id=eq.' + rowId;
+      method = 'PATCH';
+    } else {
+      payload.config_key = 'feed_config';
+    }
+    var res = await fetch(url, {
+      method: method,
+      headers: HDR,
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      showSaved('pwa-saved');
+    } else {
+      throw new Error('Save failed: ' + res.statusText);
+    }
+  } catch(e) {
+    alert('Failed to save restrictions: ' + e.message);
+  }
+}
 async function loadConfig(){
   loadPWARestrictions();var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}});if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await fetch(SB_URL+'/rest/v1/leaderboard_config?config_key=eq.login_method',{method:'PATCH',headers:HDR,body:JSON.stringify({config_value:val,updated_at:new Date().toISOString()})});showSaved('loginmethod-saved');}
@@ -315,7 +373,51 @@ async function previewFlagRules(){var countEl=document.getElementById('flag-prev
 async function applyFlagRules(){var chks=document.querySelectorAll('.row-chk:checked:not(:disabled)'),selectedIdxs=Array.from(chks).map(function(c){return parseInt(c.getAttribute('data-idx'))});var toFlag=selectedIdxs.map(function(i){return flagPreviewData[i]}).filter(Boolean);if(!toFlag.length){alert('Please select at least one activity to flag.');return}var btn=document.getElementById('btn-apply-flags'),countEl=document.getElementById('flag-preview-count');if(!confirm('Flag '+toFlag.length+' selected activit'+(toFlag.length===1?'y':'ies')+'?'))return;btn.disabled=true;btn.textContent='Flagging...';var success=0,failed=0;for(var i=0;i<toFlag.length;i++){var m=toFlag[i];try{var newReason=(m.act.flag_reason?m.act.flag_reason+', ':'')+m.reasons.join(', '),r=await fetch(SB_URL+'/rest/v1/activities?id=eq.'+m.act.id,{method:'PATCH',headers:HDR,body:JSON.stringify({is_flagged:true,flag_reason:newReason})});if(r.ok){success++;m.act.is_flagged=true;var chkEl=document.querySelector('.row-chk[data-idx="'+flagPreviewData.indexOf(m)+'"]');if(chkEl){chkEl.checked=false;chkEl.disabled=true;var row=chkEl.closest('tr');if(row)row.style.opacity='0.5'}}}catch(e){failed++}if(i%10===0)countEl.textContent='Flagging... '+(i+1)+' / '+toFlag.length}btn.textContent='🚩 Flag selected';btn.disabled=false;countEl.textContent='✅ Done — '+success+' flagged'+(failed?' | ❌ '+failed+' failed':'');updateSelectedCount()}
 async function loadChallenges(){var r=await fetch(SB_URL+'/rest/v1/challenges?order=start_date.asc&select=*',{headers:HDR}),chs=await r.json();renderChallenges(Array.isArray(chs)?chs:[])}
 function renderChallenges(chs){document.getElementById('challenges-list').innerHTML=chs.length?chs.map(function(c){return challengeHtml(c)}).join(''):'<p style="color:#bbb;font-size:14px;margin-bottom:16px">No challenges yet. Click Add challenge below.</p>';if(chs.length)setTimeout(function(){chs.forEach(function(c){var sel=document.getElementById('ch-atype-'+c.id);if(sel)updateChFields(sel);});},0);}
-function challengeHtml(c){var statusDot=c.is_active?'<span style="display:inline-block;width:8px;height:8px;background:#2e7d32;border-radius:50%;margin-right:6px"></span>':'<span style="display:inline-block;width:8px;height:8px;background:#bbb;border-radius:50%;margin-right:6px"></span>';return '<div class="ch-compact" id="ch-'+c.id+'"><div class="ch-summary" onclick="toggleCh('+c.id+')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none"><div style="flex:1;display:flex;align-items:center;gap:8px">'+statusDot+'<strong style="font-size:14px">'+esc(c.name)+'</strong><span style="font-size:12px;color:#888;background:#f5f5f5;padding:2px 8px;border-radius:10px">'+c.start_date+(c.end_date!==c.start_date?' → '+c.end_date:'')+'</span><span style="font-size:12px;color:#888">📏 '+c.distance_min+'–'+c.distance_max+' km</span><span style="font-size:12px;font-weight:700;color:#1565c0">+'+c.bonus_points+' pts</span></div><div style="display:flex;gap:6px;align-items:center"><button class="toggle-active '+(c.is_active?'toggle-on':'toggle-off')+'" onclick="event.stopPropagation();toggleChallenge('+c.id+','+c.is_active+')">'+(c.is_active?'✅ Active':'⏸ Inactive')+'</button><span style="font-size:12px;color:#bbb">▼</span></div></div><div class="ch-detail" id="chd-'+c.id+'" style="display:none;padding:16px 18px;border-top:1px solid #f0f0f0;background:#fafafa"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px">'+field('Challenge name','ch-name-'+c.id,'text',c.name)+field('Start date','ch-start-'+c.id,'date',c.start_date)+field('End date','ch-end-'+c.id,'date',c.end_date)+field('Bonus points','ch-pts-'+c.id,'number',c.bonus_points)+field('Eligible','ch-elig-'+c.id,'select-elig',c.eligible)+'<div id="ch-scope-wrap-'+c.id+'">'+field('Activity scope','ch-scope-'+c.id,'select-scope',c.activity_scope)+'</div>'+field('Distance type','ch-dtype-'+c.id,'select-dtype',c.distance_type)+field('Min distance (km)','ch-dmin-'+c.id,'number',c.distance_min)+field('Max distance (km)','ch-dmax-'+c.id,'number',c.distance_max)+field('Start time (HH:MM)','ch-time-'+c.id,'text',c.start_time_criteria||'')+field('Elevation (m)','ch-elev-'+c.id,'number',c.elevation_criteria||0)+field('Award type','ch-atype-'+c.id,'select-atype-dep',c.award_type||(c.range_split?'range-split':c.per_activity_points>0?'per-act':'one-time'))+'<div id="ch-nbt-wrap-'+c.id+'">'+field_select('Normal Bonus','ch-nbt-'+c.id,[['no-change','No Change'],['exclude-all','No Normal Bonus on Day'],['exclude-sum','Exclude Normal Bonus from Sum of Activities'],['per-activity','Each Activity']],c.normal_bonus_type||'no-change')+'</div>'+'</div><div style="display:flex;gap:8px"><button class="btn-save-ch" onclick="saveChallenge('+c.id+')">💾 Save</button><button class="btn-del" onclick="deleteChallenge('+c.id+')">🗑️ Delete</button></div></div></div>'}
+function challengeHtml(c){
+  var statusDot=c.is_active?'<span style="display:inline-block;width:8px;height:8px;background:#2e7d32;border-radius:50%;margin-right:6px"></span>':'<span style="display:inline-block;width:8px;height:8px;background:#bbb;border-radius:50%;margin-right:6px"></span>';
+  return '<div class="ch-compact" id="ch-'+c.id+'"><div class="ch-summary" onclick="toggleCh('+c.id+')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none"><div style="flex:1;display:flex;align-items:center;gap:8px">'+statusDot+'<strong style="font-size:14px">'+esc(c.name)+'</strong><span style="font-size:12px;color:#888;background:#f5f5f5;padding:2px 8px;border-radius:10px">'+c.start_date+(c.end_date!==c.start_date?' → '+c.end_date:'')+'</span><span style="font-size:12px;color:#888">📏 '+c.distance_min+'–'+c.distance_max+' km</span><span style="font-size:12px;font-weight:700;color:#1565c0">+' + c.bonus_points + ' pts</span></div><div style="display:flex;gap:6px;align-items:center"><button class="toggle-active '+(c.is_active?'toggle-on':'toggle-off')+'" onclick="event.stopPropagation();toggleChallenge('+c.id+','+c.is_active+')">'+(c.is_active?'✅ Active':'⏸ Inactive')+'</button><span style="font-size:12px;color:#bbb">▼</span></div></div><div class="ch-detail" id="chd-'+c.id+'" style="display:none;padding:20px;border-top:1px solid #f0f0f0;background:#fcfcfc">' +
+      
+      '<!-- Group 1: Basic Info -->' +
+      '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">📋 Basic Info</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">' +
+        field('Challenge name','ch-name-'+c.id,'text',c.name) +
+        field('Start date','ch-start-'+c.id,'date',c.start_date) +
+        field('End date','ch-end-'+c.id,'date',c.end_date) +
+        field('Eligible Participants','ch-elig-'+c.id,'select-elig',c.eligible) +
+      '</div>' +
+
+      '<!-- Group 2: Qualifying Criteria -->' +
+      '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎯 Qualifying Criteria</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">' +
+        field('Distance type','ch-dtype-'+c.id,'select-dtype',c.distance_type) +
+        field('Min distance (km)','ch-dmin-'+c.id,'number',c.distance_min) +
+        field('Max distance (km)','ch-dmax-'+c.id,'number',c.distance_max) +
+        field('Start time (HH:MM)','ch-time-'+c.id,'text',c.start_time_criteria||'') +
+        field('Elevation (m)','ch-elev-'+c.id,'number',c.elevation_criteria||0) +
+        '<div id="ch-scope-wrap-'+c.id+'" style="display:contents">' +
+          field('Activity scope','ch-scope-'+c.id,'select-scope',c.activity_scope) +
+        '</div>' +
+      '</div>' +
+
+      '<!-- Group 3: Awards & Scoring -->' +
+      '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎁 Awards & Scoring</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">' +
+        '<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:8px">' +
+          field('Award type','ch-atype-'+c.id,'select-atype-dep',c.award_type||(c.range_split?'range-split':c.per_activity_points>0?'per-act':'one-time')) +
+        '</div>' +
+        field('Bonus points','ch-pts-'+c.id,'number',c.bonus_points) +
+        '<div id="ch-nbt-wrap-'+c.id+'" style="display:contents">' +
+          field_select('Normal Bonus','ch-nbt-'+c.id,[['no-change','No Change'],['exclude-all','No Normal Bonus on Day'],['exclude-sum','Exclude Normal Bonus from Sum of Activities'],['per-activity','Each Activity']],c.normal_bonus_type||'no-change') +
+        '</div>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:8px;border-top:1px solid #eee;padding-top:16px;margin-top:20px">' +
+        '<button class="btn-save-ch" onclick="saveChallenge('+c.id+')">💾 Save</button>' +
+        '<button class="btn-del" onclick="deleteChallenge('+c.id+')">🗑️ Delete</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
 function updateChFields(sel){
   var atype=sel.value;
   var cid=sel.id.replace('ch-atype-','');
@@ -323,9 +425,9 @@ function updateChFields(sel){
   var nbtWrap=document.getElementById('ch-nbt-wrap-'+cid);
   var descEl=document.getElementById('adesc-'+sel.id);
   // Activity scope: only visible for one-time
-  if(scopeWrap) scopeWrap.style.display=(atype==='one-time')?'':'none';
+  if(scopeWrap) scopeWrap.style.display=(atype==='one-time')?'contents':'none';
   // Normal Bonus: hidden for range-split and two-challenges-same-day
-  if(nbtWrap)   nbtWrap.style.display=(atype==='range-split'||atype==='two-challenges-same-day')?'none':'';
+  if(nbtWrap)   nbtWrap.style.display=(atype==='range-split'||atype==='two-challenges-same-day')?'none':'contents';
   var descs={
     'one-time':                'Award bonus_points ONCE if any qualifying activity (or daily total) meets criteria. Standard distance bonus still applies.',
     'per-act':                 'Award bonus_points for EACH qualifying activity that meets the distance/elevation/time criteria. Standard distance bonus still applies.',
@@ -411,6 +513,7 @@ loadConfig();loadSpecialDates();loadChallenges();loadManualBonuses();
 </script>
 </body>
 </html>
+
 
 
 
