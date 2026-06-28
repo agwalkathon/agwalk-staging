@@ -128,13 +128,53 @@ tr:hover td{background:#FAFAFA}
 .scroll-top-inner{height:1px}
 .dist-field{display:none}
 .dist-field.show{display:block}
-@media(max-width:768px){.sidebar{width:56px}.main{margin-left:56px;flex-direction:column}.topbar{padding:0 16px;height:54px;flex-shrink:0;}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.val{font-size:18px}th,td{padding:8px 10px;font-size:12px}.filter-grid{grid-template-columns:1fr 1fr;gap:8px}.site-footer{flex-direction:column;gap:6px;text-align:center}}
+@media(max-width:768px){.sidebar{width:56px}.main{margin-left:56px;flex-direction:column}.topbar{padding:0 16px;height:54px;flex-shrink:0;}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.val{font-size:18px}th,td{padding:8px 10px;font-size:12px}.filter-grid{grid-template-columns:1fr 1fr;gap:8px}.site-footer{flex-direction:column;gap:6px;text-align:center}.content{padding:16px 12px !important}.section-header{padding:14px 16px !important}.section-body{padding:16px !important}}
 @media(max-width:480px){.filter-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
 }
 
-.section{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}.section-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none}.section-header:hover{background:#fafafa}.section-header-left{display:flex;align-items:center;gap:12px}.section-title{font-size:16px;font-weight:700}.section-sub-inline{font-size:13px;color:#999}.section-chevron{font-size:14px;color:#bbb;transition:transform .2s}.section-chevron.open{transform:rotate(180deg)}.section-body{display:none}.section-body.open{display:block}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:18px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;font-weight:600}.field input,.field select,.field textarea{padding:9px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:14px;background:#fafafa}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#E8622A;background:white}.save-btn{padding:10px 24px;background:#E8622A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}.save-btn:hover{background:#d4561f}.saved-msg{display:none;color:#2e7d32;font-size:13px;margin-left:12px}.bonus-table{width:100%;border-collapse:collapse;margin-bottom:18px}.bonus-table th{background:#fafafa;padding:9px 14px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #f0f0f0}.bonus-table td{padding:9px 14px;border-bottom:1px solid #f8f8f8}.bonus-table input{width:80px;padding:6px 10px;border:1px solid #e8e8e8;border-radius:6px;font-size:13px;text-align:center}.btn-del{padding:6px 12px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-save-ch{padding:6px 14px;background:#E8622A;color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-add{padding:10px 20px;background:#1A1A1A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}.toggle-active{padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-weight:500;cursor:pointer}.toggle-on{background:#e8f5e9;color:#2e7d32}.toggle-off{background:#f5f5f5;color:#999}.ch-compact{border:1px solid #e8e8e8;border-radius:10px;margin-bottom:10px;overflow:hidden}.ch-compact:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.rule-box{background:#fff7f2;border-left:4px solid #E8622A;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.65;color:#555}.date-pill{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fafafa;border:1px solid #eee;border-radius:10px;padding:10px 12px;margin-bottom:8px}.date-pill strong{font-size:14px}.date-pill span{font-size:12px;color:#888}.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:8px;font-size:13px}.ok{background:#e8f5e9;color:#2e7d32}.err{background:#ffebee;color:#c62828}@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
+.section{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}.section-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none}.section-header:hover{background:#fafafa}.section-header-left{display:flex;align-items:center;gap:12px}.section-header-left div{display:flex;flex-direction:column;gap:2px}.section-title{font-size:15px;font-weight:700;text-align:left;line-height:1.2}.section-sub-inline{font-size:11.5px;color:#888;text-align:left;line-height:1.3}.section-chevron{font-size:14px;color:#bbb;transition:transform .2s}.section-chevron.open{transform:rotate(180deg)}.section-body{display:none}.section-body.open{display:block}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:18px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;font-weight:600}.field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:14px;background:#fafafa}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#E8622A;background:white}.save-btn{padding:10px 24px;background:#E8622A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}.save-btn:hover{background:#d4561f}.saved-msg{display:none;color:#2e7d32;font-size:13px;margin-left:12px}.bonus-table{width:100%;border-collapse:collapse;margin-bottom:18px}.bonus-table th{background:#fafafa;padding:9px 14px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #f0f0f0}.bonus-table td{padding:9px 14px;border-bottom:1px solid #f8f8f8}.bonus-table input{width:80px;padding:6px 10px;border:1px solid #e8e8e8;border-radius:6px;font-size:13px;text-align:center}.btn-del{padding:6px 12px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-save-ch{padding:6px 14px;background:#E8622A;color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-add{padding:10px 20px;background:#1A1A1A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}.toggle-active{padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-weight:500;cursor:pointer}.toggle-on{background:#e8f5e9;color:#2e7d32}.toggle-off{background:#f5f5f5;color:#999}.ch-compact{border:1px solid #e8e8e8;border-radius:10px;margin-bottom:10px;overflow:hidden}.ch-compact:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.rule-box{background:#fff7f2;border-left:4px solid #E8622A;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.65;color:#555}.date-pill{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fafafa;border:1px solid #eee;border-radius:10px;padding:10px 12px;margin-bottom:8px}.date-pill strong{font-size:14px}.date-pill span{font-size:12px;color:#888}.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:8px;font-size:13px}.ok{background:#e8f5e9;color:#2e7d32}.err{background:#ffebee;color:#c62828}@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
 
-  </style>
+  
+    /* Toggle switch styles */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    .switch input:checked + .slider {
+      background-color: var(--brand);
+    }
+    .switch input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+</style>
 </head>
 <body>
 <aside class="sidebar">
@@ -169,6 +209,46 @@ tr:hover td{background:#FAFAFA}
 <div class="section"><div class="section-header" onclick="toggleSection('manual')"><div class="section-header-left"><span>🎁</span><div><div class="section-title">Manual Bonus by Activity ID</div><div class="section-sub-inline">Apply bonus points to specific activities manually</div></div></div><span class="section-chevron" id="chev-manual">▼</span></div><div class="section-body" id="body-manual"><div class="form-grid" style="max-width:700px"><div class="field" style="grid-column:1/-1"><label>Activity IDs (one per line, or comma separated)</label><textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea></div><div class="field"><label>Apply bonus to</label><select id="manual-apply-to"><option value="each">Each activity individually</option><option value="day">All activities on same day</option></select></div><div class="field"><label>Bonus points</label><input type="number" id="manual-pts" value="3" min="1" max="50"></div><div class="field"><label>Date</label><input type="date" id="manual-date"></div><div class="field"><label>Challenge name</label><input type="text" id="manual-reason" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button><span class="saved-msg" id="manual-saved">✅ Applied!</span><div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div><div style="margin-top:20px"><div onclick="toggleManualList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:8px;user-select:none"><div style="font-size:14px;font-weight:600">Existing manual bonuses</div><span id="chev-manuallist" style="font-size:13px;color:#bbb;transition:transform .2s">▼</span></div><div id="body-manuallist" style="display:none;margin-top:8px"><div id="manual-list"></div></div></div></div></div>
 
 <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span>🔑</span><div><div class="section-title">Participant Login Method</div><div class="section-sub-inline">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">▼</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">✅ Saved!</span></div></div>
+
+<div class="section">
+  <div class="section-header" onclick="toggleSection('pwarules')">
+    <div class="section-header-left">
+      <span>🔔</span>
+      <div>
+        <div class="section-title">PWA & Push Restrictions</div>
+        <div class="section-sub-inline">Configure installation and notification access requirements for mobile participants</div>
+      </div>
+    </div>
+    <span class="section-chevron" id="chev-pwarules">▼</span>
+  </div>
+  <div class="section-body" id="body-pwarules" style="padding: 24px;">
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+        <div style="flex: 1; text-align: left;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Push Notifications</strong>
+          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to enable push notifications before releasing the app dashboard.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="rule-force-push">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; gap: 15px;">
+        <div style="flex: 1; text-align: left;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Add to Home Screen (PWA)</strong>
+          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to install the app on their Home Screen as a PWA to access the app.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="rule-force-pwa">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <button class="save-btn" onclick="savePWARestrictions()">Save restrictions</button>
+    <span class="saved-msg" id="pwa-saved">✅ Saved!</span>
+  </div>
+</div>
+
 
 <div class="section"><div class="section-header" onclick="toggleSection('cachemgmt')"><div class="section-header-left"><span>🧹</span><div><div class="section-title">Cache Management</div><div class="section-sub-inline">Clear browser local cache to see updates immediately</div></div></div><span class="section-chevron" id="chev-cachemgmt">▼</span></div><div class="section-body" id="body-cachemgmt"><div class="rule-box"><strong>Application Cache:</strong><br>The frontend caches leaderboard and configuration data to reduce database load. If you applied manual bonuses, added new challenges, or flagged activities, it may take up to 5 minutes to show up. Click below to clear your local cache and reload immediately.</div><button class="save-btn" onclick="clearMyCache()">🧹 Clear My Browser Cache</button><span class="saved-msg" id="cache-saved">✅ Cache Cleared!</span></div></div>
 
@@ -218,7 +298,8 @@ function toggleManualList(){var b=document.getElementById("body-manuallist"),c=d
 function toggleSection(id){var b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);if(!b)return;var o=b.classList.contains('open');b.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o)}
 function showSaved(id){var el=document.getElementById(id);if(el){el.style.display='inline';setTimeout(function(){el.style.display='none'},2500)}}
 function renderBonusRows(){document.getElementById('bonus-rows').innerHTML=bonusData.map(function(b,i){return '<tr><td>'+b.km+' km</td><td><input type="number" value="'+b.pts+'" id="bp-'+i+'" min="0"></td></tr>'}).join('')}
-async function loadConfig(){var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}});if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
+async function loadConfig(){
+  loadPWARestrictions();var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}});if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await fetch(SB_URL+'/rest/v1/leaderboard_config?config_key=eq.login_method',{method:'PATCH',headers:HDR,body:JSON.stringify({config_value:val,updated_at:new Date().toISOString()})});showSaved('loginmethod-saved');}
 function clearMyCache(){var keysToRemove=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('agwalk_')===0){keysToRemove.push(k)}}keysToRemove.forEach(function(k){localStorage.removeItem(k)});showSaved('cache-saved');setTimeout(function(){window.location.reload()},1200)}
 async function saveMedals(){var val={gold:{male:+document.getElementById('gold-male').value,female:+document.getElementById('gold-female').value},silver:{male:+document.getElementById('silver-male').value,female:+document.getElementById('silver-female').value},bronze:{male:+document.getElementById('bronze-male').value,female:+document.getElementById('bronze-female').value}};await fetch(SB_URL+'/rest/v1/leaderboard_config?config_key=eq.medals',{method:'PATCH',headers:HDR,body:JSON.stringify({config_value:val,updated_at:new Date().toISOString()})});showSaved('medals-saved')}
