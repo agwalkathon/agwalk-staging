@@ -1626,9 +1626,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
     cursor: pointer;
-    width: 82px;
     height: 98px;
     background: rgba(26, 29, 32, 0.55);
     backdrop-filter: blur(16px);
@@ -1646,33 +1646,30 @@
   }
   
   /* ── Community Pulse Carousel & Ticker ── */
-  .community-stats-carousel {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 4px 2px 8px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  .community-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
   }
-  .community-stats-carousel::-webkit-scrollbar {
-    display: none;
+  @media (max-width: 480px) {
+    .community-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   .pulse-card {
-    flex: 0 0 165px;
-    scroll-snap-align: start;
     background: rgba(26, 29, 32, 0.55);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    padding: 12px 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     transition: transform 0.2s ease, border-color 0.2s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 105px;
+    height: 92px;
   }
   .pulse-card:hover {
     transform: translateY(-2px);
@@ -2545,7 +2542,14 @@ document.addEventListener('click', function(e) {
     </div>
   </div>
 
-  <!-- Metrics -->
+    <!-- Community Pulse Dashboard -->
+    <div id="community-pulse-section" style="display:none; margin-bottom:20px;">
+      <div class="sec">Community Pulse</div>
+      <div class="community-stats-grid" id="community-stats-grid"></div>
+      <div id="live-activity-ticker" class="ticker-wrap" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Metrics -->
   <div class="sec">My Stats</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
     <div class="stat-card-item">
@@ -2700,11 +2704,7 @@ document.addEventListener('click', function(e) {
   <div class="sec">Activity Feed</div>
   <div id="feed-highlights-row" style="display:none; margin-bottom: 16px;"></div>
   
-  <!-- Community Pulse Dashboard -->
-  <div id="community-pulse-section" style="display:none; margin-bottom:18px;">
-    <div class="community-stats-carousel" id="community-stats-carousel"></div>
-    <div id="live-activity-ticker" class="ticker-wrap" style="margin-top:12px;"></div>
-  </div>
+
   <div id="feed-list">
     <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
     <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
@@ -4974,7 +4974,7 @@ function triggerHighlightCheer() {
 }
 function renderCommunityPulse() {
   var pulseSec = document.getElementById('community-pulse-section');
-  var carousel = document.getElementById('community-stats-carousel');
+  var carousel = document.getElementById('community-stats-grid');
   var ticker = document.getElementById('live-activity-ticker');
   if (!pulseSec || !carousel || !ticker) return;
 
@@ -5037,22 +5037,34 @@ function renderCommunityPulse() {
   var endFmt = (endHr % 12 || 12) + ':00 ' + endPeriod;
   var peakHourStr = startFmt + ' - ' + endFmt;
 
-  // Render Carousel Cards
+  // Render Grid Cards
   var cardsHtml = '';
   
-  // Card 1: Community Odometer
+  // Card 1: Community Odometer (Distance)
   cardsHtml += `
     <div class="pulse-card">
       <div class="pulse-card-header">
-        <span>Odometer</span>
+        <span>Distance</span>
         <span class="pulse-card-icon">🏆</span>
       </div>
       <div class="pulse-card-val">${totalKm.toLocaleString('en-IN', {maximumFractionDigits:1})} km</div>
-      <div class="pulse-card-sub">${(totalKm * 1350).toLocaleString('en-IN', {maximumFractionDigits:0})} total steps</div>
+      <div class="pulse-card-sub">community total</div>
+    </div>
+  `;
+
+  // Card 2: Total Steps
+  cardsHtml += `
+    <div class="pulse-card">
+      <div class="pulse-card-header">
+        <span>Total Steps</span>
+        <span class="pulse-card-icon">👟</span>
+      </div>
+      <div class="pulse-card-val">${(totalKm * 1350).toLocaleString('en-IN', {maximumFractionDigits:0})}</div>
+      <div class="pulse-card-sub">community steps</div>
     </div>
   `;
   
-  // Card 2: Active Today
+  // Card 3: Active Today
   cardsHtml += `
     <div class="pulse-card">
       <div class="pulse-card-header">
@@ -5064,7 +5076,7 @@ function renderCommunityPulse() {
     </div>
   `;
   
-  // Card 3: Eco-Impact
+  // Card 4: Eco-Impact
   cardsHtml += `
     <div class="pulse-card">
       <div class="pulse-card-header">
@@ -5072,11 +5084,11 @@ function renderCommunityPulse() {
         <span class="pulse-card-icon">🌱</span>
       </div>
       <div class="pulse-card-val">${co2Saved.toFixed(1)} kg</div>
-      <div class="pulse-card-sub">≈ ${treesPlanted.toFixed(1)} trees planted</div>
+      <div class="pulse-card-sub">≈ ${treesPlanted.toFixed(1)} trees saved</div>
     </div>
   `;
   
-  // Card 4: Virtual Journey
+  // Card 5: Virtual Journey
   cardsHtml += `
     <div class="pulse-card">
       <div class="pulse-card-header">
@@ -5088,7 +5100,7 @@ function renderCommunityPulse() {
     </div>
   `;
   
-  // Card 5: Peak Active Hour
+  // Card 6: Peak Active Hour
   cardsHtml += `
     <div class="pulse-card">
       <div class="pulse-card-header">
@@ -5970,6 +5982,7 @@ function showTab(tab){
 
     if (tab === 'dashboard') {
       triggerRingAnimation();
+      if (typeof renderCommunityPulse === 'function') renderCommunityPulse();
     }
   }, 320);
 }
