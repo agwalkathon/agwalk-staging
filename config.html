@@ -298,6 +298,64 @@ function toggleManualList(){var b=document.getElementById("body-manuallist"),c=d
 function toggleSection(id){var b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);if(!b)return;var o=b.classList.contains('open');b.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o)}
 function showSaved(id){var el=document.getElementById(id);if(el){el.style.display='inline';setTimeout(function(){el.style.display='none'},2500)}}
 function renderBonusRows(){document.getElementById('bonus-rows').innerHTML=bonusData.map(function(b,i){return '<tr><td>'+b.km+' km</td><td><input type="number" value="'+b.pts+'" id="bp-'+i+'" min="0"></td></tr>'}).join('')}
+async function loadPWARestrictions() {
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var rows = await r.json();
+    if (rows && rows.length > 0) {
+      var config = JSON.parse(rows[0].config_value);
+      if (config && config.rules) {
+        var p = document.getElementById('rule-force-push');
+        if (p) p.checked = (config.rules.force_push_notifications === true || config.rules.force_push_notifications === 'true');
+        var w = document.getElementById('rule-force-pwa');
+        if (w) w.checked = (config.rules.force_pwa_install === true || config.rules.force_pwa_install === 'true');
+      }
+    }
+  } catch(e) {
+    console.error('Failed to load PWA restrictions:', e);
+  }
+}
+async function savePWARestrictions() {
+  try {
+    var forcePush = !!document.getElementById('rule-force-push').checked;
+    var forcePwa = !!document.getElementById('rule-force-pwa').checked;
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var rows = await r.json();
+    var config = { rules: {}, filters: {} };
+    var rowId = null;
+    if (rows && rows.length > 0) {
+      rowId = rows[0].id;
+      config = JSON.parse(rows[0].config_value);
+    }
+    if (!config.rules) config.rules = {};
+    config.rules.force_push_notifications = forcePush;
+    config.rules.force_pwa_install = forcePwa;
+    var payload = {
+      config_value: JSON.stringify(config),
+      updated_at: new Date().toISOString()
+    };
+    var url = SB_URL + '/rest/v1/leaderboard_config';
+    var method = 'POST';
+    if (rowId) {
+      url += '?id=eq.' + rowId;
+      method = 'PATCH';
+    } else {
+      payload.config_key = 'feed_config';
+    }
+    var res = await fetch(url, {
+      method: method,
+      headers: HDR,
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      showSaved('pwa-saved');
+    } else {
+      throw new Error('Save failed: ' + res.statusText);
+    }
+  } catch(e) {
+    alert('Failed to save restrictions: ' + e.message);
+  }
+}
 async function loadConfig(){
   loadPWARestrictions();var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}});if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await fetch(SB_URL+'/rest/v1/leaderboard_config?config_key=eq.login_method',{method:'PATCH',headers:HDR,body:JSON.stringify({config_value:val,updated_at:new Date().toISOString()})});showSaved('loginmethod-saved');}
@@ -455,6 +513,7 @@ loadConfig();loadSpecialDates();loadChallenges();loadManualBonuses();
 </script>
 </body>
 </html>
+
 
 
 
