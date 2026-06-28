@@ -617,14 +617,30 @@ td button.btn:last-child { margin-right: 0; }
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
-                  <input type="checkbox" id="cfg-exclude-rides" style="opacity:0; width:0; height:0;">
+                  <input type="checkbox" id="cfg-exclude-rides" onchange="toggleExcludeRidesSection(this.checked)" style="opacity:0; width:0; height:0;">
                   <span class="toggle-slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.2s; border-radius:18px;"></span>
                 </label>
                 <i class="ti ti-chevron-down toggle-icon" id="icon-exclude-rides" style="font-size:16px; transition:transform 0.2s; color:var(--text-secondary);"></i>
               </div>
             </div>
             <div class="card-body" id="card-exclude-rides" style="display:none; padding: 0 16px 16px; border-top:1px solid var(--border); padding-top:16px;">
-              <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.4;">When enabled, any activities recorded as cycling (Ride, Mountain Bike Ride, E-Bike Ride, Gravel Ride, Virtual Ride) will be automatically flagged as "Ride / Cycling" to prevent cycle stats from mixing into the leaderboards.</p>
+              <div id="exclude-rides-config-section" style="display:none; flex-direction:column; gap:12px;">
+                <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.4;">When enabled, selected sport types will be automatically flagged as "Ride / Cycling" to prevent these stats from entering the leaderboards.</p>
+                <div>
+                  <label style="display:block; font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:600;">Exclude Sports</label>
+                  <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:13px; font-weight:500;">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="Ride" style="cursor:pointer;"> Ride</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="VirtualRide" style="cursor:pointer;"> Virtual Ride</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="MountainBikeRide" style="cursor:pointer;"> Mountain Bike</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="EBikeRide" style="cursor:pointer;"> E-Bike</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="GravelRide" style="cursor:pointer;"> Gravel Ride</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="Walk" style="cursor:pointer;"> Walk</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="Run" style="cursor:pointer;"> Run</label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:6px;"><input type="checkbox" class="cfg-exclude-rides-sport" value="Hike" style="cursor:pointer;"> Hike</label>
+                  </div>
+                </div>
+              </div>
+              <div id="exclude-rides-disabled-msg" style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Exclude Rides / Cycling is disabled. Toggle switch in header to enable.</div>
             </div>
           </div>
 
@@ -683,11 +699,11 @@ td button.btn:last-child { margin-right: 0; }
             </div>
           </div>
 
-          <!-- 4. Max Moving/Elapsed Gap Check -->
+          <!-- 4. Max Moving/Elapsed Time Gap Check -->
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-max-gap')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                ⏱️ Max Moving/Elapsed Gap Check
+                ⏱️ Max Moving/Elapsed Time Gap Check
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -715,15 +731,15 @@ td button.btn:last-child { margin-right: 0; }
                   </div>
                 </div>
               </div>
-              <div id="max-gap-disabled-msg" style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Max Moving/Elapsed Gap Check is disabled. Toggle switch in header to enable.</div>
+              <div id="max-gap-disabled-msg" style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Max Moving/Elapsed Time Gap Check is disabled. Toggle switch in header to enable.</div>
             </div>
           </div>
 
-          <!-- 5. Max Speed Limit Check -->
+          <!-- 5. Min/Max Pace and Speed Check -->
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-max-speed')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                ⚡ Max Speed Limit Check
+                ⚡ Min/Max Pace and Speed Check
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -735,10 +751,32 @@ td button.btn:last-child { margin-right: 0; }
             </div>
             <div class="card-body" id="card-max-speed" style="display:none; padding: 0 16px 16px; border-top:1px solid var(--border); padding-top:16px;">
               <div id="max-speed-config-section" style="display:none; flex-direction:column; gap:12px;">
-                <div class="filter-grid" style="grid-template-columns: 1fr; gap:12px; margin-bottom:0;">
-                  <div class="filter-group">
-                    <label>Max Speed Limit (km/h)</label>
-                    <input type="number" id="cfg-max-speed" step="0.5" min="0" placeholder="e.g. 10.0">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                  <div style="background:var(--page-bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin-bottom:8px;">Walk, Run, Hike Pace (min/km)</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div class="filter-group" style="margin:0;">
+                        <label style="font-size:10px;">Min Pace (Fast Limit)</label>
+                        <input type="number" id="cfg-min-pace" step="0.1" min="0" placeholder="e.g. 3.0">
+                      </div>
+                      <div class="filter-group" style="margin:0;">
+                        <label style="font-size:10px;">Max Pace (Slow Limit)</label>
+                        <input type="number" id="cfg-max-pace" step="0.5" min="0" placeholder="e.g. 20.0">
+                      </div>
+                    </div>
+                  </div>
+                  <div style="background:var(--page-bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin-bottom:8px;">Ride Speed (km/h)</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div class="filter-group" style="margin:0;">
+                        <label style="font-size:10px;">Min Speed (Slow Limit)</label>
+                        <input type="number" id="cfg-min-speed" step="0.5" min="0" placeholder="e.g. 5.0">
+                      </div>
+                      <div class="filter-group" style="margin:0;">
+                        <label style="font-size:10px;">Max Speed (Fast Limit)</label>
+                        <input type="number" id="cfg-max-speed" step="0.5" min="0" placeholder="e.g. 45.0">
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -751,7 +789,7 @@ td button.btn:last-child { margin-right: 0; }
                   </div>
                 </div>
               </div>
-              <div id="max-speed-disabled-msg" style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Max Speed Limit Check is disabled. Toggle switch in header to enable.</div>
+              <div id="max-speed-disabled-msg" style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Min/Max Pace and Speed Check is disabled. Toggle switch in header to enable.</div>
             </div>
           </div>
 
@@ -1895,6 +1933,12 @@ function toggleCollapse(id) {
 var currentRulesConfig = null;
 
 // Toggle sections helpers
+function toggleExcludeRidesSection(show) {
+  var sec = document.getElementById('exclude-rides-config-section');
+  if (sec) sec.style.display = show ? 'flex' : 'none';
+  var msg = document.getElementById('exclude-rides-disabled-msg');
+  if (msg) msg.style.display = show ? 'none' : 'block';
+}
 function toggleMinDistanceSection(show) {
   var sec = document.getElementById('min-distance-config-section');
   if (sec) sec.style.display = show ? 'flex' : 'none';
@@ -1979,6 +2023,11 @@ function populateRulesUI(config) {
     var excludeRides = r.exclude_rides;
     chkExcludeRides.checked = typeof excludeRides === 'object' ? !!excludeRides.enabled : (excludeRides !== false);
   }
+  toggleExcludeRidesSection(chkExcludeRides ? chkExcludeRides.checked : true);
+  var excludeRidesSports = (typeof r.exclude_rides === 'object' && r.exclude_rides.sports) || ['Ride', 'VirtualRide', 'MountainBikeRide', 'EBikeRide', 'GravelRide'];
+  document.querySelectorAll('.cfg-exclude-rides-sport').forEach(function(chk) {
+    chk.checked = excludeRidesSports.includes(chk.value);
+  });
   
   var chkExcludeWorkouts = document.getElementById('cfg-exclude-workouts');
   if (chkExcludeWorkouts) {
@@ -2018,19 +2067,33 @@ function populateRulesUI(config) {
     chk.checked = maxGapSports.includes(chk.value);
   });
   
-  // 5. Max Speed Limit Check
-  var maxSpeedRule = r.max_speed_rule || {};
+  // 5. Min/Max Pace and Speed Check
+  var paceSpeedRule = r.pace_speed_rule || {};
   var chkMaxSpeedEnabled = document.getElementById('cfg-max-speed-enabled');
   if (chkMaxSpeedEnabled) {
-    chkMaxSpeedEnabled.checked = maxSpeedRule.enabled !== undefined ? !!maxSpeedRule.enabled : (r.max_speed_ms !== undefined);
+    chkMaxSpeedEnabled.checked = paceSpeedRule.enabled !== undefined ? !!paceSpeedRule.enabled : (r.max_speed_ms !== undefined);
   }
+  
+  var inputMinPace = document.getElementById('cfg-min-pace');
+  if (inputMinPace) inputMinPace.value = paceSpeedRule.min_pace !== undefined ? paceSpeedRule.min_pace : '';
+  
+  var inputMaxPace = document.getElementById('cfg-max-pace');
+  if (inputMaxPace) inputMaxPace.value = paceSpeedRule.max_pace !== undefined ? paceSpeedRule.max_pace : '';
+  
+  var inputMinSpeed = document.getElementById('cfg-min-speed');
+  if (inputMinSpeed) inputMinSpeed.value = paceSpeedRule.min_speed !== undefined ? paceSpeedRule.min_speed : '';
+
   var inputMaxSpeed = document.getElementById('cfg-max-speed');
   if (inputMaxSpeed) {
-    var speedMsVal = maxSpeedRule.value !== undefined ? maxSpeedRule.value : (r.max_speed_ms !== undefined ? r.max_speed_ms : 2.78);
-    inputMaxSpeed.value = (speedMsVal * 3.6).toFixed(1);
+    if (paceSpeedRule.max_speed !== undefined) {
+      inputMaxSpeed.value = paceSpeedRule.max_speed;
+    } else {
+      var speedMsVal = r.max_speed_ms !== undefined ? r.max_speed_ms : 2.78;
+      inputMaxSpeed.value = (speedMsVal * 3.6).toFixed(1);
+    }
   }
   toggleMaxSpeedSection(chkMaxSpeedEnabled ? chkMaxSpeedEnabled.checked : true);
-  var maxSpeedSports = maxSpeedRule.sports || ['Walk', 'Run', 'Hike'];
+  var maxSpeedSports = paceSpeedRule.sports || ['Walk', 'Run', 'Hike', 'Ride'];
   document.querySelectorAll('.cfg-max-speed-sport').forEach(function(chk) {
     chk.checked = maxSpeedSports.includes(chk.value);
   });
@@ -2160,6 +2223,11 @@ function deleteCustomRuleRow(id) {
 // Gather all inputs from UI and compile rules configuration object
 function gatherRulesConfigFromUI() {
   var excludeRides = document.getElementById('cfg-exclude-rides').checked;
+  var excludeRidesSports = [];
+  document.querySelectorAll('.cfg-exclude-rides-sport:checked').forEach(function(chk) {
+    excludeRidesSports.push(chk.value);
+  });
+
   var excludeWorkouts = document.getElementById('cfg-exclude-workouts').checked;
   
   // 3. Min Distance Rule
@@ -2178,13 +2246,16 @@ function gatherRulesConfigFromUI() {
     maxGapSports.push(chk.value);
   });
 
-  // 5. Max Speed Rule
-  var maxSpeedEnabled = document.getElementById('cfg-max-speed-enabled').checked;
-  var maxSpeedKmh = parseFloat(document.getElementById('cfg-max-speed').value) || 10.0;
-  var maxSpeedMs = maxSpeedKmh > 0 ? maxSpeedKmh / 3.6 : 2.78;
-  var maxSpeedSports = [];
+  // 5. Min/Max Pace and Speed Rule
+  var paceSpeedEnabled = document.getElementById('cfg-max-speed-enabled').checked;
+  var minPace = parseFloat(document.getElementById('cfg-min-pace').value) || 0;
+  var maxPace = parseFloat(document.getElementById('cfg-max-pace').value) || 0;
+  var minSpeed = parseFloat(document.getElementById('cfg-min-speed').value) || 0;
+  var maxSpeed = parseFloat(document.getElementById('cfg-max-speed').value) || 0;
+  var maxSpeedMs = maxSpeed > 0 ? maxSpeed / 3.6 : 2.78;
+  var paceSpeedSports = [];
   document.querySelectorAll('.cfg-max-speed-sport:checked').forEach(function(chk) {
-    maxSpeedSports.push(chk.value);
+    paceSpeedSports.push(chk.value);
   });
 
   // Pace deviation
@@ -2229,7 +2300,8 @@ function gatherRulesConfigFromUI() {
   return {
     rules: {
       exclude_rides: {
-        enabled: excludeRides
+        enabled: excludeRides,
+        sports: excludeRidesSports
       },
       exclude_workouts: {
         enabled: excludeWorkouts
@@ -2244,10 +2316,13 @@ function gatherRulesConfigFromUI() {
         value: maxGapVal,
         sports: maxGapSports
       },
-      max_speed_rule: {
-        enabled: maxSpeedEnabled,
-        value: maxSpeedMs,
-        sports: maxSpeedSports
+      pace_speed_rule: {
+        enabled: paceSpeedEnabled,
+        min_pace: minPace,
+        max_pace: maxPace,
+        min_speed: minSpeed,
+        max_speed: maxSpeed,
+        sports: paceSpeedSports
       },
       pace_deviation_rule: {
         enabled: paceEnabled,
