@@ -656,24 +656,42 @@ async function loadEmailStatus() {
       if (d.provider === 'brevo' && d.configured) {
         widget.style.display = 'block';
         var remaining = d.remaining;
-        var limit = d.limit;
-        var progressPercent = Math.min(100, Math.max(0, (remaining / limit) * 100));
         
-        document.getElementById('brevo-usage-remaining').textContent = remaining;
-        document.getElementById('brevo-usage-total').textContent = remaining + ' / ' + limit;
-        document.getElementById('brevo-usage-progress').style.width = progressPercent + '%';
-        
-        if (remaining <= 20) {
-          document.getElementById('brevo-usage-progress').style.background = '#d32f2f'; // Red if running low
+        if (d.isUnlimitedDaily) {
+          // Starter / Paid plan
+          document.getElementById('brevo-usage-plan').textContent = 'Starter Plan (Paid)';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(46,125,50,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#2e7d32';
+          
+          document.getElementById('brevo-usage-remaining').textContent = remaining.toLocaleString();
+          document.getElementById('brevo-usage-total').textContent = 'Monthly Credits Left';
+          document.getElementById('brevo-usage-progress').style.width = '100%';
+          document.getElementById('brevo-usage-progress').style.background = '#2e7d32';
         } else {
-          document.getElementById('brevo-usage-progress').style.background = '#E8622A';
+          // Free plan (Daily limit of 300)
+          var limit = d.limit || 300;
+          var progressPercent = Math.min(100, Math.max(0, (remaining / limit) * 100));
+          
+          document.getElementById('brevo-usage-plan').textContent = 'Daily Send Limit';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(232,98,42,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#E8622A';
+          
+          document.getElementById('brevo-usage-remaining').textContent = remaining;
+          document.getElementById('brevo-usage-total').textContent = remaining + ' / ' + limit;
+          document.getElementById('brevo-usage-progress').style.width = progressPercent + '%';
+          
+          if (remaining <= 20) {
+            document.getElementById('brevo-usage-progress').style.background = '#d32f2f'; // Red if running low
+          } else {
+            document.getElementById('brevo-usage-progress').style.background = '#E8622A';
+          }
         }
-        
+
         if (d.error) {
           document.getElementById('brevo-usage-remaining').textContent = '⚠️';
           document.getElementById('brevo-usage-plan').textContent = 'Connection Error';
-        } else {
-          document.getElementById('brevo-usage-plan').textContent = 'Daily Send Limit';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(211,47,47,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#d32f2f';
         }
       } else {
         widget.style.display = 'none'; // Hide if SMTP or not configured
