@@ -6901,22 +6901,48 @@ function openProfileDetail(athleteId, event) {
           } else {
             if (d === 0) {
               currentDay.setDate(currentDay.getDate() - 1);
-            cell.style.background = 'var(--brand)';
-            cell.style.boxShadow = '0 0 6px var(--brand)';
-          } else if (distVal >= 15) {
-            cell.style.background = 'rgba(232, 98, 42, 0.9)';
-          } else if (distVal >= 10) {
-            cell.style.background = 'rgba(232, 98, 42, 0.7)';
-          } else if (distVal >= 8) {
-            cell.style.background = 'rgba(232, 98, 42, 0.5)';
-          } else {
-            cell.style.background = 'rgba(232, 98, 42, 0.3)';
+              var yesterdayYMD = currentDay.toISOString().slice(0, 10);
+              if (activeDates[yesterdayYMD]) {
+                activeCount++;
+                currentDay.setDate(currentDay.getDate() - 1);
+                continue;
+              }
+            }
+            break;
           }
-        } else {
-          cell.style.background = 'rgba(255, 255, 255, 0.05)';
         }
-        grid.appendChild(cell);
-      }
+        document.getElementById('prof-pb-streak').innerText = activeCount + ' days';
+
+        // Heatmap Grid
+        var grid = document.getElementById('prof-heatmap-grid');
+        grid.innerHTML = '';
+        for (var dayNum = 1; dayNum <= 30; dayNum++) {
+          var dateStr = '2026-06-' + (dayNum < 10 ? '0' + dayNum : dayNum);
+          var distVal = activeDates[dateStr] || 0;
+          
+          var cell = document.createElement('div');
+          cell.className = 'hm-cell';
+          cell.setAttribute('title', 'June ' + dayNum + ': ' + distVal.toFixed(2) + ' km');
+          
+          if (distVal > 0) {
+            cell.classList.add('active');
+            if (distVal >= 21) {
+              cell.style.background = 'var(--brand)';
+              cell.style.boxShadow = '0 0 6px var(--brand)';
+            } else if (distVal >= 15) {
+              cell.style.background = 'rgba(232, 98, 42, 0.9)';
+            } else if (distVal >= 10) {
+              cell.style.background = 'rgba(232, 98, 42, 0.7)';
+            } else if (distVal >= 8) {
+              cell.style.background = 'rgba(232, 98, 42, 0.5)';
+            } else {
+              cell.style.background = 'rgba(232, 98, 42, 0.3)';
+            }
+          } else {
+            cell.style.background = 'rgba(255, 255, 255, 0.05)';
+          }
+          grid.appendChild(cell);
+        }
 
       // Recent 3 Activities list
       var listContainer = document.getElementById('prof-recent-activities');
@@ -6965,6 +6991,9 @@ function openProfileDetail(athleteId, event) {
     .catch(function(err) {
       console.warn('Profile activities load error:', err);
     });
+  } catch (errGlobal) {
+    console.error('Error executing openProfileDetail:', errGlobal);
+  }
 }
 
 function closeProfileDetail() {
