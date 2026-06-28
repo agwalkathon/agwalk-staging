@@ -5438,11 +5438,12 @@ function _buildBannerHtml(type, pillLabel, emoji, title, body, chips, key, timeS
       }).join('') + '</div>';
   }
   var timeHtml = timeStr ? '<div class="banner-time">' + timeStr + '</div>' : '';
+  var pillHtml = pillLabel ? '<span class="banner-type-pill ' + type + '">' + pillLabel + '</span>' : '';
   return '<div class="banner-card type-' + type + '">' +
     '<button class="banner-dismiss-btn" onclick="dismissInAppBanner(event)" title="Dismiss">✕</button>' +
     '<div class="banner-meta">' +
       '<span style="font-size:18px;">' + emoji + '</span>' +
-      '<span class="banner-type-pill ' + type + '">' + pillLabel + '</span>' +
+      pillHtml +
     '</div>' +
     '<div class="banner-title">' + title + '</div>' +
     '<div class="banner-body">' + body + '</div>' +
@@ -5486,7 +5487,7 @@ function updateInAppNotificationBanner() {
     var t = ((n.title||'') + ' ' + (n.body||'')).toLowerCase();
     var isBroadcast = t.indexOf('broadcast') !== -1 || t.indexOf('update') !== -1 || t.indexOf('admin') !== -1;
     var type = isBroadcast ? 'broadcast' : 'insight';
-    var pillLabel = isBroadcast ? '📢 Broadcast' : '🔔 Notification';
+    var pillLabel = isBroadcast ? '📢 Broadcast' : '';
     var emoji = getNotifEmoji(n.title, n.body);
     var timeStr = timeAgo(n.created_at);
     var html = _buildBannerHtml(type, pillLabel, emoji, esc(n.title), formatMarkdown(esc(n.body)), null, key, timeStr);
