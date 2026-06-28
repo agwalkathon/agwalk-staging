@@ -1976,23 +1976,46 @@ function findSharedActivityGroups(acts) {
   if (cfg.checkPace) checkedFields.push('pace');
   if (checkedFields.length === 0) return [];
 
-  // Build key for each activity
+  // Validate all checked fields have real non-null non-zero data.
+  // Activities missing any required field are excluded entirely to prevent false groupings.
+  function isValidForGrouping(a) {
+    if (cfg.checkDate) {
+      var d = getActDate(a);
+      if (!d || d.length < 8) return false;
+    }
+    if (cfg.checkStartTime) {
+      var t = getActStartTimeKey(a);
+      // 00:00 = no real start time recorded by Strava (midnight default = missing)
+      if (!t || t === '00:00') return false;
+    }
+    if (cfg.checkDistance) {
+      if (Math.round(parseFloat(a.distance_meters) || 0) <= 0) return false;
+    }
+    if (cfg.checkMovingTime) {
+      if (Math.round(parseFloat(a.moving_time_seconds) || 0) <= 0) return false;
+    }
+    if (cfg.checkPace) {
+      if (!getActPaceKey(a)) return false;
+    }
+    return true;
+  }
+
+  // Build exact grouping key — no empty-string fallbacks
   function makeKey(a) {
     var parts = [];
     if (cfg.checkDate) parts.push('D:' + getActDate(a));
-    if (cfg.checkStartTime) parts.push('T:' + (getActStartTimeKey(a) || ''));
+    if (cfg.checkStartTime) parts.push('T:' + getActStartTimeKey(a));
     if (cfg.checkDistance) parts.push('DM:' + Math.round(parseFloat(a.distance_meters) || 0));
     if (cfg.checkMovingTime) parts.push('MT:' + Math.round(parseFloat(a.moving_time_seconds) || 0));
-    if (cfg.checkPace) parts.push('P:' + (getActPaceKey(a) || ''));
+    if (cfg.checkPace) parts.push('P:' + getActPaceKey(a));
     return parts.join('|');
   }
 
-  // Group by key
+  // Group by key — only include activities passing full validation
   var keyMap = {};
   acts.forEach(function(a) {
+    if (!isValidForGrouping(a)) return;
     var k = makeKey(a);
-    // Skip if key is too sparse (all zeros/empty)
-    if (k.replace(/[D:T:DM:MT:P:|0]/g, '').length === 0 && !cfg.checkDate) return;
     if (!keyMap[k]) keyMap[k] = [];
     keyMap[k].push(a);
   });
@@ -2004,9 +2027,13 @@ function findSharedActivityGroups(acts) {
     if (group.length < 2) return;
     var athletes = {};
     group.forEach(function(a) { athletes[a.strava_athlete_id] = true; });
-    if (Object.keys(athletes).length < 2) return; // same athlete, skip
-    groups.push({ key: k, checkedFields: checkedFields, activities: group });
+    if (Object.keys(athletes).length < 2) return;
+    var sampleDate = getActDate(group[0]) || '0000-00-00';
+    groups.push({ key: k, checkedFields: checkedFields, activities: group, sortDate: sampleDate });
   });
+
+  // Sort by most recent date first
+  groups.sort(function(a, b) { return b.sortDate.localeCompare(a.sortDate); });
 
   return groups;
 }
