@@ -866,6 +866,144 @@
     .rpill.chal{background:rgba(34,197,94,0.12);color:var(--green);}
     .rpill.team{background:rgba(255,255,255,0.13);color:var(--muted);}
 
+    /* ── Leaderboard Podium styles ── */
+    .lb-podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 10px;
+      margin: 18px 0 24px;
+      padding: 0 4px;
+    }
+    .podium-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+    .podium-card:active {
+      transform: scale(0.96);
+    }
+    /* Height variance for steps/podium effect */
+    .podium-card.rank-1 {
+      height: 155px;
+      z-index: 3;
+      border-color: rgba(255, 208, 0, 0.2);
+      background: linear-gradient(180deg, rgba(255, 208, 0, 0.04) 0%, var(--surface) 100%);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    .podium-card.rank-2 {
+      height: 140px;
+      z-index: 2;
+      border-color: rgba(200, 216, 232, 0.15);
+      background: linear-gradient(180deg, rgba(200, 216, 232, 0.02) 0%, var(--surface) 100%);
+    }
+    .podium-card.rank-3 {
+      height: 135px;
+      z-index: 1;
+      border-color: rgba(244, 168, 74, 0.15);
+      background: linear-gradient(180deg, rgba(244, 168, 74, 0.02) 0%, var(--surface) 100%);
+    }
+    /* Active highlighted state on tap */
+    .podium-card.active.rank-1 {
+      border-color: #FFD000 !important;
+      box-shadow: 0 0 15px rgba(255, 208, 0, 0.25), 0 8px 25px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
+    }
+    .podium-card.active.rank-2 {
+      border-color: #C8D8E8 !important;
+      box-shadow: 0 0 15px rgba(200, 216, 232, 0.2), 0 8px 25px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
+    }
+    .podium-card.active.rank-3 {
+      border-color: #F4A84A !important;
+      box-shadow: 0 0 15px rgba(244, 168, 74, 0.2), 0 8px 25px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
+    }
+    /* Crowns & medals badge */
+    .podium-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .podium-card.rank-1 .podium-badge {
+      background: #FFD000; color: #000;
+    }
+    .podium-card.rank-2 .podium-badge {
+      background: #C8D8E8; color: #000;
+    }
+    .podium-card.rank-3 .podium-badge {
+      background: #F4A84A; color: #000;
+    }
+    .podium-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+    }
+    .podium-card.rank-1 .podium-avatar { border-color: #FFD000; }
+    .podium-card.rank-2 .podium-avatar { border-color: #C8D8E8; }
+    .podium-card.rank-3 .podium-avatar { border-color: #F4A84A; }
+    .podium-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .podium-team {
+      font-size: 9px;
+      color: var(--label);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .podium-pts {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--brand);
+      background: rgba(232, 98, 42, 0.08);
+      padding: 3px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
     /* skeleton */
     @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
     .skeleton{background:linear-gradient(90deg,#1C2030 25%,#252A3A 50%,#1C2030 75%);background-size:800px 100%;animation:shimmer 1.6s ease infinite;border-radius:8px;}
@@ -5710,6 +5848,20 @@ function renderRows(rows, prevRanks) {
     actsByAthlete[aid].push(a);
   });
 
+  function buildRowDetailHtml(r, sparkHtml, chalHtml, laInfo) {
+    return '<div class="detail-grid">' +
+        '<div class="detail-cell"><div class="detail-cell-lbl">📏 Distance</div><div class="detail-cell-val blue">' + r.pts.km.toFixed(1) + ' km</div></div>' +
+        '<div class="detail-cell"><div class="detail-cell-lbl">⭐ Dist Pts</div><div class="detail-cell-val brand">' + r.pts.distPts.toFixed(1) + '</div></div>' +
+        '<div class="detail-cell"><div class="detail-cell-lbl">⚡ Bonus</div><div class="detail-cell-val gold">' + r.pts.bonusPts + '</div></div>' +
+        (chalHtml || '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val" style="color:var(--label)">—</div></div>') +
+        '<div class="detail-cell" style="grid-column:span ' + (r.pts.challengePts > 0 ? '2' : '3') + '"><div class="detail-cell-lbl">🏆 Total</div><div class="detail-cell-val brand" style="font-size:18px;">' + r.pts.total.toFixed(2) + '</div></div>' +
+      '</div>' +
+      '<div class="detail-meta">' +
+        '<span class="last-active-chip' + (laInfo.recent ? ' recent' : '') + '">' + laInfo.text + '</span>' +
+        sparkHtml +
+      '</div>';
+  }
+
   function buildRowElement(r, i, isMePinned) {
     var isMe = String(r.p.strava_athlete_id) === meId;
     var topCls = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
@@ -5730,7 +5882,7 @@ function renderRows(rows, prevRanks) {
       else deltaHtml = '<span class="rank-delta delta-same">—</span>';
     }
 
-    // Last active - O(1) lookup
+    // Last active
     var myActsForRow = actsByAthlete[athId] || [];
     var la = getLastActive(myActsForRow);
     var laInfo = lastActiveLabel(la);
@@ -5769,18 +5921,7 @@ function renderRows(rows, prevRanks) {
       ? '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val green">' + r.pts.challengePts.toFixed(1) + '</div></div>'
       : '';
 
-    detail.innerHTML =
-      '<div class="detail-grid">' +
-        '<div class="detail-cell"><div class="detail-cell-lbl">📏 Distance</div><div class="detail-cell-val blue">' + r.pts.km.toFixed(1) + ' km</div></div>' +
-        '<div class="detail-cell"><div class="detail-cell-lbl">⭐ Dist Pts</div><div class="detail-cell-val brand">' + r.pts.distPts.toFixed(1) + '</div></div>' +
-        '<div class="detail-cell"><div class="detail-cell-lbl">⚡ Bonus</div><div class="detail-cell-val gold">' + r.pts.bonusPts + '</div></div>' +
-        (chalHtml || '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val" style="color:var(--label)">—</div></div>') +
-        '<div class="detail-cell" style="grid-column:span ' + (r.pts.challengePts > 0 ? '2' : '3') + '"><div class="detail-cell-lbl">🏆 Total</div><div class="detail-cell-val brand" style="font-size:18px;">' + r.pts.total.toFixed(2) + '</div></div>' +
-      '</div>' +
-      '<div class="detail-meta">' +
-        '<span class="last-active-chip' + (laInfo.recent ? ' recent' : '') + '">' + laInfo.text + '</span>' +
-        sparkHtml +
-      '</div>';
+    detail.innerHTML = buildRowDetailHtml(r, sparkHtml, chalHtml, laInfo);
 
     row.appendChild(summary);
     row.appendChild(detail);
@@ -5788,31 +5929,139 @@ function renderRows(rows, prevRanks) {
     // Toggle on tap
     row.addEventListener('click', function() {
       var isExp = row.classList.contains('expanded');
-      // collapse all others
+      // collapse all others (both standard rows AND podium detail)
       var allRows = list.querySelectorAll('.lb-row');
       allRows.forEach(function(r2) { r2.classList.remove('expanded'); });
+      var pDetail = document.getElementById('podium-detail');
+      if (pDetail) pDetail.style.display = 'none';
+      var allCards = list.querySelectorAll('.podium-card');
+      allCards.forEach(function(c) { c.classList.remove('active'); });
+
       if (!isExp) row.classList.add('expanded');
     });
 
     return row;
   }
 
+  // 1. Build Podium HTML if we have at least 3 rows
+  if (rows.length >= 3) {
+    var podiumContainer = document.createElement('div');
+    podiumContainer.className = 'lb-podium';
+    
+    var detailPanel = document.createElement('div');
+    detailPanel.id = 'podium-detail';
+    detailPanel.className = 'row-detail';
+    detailPanel.style.display = 'none';
+    detailPanel.style.marginTop = '-14px';
+    detailPanel.style.marginBottom = '18px';
+    detailPanel.style.borderRadius = 'var(--radius-sm)';
+    detailPanel.style.border = '1px solid var(--border)';
+    detailPanel.style.background = 'rgba(255,255,255,0.015)';
+    detailPanel.style.padding = '14px 16px';
+    
+    // Order: Rank 2, Rank 1, Rank 3
+    var order = [1, 0, 2];
+    order.forEach(function(idx) {
+      var r = rows[idx];
+      var rank = idx + 1;
+      var athId = String(r.p.strava_athlete_id);
+      var athleteName = r.p.full_name || '—';
+      var initials = athleteName.split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0, 2);
+      var teamName = (r.p.leaderboard_team || '').replace(/^Team\s+/i, '');
+      var myActsForRow = actsByAthlete[athId] || [];
+      var la = getLastActive(myActsForRow);
+      var laInfo = lastActiveLabel(la);
+      var sparkHtml = '<div class="sparkline">' + buildSparkline(myActsForRow) + '</div>';
+      var chalHtml = r.pts.challengePts > 0
+        ? '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val green">' + r.pts.challengePts.toFixed(1) + '</div></div>'
+        : '';
+        
+      var card = document.createElement('div');
+      card.className = 'podium-card rank-' + rank;
+      
+      var badge = document.createElement('div');
+      badge.className = 'podium-badge';
+      badge.innerHTML = rank === 1 ? '👑' : rank === 2 ? '2' : '3';
+      card.appendChild(badge);
+      
+      var avatar = document.createElement('div');
+      avatar.className = 'podium-avatar';
+      avatar.textContent = initials;
+      card.appendChild(avatar);
+      
+      var nameSpan = document.createElement('div');
+      nameSpan.className = 'podium-name';
+      nameSpan.textContent = athleteName;
+      card.appendChild(nameSpan);
+      
+      if (teamName) {
+        var teamSpan = document.createElement('div');
+        teamSpan.className = 'podium-team';
+        teamSpan.textContent = teamName;
+        card.appendChild(teamSpan);
+      }
+      
+      var ptsSpan = document.createElement('div');
+      ptsSpan.className = 'podium-pts';
+      ptsSpan.textContent = r.pts.total.toFixed(1) + ' pts';
+      card.appendChild(ptsSpan);
+      
+      // Click event to toggle detail panel
+      card.addEventListener('click', function() {
+        var active = card.classList.contains('active');
+        // Reset all standard rows and card highlights
+        var allRows = list.querySelectorAll('.lb-row');
+        allRows.forEach(function(r2) { r2.classList.remove('expanded'); });
+        podiumContainer.querySelectorAll('.podium-card').forEach(function(c) {
+          c.classList.remove('active');
+        });
+        
+        if (active) {
+          detailPanel.style.display = 'none';
+        } else {
+          card.classList.add('active');
+          detailPanel.innerHTML = buildRowDetailHtml(r, sparkHtml, chalHtml, laInfo);
+          detailPanel.style.display = 'block';
+        }
+      });
+      
+      podiumContainer.appendChild(card);
+    });
+    
+    list.appendChild(podiumContainer);
+    list.appendChild(detailPanel);
+  }
+
   var frag = document.createDocumentFragment();
+  var pinnedAppended = false;
+  
   rows.forEach(function(r, i) {
     var isMe = String(r.p.strava_athlete_id) === meId;
+    if (rows.length >= 3 && i < 3) {
+      return; // Skip top 3 standard rows since they are on the podium
+    }
     if (isMe && myRank > 3) {
       return; // Skip rendering user at their actual position since they are pinned after Rank 3
     }
     
-    var rowEl = buildRowElement(r, i, false);
-    frag.appendChild(rowEl);
-    
-    // Inject logged-in user standing after top 3 (index 2)
-    if (i === 2 && myRank > 3 && meRow) {
+    // Inject logged-in user standing after top 3 (index 3 of standard rows)
+    if (rows.length >= 3 && i === 3 && myRank > 3 && meRow && !pinnedAppended) {
       var pinnedEl = buildRowElement(meRow, myRank - 1, true);
       frag.appendChild(pinnedEl);
+      pinnedAppended = true;
     }
+    
+    var rowEl = buildRowElement(r, i, false);
+    frag.appendChild(rowEl);
   });
+  
+  // Fallback: if user is rank > 3 but was not appended (e.g. rows.length was exactly 3)
+  if (myRank > 3 && meRow && !pinnedAppended) {
+    var pinnedEl = buildRowElement(meRow, myRank - 1, true);
+    frag.appendChild(pinnedEl);
+    pinnedAppended = true;
+  }
+  
   list.appendChild(frag);
 
   var rnkEl = document.getElementById('lb-my-rank');
