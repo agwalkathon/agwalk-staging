@@ -2073,6 +2073,180 @@
     background: #0E1012 !important;
     outline: none;
   }
+  
+  /* Activity Detail Modal Slide-up Overlay */
+  .detail-modal {
+    position: fixed;
+    bottom: -100dvh;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(14, 16, 18, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10000;
+    transition: bottom 0.35s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+    overflow-y: auto;
+    padding-bottom: 40px;
+  }
+  .detail-modal.open {
+    bottom: 0;
+  }
+  .detail-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(14, 16, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10002;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .detail-modal-close:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .detail-map-wrap {
+    width: 100%;
+    height: 280px;
+    position: relative;
+    background: #0E1012;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .detail-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .detail-header-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .detail-header-meta {
+    flex-grow: 1;
+  }
+  .detail-header-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .detail-header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .detail-badge-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .detail-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--muted);
+  }
+  .detail-badge.brand {
+    background: rgba(232, 98, 42, 0.12);
+    border-color: rgba(232, 98, 42, 0.25);
+    color: var(--brand);
+  }
+  .detail-metrics-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--label);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .detail-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .detail-metric-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .detail-metric-card .label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--label);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .detail-metric-card .val-row {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-top: 4px;
+  }
+  .detail-metric-card .val {
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+  }
+  .detail-metric-card .unit {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .detail-desc-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .detail-desc-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .detail-desc-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    font-style: italic;
+  }
+  
+  .detail-section-sep {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 20px 0;
+  }
   .feed-card-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -2849,6 +3023,114 @@ document.addEventListener('click', function(e) {
       <div id="highlight-modal-subtitle" style="font-size:11px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">12 Days Active</div>
       <div id="highlight-modal-body" style="font-size:13.5px; color:rgba(255,255,255,0.7); line-height:1.5; margin-bottom:20px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
       <button class="btn" style="width:100%; border:none; border-radius:10px; font-weight:700; padding:12px; background:linear-gradient(135deg, #FC6100 0%, #E8622A 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 12px rgba(232,98,42,0.3);" onclick="triggerHighlightCheer()">Clap Support 👏</button>
+    </div>
+  </div>
+  
+  <!-- Activity Detail Modal -->
+  <div id="activity-detail-modal" class="detail-modal">
+    <button class="detail-modal-close" onclick="closeActivityDetail()">✕</button>
+    
+    <!-- Hero Map Section -->
+    <div class="detail-map-wrap" id="detail-map-container">
+      <div id="detail-map" style="width: 100%; height: 100%;"></div>
+    </div>
+    
+    <!-- Detail Content Container -->
+    <div class="detail-content">
+      <!-- Header Meta -->
+      <div class="detail-header">
+        <div class="detail-header-avatar" id="detail-avatar">PM</div>
+        <div class="detail-header-meta">
+          <div class="detail-header-name" id="detail-name">—</div>
+          <div class="detail-header-sub" id="detail-time-sub">—</div>
+        </div>
+      </div>
+      
+      <!-- Badges -->
+      <div class="detail-badge-container">
+        <span class="detail-badge brand" id="detail-sport-badge">Walk</span>
+        <span class="detail-badge" id="detail-date-badge">—</span>
+      </div>
+      
+      <!-- Core Metrics Grid -->
+      <div class="detail-metrics-title">Primary Metrics</div>
+      <div class="detail-metrics-grid">
+        <div class="detail-metric-card">
+          <div class="label">Distance</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-dist">—</span>
+            <span class="unit">km</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Duration</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-dur">—</span>
+            <span class="unit">elapsed</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Steps</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-steps">—</span>
+            <span class="unit">steps</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Pace</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-pace">—</span>
+            <span class="unit">/km</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Secondary Metrics Grid -->
+      <div class="detail-metrics-title">Secondary Stats</div>
+      <div class="detail-metrics-grid">
+        <div class="detail-metric-card">
+          <div class="label">Calories</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-calories">—</span>
+            <span class="unit">kcal</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Elevation Gain</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-elev">—</span>
+            <span class="unit">m</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Avg Cadence</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-cadence">—</span>
+            <span class="unit">spm</span>
+          </div>
+        </div>
+        <div class="detail-metric-card">
+          <div class="label">Avg Heart Rate</div>
+          <div class="val-row">
+            <span class="val" id="detail-metric-hr">—</span>
+            <span class="unit">bpm</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Description/Notes -->
+      <div id="detail-desc-box" style="display:none;">
+        <div class="detail-metrics-title">Activity Notes</div>
+        <div class="detail-desc-card">
+          <div class="detail-desc-title" id="detail-desc-title">Evening Walk</div>
+          <div class="detail-desc-text" id="detail-desc-content">—</div>
+        </div>
+      </div>
+      
+      <!-- Appreciation Badge -->
+      <div class="detail-metrics-title">Kudos Insights</div>
+      <div id="detail-appreciation-box"></div>
+      
     </div>
   </div>
 </div>
@@ -5783,7 +6065,7 @@ function renderFeed() {
       }
 
       return `
-        <div class="feed-card type-activity ${timeClass}">
+        <div class="feed-card type-activity ${timeClass}" onclick="openActivityDetail('${item.id}', event)" style="cursor: pointer;">
           <div class="feed-card-header">
             <div class="feed-card-avatar" style="${getAvatarStyle(athleteName)}">${initials}</div>
             <div class="feed-card-meta">
@@ -5977,6 +6259,190 @@ function renderFeed() {
   }, 100);
 }
 
+var _activeDetailMap = null;
+
+function openActivityDetail(announcementId, event) {
+  if (event && event.target && (event.target.closest('button') || event.target.closest('a') || event.target.closest('.feed-react-btn'))) {
+    return;
+  }
+  
+  var item = _feedData.find(function(x) { return x.id === announcementId; });
+  if (!item) return;
+
+  var act = {};
+  try {
+    act = JSON.parse(item.body);
+  } catch(e) {
+    console.error('Failed to parse detail activity body:', e);
+    return;
+  }
+
+  var athleteName = act.athlete_name || 'Participant';
+  var initials = athleteName.split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0, 2);
+  
+  var avatarEl = document.getElementById('detail-avatar');
+  if (avatarEl) {
+    avatarEl.innerText = initials;
+    avatarEl.setAttribute('style', getAvatarStyle(athleteName));
+  }
+  
+  document.getElementById('detail-name').innerText = athleteName;
+  
+  var deviceText = act.device_name ? ' via ' + act.device_name : '';
+  var dateTimeStr = '';
+  try {
+    var dt = new Date(item.created_at);
+    var datePart = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    var timePart = dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    dateTimeStr = datePart + ' at ' + timePart;
+  } catch(e) {}
+  document.getElementById('detail-time-sub').innerHTML = dateTimeStr + deviceText;
+  
+  var sportType = act.sport_type || 'Walk';
+  document.getElementById('detail-sport-badge').innerText = sportType;
+  try {
+    var dt = new Date(item.created_at);
+    document.getElementById('detail-date-badge').innerText = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch(e) {}
+  
+  var distKm = ((act.distance_meters || 0) / 1000).toFixed(2);
+  document.getElementById('detail-metric-dist').innerText = distKm;
+  
+  var movingSec = act.moving_time_seconds || 0;
+  var durationStr = '0m';
+  if (movingSec >= 3600) {
+    durationStr = Math.floor(movingSec / 3600) + 'h ' + Math.floor((movingSec % 3600) / 60) + 'm';
+  } else if (movingSec > 0) {
+    durationStr = Math.floor(movingSec / 60) + 'm';
+  }
+  document.getElementById('detail-metric-dur').innerText = durationStr;
+  
+  var distanceKmVal = (act.distance_meters || 0) / 1000;
+  var calcSteps = 0;
+  var sportLower = sportType.toLowerCase();
+  if (sportLower.indexOf('walk') > -1 || sportLower.indexOf('run') > -1 || sportLower.indexOf('hike') > -1) {
+    calcSteps = Math.round(distanceKmVal * 1350);
+  }
+  document.getElementById('detail-metric-steps').innerText = calcSteps > 0 ? calcSteps.toLocaleString('en-IN') : '—';
+  
+  var paceVal = '--';
+  if (distanceKmVal > 0 && movingSec > 0) {
+    var paceSec = movingSec / distanceKmVal;
+    var paceMin = Math.floor(paceSec / 60);
+    var paceRemainderSec = Math.round(paceSec % 60);
+    if (paceRemainderSec < 10) paceRemainderSec = '0' + paceRemainderSec;
+    paceVal = paceMin + ':' + paceRemainderSec;
+  }
+  document.getElementById('detail-metric-pace').innerText = paceVal;
+  
+  document.getElementById('detail-metric-calories').innerText = act.calories ? Math.round(act.calories).toLocaleString('en-IN') : '—';
+  document.getElementById('detail-metric-elev').innerText = act.elevation_gain ? Math.round(act.elevation_gain) : '—';
+  document.getElementById('detail-metric-cadence').innerText = act.avg_cadence ? Math.round(act.avg_cadence) : '—';
+  document.getElementById('detail-metric-hr').innerText = act.avg_heart_rate ? Math.round(act.avg_heart_rate) : '—';
+  
+  var descBox = document.getElementById('detail-desc-box');
+  if (act.description) {
+    descBox.style.display = 'block';
+    document.getElementById('detail-desc-title').innerText = act.activity_name || 'Activity';
+    document.getElementById('detail-desc-content').innerText = act.description;
+  } else {
+    descBox.style.display = 'none';
+  }
+  
+  var appBox = document.getElementById('detail-appreciation-box');
+  if (appBox) {
+    var appBadgeHtml = '';
+    var cardEl = document.getElementById('map-' + item.id);
+    if (cardEl && cardEl.closest('.feed-card')) {
+      var badge = cardEl.closest('.feed-card').querySelector('.activity-appreciation-badge');
+      if (badge) {
+        appBadgeHtml = badge.outerHTML;
+      }
+    }
+    
+    if (!appBadgeHtml) {
+      var durationMins = movingSec / 60;
+      var paceMinFloat = distanceKmVal > 0 ? (durationMins / distanceKmVal) : 999;
+      var actId = String(act.strava_activity_id || act.activity_date_time_ist || 'act');
+      var seed = athleteName + '_' + distanceKmVal.toFixed(2) + '_' + actId;
+      var icon = '🌱';
+      var pool = ["Wonderful active minutes! Keep this beautiful rhythm going.", "Every single step counts! Great job staying active today."];
+      
+      var hash = 0;
+      for (var i = 0; i < seed.length; i++) {
+        hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      var index = Math.abs(hash) % pool.length;
+      var msg = pool[index];
+      appBadgeHtml = `<div class="activity-appreciation-badge"><span class="appreciation-icon">${icon}</span><span class="appreciation-text">"${msg}"</span></div>`;
+    }
+    appBox.innerHTML = appBadgeHtml;
+  }
+  
+  var modal = document.getElementById('activity-detail-modal');
+  modal.style.display = 'block';
+  setTimeout(function() {
+    modal.classList.add('open');
+  }, 10);
+  
+  var mapWrap = document.getElementById('detail-map-container');
+  if (act.summary_polyline) {
+    mapWrap.style.display = 'block';
+    
+    if (_activeDetailMap) {
+      try {
+        _activeDetailMap.remove();
+      } catch(e) {}
+      _activeDetailMap = null;
+    }
+    
+    setTimeout(function() {
+      try {
+        var coordinates = decodePolyline(act.summary_polyline);
+        if (coordinates && coordinates.length > 0) {
+          _activeDetailMap = L.map('detail-map', {
+            zoomControl: true,
+            attributionControl: false
+          }).setView(coordinates[0], 14);
+          
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20
+          }).addTo(_activeDetailMap);
+          
+          var poly = L.polyline(coordinates, {
+            color: 'var(--brand)',
+            weight: 4,
+            opacity: 0.9,
+            lineJoin: 'round'
+          }).addTo(_activeDetailMap);
+          
+          _activeDetailMap.fitBounds(poly.getBounds(), {
+            padding: [20, 20]
+          });
+        }
+      } catch (mapErr) {
+        console.warn('Failed to draw detail map:', mapErr);
+      }
+    }, 400);
+  } else {
+    mapWrap.style.display = 'none';
+  }
+}
+
+function closeActivityDetail() {
+  var modal = document.getElementById('activity-detail-modal');
+  modal.classList.remove('open');
+  setTimeout(function() {
+    modal.style.display = 'none';
+    if (_activeDetailMap) {
+      try {
+        _activeDetailMap.remove();
+      } catch(e) {}
+      _activeDetailMap = null;
+    }
+  }, 350);
+}
+
 function showMoreAnnouncements() {
   _feedVisibleCount += 30;
   renderFeed();
@@ -6043,6 +6509,7 @@ function triggerConfettiBurst(x, y, emojiChar) {
 }
 
 async function reactToAnnouncement(announcementId, reactionType, event) {
+  if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
   var athleteId = currentSession ? currentSession.athleteId : '';
   if (!athleteId) return;
 
