@@ -5375,6 +5375,7 @@ function renderFeed() {
       
       var appreciationHtml = (function() {
         var actId = String(act.strava_activity_id || act.activity_date_time_ist || 'act');
+        var seed = athleteName + '_' + distanceKmVal.toFixed(2) + '_' + actId;
         var pool = [];
         var icon = '💡';
         
@@ -5384,7 +5385,13 @@ function renderFeed() {
             "Outstanding stamina! Phenomenal mileage on the road today.",
             "Absolute dedication! That long-duration effort is highly inspiring.",
             "Incredible journey! Phenomenal stride and rhythm over this distance.",
-            "Stellar endurance! A masterclass in pacing and mental focus."
+            "Stellar endurance! A masterclass in pacing and mental focus.",
+            "Unbelievable mileage! Your feet are doing spectacular work today.",
+            "A truly remarkable journey under your feet. Phenomenal energy!",
+            "Superb capacity! Your endurance walk today is a massive highlight.",
+            "Inspiring energy! That is some serious distance logged today.",
+            "Master of the long road! Your pacing and stamina are top-tier.",
+            "Spectacular persistence! Every kilometer shows your amazing dedication."
           ];
         } else if (distanceKmVal >= 8 || durationMins >= 60) {
           icon = '🌟';
@@ -5392,7 +5399,13 @@ function renderFeed() {
             "Superb distance! A highly valuable contribution to the community.",
             "Fantastic steady stride! Excellent dedication to your health.",
             "Wonderful steady walk! Great rhythm and pacing today.",
-            "Excellent mileage! Thank you for walking the green mile today."
+            "Excellent mileage! Thank you for walking the green mile today.",
+            "Impressive strides today! A very solid walk under your belt.",
+            "Brilliant dedication! Your steady momentum is absolutely spot on.",
+            "Superb rhythm today! A fantastic contribution to the team goal.",
+            "Awesome pacing! Your commitment to movement is highly motivating.",
+            "Stout effort! That was a beautiful, long steady journey today.",
+            "Great stride control! You logged some fantastic kilometers today."
           ];
         } else if (paceMinFloat < 8.5 && distanceKmVal >= 3) {
           icon = '⚡';
@@ -5400,7 +5413,13 @@ function renderFeed() {
             "Incredible cadence! That was a really brisk, high-energy walk.",
             "Fabulous speed! Your brisk tempo is absolutely remarkable.",
             "Strong rhythm! Powering through the kilometers with ease.",
-            "Outstanding tempo! You maintained a fantastic brisk stride."
+            "Outstanding tempo! You maintained a fantastic brisk stride.",
+            "Remarkable velocity! Excellent stride speed and power today.",
+            "Energetic movement! You set a fantastic pace for this distance.",
+            "Impressive swiftness! Your legs were in perfect high-speed harmony.",
+            "Fabulous brisk walk! That was a really sporty pace today.",
+            "Superb tempo! You really flew through those kilometers.",
+            "Brilliant pace control! Brisk strides make for a healthy stride."
           ];
         } else {
           icon = '🌱';
@@ -5408,13 +5427,19 @@ function renderFeed() {
             "Wonderful active minutes! Keep this beautiful rhythm going.",
             "Every single step counts! Great job staying active today.",
             "Superb consistency! Consistency is the secret to healthy living.",
-            "Delightful movement! Active strides contribute to overall wellbeing."
+            "Delightful movement! Active strides contribute to overall wellbeing.",
+            "Nice relaxing stroll! A great way to keep your body active.",
+            "Excellent daily steps! Keeping the active momentum alive.",
+            "Consistency is key! Every active minute counts toward the goal.",
+            "Lovely active walk! Great job stepping out and moving today.",
+            "Wonderful stroll! Regular movement is the foundation of health.",
+            "Splendid active time! Doing your health a massive favor today."
           ];
         }
         
         var hash = 0;
-        for (var i = 0; i < actId.length; i++) {
-          hash = actId.charCodeAt(i) + ((hash << 5) - hash);
+        for (var i = 0; i < seed.length; i++) {
+          hash = seed.charCodeAt(i) + ((hash << 5) - hash);
         }
         var index = Math.abs(hash) % pool.length;
         var msg = pool[index];
