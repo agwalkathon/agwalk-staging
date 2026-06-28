@@ -1141,7 +1141,7 @@ function exportCSV(){
       }
     }
     var utcDate=fmtUTCDateTime(a.activity_date, a.start_time);
-    var istDate=fmtISTDateTime(a.activity_date, a.start_time);
+    var istDate=fmtActivityIST(a);
     var athleteUrl=a.strava_athlete_id?'https://www.strava.com/athletes/'+a.strava_athlete_id:'';
     var activityUrl=a.strava_activity_id?'https://www.strava.com/activities/'+a.strava_activity_id:'';
     return[utcDate,istDate,r.full_name||'Unknown',r.emp_code||'',athleteUrl,a.activity_name||'',activityUrl,a.sport_type||'',distKm,movTime,ps,a.elevation_gain!=null?a.elevation_gain.toFixed(0):'',a.is_flagged?'Flagged':'Valid',a.flag_reason||''].map(function(v){
@@ -1176,12 +1176,12 @@ async function loadActivities(){
   var actIdVal=document.getElementById('activity-id-filter').value.trim();
   var athIdVal=document.getElementById('athlete-id-filter').value.trim();
   
-  var url=SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date.desc';
+  var url=SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&order=activity_date_time_ist.desc.nullslast,activity_date.desc';
   if(actIdVal) {
     url+='&strava_activity_id=eq.'+encodeURIComponent(actIdVal);
   } else {
-    if(df)url+='&activity_date=gte.'+df+'T00:00:00';
-    if(dt)url+='&activity_date=lte.'+dt+'T23:59:59.999';
+    if(df)url+='&activity_date_time_ist=gte.'+df+' 00:00:00';
+    if(dt)url+='&activity_date_time_ist=lte.'+dt+' 23:59:59.999';
   }
   if(athIdVal) url+='&strava_athlete_id=eq.'+encodeURIComponent(athIdVal);
   if(sp)url+='&sport_type=eq.'+sp;
@@ -1502,8 +1502,8 @@ async function loadFlaggedData(){
   updateBulkBar();
   try {
     var url=currentTab==='review'
-      ?SUPABASE_URL+'/rest/v1/activities?is_flagged=eq.true&is_deleted=eq.false&order=activity_date.desc'
-      :SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.true&order=activity_date.desc';
+      ?SUPABASE_URL+'/rest/v1/activities?is_flagged=eq.true&is_deleted=eq.false&order=activity_date_time_ist.desc.nullslast,activity_date.desc'
+      :SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.true&order=activity_date_time_ist.desc.nullslast,activity_date.desc';
     var acts = await fetchAllRows(url, HDR);
     allActivities = acts;
     applyFlaggedFilters();
@@ -1536,8 +1536,13 @@ function applyFlaggedFilters() {
     if (sportQuery && a.sport_type !== sportQuery) return false;
     if (reasonQuery && a.flag_reason !== reasonQuery) return false;
 
-    if (a.activity_date) {
-      var actDatePart = a.activity_date.substring(0, 10);
+    var actDatePart = '';
+    if (a.activity_date_time_ist) {
+      actDatePart = a.activity_date_time_ist.substring(0, 10);
+    } else if (a.activity_date) {
+      actDatePart = getActDate(a);
+    }
+    if (actDatePart) {
       if (dateFromQuery && actDatePart < dateFromQuery) return false;
       if (dateToQuery && actDatePart > dateToQuery) return false;
     } else if (dateFromQuery || dateToQuery) {
@@ -1619,7 +1624,7 @@ function applyFlaggedFilters() {
       + '<td><a href="https://www.strava.com/athletes/' + a.strava_athlete_id + '" target="_blank" class="ath">' + name + '</a></td>'
       + '<td style="max-width:120px"><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link" title="' + esc(a.activity_name || '') + '" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(a.activity_name || '—') + '</a></td>'
       + '<td><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '—') + '</span></td>'
-      + '<td>' + fmtDate(a.activity_date) + ' ' + fmtTime(a.activity_date, a.start_time) + '</td>'
+      + '<td>' + fmtActivityIST(a) + '</td>'
       + '<td>' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '—') + '</td>'
       + '<td>' + fmtPS(a.avg_speed, a.sport_type) + '</td>'
       + '<td><span class="flag-reason" title="' + esc(a.flag_reason || '—') + '">' + esc(a.flag_reason || '—') + '</span></td>'
@@ -1778,9 +1783,9 @@ async function fetchFlagCandidates() {
   var athleteName = document.getElementById('fr-athlete-name').value.trim();
   var activityId = document.getElementById('fr-activity-id').value.trim();
 
-  var q = `is_deleted=eq.false&order=activity_date.desc`;
-  if (dFrom) q += `&activity_date=gte.${dFrom}T00:00:00`;
-  if (dTo) q += `&activity_date=lte.${dTo}T23:59:59`;
+  var q = `is_deleted=eq.false&order=activity_date_time_ist.desc.nullslast,activity_date.desc`;
+  if (dFrom) q += `&activity_date_time_ist=gte.${dFrom} 00:00:00`;
+  if (dTo) q += `&activity_date_time_ist=lte.${dTo} 23:59:59.999`;
   if (sport) q += `&sport_type=eq.${sport}`;
   if (activityId) q += `&strava_activity_id=eq.${activityId}`;
 
