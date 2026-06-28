@@ -6431,6 +6431,7 @@ function openActivityDetail(id, event, isStravaId) {
 
     var modal = document.getElementById('activity-detail-modal');
     modal.style.display = 'block';
+    modal.style.bottom = '0px';
     setTimeout(function() {
       modal.classList.add('open');
     }, 10);
@@ -6644,6 +6645,7 @@ function openActivityDetail(id, event, isStravaId) {
 function closeActivityDetail() {
   var modal = document.getElementById('activity-detail-modal');
   modal.classList.remove('open');
+  modal.style.bottom = '-100dvh';
   setTimeout(function() {
     modal.style.display = 'none';
     if (_activeDetailMap) {
@@ -6780,6 +6782,7 @@ function openProfileDetail(athleteId, event) {
 
     var modal = document.getElementById('profile-detail-modal');
     modal.style.display = 'block';
+    modal.style.bottom = '0px';
     setTimeout(function() {
       modal.classList.add('open');
     }, 10);
@@ -6967,6 +6970,7 @@ function openProfileDetail(athleteId, event) {
 function closeProfileDetail() {
   var modal = document.getElementById('profile-detail-modal');
   modal.classList.remove('open');
+  modal.style.bottom = '-100dvh';
   setTimeout(function() {
     modal.style.display = 'none';
   }, 350);
