@@ -13,6 +13,8 @@
   <link rel="apple-touch-icon" href="/agwalk/icon-192.png">
   <title>My Portal — Arcgate Walkathon 2026</title>
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -2066,6 +2068,10 @@
     font-style: italic;
     color: var(--muted);
     line-height: 1.35;
+  }
+  .feed-card-map-wrap .leaflet-container {
+    background: #0E1012 !important;
+    outline: none;
   }
   .feed-card-stats-grid {
     display: grid;
@@ -5345,6 +5351,30 @@ function getAvatarStyle(name) {
   return 'background:' + c.bg + '; border-color:' + c.border + '; color:' + c.text + '; box-shadow: 0 0 8px ' + c.bg + ';';
 }
 
+function decodePolyline(str, precision) {
+  var index = 0, lat = 0, lng = 0, coordinates = [], shift = 0, result = 0, byte = null, latitude_change, longitude_change, factor = Math.pow(10, precision || 5);
+  while (index < str.length) {
+    byte = null; shift = 0; result = 0;
+    do {
+      byte = str.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lat += latitude_change;
+    shift = 0; result = 0;
+    do {
+      byte = str.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lng += longitude_change;
+    coordinates.push([lat / factor, lng / factor]);
+  }
+  return coordinates;
+}
+
 function renderFeed() {
   var list = document.getElementById('feed-list');
   if (!list) return;
@@ -5742,6 +5772,16 @@ function renderFeed() {
         descriptionHtml = `<div class="feed-card-activity-desc">${esc(act.description)}</div>`;
       }
 
+      var mapHtml = '';
+      if (act.summary_polyline) {
+        var mapContainerId = 'map-' + item.id;
+        mapHtml = `
+          <div class="feed-card-map-wrap" style="position: relative; margin: 12px 0 16px 0; height: 160px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden; background: #0E1012;">
+            <div id="${mapContainerId}" style="width: 100%; height: 100%;"></div>
+          </div>
+        `;
+      }
+
       return `
         <div class="feed-card type-activity ${timeClass}">
           <div class="feed-card-header">
@@ -5758,6 +5798,7 @@ function renderFeed() {
             </div>
             ${descriptionHtml}
             ${appreciationHtml}
+            ${mapHtml}
             ${(function() {
               var statsCols = [];
               statsCols.push(`
@@ -5884,6 +5925,56 @@ function renderFeed() {
 
   list.innerHTML = html;
   startLiveTicker();
+
+  // Initialize Leaflet maps for cards asynchronously
+  setTimeout(function() {
+    visibleActs.forEach(function(item) {
+      if (item.type === 'activity') {
+        var act = {};
+        try {
+          act = JSON.parse(item.body);
+        } catch(e) {}
+        
+        if (act.summary_polyline) {
+          var containerId = 'map-' + item.id;
+          var mapContainer = document.getElementById(containerId);
+          if (mapContainer && !mapContainer._leaflet_id) {
+            try {
+              var coordinates = decodePolyline(act.summary_polyline);
+              if (coordinates && coordinates.length > 0) {
+                var map = L.map(containerId, {
+                  zoomControl: false,
+                  attributionControl: false,
+                  dragging: false,
+                  scrollWheelZoom: false,
+                  doubleClickZoom: false,
+                  boxZoom: false,
+                  touchZoom: false
+                }).setView(coordinates[0], 14);
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                  maxZoom: 20
+                }).addTo(map);
+
+                var poly = L.polyline(coordinates, {
+                  color: 'var(--brand)',
+                  weight: 3.5,
+                  opacity: 0.85,
+                  lineJoin: 'round'
+                }).addTo(map);
+
+                map.fitBounds(poly.getBounds(), {
+                  padding: [12, 12]
+                });
+              }
+            } catch (mapErr) {
+              console.warn('Failed to initialize map for card ' + containerId + ':', mapErr);
+            }
+          }
+        }
+      }
+    });
+  }, 100);
 }
 
 function showMoreAnnouncements() {
