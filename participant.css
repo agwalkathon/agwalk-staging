@@ -2193,9 +2193,38 @@
     background: #0E1012;
     z-index: 10000;
     transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+    transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow-y: auto;
     padding-bottom: 40px;
+  }
+  .glass-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .glass-metric-box {
+    background: rgba(255,255,255,0.035);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color 0.2s ease;
+  }
+  .glass-metric-box:hover {
+    border-color: rgba(255,255,255,0.12);
+  }
+  .glass-section-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 18px 0 10px;
   }
   .detail-modal.open {
     transform: translateX(0);
@@ -2214,12 +2243,14 @@
   .detail-fields-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px 24px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 20px;
   }
   .detail-field-item {
-    display: flex;
-    flex-direction: column;
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
   }
   .detail-field-label {
     font-size: 11px;
