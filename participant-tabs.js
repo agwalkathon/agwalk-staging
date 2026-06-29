@@ -1882,7 +1882,7 @@ function renderFeed() {
         var count = (item.reaction_counts && item.reaction_counts[emo.type]) || 0;
         var displayCount = count > 0 ? count : '';
         var activeClass = (item.my_reactions && item.my_reactions.indexOf(emo.type) > -1) ? 'active' : '';
-        reactionButtonsHtml += `<button class="feed-react-btn ${activeClass}" onclick="reactToAnnouncement('${item.id}', '${emo.type}', event)"><span class="emoji" style="display: flex; align-items: center; justify-content: center;">${emo.icon}</span><span class="count">${displayCount}</span></button>`;
+        reactionButtonsHtml += `<button class="feed-react-btn ${activeClass}" data-ann-id="${item.id}" data-react-type="${emo.type}" onclick="reactToAnnouncement('${item.id}', '${emo.type}', event)"><span class="emoji" style="display: flex; align-items: center; justify-content: center;">${emo.icon}</span><span class="count">${displayCount}</span></button>`;
       });
 
       html += `
@@ -1960,7 +1960,7 @@ function renderFeed() {
         var count = (item.reaction_counts && item.reaction_counts[emo.type]) || 0;
         var displayCount = count > 0 ? count : '';
         var activeClass = (item.my_reactions && item.my_reactions.indexOf(emo.type) > -1) ? 'active' : '';
-        reactionButtonsHtml += `<button class="feed-react-btn ${activeClass}" onclick="reactToAnnouncement('${item.id}', '${emo.type}', event)"><span class="emoji" style="display: flex; align-items: center; justify-content: center;">${emo.icon}</span><span class="count">${displayCount}</span></button>`;
+        reactionButtonsHtml += `<button class="feed-react-btn ${activeClass}" data-ann-id="${item.id}" data-react-type="${emo.type}" onclick="reactToAnnouncement('${item.id}', '${emo.type}', event)"><span class="emoji" style="display: flex; align-items: center; justify-content: center;">${emo.icon}</span><span class="count">${displayCount}</span></button>`;
       });
 
       html += `
@@ -2024,13 +2024,8 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
       if (item.reaction_counts[reactionType] > 0) item.reaction_counts[reactionType]--;
       
       // Update DOM directly
-      var btn = null;
-      if (event) {
-        btn = event.currentTarget || (event.target && event.target.closest('button'));
-      }
-      if (!btn) {
-        btn = document.querySelector(`button[onclick*="'${announcementId}'"][onclick*="'${reactionType}'"]`);
-      }
+      var btn = (event && event.target) ? event.target.closest('button.feed-react-btn') : null;
+      if (!btn) btn = document.querySelector('button[data-ann-id="' + announcementId + '"][data-react-type="' + reactionType + '"]');
       if (btn) {
         btn.classList.remove('active');
         var cntEl = btn.querySelector('.count');
@@ -2063,13 +2058,8 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
       item.reaction_counts[reactionType] = (item.reaction_counts[reactionType] || 0) + 1;
       
       // Update DOM directly
-      var btn = null;
-      if (event) {
-        btn = event.currentTarget || (event.target && event.target.closest('button'));
-      }
-      if (!btn) {
-        btn = document.querySelector(`button[onclick*="'${announcementId}'"][onclick*="'${reactionType}'"]`);
-      }
+      var btn = (event && event.target) ? event.target.closest('button.feed-react-btn') : null;
+      if (!btn) btn = document.querySelector('button[data-ann-id="' + announcementId + '"][data-react-type="' + reactionType + '"]');
       if (btn) {
         btn.classList.add('active');
         var cntEl = btn.querySelector('.count');
@@ -2543,3 +2533,11 @@ if (document.readyState === 'loading') {
 } else {
   load().finally(function(){ hideSplash(); });
 }
+function loadProfileTimeframe() {
+  var sel = document.getElementById('prof-timeframe-select');
+  var val = sel ? sel.value : 'month';
+  var athleteId = _currentProfileAthleteId;
+  if (!athleteId) return;
+  openProfileDetail(athleteId, null);
+}
+var _currentProfileAthleteId = '';
