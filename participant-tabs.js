@@ -1405,12 +1405,8 @@ function getMilestoneWeight(title) {
 
 function renderFeedHighlights() {
   var container = document.getElementById('feed-highlights-row');
-  if (!container) return;
-
-  if (!LB_REG || !LB_REG.length || !LB_ACTS || !LB_ACTS.length) {
-    container.style.display = 'none';
-    return;
-  }
+  if (container) container.style.display = 'none';
+  return;
 
   var actsByAthlete = {};
   LB_ACTS.forEach(function(a) {
@@ -1974,6 +1970,19 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
     if (idx > -1) {
       item.my_reactions.splice(idx, 1);
       if (item.reaction_counts[reactionType] > 0) item.reaction_counts[reactionType]--;
+      
+      // Update DOM directly
+      if (event) {
+        var btn = event.currentTarget || event.target.closest('button');
+        if (btn) {
+          btn.classList.remove('active');
+          var cntEl = btn.querySelector('.count');
+          if (cntEl) {
+            var curr = parseInt(cntEl.textContent, 10) || 0;
+            cntEl.textContent = Math.max(0, curr - 1);
+          }
+        }
+      }
     } else {
       var clickX = 0, clickY = 0;
       if (event) {
@@ -1994,12 +2003,24 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
       }
       item.my_reactions.push(reactionType);
       item.reaction_counts[reactionType] = (item.reaction_counts[reactionType] || 0) + 1;
+      
+      // Update DOM directly
+      if (event) {
+        var btn = event.currentTarget || event.target.closest('button');
+        if (btn) {
+          btn.classList.add('active');
+          var cntEl = btn.querySelector('.count');
+          if (cntEl) {
+            var curr = parseInt(cntEl.textContent, 10) || 0;
+            cntEl.textContent = curr + 1;
+          }
+        }
+      }
     }
-    renderFeed();
   }
 
   try {
-    var res = await fetch(BACKEND + '/react', {
+    var res = await fetch(BACKEND + '/announcements/react', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
