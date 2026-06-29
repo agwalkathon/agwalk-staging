@@ -15,6 +15,46 @@ async function fetchAll(url) {
   return all;
 }
 
+async function fetchAllParallel(url) {
+  var sep = url.indexOf('?') > -1 ? '&' : '?';
+  var countHeaders = Object.assign({}, HDR, { 'Prefer': 'count=exact' });
+  try {
+    var countRes = await fetch(url + sep + 'limit=1', { headers: countHeaders });
+    if (!countRes.ok) {
+      return fetchAll(url);
+    }
+    var contentRange = countRes.headers.get('content-range');
+    var total = 0;
+    if (contentRange) {
+      var parts = contentRange.split('/');
+      if (parts.length > 1) total = parseInt(parts[1]) || 0;
+    }
+    if (total === 0) return [];
+    
+    var ps = 1000;
+    var promises = [];
+    for (var from = 0; from < total; from += ps) {
+      var pageUrl = url + sep + 'limit=' + ps + '&offset=' + from;
+      var pageHeaders = Object.assign({}, HDR, { 'Range-Unit': 'items', 'Range': from + '-' + (from + ps - 1) });
+      promises.push(
+        fetch(pageUrl, { headers: pageHeaders }).then(function(r) {
+          if (!r.ok) throw new Error("Page fetch failed: " + r.status);
+          return r.json();
+        })
+      );
+    }
+    var results = await Promise.all(promises);
+    var all = [];
+    results.forEach(function(page) {
+      if (Array.isArray(page)) all = all.concat(page);
+    });
+    return all;
+  } catch(e) {
+    console.warn('[Cache] fetchAllParallel error, falling back to sequential:', e);
+    return fetchAll(url);
+  }
+}
+
 // Caching Layer
 var CACHE_TTL = { personal: 5*60*1000, config: 10*60*1000, ranking: 5*60*1000, reg: 30*60*1000 };
 function cacheSet(key, data) {
@@ -640,8 +680,8 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain,description,activity_date_time_ist'),
-                fetchAll(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
                   if (_touchInteracting) {
@@ -661,8 +701,8 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAll(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,elevation_gain,description,activity_date_time_ist'),
-            fetchAll(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v2', allActsRaw);
           allRegRaw  = fetched[1]; cacheSet('ranking_reg',  allRegRaw);
