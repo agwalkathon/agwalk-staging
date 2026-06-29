@@ -85,7 +85,7 @@ function showTab(tab) {
     if (!_feedPollInterval) {
       _feedPollInterval = setInterval(function() {
         loadFeed(true).catch(function(e) { console.warn('Poll loadFeed error:', e); });
-      }, 10000);
+      }, 30000);
     }
   } else {
     if (_feedPollInterval) {
@@ -1313,6 +1313,28 @@ async function loadFeed(isSilent) {
         return new Date(b.created_at) - new Date(a.created_at);
       });
       
+      // Preserve any optimistic reaction state not yet confirmed by server
+      if (isSilent && _feedData.length) {
+        var localReactMap = {};
+        _feedData.forEach(function(item) {
+          if (item.my_reactions && item.my_reactions.length > 0) {
+            localReactMap[String(item.id)] = item.my_reactions;
+          }
+        });
+        sortedNewFeed.forEach(function(item) {
+          var local = localReactMap[String(item.id)];
+          if (local) {
+            local.forEach(function(rt) {
+              if (!item.my_reactions) item.my_reactions = [];
+              if (item.my_reactions.indexOf(rt) === -1) {
+                item.my_reactions.push(rt);
+                if (!item.reaction_counts) item.reaction_counts = {};
+                item.reaction_counts[rt] = (item.reaction_counts[rt] || 0) + 1;
+              }
+            });
+          }
+        });
+      }
       var changed = JSON.stringify(sortedNewFeed) !== JSON.stringify(_feedData);
       if (changed || !isSilent) {
         _feedData = sortedNewFeed;
@@ -1967,7 +1989,7 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
   }
 
   try {
-    var res = await fetch(BACKEND + '/react', {
+    var res = await fetch(BACKEND + '/announcements/react', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2178,31 +2200,20 @@ function renderNotifications() {
   });
 }
 
-function clearPWACache(btn) {
-  if (btn) {
-    btn.style.color = '#10b981';
-    btn.style.transform = 'scale(1.15)';
-    btn.style.transition = 'all 0.2s ease';
-  }
-
-  if (currentSession && currentSession.athleteId) {
-    cacheClear(currentSession.athleteId);
-  }
-
-  var reloadPage = function() {
-    window.location.reload(true);
-  };
-
-  if ('serviceWorker' in navigator) {
-    caches.keys().then(function(names) {
-      return Promise.all(names.map(function(name) { return caches.delete(name); }));
-    }).then(function() {
-      setTimeout(reloadPage, 800);
-    }).catch(function() {
-      setTimeout(reloadPage, 800);
-    });
-  } else {
-    setTimeout(reloadPage, 800);
+function clearPWACache() {
+  if (confirm('Clear offline app cache and refresh portal?')) {
+    if (currentSession && currentSession.athleteId) {
+      cacheClear(currentSession.athleteId);
+    }
+    if ('serviceWorker' in navigator) {
+      caches.keys().then(function(names) {
+        return Promise.all(names.map(function(name) { return caches.delete(name); }));
+      }).then(function() {
+        window.location.reload(true);
+      });
+    } else {
+      window.location.reload(true);
+    }
   }
 }
 
