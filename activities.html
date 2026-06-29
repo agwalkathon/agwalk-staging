@@ -1662,7 +1662,10 @@ function applyFlaggedFilters() {
     var name = r ? r.full_name : 'Unknown';
     if (nameQuery && name.toLowerCase().indexOf(nameQuery) === -1) return false;
     if (sportQuery && a.sport_type !== sportQuery) return false;
-    if (reasonQuery && a.flag_reason !== reasonQuery) return false;
+    if (reasonQuery) {
+      var reason = a.flag_reason || '';
+      if (reason.toLowerCase().indexOf(reasonQuery.toLowerCase()) === -1) return false;
+    }
 
     var actDatePart = '';
     if (a.activity_date_time_ist) {
