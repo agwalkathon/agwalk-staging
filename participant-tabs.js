@@ -6,7 +6,6 @@
 var _feedLoaded = false;
 var _feedVisibleCount = 30;
 var _feedPollInterval = null;
-var _feedMaps = [];
 
 var _highlightsData = {};
 var _activeInsight = null;
@@ -65,6 +64,14 @@ function showTab(tab) {
       loadFeed().catch(function(e) { console.warn('showTab loadFeed error:', e); });
       _feedLoaded = true;
     }
+    // Force Leaflet to re-measure container sizes after tab slide animation is complete
+    setTimeout(function() {
+      if (window._feedMaps && window._feedMaps.length > 0) {
+        window._feedMaps.forEach(function(m) {
+          try { m.invalidateSize(); } catch(e) {}
+        });
+      }
+    }, 350);
   }
 
   // Poll intervals for live updates
@@ -1115,7 +1122,7 @@ function renderFeed() {
               keyboard: false,
               attributionControl: false
             }).setView(coordinates[0], 14);
-            _feedMaps.push(map);
+            window._feedMaps.push(map);
 
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
               maxZoom: 20
@@ -1612,6 +1619,20 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+
+// Today's Date in Header
+(function(){
+  try{
+    var d = new Date();
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var monthName = months[d.getMonth()];
+    var day = d.getDate();
+    var year = d.getFullYear();
+    var formattedDate = monthName + ', ' + day + ', ' + year;
+    var dateEl = document.getElementById('hdr-today-date');
+    if(dateEl) dateEl.textContent = formattedDate;
+  }catch(e){}
+})();
 
 // Boot Main Application
 if (document.readyState === 'loading') {
