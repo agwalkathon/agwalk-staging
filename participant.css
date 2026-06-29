@@ -783,14 +783,14 @@
       display: flex;
       flex: 1;
       gap: 16px;
-      margin-left: 12px;
+      margin-left: 0;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
     .whoop-stat-item {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
     }
     .whoop-stat-val {
       font-size: 16px;
