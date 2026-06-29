@@ -818,9 +818,30 @@ function renderRows(rows, prevRanks) {
 
   function buildRowElement(r, i, isMePinned) {
     var isMe = String(r.p.strava_athlete_id) === meId;
-    var topCls = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-    var rankIcon = i === 0 ? '1' : i === 1 ? '2' : i === 2 ? '3' : '#' + (i + 1);
-    var rankColCls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+    var isTeam = (LB_currentTab === 'team');
+    var topCls = '';
+    var rankIcon = '';
+    var rankColCls = '';
+
+    if (isTeam) {
+      if (i === 0) {
+        topCls = 'rank-1'; rankIcon = '1'; rankColCls = 'r1';
+      } else if (i === 1) {
+        topCls = 'rank-2'; rankIcon = '2'; rankColCls = 'r2';
+      } else {
+        topCls = ''; rankIcon = '#' + (i + 1); rankColCls = 'rn';
+      }
+    } else {
+      if (i === 0) {
+        topCls = 'rank-1'; rankIcon = '1'; rankColCls = 'r1';
+      } else if (i === 1) {
+        topCls = 'rank-2'; rankIcon = '2'; rankColCls = 'r2';
+      } else if (i === 2) {
+        topCls = 'rank-3'; rankIcon = '3'; rankColCls = 'r3';
+      } else {
+        topCls = ''; rankIcon = '#' + (i + 1); rankColCls = 'rn';
+      }
+    }
     var mPts = r.pts.total;
     var rowMedal = getMedalLB(mPts, r.p.gender);
     var teamName = (r.p.leaderboard_team || '').replace(/^Team\s+/i, '');
