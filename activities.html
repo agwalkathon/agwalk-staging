@@ -2288,48 +2288,81 @@ async function fetchFlagCandidates() {
     var avgSpeed = a.avg_speed || 0; 
     var pace = avgSpeed ? (1000 / avgSpeed) / 60 : 999999; 
 
-    // 1. Distance filter
-    if (distMin > 0 && km < distMin) {
-      reasons.push('Distance below min limit (' + km.toFixed(2) + ' < ' + distMin + ' km)');
-    }
-    if (distMax < 999999 && km > distMax) {
-      reasons.push('Distance above max limit (' + km.toFixed(2) + ' > ' + distMax + ' km)');
+    // 1. Distance filter (Inclusive)
+    var matchesDist = (km >= distMin && km <= distMax);
+
+    // 2. Pace filter (Inclusive)
+    var matchesPace = true;
+    if (document.getElementById('fr-pace-min').value || document.getElementById('fr-pace-max').value) {
+      matchesPace = (pace >= paceMin && pace <= paceMax);
     }
 
-    // 2. Pace filter
-    if (paceMin > 0 && pace < paceMin) {
-      reasons.push('Pace too fast (' + pace.toFixed(2) + ' < ' + paceMin + ' min/km)');
-    }
-    if (paceMax < 999999 && pace > paceMax) {
-      reasons.push('Pace too slow (' + pace.toFixed(2) + ' > ' + paceMax + ' min/km)');
-    }
-
-    // 3. Steps filter
-    if (stepsMin > 0 && km > 0.1) {
-      var stepsPerKm = steps / km;
-      if (stepsPerKm < stepsMin) {
-        reasons.push('Steps Count Issue (' + Math.round(stepsPerKm) + ' < ' + stepsMin + ' steps/km)');
+    // 3. Steps filter (Matches if steps/km is below minimum threshold)
+    var matchesSteps = true;
+    var stepsPerKm = 0;
+    if (stepsMin > 0) {
+      if (km > 0.1) {
+        stepsPerKm = steps / km;
+        matchesSteps = (stepsPerKm < stepsMin);
+      } else {
+        matchesSteps = false;
       }
     }
 
-    // 4. Max Speed filter
-    if (speedMaxKmh > 0 && avgSpeed > 0) {
-      var speedKmh = avgSpeed * 3.6;
-      if (speedKmh > speedMaxKmh) {
-        reasons.push('Speed too high (' + speedKmh.toFixed(1) + ' > ' + speedMaxKmh + ' km/h)');
+    // 4. Max Speed filter (Matches if speed exceeds limit)
+    var matchesSpeed = true;
+    var speedKmh = 0;
+    if (speedMaxKmh > 0) {
+      if (avgSpeed > 0) {
+        speedKmh = avgSpeed * 3.6;
+        matchesSpeed = (speedKmh > speedMaxKmh);
+      } else {
+        matchesSpeed = false;
       }
     }
 
-    // 5. Max moving/elapsed gap filter
-    if (gapMaxHrs > 0 && elapsed > 0 && moving > 0) {
-      var gapSeconds = elapsed - moving;
-      var limitSeconds = gapMaxHrs * 3600;
-      if (gapSeconds > limitSeconds) {
+    // 5. Max moving/elapsed gap filter (Matches if gap exceeds limit)
+    var matchesGap = true;
+    var gapSeconds = 0;
+    if (gapMaxHrs > 0) {
+      if (elapsed > 0 && moving > 0) {
+        gapSeconds = elapsed - moving;
+        var limitSeconds = gapMaxHrs * 3600;
+        matchesGap = (gapSeconds > limitSeconds);
+      } else {
+        matchesGap = false;
+      }
+    }
+
+    // If it matches all active filters, include it in matches
+    if (matchesDist && matchesPace && matchesSteps && matchesSpeed && matchesGap) {
+      // Build descriptive flag reasons based on the matched criteria
+      if (km < 1.0) {
+        reasons.push('Distance below 1 km (' + km.toFixed(2) + ' km)');
+      } else if (document.getElementById('fr-dist-min').value || document.getElementById('fr-dist-max').value) {
+        reasons.push('Distance Filter Match (' + km.toFixed(2) + ' km)');
+      }
+      
+      if (document.getElementById('fr-pace-min').value || document.getElementById('fr-pace-max').value) {
+        reasons.push('Pace Filter Match (' + pace.toFixed(2) + ' min/km)');
+      }
+      
+      if (stepsMin > 0) {
+        reasons.push('Low steps/km (' + Math.round(stepsPerKm) + ' < ' + stepsMin + ' steps/km)');
+      }
+      
+      if (speedMaxKmh > 0) {
+        reasons.push('Speed limit exceeded (' + speedKmh.toFixed(1) + ' > ' + speedMaxKmh + ' km/h)');
+      }
+      
+      if (gapMaxHrs > 0) {
         reasons.push('Elapsed gap too high (' + fmtDur(gapSeconds) + ' > ' + gapMaxHrs + ' hrs)');
       }
-    }
 
-    if (reasons.length > 0) {
+      if (reasons.length === 0) {
+        reasons.push('Manual bulk flag match');
+      }
+
       matches.push({
         act: a,
         name: regMap[String(a.strava_athlete_id).trim()] ? regMap[String(a.strava_athlete_id).trim()].full_name : 'Unknown',
