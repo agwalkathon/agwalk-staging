@@ -504,9 +504,6 @@
       -webkit-overflow-scrolling: touch;
       padding: 14px 20px 90px;
     }
-    .content:not(.active) {
-      visibility: hidden !important;
-    }
     .hidden-tab {
       display: none !important;
     }
