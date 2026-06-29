@@ -36,7 +36,7 @@ function openActivityDetail(id, event, isStravaId) {
     return;
   }
   try {
-    if (event && event.target && (event.target.closest('button') || event.target.closest('a') || event.target.closest('.feed-react-btn'))) {
+    if (event && event.target && (event.target.closest('button') || event.target.closest('.feed-react-btn'))) {
       return;
     }
     if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
@@ -398,7 +398,7 @@ function openProfileDetail(athleteId, event) {
     return;
   }
   try {
-    if (event && event.target && (event.target.closest('button') || event.target.closest('a') || event.target.closest('.feed-react-btn'))) {
+    if (event && event.target && (event.target.closest('button') || event.target.closest('.feed-react-btn'))) {
       return;
     }
     if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
