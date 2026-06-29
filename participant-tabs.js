@@ -2238,6 +2238,8 @@ async function checkPushSubscriptionState() {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
     
+    card.style.display = 'flex';
+    
     if (Notification.permission === 'denied') {
       desc.innerHTML = '<span style="color:#ef4444;">❌ Notifications blocked.</span> Please enable notifications in your browser settings to receive alerts.';
       btn.textContent = 'Blocked in Settings';
