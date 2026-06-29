@@ -41,6 +41,11 @@ function showTab(tab) {
     el.classList.toggle('active', el.id === 'bnav-' + tab);
   });
 
+  // Toggle active class on tab content panels
+  document.querySelectorAll('.swipe-container-track > .content').forEach(function(el) {
+    el.classList.toggle('active', el.id === 'tab-' + tab);
+  });
+
   // Calculate slide displacement
   var idx = TAB_ORDER.indexOf(tab);
   var track = document.getElementById('tab-track');
@@ -85,7 +90,7 @@ function showTab(tab) {
     if (!_feedPollInterval) {
       _feedPollInterval = setInterval(function() {
         loadFeed(true).catch(function(e) { console.warn('Poll loadFeed error:', e); });
-      }, 30000);
+      }, 10000);
     }
   } else {
     if (_feedPollInterval) {
@@ -159,6 +164,185 @@ function showTab(tab) {
 })();
 
 // Dashboard community pulse tab rendering
+function renderCommunityPulse() {
+  return; // Temporarily disabled for now
+
+  var actsByAthlete = {};
+  LB_ACTS.forEach(function(a) {
+    if (a.is_flagged) return;
+    var aid = String(a.strava_athlete_id);
+    if (!actsByAthlete[aid]) actsByAthlete[aid] = [];
+    actsByAthlete[aid].push(a);
+  });
+
+  var totalKm = 0, totalHours = 0, activeCount = 0;
+  var hourBuckets = {};
+
+  LB_REG.forEach(function(p) {
+    var acts = actsByAthlete[p.strava_athlete_id] || [];
+    var km = acts.reduce(function(s,a){return s+(a.distance_meters||0)/1000;},0);
+    var hr = acts.reduce(function(s,a){return s+(a.moving_time_seconds||0)/3600;},0);
+    totalKm += km;
+    totalHours += hr;
+    if (acts.length > 0) {
+      activeCount++;
+    }
+
+    acts.forEach(function(a) {
+      try {
+        var localDt = new Date(a.activity_date);
+        if (a.start_time) {
+          var hp = a.start_time.split(':');
+          var hrVal = parseInt(hp[0], 10);
+          if (!isNaN(hrVal)) {
+            hourBuckets[hrVal] = (hourBuckets[hrVal] || 0) + 1;
+          }
+        } else if (!isNaN(localDt.getTime())) {
+          var hrVal = localDt.getHours();
+          hourBuckets[hrVal] = (hourBuckets[hrVal] || 0) + 1;
+        }
+      } catch (e) {}
+    });
+  });
+
+  var peakHour = '—';
+  var maxActs = 0;
+  for (var h = 0; h < 24; h++) {
+    if ((hourBuckets[h] || 0) > maxActs) {
+      maxActs = hourBuckets[h];
+      var startH = h;
+      var endH = (h + 1) % 24;
+      var fmtH = function(x) {
+        var ampm = x >= 12 ? 'PM' : 'AM';
+        var h12 = x % 12;
+        if (h12 === 0) h12 = 12;
+        return h12 + ' ' + ampm;
+      };
+      peakHour = fmtH(startH) + ' - ' + fmtH(endH);
+    }
+  }
+
+  var activePct = Math.round((activeCount / LB_REG.length) * 100);
+  var co2 = Math.round(totalKm * 0.12);
+  var totalSteps = Math.round(totalKm * 1350);
+
+  // K2K journey
+  var k2kLength = 3600;
+  var k2kRawCount = totalKm / k2kLength;
+  var k2kCompletions = Math.floor(k2kRawCount);
+  var k2kRemKm = totalKm % k2kLength;
+  var k2kRemPct = ((k2kRemKm / k2kLength) * 100).toFixed(1);
+
+  // Odometer HTML
+  var target = totalKm.toFixed(0);
+  var padTarget = target.padStart(6, '0');
+  var odoHtml = '';
+  for (var i = 0; i < padTarget.length; i++) {
+    odoHtml += '<div class="digit-box">' + padTarget[i] + '</div>';
+  }
+
+  // Ring Dash offsets
+  var activeOffset = 220 - (220 * activePct) / 100;
+  var k2kOffset = 220 - (220 * parseFloat(k2kRemPct)) / 100;
+
+  var cardsHtml = 
+    // Odometer section
+    '<div class="pulse-odo-card" style="grid-column: span 12;">' +
+      '<div style="font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-family: var(--font); text-align: left;">' +
+        'Odometer' +
+      '</div>' +
+      '<div style="display: flex; align-items: baseline; gap: 8px;">' +
+        '<div class="pulse-odometer" style="display:flex; gap: 4px;">' + odoHtml + '</div>' +
+        '<span style="font-size: 16px; font-weight: 800; color: var(--muted); font-family: var(--font);">KM</span>' +
+      '</div>' +
+    '</div>' +
+
+    // K2K journey card
+    '<div class="pulse-card k2k-card" style="grid-column: span 6;">' +
+      '<div class="pulse-card-top">' +
+        '<div class="pulse-circle">' +
+          '<svg viewBox="0 0 80 80" width="80" height="80">' +
+            '<circle class="bg" cx="40" cy="40" r="35"></circle>' +
+            '<circle class="fill k2k-fill" cx="40" cy="40" r="35" style="stroke-dashoffset: 220; stroke: #A78BFA;"></circle>' +
+          '</svg>' +
+          '<div class="pulse-pct k2k-pct">0%</div>' +
+        '</div>' +
+        '<div class="pulse-desc">' +
+          '<div class="pulse-title">Virtual Journey</div>' +
+          '<div class="pulse-subtitle">Kashmir to Kanyakumari (3,600 km)</div>' +
+          '<div class="pulse-metric" style="color: #C084FC;">' + k2kRemKm.toFixed(0) + ' km / 3,600 km</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pulse-card-footer">' +
+        'Completed <strong style="color:#C084FC; font-weight:800;">' + k2kCompletions + ' times</strong>. ' + (k2kCompletions > 0 ? 'On journey #' + (k2kCompletions + 1) : 'First journey') + '.' +
+      '</div>' +
+    '</div>' +
+
+    // Active Today card
+    '<div class="pulse-card active-card" style="grid-column: span 6;">' +
+      '<div class="pulse-card-top">' +
+        '<div class="pulse-circle">' +
+          '<svg viewBox="0 0 80 80" width="80" height="80">' +
+            '<circle class="bg" cx="40" cy="40" r="35"></circle>' +
+            '<circle class="fill active-fill" cx="40" cy="40" r="35" style="stroke-dashoffset: 220; stroke: var(--brand);"></circle>' +
+          '</svg>' +
+          '<div class="pulse-pct active-pct">0%</div>' +
+        '</div>' +
+        '<div class="pulse-desc">' +
+          '<div class="pulse-title">Active Today</div>' +
+          '<div class="pulse-subtitle">' + activeCount + ' of ' + LB_REG.length + ' athletes</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Total Steps card
+    '<div class="pulse-card-stat" style="grid-column: span 3;">' +
+      '<div class="pulse-stat-val">' + totalSteps.toLocaleString('en-IN') + '</div>' +
+      '<div class="pulse-stat-lbl">TOTAL STEPS</div>' +
+      '<div class="pulse-stat-sub">Based on average cadence</div>' +
+    '</div>' +
+
+    // CO2 offset card
+    '<div class="pulse-card-stat" style="grid-column: span 3;">' +
+      '<div class="pulse-stat-val" style="color: #34D399;">' + co2.toLocaleString('en-IN') + ' kg</div>' +
+      '<div class="pulse-stat-lbl" style="color: #34D399;">CO₂ OFFSET</div>' +
+      '<div class="pulse-stat-sub">Equivalent trees carbon offset</div>' +
+    '</div>' +
+
+    // Total Active Hours card
+    '<div class="pulse-card-stat" style="grid-column: span 3;">' +
+      '<div class="pulse-stat-val" style="color: #60A5FA;">' + Math.round(totalHours).toLocaleString('en-IN') + ' hrs</div>' +
+      '<div class="pulse-stat-lbl" style="color: #60A5FA;">ACTIVE TIME</div>' +
+      '<div class="pulse-stat-sub">Cumulative moving duration</div>' +
+    '</div>' +
+
+    // Peak active hour card
+    '<div class="pulse-card-stat" style="grid-column: span 3;">' +
+      '<div class="pulse-stat-val" style="color: #FBBF24;">' + peakHour + '</div>' +
+      '<div class="pulse-stat-lbl" style="color: #FBBF24;">PEAK ACTIVE HOUR</div>' +
+      '<div class="pulse-stat-sub">Most active start hour bracket</div>' +
+    '</div>';
+
+  grid.innerHTML = cardsHtml;
+
+  // Queue ring animation
+  var anims = [];
+  var actFill = grid.querySelector('.active-fill');
+  var actPct = grid.querySelector('.active-pct');
+  if (actFill && actPct) {
+    anims.push({ fillEl: actFill, pctEl: actPct, offset: activeOffset, displayPct: activePct });
+  }
+  var k2kFill = grid.querySelector('.k2k-fill');
+  var k2kPct = grid.querySelector('.k2k-pct');
+  if (k2kFill && k2kPct) {
+    anims.push({ fillEl: k2kFill, pctEl: k2kPct, offset: k2kOffset, displayPct: Math.round(parseFloat(k2kRemPct)) });
+  }
+
+  window._ringAnimationData = anims;
+  setTimeout(function() {
+    triggerRingAnimation();
+  }, 100);
+}
 
 function triggerRingAnimation() {
   if (typeof _ringAnimationData === 'undefined' || !_ringAnimationData.length) return;
@@ -534,9 +718,9 @@ function precomputeLBScores() {
   try {
     var cachedReg = JSON.parse(safeGetItem('agwalk_ranking_reg') || 'null');
     var cachedActs = JSON.parse(safeGetItem('agwalk_ranking_acts_v2') || 'null');
-    if (cachedReg && cachedReg.val && cachedActs && cachedActs.val) {
-      LB_REG = cachedReg.val;
-      LB_ACTS = cachedActs.val;
+    if (cachedReg && cachedReg.data && cachedActs && cachedActs.data) {
+      LB_REG = cachedReg.data;
+      LB_ACTS = cachedActs.data;
       precomputeLBScores();
     }
   } catch(e) {}
@@ -1134,28 +1318,6 @@ async function loadFeed(isSilent) {
         return new Date(b.created_at) - new Date(a.created_at);
       });
       
-      // Preserve any optimistic reaction state not yet confirmed by server
-      if (isSilent && _feedData.length) {
-        var localReactMap = {};
-        _feedData.forEach(function(item) {
-          if (item.my_reactions && item.my_reactions.length > 0) {
-            localReactMap[String(item.id)] = item.my_reactions;
-          }
-        });
-        sortedNewFeed.forEach(function(item) {
-          var local = localReactMap[String(item.id)];
-          if (local) {
-            local.forEach(function(rt) {
-              if (!item.my_reactions) item.my_reactions = [];
-              if (item.my_reactions.indexOf(rt) === -1) {
-                item.my_reactions.push(rt);
-                if (!item.reaction_counts) item.reaction_counts = {};
-                item.reaction_counts[rt] = (item.reaction_counts[rt] || 0) + 1;
-              }
-            });
-          }
-        });
-      }
       var changed = JSON.stringify(sortedNewFeed) !== JSON.stringify(_feedData);
       if (changed || !isSilent) {
         _feedData = sortedNewFeed;
@@ -1214,8 +1376,149 @@ function getMilestoneWeight(title) {
   return 1;
 }
 
+function renderFeedHighlights() {
+  var container = document.getElementById('feed-highlights-row');
+  if (!container) return;
 
+  if (!LB_REG || !LB_REG.length || !LB_ACTS || !LB_ACTS.length) {
+    container.style.display = 'none';
+    return;
+  }
 
+  var actsByAthlete = {};
+  LB_ACTS.forEach(function(a) {
+    var aid = String(a.strava_athlete_id);
+    if (!actsByAthlete[aid]) actsByAthlete[aid] = [];
+    actsByAthlete[aid].push(a);
+  });
+
+  var scored = LB_REG.map(function(p) {
+    var acts = actsByAthlete[p.strava_athlete_id] || [];
+    var totalKm = acts.reduce(function(s,a){return s+(a.distance_meters||0)/1000;}, 0);
+    var dayKm = {};
+    acts.forEach(function(a){var d=getActDate(a);if(d)dayKm[d]=(dayKm[d]||0)+(a.distance_meters||0)/1000;});
+    
+    var days = Object.keys(dayKm).sort(), streak=0, cur=0, prev=null;
+    days.forEach(function(d){if(prev){var diff=Math.round((new Date(d+'T12:00:00')-new Date(prev+'T12:00:00'))/86400000);cur=diff===1?cur+1:1;}else cur=1;streak=Math.max(streak,cur);prev=d;});
+    
+    return {
+      id: String(p.strava_athlete_id),
+      name: p.full_name || '—',
+      totalKm: totalKm,
+      streak: streak,
+      actCount: acts.length,
+      team: p.leaderboard_team || ''
+    };
+  }).filter(function(x){return x.totalKm > 0;});
+
+  if (!scored.length) {
+    container.style.display = 'none';
+    return;
+  }
+
+  var topDist = scored.slice().sort(function(a,b){return b.totalKm - a.totalKm;})[0];
+  var topStreak = scored.slice().sort(function(a,b){return b.streak - a.streak;})[0];
+  var topCount = scored.slice().sort(function(a,b){return b.actCount - a.actCount;})[0];
+
+  var teamDist = {};
+  scored.forEach(function(x) {
+    if (x.team) teamDist[x.team] = (teamDist[x.team] || 0) + x.totalKm;
+  });
+  var topTeamName = '';
+  var topTeamKm = 0;
+  Object.keys(teamDist).forEach(function(team) {
+    if (teamDist[team] > topTeamKm) {
+      topTeamKm = teamDist[team];
+      topTeamName = team;
+    }
+  });
+
+  _highlightsData = {
+    champ: topDist ? {
+      emoji: '🚶‍♂️',
+      title: 'Distance Champion',
+      subtitle: topDist.totalKm.toFixed(1) + ' km walked',
+      body: topDist.name + ' is leading the walkathon leaderboard with an outstanding total distance of ' + topDist.totalKm.toFixed(1) + ' km! Keep pacing the way!',
+      ringColor: '#FFD000'
+    } : null,
+    streak: topStreak && topStreak.streak > 0 ? {
+      emoji: '🔥',
+      title: 'Streak Master',
+      subtitle: topStreak.streak + ' Days Active',
+      body: topStreak.name + ' is on fire with a consecutive daily log streak of ' + topStreak.streak + ' days! Consistency wins!',
+      ringColor: '#E8622A'
+    } : null,
+    active: topCount ? {
+      emoji: '⚡',
+      title: 'Most Active',
+      subtitle: topCount.actCount + ' Activities',
+      body: topCount.name + ' has logged the highest activity frequency with ' + topCount.actCount + ' verified workouts this month! Relentless drive!',
+      ringColor: '#22C55E'
+    } : null,
+    team: topTeamName ? {
+      emoji: '🏆',
+      title: 'Top Team',
+      subtitle: topTeamKm.toFixed(1) + ' km accumulated',
+      body: topTeamName + ' is leading the team leaderboard with a total combined distance of ' + topTeamKm.toFixed(1) + ' km! Strength in numbers!',
+      ringColor: '#A78BFA'
+    } : null
+  };
+
+  container.innerHTML = '';
+  container.style.display = 'flex';
+  
+  var cardsHtml = [];
+  ['champ', 'streak', 'active', 'team'].forEach(function(key) {
+    var data = _highlightsData[key];
+    if (data) {
+      cardsHtml.push(`
+        <div class="highlight-card" onclick="openHighlightDetail('${key}')" style="border-top: 2.5px solid ${data.ringColor};">
+          <div class="highlight-emoji">${data.emoji}</div>
+          <div class="highlight-info">
+            <div class="highlight-title">${esc(data.title)}</div>
+            <div class="highlight-sub">${esc(data.subtitle)}</div>
+          </div>
+        </div>
+      `);
+    }
+  });
+  container.innerHTML = cardsHtml.join('');
+}
+
+function openHighlightDetail(key) {
+  var data = _highlightsData[key];
+  if (!data) return;
+  var modal = document.getElementById('highlight-detail-modal');
+  if (!modal) return;
+  
+  var emojiEl = document.getElementById('highlight-modal-emoji');
+  var titleEl = document.getElementById('highlight-modal-title');
+  var subEl = document.getElementById('highlight-modal-subtitle');
+  var bodyEl = document.getElementById('highlight-modal-body');
+  
+  if (emojiEl) emojiEl.textContent = data.emoji;
+  if (titleEl) titleEl.textContent = data.title;
+  if (subEl) {
+    subEl.textContent = data.subtitle;
+    subEl.style.color = data.ringColor;
+  }
+  if (bodyEl) bodyEl.textContent = data.body;
+  
+  modal.style.display = 'flex';
+  var card = modal.querySelector('.modal-card');
+  if (card) {
+    card.style.transform = 'scale(0.9)';
+    setTimeout(function() {
+      card.style.transform = 'scale(1)';
+    }, 10);
+  }
+}
+
+function triggerHighlightCheer() {
+  triggerConfettiBurst();
+  var modal = document.getElementById('highlight-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
 
 function triggerConfettiBurst() {
   if (typeof confetti === 'function') {
@@ -1305,6 +1608,8 @@ function renderFeed() {
   }
   window._feedMaps = [];
 
+  renderFeedHighlights();
+  renderCommunityPulse();
   if (!_feedData.length) {
     list.innerHTML = '<div class="empty-state"><div class="icon">📢</div><p>No updates in the feed yet. Check back later!</p></div>';
     return;
@@ -1667,7 +1972,7 @@ async function reactToAnnouncement(announcementId, reactionType, event) {
   }
 
   try {
-    var res = await fetch(BACKEND + '/announcements/react', {
+    var res = await fetch(BACKEND + '/react', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1878,18 +2183,31 @@ function renderNotifications() {
   });
 }
 
-function clearPWACache() {
+function clearPWACache(btn) {
+  if (btn) {
+    btn.style.color = '#10b981';
+    btn.style.transform = 'scale(1.15)';
+    btn.style.transition = 'all 0.2s ease';
+  }
+
   if (currentSession && currentSession.athleteId) {
     cacheClear(currentSession.athleteId);
   }
+
+  var reloadPage = function() {
+    window.location.reload(true);
+  };
+
   if ('serviceWorker' in navigator) {
     caches.keys().then(function(names) {
       return Promise.all(names.map(function(name) { return caches.delete(name); }));
     }).then(function() {
-      window.location.reload(true);
+      setTimeout(reloadPage, 800);
+    }).catch(function() {
+      setTimeout(reloadPage, 800);
     });
   } else {
-    window.location.reload(true);
+    setTimeout(reloadPage, 800);
   }
 }
 
