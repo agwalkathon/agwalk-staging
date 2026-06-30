@@ -543,7 +543,7 @@
     /* ── Section label ── */
     .sec{font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 14px;}
     .sec:first-child{margin-top:4px;}
-    .card > .sec{padding:16px 16px 0;margin:0 0 14px;}
+    .card > .sec{padding:14px 16px 0;margin:0 0 12px;}
     .medal-pred > .sec,.heatmap-wrap > .sec{margin:0 0 14px;}
 
     /* ── Card ── */
@@ -679,10 +679,7 @@
     /* Stat cards grid */
     .stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
     .stat-card-item {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 16px 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      padding: 10px 8px;
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       cursor: pointer;
     }
@@ -692,19 +689,10 @@
     .stat-card-item:active {
       transform: scale(0.96);
     }
-    /* Glowing accents matching their icons */
-    .stat-card-item:nth-of-type(1):hover {
-      border-color: rgba(232, 98, 42, 0.3);
-      box-shadow: 0 8px 20px rgba(232, 98, 42, 0.06);
-    }
-    .stat-card-item:nth-of-type(2):hover {
-      border-color: rgba(34, 197, 94, 0.3);
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.06);
-    }
-    .stat-card-item:nth-of-type(3):hover {
-      border-color: rgba(96, 165, 250, 0.3);
-      box-shadow: 0 8px 20px rgba(96, 165, 250, 0.06);
-    }
+    /* Subtle icon highlight on hover */
+    .stat-card-item:nth-of-type(1):hover .stat-card-icon { box-shadow: 0 0 12px rgba(232, 98, 42, 0.3); }
+    .stat-card-item:nth-of-type(2):hover .stat-card-icon { box-shadow: 0 0 12px rgba(34, 197, 94, 0.25); }
+    .stat-card-item:nth-of-type(3):hover .stat-card-icon { box-shadow: 0 0 12px rgba(96, 165, 250, 0.25); }
     .stat-card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;flex-shrink:0;}
     .stat-card-val{font-size:var(--fs-lg);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-0.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .stat-card-label{font-size:10px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
