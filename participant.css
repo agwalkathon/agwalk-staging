@@ -406,33 +406,61 @@
     }
     .banner-card {
       border-radius: var(--radius-sm);
-      padding: 13px 14px;
+      padding: 14px 16px;
       position: relative;
-      background: linear-gradient(135deg, rgba(232, 98, 42, 0.08) 0%, rgba(26, 29, 32, 0.95) 60%);
-      border: 1px solid rgba(232, 98, 42, 0.22);
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-left: 4px solid var(--brand);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(232, 98, 42, 0.04);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
       transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .banner-card.type-broadcast {
       border-left-color: #7C3AED;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.10) 0%, rgba(26, 29, 32, 0.95) 60%);
-      border-color: rgba(124, 58, 237, 0.22);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(124, 58, 237, 0.04);
     }
     .banner-card.type-recovery {
       border-left-color: #22C55E;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(26, 29, 32, 0.95) 60%);
-      border-color: rgba(34, 197, 94, 0.2);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(34, 197, 94, 0.04);
     }
     .banner-card.type-insight {
       border-left-color: #60A5FA;
-      background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(26, 29, 32, 0.95) 60%);
-      border-color: rgba(96, 165, 250, 0.2);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(96, 165, 250, 0.04);
+    }
+    .banner-card.type-warning {
+      border-left-color: #FC6100;
+    }
+    .banner-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(232, 98, 42, 0.12);
+      color: var(--brand);
+    }
+    .banner-card.type-broadcast .banner-icon {
+      background: rgba(124, 58, 237, 0.12);
+      color: #A78BFA;
+    }
+    .banner-card.type-recovery .banner-icon {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22C55E;
+    }
+    .banner-card.type-insight .banner-icon {
+      background: rgba(96, 165, 250, 0.12);
+      color: #60A5FA;
+    }
+    .banner-card.type-warning .banner-icon {
+      background: rgba(252, 97, 0, 0.12);
+      color: #FC6100;
+    }
+    .banner-content {
+      flex: 1;
+      min-width: 0;
     }
     .banner-dismiss-btn {
       position:absolute; top:9px; right:9px;
