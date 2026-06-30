@@ -470,7 +470,7 @@ function renderActivities(acts, dayBreakdown, actBreakdown, gender) {
         '<span class="whoop-date-month">' + esc(shortMonth) + '</span>' +
       '</div>' +
       '<div style="flex:1; display:flex; flex-direction:column; margin-left:12px; min-width:0; align-items:stretch;">' +
-        '<div class="whoop-stats-box" style="margin-left:0; width:100%; justify-content:flex-start;">' +
+        '<div class="whoop-stats-box" style="margin-left:auto; justify-content:flex-end; padding-right:8px;">' +
           '<div class="whoop-stat-item">' + actValHtml + '<span class="whoop-stat-lbl">ACTS</span></div>' +
           '<div class="whoop-stat-item"><span class="whoop-stat-val">' + daySteps.toLocaleString('en-IN') + '</span><span class="whoop-stat-lbl">STEPS</span></div>' +
           '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>' +
