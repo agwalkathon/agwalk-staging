@@ -78,6 +78,19 @@ function cacheClear(athleteId) {
 // Cache migrations
 safeRemoveItem('agwalk_ranking_acts');
 
+function getRegistrationFetchUrl(s) {
+  var athleteId = s.athleteId;
+  if (!athleteId || athleteId === 'null' || athleteId === 'undefined') {
+    if (s.empCode) {
+      return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(s.empCode) + '&select=*';
+    }
+    if (s.email) {
+      return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(s.email) + '&select=*';
+    }
+  }
+  return SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=*';
+}
+
 // Main Application Loader
 async function load(isBackgroundRefresh) {
   // Handle Strava OAuth callback
@@ -168,7 +181,7 @@ async function load(isBackgroundRefresh) {
     if (_allFromCache && !isBackgroundRefresh) {
       setTimeout(function(){
         Promise.all([
-          fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId+'&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
+          fetch(getRegistrationFetchUrl(s),{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
           fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30T23:59:59&order=activity_date.desc').then(function(d){cacheSet('acts_'+athleteId,d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
           fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
@@ -200,7 +213,7 @@ async function load(isBackgroundRefresh) {
     } else {
       console.log('[Cache] Cache miss — fetching Phase 1 from Supabase...');
       var [regRes,myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
-        fetch(SUPABASE_URL+'/rest/v1/registration?strava_athlete_id=eq.'+athleteId+'&select=*',{headers:HDR}),
+        fetch(getRegistrationFetchUrl(s),{headers:HDR}),
         fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-06-30T23:59:59&order=activity_date.desc'),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
