@@ -2790,16 +2790,15 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
 
-  .feed-react-btn .reaction-svg {
-    stroke: var(--muted);
-    fill: none;
+  .feed-react-btn .reaction-fa {
+    font-size: 13.5px;
+    color: var(--muted);
     transition: all 0.2s ease;
     pointer-events: none;
   }
-  .feed-react-btn.active .reaction-svg {
-    stroke: var(--brand);
-    fill: rgba(232, 98, 42, 0.15);
+  .feed-react-btn.active .reaction-fa {
+    color: var(--brand);
   }
-  .feed-react-btn:hover .reaction-svg {
-    stroke: var(--brand);
+  .feed-react-btn:hover .reaction-fa {
+    color: var(--brand);
   }
