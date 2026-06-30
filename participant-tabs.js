@@ -942,10 +942,11 @@ function renderRows(rows, prevRanks) {
       frag.appendChild(pinnedEl);
     }
   });
-  list.appendChild(frag);
-
-  var rnkEl = document.getElementById('lb-my-rank');
-  if (rnkEl && myRank > 0) rnkEl.textContent = '#' + myRank;
+  requestAnimationFrame(function() {
+    list.appendChild(frag);
+    var rnkEl = document.getElementById('lb-my-rank');
+    if (rnkEl && myRank > 0) rnkEl.textContent = '#' + myRank;
+  });
 }
 
 function renderHallOfFame() {
@@ -1106,7 +1107,8 @@ function lbBoot() {
     precomputeLBScores();
     _lbReady = true;
   }
-  lbRender();
+  showSkeletons();
+  setTimeout(function() { lbRender(); }, 0);
 }
 window.lbBoot = lbBoot;
 
