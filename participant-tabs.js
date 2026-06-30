@@ -2038,7 +2038,10 @@ function getEmojiCharForType(type, isMilestone) {
 async function reactToAnnouncement(announcementId, reactionType, event, btnElement) {
   if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
   var athleteId = currentSession ? currentSession.athleteId : '';
-  if (!athleteId) return;
+  if (!athleteId || athleteId === 'null' || athleteId === 'undefined') {
+    alert('⚠️ Please connect your Strava account first.');
+    return;
+  }
 
   var item = _feedData.find(function(x) { return String(x.id) === String(announcementId); });
   if (item) {
