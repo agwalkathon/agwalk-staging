@@ -2110,6 +2110,17 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .reactions-avatar-pile {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .reactions-avatar-pile:hover {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+  .reactions-avatar-pile:active {
+    transform: scale(0.97);
+  }
+
   /* Activity Feed Styles */
   .feed-card-avatar {
     width: 40px;
