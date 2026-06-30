@@ -1,7 +1,7 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     :root{
       --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
-      --bg:#0E1012; --surface:#1A1D20; --surface2:#242830;
+      --bg:#0e1115; --surface:#1A1D20; --surface2:#242830;
       --border:rgba(255,255,255,0.07);
       --text:#FFFFFF; --muted:rgba(255,255,255,0.52); --label:rgba(255,255,255,0.35); --dim:rgba(255,255,255,0.20);
       --green:#22C55E; --green-dim:rgba(34,197,94,0.12);
@@ -21,11 +21,13 @@
       --fs-xl: 26px;
       --fs-xxl: 40px;
     }
+    html{background:#0e1115;}
     html,body{height:100dvh;overflow:hidden;max-width:100vw;}
     body {
       font-family: var(--font);
       background: linear-gradient(180deg, #0e1115 0%, #171c24 100%);
       background-attachment: fixed;
+      background-size: 100% 100dvh;
       color: var(--text);
       display: flex;
       flex-direction: column;
@@ -484,7 +486,7 @@
       width: 100%;
       overflow: hidden;
       position: relative;
-      background: var(--bg);
+      background: transparent;
       display: flex;
       flex-direction: column;
     }
