@@ -1226,33 +1226,35 @@
     /* ── Tabs ── */
     .lb-tabs {
       display: flex;
-      background: rgba(26, 29, 32, 0.45);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 22px;
+      padding: 3px;
       margin: 10px 0 14px;
-      box-shadow: inset 0 1px 1px rgba(255,255,255,0.02);
+      gap: 2px;
     }
     .lb-tab {
       flex: 1;
-      padding: 9px 8px;
-      font-size: var(--fs-sm);
-      font-weight: 700;
-      color: var(--muted);
+      padding: 8px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.4);
       background: none;
       border: none;
-      border-radius: 16px;
+      border-radius: 19px;
       cursor: pointer;
       font-family: var(--font);
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .lb-tab.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.08);
-      border-bottom-color: transparent;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      color: #111;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     }
 
     /* ── Info Banner (replacing Legend) ── */
