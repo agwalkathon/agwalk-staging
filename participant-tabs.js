@@ -2000,19 +2000,36 @@ function renderFeed() {
         </div>
       `;
     } else {
-      var iconHtml = (item.type === 'milestone') ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>' : '';
+      var iconHtml = '';
+      if (item.type === 'milestone') {
+        iconHtml = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>';
+      } else if (item.type === 'broadcast') {
+        iconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+      }
+
       var bodyHtml = item.body ? `<div class="feed-card-body">${formatMarkdown(item.body)}</div>` : '';
       var targetAthleteId = String(item.tagged_athlete_id || '');
       var athleteReg = regMap[targetAthleteId];
       var athleteName = athleteReg ? athleteReg.full_name : 'Participant';
+      
+      var nameHtml = '';
+      var cardOnclick = '';
+      if (item.type === 'broadcast') {
+        athleteName = 'Announcement';
+        nameHtml = `<span class="athlete-profile-static" style="color:#fff; font-weight:700; font-size:14px;">${esc(athleteName)}</span>`;
+        cardOnclick = 'event.stopPropagation();';
+      } else {
+        nameHtml = `<a href="#" onclick="openProfileDetail('${targetAthleteId}', event); event.stopPropagation(); return false;" class="athlete-profile-link">${esc(athleteName)}</a>`;
+        cardOnclick = `openProfileDetail('${targetAthleteId}', event)`;
+      }
 
       html += `
-        <div class="feed-card type-${item.type}" onclick="openProfileDetail('${targetAthleteId}', event)">
+        <div class="feed-card type-${item.type}" onclick="${cardOnclick}">
           <div class="feed-card-header">
             <div class="feed-card-icon">${iconHtml}</div>
             <div class="feed-card-meta">
               <div class="feed-card-athlete-name">
-                <a href="#" onclick="openProfileDetail('${targetAthleteId}', event); event.stopPropagation(); return false;" class="athlete-profile-link">${esc(athleteName)}</a>
+                ${nameHtml}
               </div>
               <div class="feed-card-title" style="font-size: 13px; font-weight: 700; color: var(--brand); margin-top: 2px;">${esc(item.title)}</div>
               <div class="feed-card-time">${dateLabel}</div>
