@@ -553,19 +553,17 @@
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 14px 16px;
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
       position: relative;
       overflow: hidden;
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.25s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      min-height: 64px;
     }
     .pb-card:hover {
       transform: translateY(-2px);
@@ -608,9 +606,10 @@
       font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      text-align: right;
+      text-align: left;
       white-space: nowrap;
       flex-shrink: 0;
+      margin-top: 2px;
     }
     .pb-card-sub {
       font-size: 10px;
