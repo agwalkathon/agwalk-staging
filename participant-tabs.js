@@ -1394,6 +1394,7 @@ async function loadFeed(isSilent) {
         if (list) {
           renderFeed();
         }
+        updateInAppNotificationBanner();
       }
       
       var lastViewedStr = safeGetItem('ag_last_viewed_announcements') || '';
@@ -1632,10 +1633,27 @@ function initFeedMaps() {
         }).addTo(map);
 
         var poly = L.polyline(coordinates, {
-          color: 'var(--brand)',
-          weight: 3.5,
-          opacity: 0.85,
+          color: '#00E676', // Glowing neon green (Google Map / fitness style)
+          weight: 4,
+          opacity: 0.9,
           lineJoin: 'round'
+        }).addTo(map);
+
+        // Add start and end point circle markers
+        L.circleMarker(coordinates[0], {
+          radius: 5,
+          color: '#ffffff',
+          weight: 1.5,
+          fillColor: '#22c55e', // Emerald Green for start
+          fillOpacity: 1
+        }).addTo(map);
+
+        L.circleMarker(coordinates[coordinates.length - 1], {
+          radius: 5,
+          color: '#ffffff',
+          weight: 1.5,
+          fillColor: '#ef4444', // Red for end
+          fillOpacity: 1
         }).addTo(map);
 
         map._refit = function() {
@@ -2225,10 +2243,14 @@ var _activeRecovery = null;
 function renderInAppNotificationBanner(title, body, onClick, key, onClose, type) {
   var onDismissStr = onClose ? 'onClose()' : 'dismissInAppBanner(event)';
   var cardClass = type ? 'banner-card type-' + type : 'banner-card';
+  var iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+  if (type === 'broadcast') {
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+  }
   return `
     <div class="${cardClass}" onclick="${onClick}" style="cursor: ${onClick ? 'pointer' : 'default'};">
       <button class="banner-dismiss-btn" onclick="${onDismissStr}" title="Dismiss">✕</button>
-      <div class="banner-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="banner-icon">${iconSvg}</div>
       <div class="banner-content">
         <div class="banner-title">${esc(title)}</div>
         <div class="banner-body">${esc(body)}</div>
@@ -2275,7 +2297,26 @@ function updateInAppNotificationBanner() {
     }
   }
 
-  // Priority 2: Recovery insights
+  // Priority 2: Broadcast message from admin
+  if (typeof _feedData !== 'undefined' && _feedData && _feedData.length > 0) {
+    var latestBroadcast = _feedData.find(function(item) { return item.type === 'broadcast'; });
+    if (latestBroadcast) {
+      var bcKey = 'broadcast_' + latestBroadcast.id;
+      if (!dismissed[bcKey]) {
+        var html = renderInAppNotificationBanner(
+          latestBroadcast.title || 'Walkathon Update',
+          latestBroadcast.body,
+          'showTab(\'feed\')', bcKey, null, 'broadcast'
+        );
+        banner.setAttribute('data-banner-key', bcKey);
+        banner.innerHTML = html;
+        banner.style.display = 'block';
+        return;
+      }
+    }
+  }
+
+  // Priority 3: Recovery insights
   if (_activeRecovery) {
     var recKey = _activeRecovery.key;
     if (!dismissed[recKey]) {
@@ -2291,7 +2332,7 @@ function updateInAppNotificationBanner() {
     }
   }
 
-  // Priority 3: Daily Milestones or Medal insights
+  // Priority 4: Daily Milestones or Medal insights
   if (_activeInsight) {
     var iKey = _activeInsight.key;
     if (!dismissed[iKey]) {
