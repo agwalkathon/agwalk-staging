@@ -317,6 +317,8 @@ async function sendOTP(){
     if (!d.success) {
       if (d.error === 'not_found') {
         showErr('⛔ <strong>Email not found.</strong><br>This email is not registered. Please register first.');
+      } else if (d.error === 'no_strava_id') {
+        showErr('⚠️ <strong>Account setup incomplete.</strong><br>Contact pra@arcgate.com for assistance.');
       } else if (d.error === 'smtp_not_configured') {
         showErr('⚠️ <strong>Email service not ready.</strong><br>Brevo key is not configured. Contact pra@arcgate.com');
       } else {
