@@ -2794,6 +2794,7 @@
     stroke: var(--muted);
     fill: none;
     transition: all 0.2s ease;
+    pointer-events: none;
   }
   .feed-react-btn.active .reaction-svg {
     stroke: var(--brand);
