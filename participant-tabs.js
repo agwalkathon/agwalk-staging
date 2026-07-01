@@ -2200,6 +2200,19 @@ async function reactToAnnouncement(announcementId, reactionType, event, btnEleme
     }
 
     if (d.success) {
+      // Create in-app notification for activity owner
+      if (d.action === 'added' && item) {
+        var ownerAthleteId = item.tagged_athlete_id || '';
+        if (ownerAthleteId && String(ownerAthleteId) !== String(athleteId)) {
+          var myName = currentSession ? (currentSession.name || currentSession.firstName || 'A teammate') : 'A teammate';
+          var actName = '';
+          try { actName = JSON.parse(item.body).activity_name || item.title || ''; } catch(e) { actName = item.title || ''; }
+          fetch(BACKEND + '/notifications/create', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ recipient_athlete_id: String(ownerAthleteId), sender_athlete_id: String(athleteId), sender_name: myName, announcement_id: String(announcementId), activity_name: actName, type: reactionType })
+          }).catch(function(){});
+        }
+      }
       var confirmedBtn = document.querySelector('button[data-ann-id="' + announcementId + '"][data-react-type="' + reactionType + '"]');
       if (confirmedBtn) {
         var cntEl = confirmedBtn.querySelector('.count');
@@ -2387,6 +2400,35 @@ function timeAgo(dateString) {
   }
 }
 
+function openNotificationItem(n) {
+  // Mark as read
+  if (!n.is_read) {
+    fetch(BACKEND + '/notifications/read', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:n.id}) }).catch(function(){});
+    // Update local state
+    var local = _notificationsList.find(function(x){ return x.id === n.id; });
+    if (local) local.is_read = true;
+    renderNotifications();
+  }
+  // Close dropdown
+  var dropdown = document.getElementById('notification-dropdown');
+  if (dropdown) dropdown.style.display = 'none';
+  // Navigate to feed tab + highlight the post
+  if (n.url && n.url.startsWith('feed:')) {
+    var annId = n.url.split(':')[1];
+    showTab('feed');
+    setTimeout(function() {
+      var btn = document.querySelector('button[data-ann-id="' + annId + '"]');
+      var card = btn ? btn.closest('.feed-card') : null;
+      if (card) {
+        card.scrollIntoView({ behavior:'smooth', block:'center' });
+        card.style.transition = 'box-shadow 0.4s ease';
+        card.style.boxShadow = '0 0 0 2px var(--brand)';
+        setTimeout(function(){ card.style.boxShadow = ''; }, 2200);
+      }
+    }, 320);
+  }
+}
+
 function renderNotifications() {
   var badge = document.getElementById('notification-badge');
   var list = document.getElementById('notif-list');
@@ -2423,9 +2465,18 @@ function renderNotifications() {
     if (n.type === 'medal') icon = '🏆';
     if (n.type === 'kudos') icon = '👏';
     if (n.type === 'comment') icon = '💬';
+    if (n.type === 'like') icon = '👍';
+    if (n.type === 'heart') icon = '❤️';
+
+    var notifBody = '';
+    if (n.body) { try { var bd = JSON.parse(n.body); notifBody = ''; } catch(e) { notifBody = n.body; } }
 
     var clickHandler = '';
-    if (n.url === 'connect_strava') {
+    var isFeedNotif = n.url && n.url.startsWith('feed:');
+    if (isFeedNotif) {
+      var _nid = n.id; var _nref = n;
+      clickHandler = 'openNotificationItem(' + JSON.stringify(n).replace(/"/g, '&quot;') + ')';
+    } else if (n.url === 'connect_strava') {
       clickHandler = 'window.handleStravaConnect(event);';
     } else if (n.url) {
       clickHandler = 'if(\'' + n.url + '\' && \'' + n.url + '\' !== \'null\') { window.location.href=\'' + n.url + '\'; }';
@@ -2436,7 +2487,7 @@ function renderNotifications() {
         <div style="font-size: 20px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border-radius: 50%;">${icon}</div>
         <div style="flex: 1; min-width: 0;">
           <div style="font-size: 13.5px; font-weight: 700; color: #fff; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(n.title)}</div>
-          <div style="font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4;">${esc(n.body)}</div>
+          <div style="font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4;">${notifBody ? esc(notifBody) : ''}</div>
           <div style="font-size: 10px; color: var(--brand); font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px;">${timeAgo(n.created_at)}</div>
         </div>
       </div>
