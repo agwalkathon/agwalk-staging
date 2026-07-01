@@ -388,27 +388,42 @@ function openActivityDetail(id, event, isStravaId) {
         })
         .catch(function(err) { console.warn('Failed to load splits:', err); });
 
+      function handleLoadedActivity(fullAct) {
+        var athleteId = fullAct.strava_athlete_id || fullAct.athlete_id;
+        if (athleteId) {
+          fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=full_name', { headers: HDR })
+            .then(function(r) { return r.json(); })
+            .then(function(regRows) {
+              if (regRows && regRows.length > 0) {
+                fullAct.athlete_name = regRows[0].full_name;
+              }
+              populateFromActivity(fullAct, null);
+            })
+            .catch(function() {
+              populateFromActivity(fullAct, null);
+            });
+        } else {
+          populateFromActivity(fullAct, null);
+        }
+      }
+
       fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=eq.' + stravaActId, { headers: HDR })
         .then(function(res) { return res.json(); })
         .then(function(rows) {
           if (rows && rows.length > 0) {
-            var fullAct = rows[0];
-            var athleteId = fullAct.strava_athlete_id || fullAct.athlete_id;
-            if (athleteId) {
-              fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=full_name', { headers: HDR })
-                .then(function(r) { return r.json(); })
-                .then(function(regRows) {
-                  if (regRows && regRows.length > 0) {
-                    fullAct.athlete_name = regRows[0].full_name;
-                  }
-                  populateFromActivity(fullAct, null);
-                })
-                .catch(function() {
-                  populateFromActivity(fullAct, null);
-                });
-            } else {
-              populateFromActivity(fullAct, null);
-            }
+            handleLoadedActivity(rows[0]);
+          } else {
+            // Try fallback query by internal database ID
+            fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + stravaActId, { headers: HDR })
+              .then(function(res) { return res.json(); })
+              .then(function(rows2) {
+                if (rows2 && rows2.length > 0) {
+                  handleLoadedActivity(rows2[0]);
+                } else {
+                  console.warn('Activity not found by strava_activity_id or id:', stravaActId);
+                }
+              })
+              .catch(function(err) { console.warn('Fallback fetch failed:', err); });
           }
         })
         .catch(function(err) { console.warn('Failed to load full activity details:', err); });
@@ -862,6 +877,7 @@ async function submitActivityReport() {
   
   if ((!activityId || !ownerId) && window._currentStravaActivityId) {
     try {
+      // 1. Try resolving by strava_activity_id
       var r = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=eq.' + window._currentStravaActivityId, {
         headers: { apikey: ANON, Authorization: 'Bearer ' + ANON }
       });
@@ -869,6 +885,19 @@ async function submitActivityReport() {
       if (data && data.length > 0) {
         activityId = data[0].id;
         ownerId = data[0].strava_athlete_id || data[0].athlete_id;
+      } else {
+        // 2. Try resolving by database primary key id
+        var r2 = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + window._currentStravaActivityId, {
+          headers: { apikey: ANON, Authorization: 'Bearer ' + ANON }
+        });
+        var data2 = await r2.json();
+        if (data2 && data2.length > 0) {
+          activityId = data2[0].id;
+          ownerId = data2[0].strava_athlete_id || data2[0].athlete_id;
+        }
+      }
+      
+      if (activityId) {
         window._currentReportActivityId = activityId;
         window._currentReportOwnerId = ownerId;
       }
@@ -878,7 +907,11 @@ async function submitActivityReport() {
   }
   
   if (!activityId || !ownerId) {
-    alert('Failed to report activity: Activity details not loaded.');
+    alert('Failed to report activity: Activity details not loaded.\n'
+        + 'Diagnostic Log:\n'
+        + '- currentReportActivityId: ' + window._currentReportActivityId + '\n'
+        + '- currentReportOwnerId: ' + window._currentReportOwnerId + '\n'
+        + '- currentStravaActivityId: ' + window._currentStravaActivityId);
     return;
   }
   
