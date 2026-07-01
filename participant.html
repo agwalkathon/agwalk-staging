@@ -774,7 +774,31 @@
         <div class="detail-metrics-title">Kudos Insights</div>
         <div id="detail-appreciation-box"></div>
       </div>
-      
+
+      <!-- Report Suspicious Activity -->
+      <div id="detail-report-section" style="margin-top:24px; display:none;">
+        <button id="btn-report-activity" onclick="toggleReportForm()" style="display:flex; align-items:center; gap:8px; width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer; text-align:left; transition:all 0.2s;">
+          <span style="color:var(--brand); font-size:15px;">&#9873;</span> Mark as Suspicious Activity
+        </button>
+        <div id="report-form-container" style="display:none; margin-top:10px; background:var(--surface); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px;">
+          <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px;">Reason for Reporting</div>
+          <select id="report-reason-select" onchange="onReportReasonChange()" style="width:100%; padding:10px 12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-size:13px; margin-bottom:10px; cursor:pointer; box-sizing:border-box;">
+            <option value="">Select a reason...</option>
+            <option value="gps_manipulation">GPS manipulation / route editing</option>
+            <option value="impossible_speed">Impossible speed or distance</option>
+            <option value="indoor_outdoor">Indoor activity recorded as outdoor</option>
+            <option value="duplicate">Duplicate activity</option>
+            <option value="not_walking">Not a walking/running activity</option>
+            <option value="custom">Other (specify below)</option>
+          </select>
+          <textarea id="report-comments" placeholder="Additional details (optional)..." style="width:100%; padding:10px 12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-size:13px; min-height:72px; resize:none; box-sizing:border-box; margin-bottom:12px; font-family:inherit;"></textarea>
+          <div style="display:flex; gap:8px;">
+            <button id="btn-submit-report" onclick="submitActivityReport()" style="flex:1; padding:10px 16px; background:rgba(232,98,42,0.12); border:1px solid rgba(232,98,42,0.3); border-radius:8px; color:var(--brand); font-size:13px; font-weight:800; cursor:pointer; transition:all 0.2s;">Submit Report</button>
+            <button onclick="toggleReportForm()" style="padding:10px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
