@@ -317,19 +317,23 @@
 </div>
 
 <!-- Leaderboard tab -->
-<div class="content" id="tab-leaderboard" style="padding:0;background:var(--bg);">
+<div class="content" id="tab-leaderboard" style="padding:0;background:transparent;">
   <!-- hidden els for JS compat -->
   <span id="lb-my-name" style="display:none"></span>
   <span id="lb-my-tags" style="display:none"></span>
   <span id="lb-my-pts" style="display:none"></span>
   <span id="lb-my-rank" style="display:none"></span>
+  <div class="max-w">
   <div class="lb-tabs">
     <button class="lb-tab active" id="lb-tab-shift" onclick="switchTab('shift')">My Category</button>
     <button class="lb-tab" id="lb-tab-team" onclick="switchTab('team')">My Team</button>
     <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
   </div>
   <!-- My Standing + Rank Movement -->
-  <div style="padding:12px 20px 0;">
+  <div style="padding:0 20px; margin-bottom:12px;">
+  <div class="card">
+  <div class="sec">My Standing</div>
+  <div style="padding:0 14px 14px;">
     <div class="standing-grid">
       <div class="standing-card">
         <div class="standing-rank-big" id="standing-shift-rank">—</div>
@@ -358,12 +362,15 @@
       <span>ℹ️ Tap any row or podium card to view points breakdown</span>
     </div>
   </div>
+  </div>
+  </div>
   <div class="lb-content">
     <div id="lb-list">
       <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
       <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
       <div class="skel-row"><div class="skeleton skel-c"></div><div class="skel-lines"><div class="skeleton skel-l m"></div><div class="skeleton skel-l s"></div></div></div>
     </div>
+  </div>
   </div>
 </div>
 
