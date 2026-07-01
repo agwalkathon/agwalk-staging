@@ -709,7 +709,7 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
                 fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
@@ -730,7 +730,7 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
             fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v3', allActsRaw);
