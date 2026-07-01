@@ -45,9 +45,10 @@
       backdrop-filter:blur(20px);
       -webkit-backdrop-filter:blur(20px);
       padding:max(14px,env(safe-area-inset-top)) 16px 14px;
-      display:flex;align-items:center;
-      justify-content:space-between;
-      gap:8px;
+    }
+    .hdr-inner{
+      max-width:540px;margin:0 auto;width:100%;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
     }
     .hdr-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
     .hdr-right{display:flex;align-items:center;gap:0;flex:1;justify-content:flex-end;min-width:0;}
