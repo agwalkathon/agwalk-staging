@@ -1109,6 +1109,11 @@ async function load(isBackgroundRefresh) {
         cardDiv.className='ch-card ' + statusCls;
         
         var displayName = getChallengeEmoji(ch.name) + ' ' + toTitleCase(ch.name);
+        var statusBarHtml = earned
+          ? '<span>&#10003; Achieved</span><span>+' + Math.round(displayPts) + ' pts earned</span>'
+          : missed
+            ? '<span>&#10007; Not completed</span><span>Deadline passed</span>'
+            : '<span>! Available</span><span>+' + Math.round(ch.bonus_points) + ' pts possible</span>';
         cardDiv.innerHTML = `
           <div class="ch-card-header">
             <div class="ch-dot ${statusCls}">${statusIcon}</div>
@@ -1118,6 +1123,7 @@ async function load(isBackgroundRefresh) {
             </div>
             <div class="ch-pts ${statusCls}">+${Math.round(earned ? displayPts : ch.bonus_points)} pts</div>
           </div>
+          <div class="ch-status-bar ${statusCls}">${statusBarHtml}</div>
         `;
         chList.appendChild(cardDiv);
       });
