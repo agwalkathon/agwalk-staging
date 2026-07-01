@@ -2209,11 +2209,11 @@
     line-height: 1.4;
   }
   .feed-card-map-wrap .leaflet-container {
-    background: #2a2a2a !important;
+    background: #0e1115 !important;
     outline: none;
   }
   .feed-card-map-wrap .leaflet-tile-pane {
-    filter: brightness(1.65) contrast(0.82) saturate(0.1);
+    filter: brightness(0.82) contrast(1.05) saturate(0.45) hue-rotate(12deg);
   }
   
   /* Activity Detail Modal Slide-up Overlay */
@@ -2291,10 +2291,10 @@
     width: 100%;
     height: 250px;
     position: relative;
-    background: #2a2a2a;
+    background: #0e1115;
   }
   .detail-map-wrap .leaflet-tile-pane {
-    filter: brightness(1.65) contrast(0.82) saturate(0.1);
+    filter: brightness(0.82) contrast(1.05) saturate(0.45) hue-rotate(12deg);
   }
   .detail-content {
     max-width: 600px;
