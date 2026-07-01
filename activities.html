@@ -510,7 +510,6 @@ td button.btn:last-child { margin-right: 0; }
     <div class="tab-bar">
       <div style="display:flex;gap:4px;flex-wrap:wrap;">
         <button class="tab-btn active" id="tab-all" onclick="switchTab('all')">🏃 All Workouts</button>
-        <button class="tab-btn" id="tab-review" onclick="switchTab('review')">🚩 Under Review</button>
         <button class="tab-btn" id="tab-scanner" onclick="switchTab('scanner')">🔍 Bulk Flag Scanner</button>
         <button class="tab-btn" id="tab-deleted" onclick="switchTab('deleted')">🗑️ Deleted</button>
         <button class="tab-btn" id="tab-rules" onclick="switchTab('rules')">⚙️ Auto-Flag Rules</button>
@@ -524,13 +523,25 @@ td button.btn:last-child { margin-right: 0; }
       <div class="filter-bar"><h3>Filter activities</h3><div class="filter-grid">
       <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div><div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
       <div class="filter-group"><label>Status</label><select id="status-filter"><option value="">All statuses</option><option value="valid">✅ Valid</option><option value="invalid">🚩 Invalid / Flagged</option></select></div>
+      <div class="filter-group"><label>Review State</label><select id="review-filter"><option value="">All</option><option value="pending">⏳ Pending Review</option><option value="reviewed">✓ Reviewed</option></select></div>
       <div class="filter-group"><label>Flag reason</label><select id="flag-reason-filter"><option value="">All reasons</option><optgroup label="── Manual Review ──"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="── Auto Flags ──"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="── Manual Flags ──"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select></div>
       <div class="filter-group"><label>Activity type</label><select id="sport-filter"><option value="">All types</option><option value="Walk">Walk</option><option value="Run">Run</option><option value="Ride">Ride</option><option value="Hike">Hike</option><option value="VirtualRun">Virtual Run</option><option value="VirtualRide">Virtual Ride</option><option value="MountainBikeRide">Mountain Bike Ride</option></select></div>
       <div class="filter-group"><label>Participant Name</label><input type="text" id="athlete-name" placeholder="Search participant name..." list="participant-names"><datalist id="participant-names"></datalist></div><div class="filter-group"><label>Team</label><select id="team-filter"><option value="">All teams</option><option>Team Seattle</option><option>Team San Francisco</option><option>Team Los Angeles</option><option>Team Chicago</option><option>Team Austin</option><option>Team New York</option></select></div><div class="filter-group"><label>Activity ID</label><input type="text" id="activity-id-filter" placeholder="Search activity ID..."></div><div class="filter-group"><label>Athlete ID</label><input type="text" id="athlete-id-filter" placeholder="Search athlete ID..."></div>
       </div><div class="filter-actions"><button class="btn btn-primary" onclick="loadActivities()">Search</button><button class="btn btn-ghost" onclick="setDefaultTodayFilters();loadActivities();">Today</button><button class="btn btn-ghost" onclick="clearFilters()">Clear</button><button class="btn btn-ghost" id="export-btn" onclick="exportCSV()" style="display:none"><i class="ti ti-download"></i> Export CSV</button><span id="searching-indicator" style="display:none;align-items:center;gap:8px;font-size:13px;color:#888"><div class="spinner" style="width:18px;height:18px;border-width:2px"></div>Searching...</span></div></div>
       <div class="stats-grid" id="stats-row" style="display:none"><div class="stat-card"><div class="val" id="total-activities">—</div><div class="lbl">Activities found</div></div><div class="stat-card"><div class="val" id="total-distance">—</div><div class="lbl">Total km</div></div><div class="stat-card dark"><div class="val" id="total-participants">—</div><div class="lbl">Participants</div></div><div class="stat-card green"><div class="val" id="total-valid">—</div><div class="lbl">Valid</div></div><div class="stat-card red"><div class="val" id="total-flagged">—</div><div class="lbl">Flagged</div></div></div>
       <div id="flag-counts" style="display:none;margin-bottom:18px;gap:8px;flex-wrap:wrap"></div>
-      <div class="card"><div id="placeholder" class="empty"><div class="icon">🔍</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th>Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Device</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
+      
+      <!-- Bulk actions bar for All Workouts -->
+      <div class="bulk-bar" id="bulk-actions-bar-all" style="display:none; margin-bottom:12px;">
+        <span id="bulk-count-msg-all"><span class="bulk-selected-count" id="bulk-selected-num-all">0</span> items selected</span>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <button class="btn btn-success" id="btn-bulk-clear-all" onclick="doBulkActionAll('unflag')">✅ Clear Selected</button>
+          <button class="btn btn-primary" id="btn-bulk-review-all" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkActionAll('review')">👁️ Review Selected</button>
+          <button class="btn btn-danger" id="btn-bulk-delete-all" onclick="doBulkActionAll('delete')">🗑️ Delete Selected</button>
+        </div>
+      </div>
+
+      <div class="card"><div id="placeholder" class="empty"><div class="icon">🔍</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th>Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Device</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
     </div>
 
     <!-- Tab 2 & 4: Under Review / Deleted Workouts -->
@@ -1136,6 +1147,145 @@ td button.btn:last-child { margin-right: 0; }
   </div>
 </div>
 <div class="modal-overlay" id="flag-modal"><div class="modal"><h3>Update Status</h3><p class="sub" id="modal-sub"></p><label>Flag reason</label><select id="modal-flag-reason" onchange="checkModalDist()"><option value="">— Mark as Valid (clear flag) —</option><optgroup label="── Manual Review ──"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="── Auto Flags ──"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="── Manual Flags ──"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select><div class="dist-field" id="modal-dist-field"><label>Corrected distance (meters)</label><input type="number" id="modal-corrected-dist" placeholder="e.g. 3500"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-confirm" onclick="confirmStatus()">Save</button></div></div></div>
+
+<!-- Custom Edit Activity Modal -->
+<div class="modal-overlay" id="edit-activity-modal">
+  <div class="modal" style="max-width: 600px; width: 90%;">
+    <h3>Edit Activity Details</h3>
+    <p class="sub" id="edit-modal-sub"></p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; text-align: left;">
+      
+      <!-- Status -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Status</label>
+        <select id="edit-status">
+          <option value="valid">✅ Valid</option>
+          <option value="flagged">🚩 Invalid / Flagged</option>
+        </select>
+      </div>
+      
+      <!-- Is Reviewed -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Is Reviewed</label>
+        <select id="edit-reviewed">
+          <option value="false">❌ Pending</option>
+          <option value="true">✅ Reviewed</option>
+        </select>
+      </div>
+
+      <!-- Flag Reason -->
+      <div class="filter-group" style="grid-column: span 2; margin-bottom:0;">
+        <label style="font-weight:700;">Flag Reason</label>
+        <select id="edit-flag-reason-select" onchange="onEditFlagReasonSelectChange()">
+          <option value="">- None (Valid) -</option>
+          <optgroup label="── Manual Review ──">
+            <option value="Manual Review - Distance Issue">Manual Review - Distance Issue</option>
+            <option value="Manual Review - Pace Issue">Manual Review - Pace Issue</option>
+          </optgroup>
+          <optgroup label="── Auto Flags ──">
+            <option value="Distance below min limit">Distance below min limit</option>
+            <option value="Distance above max limit">Distance above max limit</option>
+            <option value="Pace too fast">Pace too fast</option>
+            <option value="Pace too slow">Pace too slow</option>
+            <option value="Steps Count Issue">Steps Count Issue</option>
+            <option value="Speed too high">Speed too high</option>
+            <option value="Elapsed gap too high">Elapsed gap too high</option>
+            <option value="Pace Deviation Issue">Pace Deviation Issue</option>
+            <option value="Shared Activity (auto-detected)">Shared Activity (auto-detected)</option>
+          </optgroup>
+          <optgroup label="── Manual Flags ──">
+            <option value="Not Our Participant">Not Our Participant</option>
+            <option value="Less than 1 km">Less than 1 km</option>
+            <option value="Treadmill">Treadmill</option>
+            <option value="Workout">Workout</option>
+            <option value="Elapsed Time Issue">Elapsed Time Issue</option>
+            <option value="Pace Issue (Bike/Cycle)">Pace Issue (Bike/Cycle)</option>
+            <option value="Shared (no proof)">Shared (no proof)</option>
+            <option value="Indoor Run/Walk">Indoor Run/Walk</option>
+            <option value="More than 2 Activities">More than 2 Activities</option>
+            <option value="Suspicious Activity">Suspicious Activity</option>
+            <option value="Ride / Cycling">Ride / Cycling</option>
+            <option value="Distance Cropped - GPS Glitch">Distance Cropped - GPS Glitch</option>
+            <option value="Distance Issue">Distance Issue</option>
+            <option value="GPS Glitch">GPS Glitch</option>
+            <option value="custom">- Custom Reason (Type below) -</option>
+          </optgroup>
+        </select>
+        <input type="text" id="edit-flag-reason-custom" class="edit-input" placeholder="Type custom flag reason..." style="margin-top: 6px; display: none; width: 100%;">
+      </div>
+
+      <!-- Date/Time UTC -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Date/Time UTC</label>
+        <input type="text" id="edit-date-utc" placeholder="e.g. 2026-06-27T10:25:40+00:00" style="width: 100%;">
+      </div>
+
+      <!-- Date/Time IST -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Date/Time IST</label>
+        <input type="text" id="edit-date-ist" placeholder="e.g. 2026-06-27T15:55:40" style="width: 100%;">
+      </div>
+
+      <!-- Sport Type -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Sport Type</label>
+        <select id="edit-sport-type">
+          <option value="Walk">Walk</option>
+          <option value="Run">Run</option>
+          <option value="Ride">Ride</option>
+          <option value="Hike">Hike</option>
+          <option value="VirtualRun">Virtual Run</option>
+          <option value="VirtualRide">Virtual Ride</option>
+          <option value="MountainBikeRide">Mountain Bike Ride</option>
+        </select>
+      </div>
+
+      <!-- Distance -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Distance (km)</label>
+        <input type="number" step="0.01" id="edit-distance" placeholder="e.g. 5.23" style="width: 100%;">
+        <span id="edit-distance-history" style="font-size: 11px; color: #888; display: block; margin-top: 4px;"></span>
+      </div>
+
+      <!-- Is Deleted -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Is Deleted</label>
+        <select id="edit-deleted" onchange="onEditDeletedChange()">
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+
+      <!-- Is Deleted Reason -->
+      <div class="filter-group" style="margin-bottom:0;">
+        <label style="font-weight:700;">Deleted Reason</label>
+        <select id="edit-deleted-reason-select" onchange="onEditDeletedReasonSelectChange()">
+          <option value="">- Select Reason -</option>
+          <option value="Duplicate Activity">Duplicate Activity</option>
+          <option value="Incorrect Participant">Incorrect Participant</option>
+          <option value="Manual Request">Manual Request</option>
+          <option value="Invalid Data / Spam">Invalid Data / Spam</option>
+          <option value="Self Deleted by Athlete">Self Deleted by Athlete</option>
+          <option value="custom">- Custom Reason (Type below) -</option>
+        </select>
+        <input type="text" id="edit-deleted-reason-custom" class="edit-input" placeholder="Type custom deleted reason..." style="margin-top: 6px; display: none; width: 100%;">
+      </div>
+
+      <!-- Manual Bonus -->
+      <div class="filter-group" style="grid-column: span 2; margin-bottom:0;">
+        <label style="font-weight:700;">Manual Bonus Points</label>
+        <input type="number" id="edit-bonus" placeholder="e.g. 0" style="width: 100%;">
+      </div>
+
+    </div>
+
+    <div class="modal-actions" style="margin-top: 20px;">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-confirm" onclick="saveEditModal()">Save Changes</button>
+    </div>
+  </div>
+</div>
 <footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 <script>
@@ -1342,6 +1492,13 @@ async function loadActivities(){
       var r=rm[String(a.strava_athlete_id).trim()];
       return r&&r.leaderboard_team===tm;
     });
+
+    var rv = document.getElementById('review-filter').value;
+    if (rv === 'pending') {
+      acts = acts.filter(function(a) { return a.is_flagged && a.is_reviewed !== true && a.is_reviewed !== 'true'; });
+    } else if (rv === 'reviewed') {
+      acts = acts.filter(function(a) { return a.is_reviewed === true || a.is_reviewed === 'true'; });
+    }
     
     var km=acts.reduce(function(s,a){return s+(a.distance_meters||0)},0)/1000;
     var validCnt=acts.filter(function(a){return!a.is_flagged}).length;
@@ -1372,11 +1529,15 @@ async function loadActivities(){
     
     window._exportActs=acts;
     window._exportRm=rm;
+    allActivities=acts;
     document.getElementById('export-btn').style.display=acts.length?'inline-flex':'none';
     document.getElementById('result-count').textContent=acts.length+' activit'+(acts.length===1?'y':'ies')+' found';
     
+    // update bulk selected display
+    updateBulkBarAll();
+    
     if(!acts.length){
-      document.getElementById('activities-body').innerHTML='<tr><td colspan="9" style="text-align:center;padding:48px;color:#bbb">No activities match your filters</td></tr>';
+      document.getElementById('activities-body').innerHTML='<tr><td colspan="11" style="text-align:center;padding:48px;color:#bbb">No activities match your filters</td></tr>';
       document.getElementById('searching-indicator').style.display='none';
       return;
     }
@@ -1386,13 +1547,39 @@ async function loadActivities(){
       var actUrl='https://www.strava.com/activities/'+a.strava_activity_id;
       var athleteName=r&&r.full_name?r.full_name:'Unknown';
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
-      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openModal('+a.id+')">🚩 '+esc(a.flag_reason||'Flagged')+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+a.id+')">✅ Valid</span>';
-      return'<tr class="activity-row" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'—')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'—')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'—')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'—')+'" data-steps="'+(a.steps||'—')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'—')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points"><td id="status-cell-'+a.id+'" data-reason="'+esc(a.flag_reason||'')+'">'+statusBadge+'</td><td>'+fmtActivityIST(a)+'</td><td><a href="https://www.strava.com/athletes/'+a.strava_athlete_id+'" target="_blank" class="ath">'+esc(athleteName)+'</a></td><td style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'—')+'</a></td><td class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'—')+'</span></td><td class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—')+'</td><td>'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—')+'</td><td>'+fmtPS(a.avg_speed,a.sport_type)+'</td><td>'+esc(a.device_name||'—')+'</td></tr>';
+      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">🚩 '+esc(a.flag_reason||'Flagged')+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">✅ Valid</span>';
+      
+      var reviewBtnHtml = '';
+      var clearBtnHtml = '';
+      if (a.is_flagged) {
+        reviewBtnHtml = isRev
+          ? '<button class="btn btn-sm" style="background:#e5e7eb; color:#374151; border:1px solid #d1d5db; padding: 4px 8px; font-size:11px;" onclick="toggleReviewStatusAll(' + a.id + ', false)">Unreview</button>'
+          : '<button class="btn btn-primary btn-sm" style="background:#3b82f6; border-color:#3b82f6; padding: 4px 8px; font-size:11px;" onclick="toggleReviewStatusAll(' + a.id + ', true)">Reviewed</button>';
+        clearBtnHtml = '<button class="btn btn-success btn-sm" style="padding: 4px 8px; font-size:11px;" onclick="doActionAll(' + a.id + ',\'unflag\',\'\')">Clear</button>';
+      } else {
+        reviewBtnHtml = '<button class="btn btn-sm" disabled style="opacity:0.4; cursor:not-allowed; padding: 4px 8px; font-size:11px;">Reviewed</button>';
+        clearBtnHtml = '<button class="btn btn-sm" disabled style="opacity:0.4; cursor:not-allowed; padding: 4px 8px; font-size:11px;">Clear</button>';
+      }
+      
+      var actionsCellHtml = '<div style="display:flex; gap:4px; align-items:center;">'
+        + '<button class="btn btn-orange btn-sm" style="padding: 4px 8px; font-size:11px;" onclick="openCustomEditModal(' + a.id + ')">Edit</button>'
+        + reviewBtnHtml
+        + clearBtnHtml
+        + '<button class="btn btn-danger btn-sm" style="padding: 4px 8px; font-size:11px;" onclick="doActionAll(' + a.id + ',\'delete\',\'\')">Delete</button>'
+        + '</div>';
+        
+      var chkHtml = '<td style="text-align:center"><input type="checkbox" class="row-chk-all" data-id="'+a.id+'" onchange="toggleRowAll('+a.id+', this.checked)" '+(bulkSelected[a.id]?'checked':'')+' style="cursor:pointer; width:15px; height:15px"></td>';
+      
+      return'<tr class="activity-row" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'—')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'—')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'—')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'—')+'" data-steps="'+(a.steps||'—')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'—')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points">'
+        + chkHtml
+        + '<td id="status-cell-'+a.id+'" data-reason="'+esc(a.flag_reason||'')+'">'+statusBadge+'</td><td>'+fmtActivityIST(a)+'</td><td><a href="https://www.strava.com/athletes/'+a.strava_athlete_id+'" target="_blank" class="ath">'+esc(athleteName)+'</a></td><td style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'—')+'</a></td><td class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'—')+'</span></td><td class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—')+'</td><td>'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—')+'</td><td>'+fmtPS(a.avg_speed,a.sport_type)+'</td><td>'+esc(a.device_name||'—')+'</td>'
+        + '<td>' + actionsCellHtml + '</td>'
+        + '</tr>';
     }).join('');
     setTimeout(initScrollSync,100);
   }catch(e){
     console.error(e);
-    document.getElementById('activities-body').innerHTML='<tr><td colspan="9" style="text-align:center;padding:48px;color:#c62828">Error loading data. Please try again.</td></tr>';
+    document.getElementById('activities-body').innerHTML='<tr><td colspan="11" style="text-align:center;padding:48px;color:#c62828">Error loading data. Please try again.</td></tr>';
   }
   document.getElementById('searching-indicator').style.display='none';
 }
@@ -1536,21 +1723,26 @@ var currentTab = 'all', allActivities = [], bulkSelected = {};
 function switchTab(t){
   currentTab=t;
   document.getElementById('tab-all').classList.toggle('active',t==='all');
-  document.getElementById('tab-review').classList.toggle('active',t==='review');
   document.getElementById('tab-rules').classList.toggle('active',t==='rules');
   document.getElementById('tab-scanner').classList.toggle('active',t==='scanner');
   document.getElementById('tab-deleted').classList.toggle('active',t==='deleted');
 
-  // Reset filters
+  // Reset bulk selected and bars when switching tabs
+  bulkSelected = {};
+  var chkAllAll = document.getElementById('chk-all-rows-all');
+  if (chkAllAll) chkAllAll.checked = false;
+  var chkAllDeleted = document.getElementById('chk-all-rows');
+  if (chkAllDeleted) chkAllDeleted.checked = false;
+  updateBulkBarAll();
+  updateBulkBar();
+
   if(t === 'all') {
     clearFilters();
   } else {
     document.getElementById('flagged-athlete-name').value = '';
     document.getElementById('flagged-sport-filter').value = '';
-    document.getElementById('flagged-reason-filter').value = '';
-    bulkSelected = {};
-    var chkAll = document.getElementById('chk-all-rows');
-    if (chkAll) chkAll.checked = false;
+    var rFilter = document.getElementById('flagged-reason-filter');
+    if (rFilter) rFilter.value = '';
   }
 
   if (t === 'rules') {
@@ -1561,7 +1753,6 @@ function switchTab(t){
     document.getElementById('rules-container').style.display = 'block';
     document.getElementById('scanner-container').style.display = 'none';
     document.getElementById('btn-recheck-outer').style.display = 'none';
-    updateBulkBar();
   } else if (t === 'scanner') {
     document.getElementById('page-title').textContent = 'Bulk Flag Scanner';
     document.getElementById('page-subtitle').textContent = 'Scan existing database manually using configured thresholds';
@@ -1581,26 +1772,24 @@ function switchTab(t){
     document.getElementById('btn-recheck-outer').style.display = 'none';
   } else {
     document.getElementById('page-title').textContent = 'Flagged Activities';
-    document.getElementById('page-subtitle').textContent = t==='review'?'Activities under review or needing attention':'Deleted activities awaiting review or restoration';
+    document.getElementById('page-subtitle').textContent = 'Deleted activities awaiting review or restoration';
     document.getElementById('all-workouts-container').style.display = 'none';
     document.getElementById('flagged-data-container').style.display = 'block';
     document.getElementById('rules-container').style.display = 'none';
     document.getElementById('scanner-container').style.display = 'none';
-    document.getElementById('btn-recheck-outer').style.display = t==='review'?'inline-flex':'none';
+    document.getElementById('btn-recheck-outer').style.display = 'none';
     
-    // Adjust filters and bulk action buttons based on Review vs Deleted
-    document.getElementById('reason-filter-group').style.display = t==='review'?'block':'none';
-    document.getElementById('reviewed-filter-group').style.display = t==='review'?'flex':'none';
-    document.getElementById('btn-bulk-clear').style.display = t==='review'?'inline-flex':'none';
-    document.getElementById('btn-bulk-review').style.display = t==='review'?'inline-flex':'none';
-    document.getElementById('btn-bulk-delete').style.display = t==='review'?'inline-flex':'none';
-    document.getElementById('btn-bulk-restore').style.display = t==='deleted'?'inline-flex':'none';
-    document.getElementById('btn-bulk-perm-delete').style.display = t==='deleted'?'inline-flex':'none';
-
-    if (t === 'review') {
-      var chkReviewed = document.getElementById('flagged-reviewed-chk');
-      if (chkReviewed) chkReviewed.checked = false;
-    }
+    // Adjust filters and bulk action buttons based on Deleted
+    var reasonFilterGrp = document.getElementById('reason-filter-group');
+    if (reasonFilterGrp) reasonFilterGrp.style.display = 'none';
+    var revFilterGrp = document.getElementById('reviewed-filter-group');
+    if (revFilterGrp) revFilterGrp.style.display = 'none';
+    
+    document.getElementById('btn-bulk-clear').style.display = 'none';
+    document.getElementById('btn-bulk-review').style.display = 'none';
+    document.getElementById('btn-bulk-delete').style.display = 'none';
+    document.getElementById('btn-bulk-restore').style.display = 'inline-flex';
+    document.getElementById('btn-bulk-perm-delete').style.display = 'inline-flex';
 
     loadFlaggedData();
   }
@@ -3098,6 +3287,345 @@ if(nameInputFlagged) {
       }
     }
   });
+}
+// Custom Edit Activity Modal and Unified Actions Functions
+var editActivityObj = null;
+
+async function openCustomEditModal(id) {
+  currentId = id;
+  
+  document.getElementById('edit-modal-sub').textContent = 'Loading details for Activity #' + id + '...';
+  document.getElementById('edit-activity-modal').classList.add('show');
+  
+  try {
+    var r = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + id, { headers: HDR });
+    var data = await r.json();
+    if (!data || data.length === 0) {
+      alert('Activity not found in database.');
+      closeEditModal();
+      return;
+    }
+    editActivityObj = data[0];
+    
+    var reg = regMap[String(editActivityObj.strava_athlete_id).trim()] || {};
+    var athleteName = reg.full_name || 'Unknown';
+    document.getElementById('edit-modal-sub').textContent = 'Participant: ' + athleteName + ' | Activity #' + id;
+    
+    document.getElementById('edit-status').value = editActivityObj.is_flagged ? 'flagged' : 'valid';
+    document.getElementById('edit-reviewed').value = String(editActivityObj.is_reviewed || false);
+    
+    var reason = editActivityObj.flag_reason || '';
+    var reasonSelect = document.getElementById('edit-flag-reason-select');
+    var customInput = document.getElementById('edit-flag-reason-custom');
+    
+    var matches = false;
+    for (var i = 0; i < reasonSelect.options.length; i++) {
+      if (reasonSelect.options[i].value === reason) {
+        matches = true;
+        break;
+      }
+    }
+    
+    if (reason === '') {
+      reasonSelect.value = '';
+      customInput.style.display = 'none';
+      customInput.value = '';
+    } else if (matches) {
+      reasonSelect.value = reason;
+      customInput.style.display = 'none';
+      customInput.value = '';
+    } else {
+      reasonSelect.value = 'custom';
+      customInput.style.display = 'block';
+      customInput.value = reason;
+    }
+    
+    document.getElementById('edit-date-utc').value = editActivityObj.activity_date || '';
+    document.getElementById('edit-date-ist').value = editActivityObj.activity_date_time_ist || '';
+    document.getElementById('edit-sport-type').value = editActivityObj.sport_type || 'Walk';
+    
+    var distanceKm = editActivityObj.distance_meters ? (editActivityObj.distance_meters / 1000).toFixed(2) : '0.00';
+    document.getElementById('edit-distance').value = distanceKm;
+    
+    var distHistSpan = document.getElementById('edit-distance-history');
+    var rawData = editActivityObj.raw_data || {};
+    if (rawData.original_distance_meters !== undefined && rawData.original_distance_meters !== null) {
+      var origKm = (rawData.original_distance_meters / 1000).toFixed(2);
+      distHistSpan.textContent = 'Original Distance: ' + origKm + ' km';
+    } else {
+      distHistSpan.textContent = 'Original Distance: Not edited yet';
+    }
+    
+    document.getElementById('edit-deleted').value = editActivityObj.is_deleted ? 'true' : 'false';
+    onEditDeletedChange();
+    
+    var delReason = editActivityObj.deleted_reason || '';
+    var delReasonSelect = document.getElementById('edit-deleted-reason-select');
+    var delCustomInput = document.getElementById('edit-deleted-reason-custom');
+    
+    var delMatches = false;
+    for (var i = 0; i < delReasonSelect.options.length; i++) {
+      if (delReasonSelect.options[i].value === delReason) {
+        delMatches = true;
+        break;
+      }
+    }
+    
+    if (delReason === '') {
+      delReasonSelect.value = '';
+      delCustomInput.style.display = 'none';
+      delCustomInput.value = '';
+    } else if (delMatches) {
+      delReasonSelect.value = delReason;
+      delCustomInput.style.display = 'none';
+      delCustomInput.value = '';
+    } else {
+      delReasonSelect.value = 'custom';
+      delCustomInput.style.display = 'block';
+      delCustomInput.value = delReason;
+    }
+    
+    document.getElementById('edit-bonus').value = editActivityObj.manual_bonus || 0;
+    
+  } catch (e) {
+    alert('Error loading activity: ' + e.message);
+    closeEditModal();
+  }
+}
+
+function onEditFlagReasonSelectChange() {
+  var val = document.getElementById('edit-flag-reason-select').value;
+  var customInput = document.getElementById('edit-flag-reason-custom');
+  if (val === 'custom') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
+}
+
+function onEditDeletedReasonSelectChange() {
+  var val = document.getElementById('edit-deleted-reason-select').value;
+  var customInput = document.getElementById('edit-deleted-reason-custom');
+  if (val === 'custom') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
+}
+
+function onEditDeletedChange() {
+  var val = document.getElementById('edit-deleted').value;
+  var selectReason = document.getElementById('edit-deleted-reason-select');
+  var customReason = document.getElementById('edit-deleted-reason-custom');
+  if (val === 'true') {
+    selectReason.disabled = false;
+  } else {
+    selectReason.disabled = true;
+    selectReason.value = '';
+    customReason.style.display = 'none';
+    customReason.value = '';
+  }
+}
+
+function closeEditModal() {
+  document.getElementById('edit-activity-modal').classList.remove('show');
+}
+
+async function saveEditModal() {
+  if (!currentId || !editActivityObj) return;
+  
+  var is_flagged = document.getElementById('edit-status').value === 'flagged';
+  var is_reviewed = document.getElementById('edit-reviewed').value === 'true';
+  
+  var flag_reason = '';
+  if (is_flagged) {
+    var reasonSelect = document.getElementById('edit-flag-reason-select').value;
+    if (reasonSelect === 'custom') {
+      flag_reason = document.getElementById('edit-flag-reason-custom').value.trim();
+    } else {
+      flag_reason = reasonSelect;
+    }
+    if (!flag_reason) {
+      alert('Please specify a flag reason.');
+      return;
+    }
+  }
+  
+  var activity_date = document.getElementById('edit-date-utc').value.trim();
+  var activity_date_time_ist = document.getElementById('edit-date-ist').value.trim();
+  var sport_type = document.getElementById('edit-sport-type').value;
+  
+  var distanceKm = parseFloat(document.getElementById('edit-distance').value) || 0;
+  var new_distance_meters = Math.round(distanceKm * 1000);
+  
+  var is_deleted = document.getElementById('edit-deleted').value === 'true';
+  var deleted_reason = '';
+  if (is_deleted) {
+    var delSelect = document.getElementById('edit-deleted-reason-select').value;
+    if (delSelect === 'custom') {
+      deleted_reason = document.getElementById('edit-deleted-reason-custom').value.trim();
+    } else {
+      deleted_reason = delSelect;
+    }
+  }
+  
+  var manual_bonus = parseInt(document.getElementById('edit-bonus').value) || 0;
+  
+  var rawData = editActivityObj.raw_data || {};
+  if (editActivityObj.distance_meters !== new_distance_meters) {
+    if (rawData.original_distance_meters === undefined || rawData.original_distance_meters === null) {
+      rawData.original_distance_meters = editActivityObj.distance_meters;
+    }
+    if (!Array.isArray(rawData.edit_history)) {
+      rawData.edit_history = [];
+    }
+    rawData.edit_history.push({
+      field: 'distance_meters',
+      old_val: editActivityObj.distance_meters,
+      new_val: new_distance_meters,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  var updates = {
+    is_flagged: is_flagged,
+    flag_reason: is_flagged ? flag_reason : null,
+    is_reviewed: is_reviewed,
+    activity_date: activity_date,
+    activity_date_time_ist: activity_date_time_ist,
+    sport_type: sport_type,
+    distance_meters: new_distance_meters,
+    is_deleted: is_deleted,
+    deleted_reason: is_deleted ? deleted_reason : null,
+    manual_bonus: manual_bonus,
+    raw_data: rawData
+  };
+  
+  try {
+    var resp = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + currentId, {
+      method: 'PATCH',
+      headers: {
+        apikey: SUPABASE_ANON,
+        Authorization: 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!resp.ok) throw new Error('Database patch failed with status: ' + resp.status);
+    
+    var backendAction = 'unflag';
+    if (is_deleted) backendAction = 'delete';
+    else if (is_flagged) backendAction = 'flag';
+    
+    await fetch(BACKEND_URL + '/flag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        activity_id: currentId,
+        action: backendAction,
+        flag_reason: flag_reason
+      })
+    });
+    
+    showToast('Activity updated successfully!', false);
+    closeEditModal();
+    loadActivities();
+    
+  } catch (err) {
+    alert('Error saving activity: ' + err.message);
+  }
+}
+
+async function doActionAll(id, action, reason) {
+  try {
+    await fetch(BACKEND_URL+'/flag',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({activity_id:id, action:action, flag_reason:reason})
+    });
+    if (bulkSelected[id]) delete bulkSelected[id];
+    showToast('Action completed successfully!', false);
+    loadActivities();
+  } catch (e) {
+    alert('Action failed: ' + e.message);
+  }
+}
+
+function toggleReviewStatusAll(id, newStatus) {
+  var action = newStatus ? 'review' : 'unreview';
+  doActionAll(id, action, '');
+}
+
+function toggleAllRowsAll(checked) {
+  var allVisibleActs = window._exportActs || [];
+  allVisibleActs.forEach(function(a) {
+    if (checked) bulkSelected[a.id] = true;
+    else delete bulkSelected[a.id];
+  });
+  var chks = document.querySelectorAll('.row-chk-all');
+  chks.forEach(function(c) { c.checked = checked; });
+  updateBulkBarAll();
+}
+
+function toggleRowAll(id, checked) {
+  if (checked) bulkSelected[id] = true;
+  else delete bulkSelected[id];
+  updateBulkBarAll();
+}
+
+function updateBulkBarAll() {
+  var ids = Object.keys(bulkSelected);
+  var n = ids.length;
+  var bar = document.getElementById('bulk-actions-bar-all');
+  if (!bar) return;
+  if (n > 0) {
+    bar.style.display = 'flex';
+    document.getElementById('bulk-selected-num-all').textContent = n;
+    var allChk = document.getElementById('chk-all-rows-all');
+    if (allChk && window._exportActs && window._exportActs.length > 0) {
+      allChk.checked = n === window._exportActs.length;
+    }
+  } else {
+    bar.style.display = 'none';
+    var allChk = document.getElementById('chk-all-rows-all');
+    if (allChk) allChk.checked = false;
+  }
+}
+
+async function doBulkActionAll(action) {
+  var ids = Object.keys(bulkSelected);
+  if (!ids.length) return;
+  if (!confirm('Are you sure you want to bulk-' + action + ' the ' + ids.length + ' selected activities?')) return;
+  
+  var bar = document.getElementById('bulk-actions-bar-all');
+  var origHtml = bar.innerHTML;
+  bar.innerHTML = '<span>⏳ Processing bulk action... <span class="bulk-selected-count" id="bulk-prog-all">0</span> / ' + ids.length + '</span>';
+  
+  var success = 0;
+  for (var i = 0; i < ids.length; i++) {
+    var id = ids[i];
+    try {
+      var act = window._exportActs ? window._exportActs.find(function(a) { return String(a.id) === String(id); }) : null;
+      var reason = act ? act.flag_reason || '' : '';
+      await fetch(BACKEND_URL+'/flag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activity_id: parseInt(id), action: action, flag_reason: reason })
+      });
+      success++;
+      var progEl = document.getElementById('bulk-prog-all');
+      if (progEl) progEl.textContent = success;
+    } catch(e) {
+      console.error('Bulk action failed for ID ' + id, e);
+    }
+  }
+  
+  bulkSelected = {};
+  updateBulkBarAll();
+  alert('Bulk action completed successfully.');
+  loadActivities();
 }
 </script>
 </body>
