@@ -1629,7 +1629,8 @@ function initFeedMaps() {
         window._feedMaps.push(map);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          maxZoom: 20
+          maxZoom: 20,
+          className: 'app-map-tile'
         }).addTo(map);
 
         var poly = L.polyline(coordinates, {
