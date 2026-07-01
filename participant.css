@@ -1105,7 +1105,7 @@
       display: flex;
       justify-content: space-around;
       padding: 6px;
-      z-index: 200;
+      z-index: 9999;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
