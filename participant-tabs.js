@@ -49,7 +49,16 @@ function clearLeaderboardTab() {
 
 function showTab(tab) {
   if (tab === 'feed' && !CONFIG_LB.announcements_enabled) return;
-  if (_currentTab === tab) return;
+  if (_currentTab === tab) {
+    var container = document.getElementById('tab-' + tab);
+    if (container) {
+      container.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    return;
+  }
 
   var prevTab = _currentTab;
   _currentTab = tab;
