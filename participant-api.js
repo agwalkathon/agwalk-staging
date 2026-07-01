@@ -182,7 +182,7 @@ async function load(isBackgroundRefresh) {
       setTimeout(function(){
         Promise.all([
           fetch(getRegistrationFetchUrl(s),{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
-          fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-07-01T15:00:00&order=activity_date.desc').then(function(d){cacheSet('acts_'+athleteId,d);}),
+          fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01T00:00:00%2B05:30&activity_date=lte.2026-06-30T23:59:59%2B05:30&order=activity_date.desc').then(function(d){cacheSet('acts_'+athleteId,d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
           fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
           fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
@@ -214,7 +214,7 @@ async function load(isBackgroundRefresh) {
       console.log('[Cache] Cache miss — fetching Phase 1 from Supabase...');
       var [regRes,myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
         fetch(getRegistrationFetchUrl(s),{headers:HDR}),
-        fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-07-01T15:00:00&order=activity_date.desc'),
+        fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-06-01T00:00:00%2B05:30&activity_date=lte.2026-06-30T23:59:59%2B05:30&order=activity_date.desc'),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
@@ -391,8 +391,8 @@ async function load(isBackgroundRefresh) {
 
     (function(){
       var validA=myActs.filter(function(a){return !a.is_flagged;});
-      var EVENT_START=new Date('2026-06-01T00:00:00');
-      var EVENT_END=new Date('2026-07-01T15:00:00+05:30');
+      var EVENT_START=new Date('2026-06-01T00:00:00+05:30');
+      var EVENT_END=new Date('2026-06-30T23:59:59+05:30');
       var nowD=new Date();
       var totalEventDays=Math.round((Math.min(nowD,EVENT_END)-EVENT_START)/86400000)+1;
       var activeDaysSet={};
@@ -702,7 +702,6 @@ async function load(isBackgroundRefresh) {
       try{
         var _cachedRankActs = cacheGet('ranking_acts_v2', CACHE_TTL.ranking);
         var _cachedRankReg  = cacheGet('ranking_reg',  CACHE_TTL.ranking);
-        var allActsRaw, allRegRaw;
         if (_cachedRankActs && _cachedRankReg) {
           console.log('[Cache] Serving Phase 2 (ranking) from cache ✓');
           allActsRaw = _cachedRankActs;
@@ -710,7 +709,7 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-07-01T15:00:00&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01T00:00:00%2B05:30&activity_date=lte.2026-06-30T23:59:59%2B05:30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
                 fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
@@ -731,7 +730,7 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01&activity_date=lte.2026-07-01T15:00:00&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&activity_date=gte.2026-06-01T00:00:00%2B05:30&activity_date=lte.2026-06-30T23:59:59%2B05:30&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
             fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v2', allActsRaw);
@@ -745,12 +744,12 @@ async function load(isBackgroundRefresh) {
         if (typeof renderFeedHighlights === 'function') renderFeedHighlights();
         if (typeof renderCommunityPulse === 'function') renderCommunityPulse();
       }catch(e2){console.warn('Ranking load failed:',e2);return;}
-        if (typeof renderStanding === 'function') renderStanding();
+      if (typeof renderStanding === 'function') renderStanding();
     })();
 
     // Pace Goals Card
     var now=new Date();
-    var EVENT_END=new Date('2026-07-01T15:00:00+05:30');
+    var EVENT_END=new Date('2026-06-30T23:59:59+05:30');
     var daysLeft=Math.max(0,Math.ceil((EVENT_END-now)/(1000*60*60*24)));
     var todayStr=getISTDate(now.toISOString());
     var todayKm=myActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return getActDate(a)===todayStr?s+(a.distance_meters||0)/1000:s;},0);
@@ -779,7 +778,7 @@ async function load(isBackgroundRefresh) {
       paceCard.innerHTML='';
 
       if(myPts>=goldThresh){
-        var daysElapsed=Math.max(1,(now-new Date('2026-06-01'))/86400000);
+        var daysElapsed=Math.max(1,(now-new Date('2026-06-01T00:00:00+05:30'))/86400000);
         var avgKmDay=fullPts.km/daysElapsed;
         var goldActsMap={};
         allActs.forEach(function(a){if(!goldActsMap[a.strava_athlete_id])goldActsMap[a.strava_athlete_id]=[];goldActsMap[a.strava_athlete_id].push(a);});
@@ -825,9 +824,8 @@ async function load(isBackgroundRefresh) {
             '</div>'
           );
         paceCard.appendChild(div);
-
       } else {
-        var daysElapsed2=Math.max(1,(now-new Date('2026-06-01'))/86400000);
+        var daysElapsed2=Math.max(1,(now-new Date('2026-06-01T00:00:00+05:30'))/86400000);
         var avgKmDay2=fullPts.km/daysElapsed2;
         var projectedPts2=(myPts+(avgKmDay2*daysLeft)).toFixed(0);
         var icoCalPace='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
