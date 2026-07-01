@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="participant.css?v=20260630_v51">
+  <link rel="stylesheet" href="participant.css?v=20260630_v52">
 </head>
 </head>
 <body>
@@ -332,7 +332,10 @@
     <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
   </div>
   <!-- My Standing + Rank Movement -->
-  <div style="padding:12px 20px 0;">
+  <div style="padding:0 20px; margin-bottom:12px;">
+  <div class="card">
+  <div class="sec">My Standing</div>
+  <div style="padding:0 14px 14px;">
     <div class="standing-grid">
       <div class="standing-card">
         <div class="standing-rank-big" id="standing-shift-rank">—</div>
@@ -360,6 +363,8 @@
     <div class="lb-info-banner">
       <span>ℹ️ Tap any row or podium card to view points breakdown</span>
     </div>
+  </div>
+  </div>
   </div>
   <div class="lb-content">
     <div id="lb-list">
