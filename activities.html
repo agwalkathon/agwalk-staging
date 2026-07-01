@@ -1548,8 +1548,6 @@ async function loadActivities(){
     url+='&is_flagged=is.true';
   } else if(st==='deleted') {
     url+='&is_deleted=eq.true';
-  } else {
-    url+='&is_deleted=eq.false';
   }
   if(fr)url+='&flag_reason=ilike.%25'+encodeURIComponent(fr)+'%25';
   
@@ -3729,7 +3727,7 @@ function updateRowStatusLocally(id, action) {
   var mustRemove = false;
   
   if (action === 'delete') {
-    mustRemove = (stFilter !== 'deleted');
+    mustRemove = (stFilter !== '' && stFilter !== 'deleted');
   } else if (action === 'unflag') {
     mustRemove = (stFilter === 'invalid') || (revFilter === 'pending');
   } else if (action === 'review') {
