@@ -493,10 +493,10 @@ async function load(isBackgroundRefresh) {
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
     safeSetText('s-dist', Math.round(fullPts.km));
     safeSetText('s-acts', validCount);
-    safeSetText('s-pts-dist', fullPts.distPts.toFixed(1));
-    safeSetText('s-pts-milestone', fullPts.bonusPts.toFixed(1));
-    safeSetText('s-pts-challenge', fullPts.challengePts.toFixed(1));
-    safeSetText('s-pts-total', fullPts.total.toFixed(1));
+    safeSetText('s-pts-dist', fullPts.distPts.toFixed(1)+' pts');
+    safeSetText('s-pts-milestone', fullPts.bonusPts.toFixed(1)+' pts');
+    safeSetText('s-pts-challenge', fullPts.challengePts.toFixed(1)+' pts');
+    safeSetText('s-pts-total', fullPts.total.toFixed(1)+' pts');
 
     var validActs=myActs.filter(function(a){return !a.is_flagged;});
     var totalMovingSec=validActs.reduce(function(s,a){return s+(a.moving_time_seconds||0);},0);
