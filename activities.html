@@ -618,7 +618,7 @@ td button.btn:last-child { margin-right: 0; }
         </div>
       </div>
 
-      <div class="card"><div id="placeholder" class="empty"><div class="icon">🔍</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
+      <div class="card"><div id="placeholder" class="empty"><div class="icon">🔍</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Audit Trail</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
     </div>
 
     <!-- Tab 2 & 4: Under Review / Deleted Workouts -->
@@ -1461,8 +1461,142 @@ async function loadRegistrations() {
 }
 authGuard();
 function setDefaultTodayFilters(){var today=localDateValue(new Date());document.getElementById('date-from').value=today;document.getElementById('date-to').value=today}function initScrollSync(){var tw=document.getElementById('table-wrap'),st=document.getElementById('scroll-top'),si=document.getElementById('scroll-top-inner');if(!tw||!st||!si)return;si.style.width=tw.scrollWidth+'px';st.onscroll=function(){tw.scrollLeft=st.scrollLeft};tw.onscroll=function(){st.scrollLeft=tw.scrollLeft}}
-var currentId=null;function openModal(id){currentId=id;var cell=document.getElementById('status-cell-'+id);var reason=cell?(cell.getAttribute('data-reason')||''):'';document.getElementById('modal-sub').textContent='Activity #'+id;document.getElementById('modal-flag-reason').value=reason;checkModalDist();document.getElementById('flag-modal').classList.add('show')}function closeModal(){document.getElementById('flag-modal').classList.remove('show');currentId=null}function checkModalDist(){var v=document.getElementById('modal-flag-reason').value;document.getElementById('modal-dist-field').classList.toggle('show',v==='Distance Cropped - GPS Glitch')}async function confirmStatus(){var reason=document.getElementById('modal-flag-reason').value,dist=document.getElementById('modal-corrected-dist').value,payload;if(!reason)payload={activity_id:currentId,action:'unflag',flag_reason:''};else if(reason==='Distance Cropped - GPS Glitch'&&dist)payload={activity_id:currentId,action:'update_distance',flag_reason:reason,distance_meters:parseFloat(dist)};else payload={activity_id:currentId,action:'flag',flag_reason:reason};try{var resp=await fetch(BACKEND_URL+'/flag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});var result={success:resp.ok};try{result=await resp.json()}catch(e){}if(!resp.ok&&!result.success)throw new Error('Flag error '+resp.status);var statusCell=document.getElementById('status-cell-'+currentId);if(statusCell){if(reason){statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')">🚩 '+esc(reason)+'</span>';statusCell.setAttribute('data-reason',reason)}else{statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')">✅ Valid</span>';statusCell.setAttribute('data-reason','')}}closeModal(); if(typeof currentTab !== 'undefined' && currentTab === 'review') { loadFlaggedData(); }}catch(e){alert('Error saving: '+e.message)}}document.getElementById('flag-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
-document.addEventListener('dblclick',function(e){var cell=e.target.closest('td[data-edit]');if(!cell)return;var type=cell.getAttribute('data-edit'),actId=cell.getAttribute('data-id'),current=cell.getAttribute('data-val');if(type==='dist')startEditDist(cell,actId,current);if(type==='type')startEditType(cell,actId,current)});function startEditDist(cell,actId,currentM){var km=(parseFloat(currentM)||0)/1000;cell.innerHTML='<input class="edit-input" type="number" step="0.01" value="'+km.toFixed(2)+'" id="ei-'+actId+'">';var inp=cell.querySelector('input');inp.focus();inp.select();inp.addEventListener('blur',function(){saveDist(cell,actId,inp.value)});inp.addEventListener('keydown',function(e){if(e.key==='Enter')inp.blur();if(e.key==='Escape')cell.innerHTML=km.toFixed(2)+' km'})}async function saveDist(cell,actId,val){var km=parseFloat(val)||0,meters=Math.round(km*1000);cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';try{await fetch(SUPABASE_URL+'/rest/v1/activities?id=eq.'+actId,{method:'PATCH',headers:{apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON,'Content-Type':'application/json'},body:JSON.stringify({distance_meters:meters})});cell.setAttribute('data-val',meters);cell.innerHTML=km.toFixed(2)+' km'}catch(e){cell.innerHTML='Error'}}function startEditType(cell,actId,current){var types=['Walk','Run','Hike','Ride','VirtualRun','VirtualRide','MountainBikeRide'];var opts=types.map(function(t){return'<option value="'+t+'"'+(t===current?' selected':'')+'>'+t+'</option>'}).join('');cell.innerHTML='<select class="edit-select"><option value="">— Select —</option>'+opts+'</select>';var sel=cell.querySelector('select');sel.focus();sel.addEventListener('blur',function(){saveType(cell,actId,sel.value)});sel.addEventListener('change',function(){sel.blur()})}async function saveType(cell,actId,newType){if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'—';return}cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';try{await fetch(SUPABASE_URL+'/rest/v1/activities?id=eq.'+actId,{method:'PATCH',headers:{apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON,'Content-Type':'application/json'},body:JSON.stringify({sport_type:newType})});cell.setAttribute('data-val',newType);cell.innerHTML='<span class="badge '+bc(newType)+'">'+newType+'</span>'}catch(e){cell.innerHTML='Error'}}
+var currentId=null;
+function openModal(id){
+  currentId=id;
+  var cell=document.getElementById('status-cell-'+id);
+  var reason=cell?(cell.getAttribute('data-reason')||''):'';
+  document.getElementById('modal-sub').textContent='Activity #'+id;
+  document.getElementById('modal-flag-reason').value=reason;
+  checkModalDist();
+  document.getElementById('flag-modal').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('flag-modal').classList.remove('show');
+  currentId=null;
+}
+function checkModalDist(){
+  var v=document.getElementById('modal-flag-reason').value;
+  document.getElementById('modal-dist-field').classList.toggle('show',v==='Distance Cropped - GPS Glitch');
+}
+async function confirmStatus(){
+  var reason=document.getElementById('modal-flag-reason').value,dist=document.getElementById('modal-corrected-dist').value,payload;
+  if(!reason) payload={activity_id:currentId,action:'unflag',flag_reason:''};
+  else if(reason==='Distance Cropped - GPS Glitch'&&dist) payload={activity_id:currentId,action:'update_distance',flag_reason:reason,distance_meters:parseFloat(dist)};
+  else payload={activity_id:currentId,action:'flag',flag_reason:reason};
+  try{
+    var resp=await fetch(BACKEND_URL+'/flag',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
+      body:JSON.stringify(payload)
+    });
+    var result={success:resp.ok};
+    try{result=await resp.json()}catch(e){}
+    if(!resp.ok&&!result.success)throw new Error('Flag error '+resp.status);
+    var statusCell=document.getElementById('status-cell-'+currentId);
+    if(statusCell){
+      if(reason){
+        statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')">🚩 '+esc(reason)+'</span>';
+        statusCell.setAttribute('data-reason',reason);
+      }else{
+        statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')">✅ Valid</span>';
+        statusCell.setAttribute('data-reason','');
+      }
+    }
+    closeModal();
+    if(typeof currentTab !== 'undefined' && currentTab === 'review') {
+      loadFlaggedData();
+    } else {
+      loadActivities();
+    }
+  }catch(e){alert('Error saving: '+e.message)}
+}
+document.getElementById('flag-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+document.addEventListener('dblclick',function(e){
+  var cell=e.target.closest('td[data-edit]');
+  if(!cell)return;
+  var type=cell.getAttribute('data-edit'),actId=cell.getAttribute('data-id'),current=cell.getAttribute('data-val');
+  if(type==='dist')startEditDist(cell,actId,current);
+  if(type==='type')startEditType(cell,actId,current);
+});
+function startEditDist(cell,actId,currentM){
+  var km=(parseFloat(currentM)||0)/1000;
+  cell.innerHTML='<input class="edit-input" type="number" step="0.01" value="'+km.toFixed(2)+'" id="ei-'+actId+'">';
+  var inp=cell.querySelector('input');
+  inp.focus();inp.select();
+  inp.addEventListener('blur',function(){saveDist(cell,actId,inp.value)});
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter')inp.blur();
+    if(e.key==='Escape')cell.innerHTML=km.toFixed(2)+' km';
+  });
+}
+async function saveDist(cell,actId,val){
+  var km=parseFloat(val)||0,meters=Math.round(km*1000);
+  cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';
+  try{
+    var adminEmail = 'Unknown Admin';
+    try {
+      var t = sessionStorage.getItem('wk_admin_token');
+      if (t) adminEmail = JSON.parse(atob(t.split('.')[1])).email || 'admin@arcgate.com';
+    } catch(e){}
+    await fetch(SUPABASE_URL+'/rest/v1/activities?id=eq.'+actId,{
+      method:'PATCH',
+      headers:{
+        apikey:SUPABASE_ANON,
+        Authorization:'Bearer '+SUPABASE_ANON,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        distance_meters:meters,
+        flagged_at: new Date().toISOString(),
+        flagged_by: adminEmail
+      })
+    });
+    cell.setAttribute('data-val',meters);
+    cell.innerHTML=km.toFixed(2)+' km';
+    loadActivities();
+  }catch(e){cell.innerHTML='Error'}
+}
+function startEditType(cell,actId,current){
+  var types=['Walk','Run','Hike','Ride','VirtualRun','VirtualRide','MountainBikeRide'];
+  var opts=types.map(function(t){return'<option value="'+t+'"'+(t===current?' selected':'')+'>'+t+'</option>'}).join('');
+  cell.innerHTML='<select class="edit-select"><option value="">— Select —</option>'+opts+'</select>';
+  var sel=cell.querySelector('select');
+  sel.focus();
+  sel.addEventListener('blur',function(){saveType(cell,actId,sel.value)});
+  sel.addEventListener('change',function(){sel.blur()});
+}
+async function saveType(cell,actId,newType){
+  if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'—';return}
+  cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';
+  try{
+    var adminEmail = 'Unknown Admin';
+    try {
+      var t = sessionStorage.getItem('wk_admin_token');
+      if (t) adminEmail = JSON.parse(atob(t.split('.')[1])).email || 'admin@arcgate.com';
+    } catch(e){}
+    await fetch(SUPABASE_URL+'/rest/v1/activities?id=eq.'+actId,{
+      method:'PATCH',
+      headers:{
+        apikey:SUPABASE_ANON,
+        Authorization:'Bearer '+SUPABASE_ANON,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        sport_type:newType,
+        flagged_at: new Date().toISOString(),
+        flagged_by: adminEmail
+      })
+    });
+    cell.setAttribute('data-val',newType);
+    cell.innerHTML='<span class="badge '+bc(newType)+'">'+newType+'</span>';
+    loadActivities();
+  }catch(e){cell.innerHTML='Error'}
+}
 function clearFilters(){
   document.getElementById('athlete-name').value='';
   document.getElementById('activity-id-filter').value='';
@@ -1515,12 +1649,76 @@ function exportCSV(){
   URL.revokeObjectURL(url);
 }
 
+function renderAuditTrail(a) {
+  var list = [];
+  
+  if (a.flagged_at && a.flagged_by) {
+    list.push({
+      action: 'Flagged',
+      icon: '🚩',
+      by: a.flagged_by,
+      at: a.flagged_at
+    });
+  }
+  if (a.cleared_at && a.cleared_by) {
+    list.push({
+      action: 'Cleared',
+      icon: '✅',
+      by: a.cleared_by,
+      at: a.cleared_at
+    });
+  }
+  if (a.reviewed_at && a.reviewed_by) {
+    list.push({
+      action: 'Reviewed',
+      icon: '👁️',
+      by: a.reviewed_by,
+      at: a.reviewed_at
+    });
+  }
+  if (a.deleted_at && a.deleted_by) {
+    list.push({
+      action: 'Deleted',
+      icon: '🗑️',
+      by: a.deleted_by,
+      at: a.deleted_at
+    });
+  }
+  
+  if (!list.length) return '<span style="color:#aaa; font-style:italic; font-size:11px;">Auto Imported</span>';
+  
+  list.sort(function(x, y) {
+    return new Date(y.at) - new Date(x.at);
+  });
+  
+  var latest = list[0];
+  var dateObj = new Date(latest.at);
+  var formattedDate = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' ' + 
+                      dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  
+  var shortBy = latest.by.indexOf('@') > -1 ? latest.by.split('@')[0] : latest.by;
+  
+  var bg = '#f3f4f6';
+  var fg = '#374151';
+  var border = '#e5e7eb';
+  if (latest.action === 'Flagged') { bg = '#ffe4e6'; fg = '#e11d48'; border = '#fda4af'; }
+  if (latest.action === 'Deleted') { bg = '#fee2e2'; fg = '#ef4444'; border = '#fca5a5'; }
+  if (latest.action === 'Cleared') { bg = '#dcfce7'; fg = '#15803d'; border = '#bbf7d0'; }
+  if (latest.action === 'Reviewed') { bg = '#dbeafe'; fg = '#1d4ed8'; border = '#bfdbfe'; }
+  
+  return '<div style="display:flex; flex-direction:column; gap:2px; font-family:var(--font);">' +
+         '<span class="badge" style="background:'+bg+'; color:'+fg+'; border: 1px solid '+border+'; justify-content:flex-start; width:max-content; font-size:11px; padding:2px 6px; font-weight:600;">' + latest.icon + ' ' + latest.action + '</span>' +
+         '<span style="font-size:10px; color:#6b7280; font-weight:500; white-space:nowrap; text-align:left;">by ' + esc(shortBy) + '</span>' +
+         '<span style="font-size:9px; color:#9ca3af; font-weight:400; text-align:left;">' + formattedDate + '</span>' +
+         '</div>';
+}
+
 async function loadActivities(){
   document.getElementById('placeholder').style.display='none';
   document.getElementById('results').style.display='block';
   document.getElementById('stats-row').style.display='none';
   document.getElementById('searching-indicator').style.display='flex';
-  document.getElementById('activities-body').innerHTML='<tr><td colspan="11"><div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:48px"><div style="width:28px;height:28px;border:3px solid #f0f0f0;border-top-color:#E8622A;border-radius:50%;animation:spin .8s linear infinite"></div><span style="color:#888;font-size:14px">Searching activities...</span></div></td></tr>';
+  document.getElementById('activities-body').innerHTML='<tr><td colspan="12"><div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:48px"><div style="width:28px;height:28px;border:3px solid #f0f0f0;border-top-color:#E8622A;border-radius:50%;animation:spin .8s linear infinite"></div><span style="color:#888;font-size:14px">Searching activities...</span></div></td></tr>';
   
   var df=document.getElementById('date-from').value;
   var dt=document.getElementById('date-to').value;
@@ -1666,13 +1864,14 @@ async function loadActivities(){
         + '<td data-label="Moving Time">'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—')+'</td>'
         + '<td data-label="Pace/Speed">'+fmtPS(a.avg_speed,a.sport_type)+'</td>'
         + '<td data-label="Deleted">' + ((a.is_deleted === true || a.is_deleted === 'true') ? '<span class="badge badge-invalid" style="background:#FFE4E6; color:#E11D48; border-color:#FDA4AF;">Yes</span>' : '<span class="badge badge-valid">No</span>') + '</td>'
+        + '<td data-label="Audit Trail">' + renderAuditTrail(a) + '</td>'
         + '<td data-label="Actions">' + actionsCellHtml + '</td>'
         + '</tr>';
     }).join('');
     setTimeout(initScrollSync,100);
   }catch(e){
     console.error(e);
-    document.getElementById('activities-body').innerHTML='<tr><td colspan="11" style="text-align:center;padding:48px;color:#c62828">Error loading data. Please try again.</td></tr>';
+    document.getElementById('activities-body').innerHTML='<tr><td colspan="12" style="text-align:center;padding:48px;color:#c62828">Error loading data. Please try again.</td></tr>';
   }
   document.getElementById('searching-indicator').style.display='none';
 }
@@ -2100,14 +2299,18 @@ function updateBulkBar() {
 }
 
 async function doAction(id,action,reason){
+  var headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+  };
   if (action === 'review' || action === 'unreview') {
-    await fetch(BACKEND_URL+'/flag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity_id:id,action:action,flag_reason:reason})});
+    await fetch(BACKEND_URL+'/flag',{method:'POST',headers:headers,body:JSON.stringify({activity_id:id,action:action,flag_reason:reason})});
     var act = allActivities.find(function(a) { return a.id === id; });
     if (act) {
       act.is_reviewed = (action === 'review');
     }
   } else {
-    await fetch(BACKEND_URL+'/flag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity_id:id,action:action,flag_reason:reason})});
+    await fetch(BACKEND_URL+'/flag',{method:'POST',headers:headers,body:JSON.stringify({activity_id:id,action:action,flag_reason:reason})});
     allActivities = allActivities.filter(function(a) { return a.id !== id; });
     delete bulkSelected[id];
   }
@@ -2129,6 +2332,7 @@ async function doBulkAction(action) {
   bar.innerHTML = '<span>⏳ Processing bulk action... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
   
   var success = 0;
+  var token = sessionStorage.getItem('wk_admin_token');
   for (var i = 0; i < ids.length; i++) {
     var id = ids[i];
     try {
@@ -2136,7 +2340,10 @@ async function doBulkAction(action) {
       var reason = act ? act.flag_reason || '' : '';
       await fetch(BACKEND_URL+'/flag', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify({ activity_id: parseInt(id), action: action, flag_reason: reason })
       });
       if (action === 'review' || action === 'unreview') {
@@ -2163,9 +2370,6 @@ async function doBulkAction(action) {
 }
 
 async function doPermanentDelete(id) {
-  var act = allActivities.find(function(a) { return a.id === id; });
-  var stravaId = act ? act.strava_activity_id || '' : '';
-  
   var msg = "⚠️ WARNING: This will permanently and physically delete this activity record from the database.\n\n" +
             "If this activity STILL exists on the athlete's Strava account, it WILL be re-imported in the following situations:\n" +
             "1. When the athlete logs in or re-connects their Strava account.\n" +
@@ -2177,9 +2381,11 @@ async function doPermanentDelete(id) {
   if (!confirm(msg)) return;
   
   try {
-    var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + id, {
+    var res = await fetch(BACKEND_URL + '/admin/activities/' + id, {
       method: 'DELETE',
-      headers: Object.assign({}, HDR, { 'Prefer': 'return=minimal' })
+      headers: {
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      }
     });
     if (res.ok) {
       allActivities = allActivities.filter(function(a) { return a.id !== id; });
@@ -2213,12 +2419,15 @@ async function doBulkPermanentDelete() {
   bar.innerHTML = '<span>⏳ Processing permanent delete... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
   
   var success = 0, failed = 0;
+  var token = sessionStorage.getItem('wk_admin_token');
   for (var i = 0; i < ids.length; i++) {
     var id = ids[i];
     try {
-      var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + id, {
+      var res = await fetch(BACKEND_URL + '/admin/activities/' + id, {
         method: 'DELETE',
-        headers: Object.assign({}, HDR, { 'Prefer': 'return=minimal' })
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
       });
       if (res.ok) {
         allActivities = allActivities.filter(function(a) { return String(a.id) !== String(id); });
@@ -3576,7 +3785,13 @@ async function saveEditModal() {
       timestamp: new Date().toISOString()
     });
   }
-  
+
+  var adminEmail = 'Unknown Admin';
+  try {
+    var t = sessionStorage.getItem('wk_admin_token');
+    if (t) adminEmail = JSON.parse(atob(t.split('.')[1])).email || 'admin@arcgate.com';
+  } catch(e){}
+
   var updates = {
     is_flagged: is_flagged,
     flag_reason: is_flagged ? flag_reason : null,
@@ -3590,6 +3805,29 @@ async function saveEditModal() {
     manual_bonus: manual_bonus,
     raw_data: rawData
   };
+
+  var nowIso = new Date().toISOString();
+  if (is_flagged) {
+    updates.flagged_at = nowIso;
+    updates.flagged_by = adminEmail;
+  } else {
+    updates.cleared_at = nowIso;
+    updates.cleared_by = adminEmail;
+  }
+  if (is_reviewed) {
+    updates.reviewed_at = nowIso;
+    updates.reviewed_by = adminEmail;
+  } else {
+    updates.reviewed_at = null;
+    updates.reviewed_by = null;
+  }
+  if (is_deleted) {
+    updates.deleted_at = nowIso;
+    updates.deleted_by = adminEmail;
+  } else {
+    updates.deleted_at = null;
+    updates.deleted_by = null;
+  }
   
   try {
     var resp = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + currentId, {
@@ -3609,7 +3847,10 @@ async function saveEditModal() {
     
     await fetch(BACKEND_URL + '/flag', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
       body: JSON.stringify({
         activity_id: currentId,
         action: backendAction,
@@ -3630,7 +3871,10 @@ async function doActionAll(id, action, reason) {
   try {
     await fetch(BACKEND_URL+'/flag',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
       body:JSON.stringify({activity_id:id, action:action, flag_reason:reason})
     });
     if (bulkSelected[id]) delete bulkSelected[id];
@@ -3692,6 +3936,7 @@ async function doBulkActionAll(action) {
   bar.innerHTML = '<span>⏳ Processing bulk action... <span class="bulk-selected-count" id="bulk-prog-all">0</span> / ' + ids.length + '</span>';
   
   var success = 0;
+  var token = sessionStorage.getItem('wk_admin_token');
   for (var i = 0; i < ids.length; i++) {
     var id = ids[i];
     try {
@@ -3699,7 +3944,10 @@ async function doBulkActionAll(action) {
       var reason = act ? act.flag_reason || '' : '';
       await fetch(BACKEND_URL+'/flag', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify({ activity_id: parseInt(id), action: action, flag_reason: reason })
       });
       success++;
