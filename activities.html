@@ -1547,7 +1547,9 @@ async function loadActivities(){
       var actUrl='https://www.strava.com/activities/'+a.strava_activity_id;
       var athleteName=r&&r.full_name?r.full_name:'Unknown';
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
-      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">🚩 '+esc(a.flag_reason||'Flagged')+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">✅ Valid</span>';
+      var rawReason = a.flag_reason || 'Flagged';
+      var displayReason = rawReason.length > 27 ? rawReason.substring(0, 27) + '...' : rawReason;
+      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">🚩 '+esc(displayReason)+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">✅ Valid</span>';
       
       var reviewBtnHtml = '';
       var clearBtnHtml = '';
