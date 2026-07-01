@@ -3046,7 +3046,7 @@ function closeReactionsDetail() {
       });
 
       labels = Object.keys(counts);
-      data = Object.values(counts);
+      data = labels.map(function(k) { return counts[k]; });
 
       chartDataSets = [{
         data: data,
@@ -3087,7 +3087,7 @@ function closeReactionsDetail() {
         var parts = dStr.split('-');
         return parts[2] + '/' + parts[1]; // DD/MM format
       });
-      data = Object.values(dateKm);
+      data = Object.keys(dateKm).map(function(k) { return dateKm[k]; });
 
       chartDataSets = [{
         label: 'Distance (km)',
@@ -3123,7 +3123,7 @@ function closeReactionsDetail() {
         var parts = dStr.split('-');
         return parts[2] + '/' + parts[1]; // DD/MM format
       });
-      data = Object.values(dateSec).map(function(sec) { return Math.round(sec / 60); });
+      data = Object.keys(dateSec).map(function(k) { return Math.round(dateSec[k] / 60); });
 
       chartDataSets = [{
         label: 'Active Minutes',
