@@ -433,8 +433,14 @@
 
         // 5. Fetch activities in range (including dates)
         var actUrl = SUPABASE_URL + '/rest/v1/activities?is_deleted=eq.false';
-        if (df) actUrl += '&activity_date=gte.' + df + 'T00:00:00';
-        if (dt) actUrl += '&activity_date=lte.' + dt + 'T23:59:59';
+        if (df) {
+          var startDt = new Date(df + 'T00:00:00+05:30');
+          if (!isNaN(startDt.getTime())) actUrl += '&activity_date=gte.' + startDt.toISOString();
+        }
+        if (dt) {
+          var endDt = new Date(dt + 'T23:59:59+05:30');
+          if (!isNaN(endDt.getTime())) actUrl += '&activity_date=lte.' + endDt.toISOString();
+        }
         actUrl += '&select=strava_athlete_id,distance_meters,sport_type,activity_date,avg_speed,elevation_gain,strava_activity_id,is_flagged,manual_bonus,activity_name,start_time,description,activity_date_time_ist,moving_time_seconds&order=id.asc';
         
         ACTIVITIES = await fetchAllRows(actUrl);
