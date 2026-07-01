@@ -865,17 +865,37 @@ async function startImport(mode) {
 }
 
 function rowToActivity(row) {
-  var actDate = row['activity_date'];
+  var dateRaw = (row['activity_date'] || '').trim();
+  var actDate = dateRaw;
   var istDateStr = null;
-  if (actDate) {
+
+  if (dateRaw) {
+    var rawStr = dateRaw.includes('T') ? dateRaw : dateRaw + 'T06:30:00';
+    var hasOffset = rawStr.endsWith('Z') || rawStr.endsWith('z') || /[+-]\d{2}:?\d{2}$/.test(rawStr);
+    
     try {
-      var dt = new Date(actDate);
-      if (!isNaN(dt.getTime())) {
-        var istMs = dt.getTime() + (5.5 * 60 * 60 * 1000);
-        istDateStr = new Date(istMs).toISOString().replace(/[Zz]$/, '');
+      if (hasOffset) {
+        var dt = new Date(rawStr);
+        if (!isNaN(dt.getTime())) {
+          actDate = dt.toISOString();
+          var istMs = dt.getTime() + (5.5 * 60 * 60 * 1000);
+          istDateStr = new Date(istMs).toISOString().replace(/[Zz]$/, '');
+        }
+      } else {
+        var parts = rawStr.split('T');
+        var dateParts = parts[0].split('-');
+        var timeParts = parts[1].split(':');
+        var yr = parseInt(dateParts[0]), mo = parseInt(dateParts[1]) - 1, dy = parseInt(dateParts[2]);
+        var hr = parseInt(timeParts[0]), mi = parseInt(timeParts[1]), sc = parseInt(timeParts[2] || 0);
+        
+        var istUtcMs = Date.UTC(yr, mo, dy, hr, mi, sc);
+        istDateStr = new Date(istUtcMs).toISOString().replace(/[Zz]$/, '');
+        
+        var utcMs = istUtcMs - (5.5 * 60 * 60 * 1000);
+        actDate = new Date(utcMs).toISOString();
       }
     } catch(e) {
-      console.warn('Failed to parse IST date:', e);
+      console.warn('Failed to parse date:', e);
     }
   }
 
@@ -1043,13 +1063,34 @@ function generateSQL(rows) {
   lines.push('VALUES');
 
   var vals = rows.map(function(r) {
+    var dateRaw = (r.activity_date || '').trim();
+    var actDate = dateRaw;
     var istDateStr = null;
-    if (r.activity_date) {
+
+    if (dateRaw) {
+      var rawStr = dateRaw.includes('T') ? dateRaw : dateRaw + 'T06:30:00';
+      var hasOffset = rawStr.endsWith('Z') || rawStr.endsWith('z') || /[+-]\d{2}:?\d{2}$/.test(rawStr);
+      
       try {
-        var dt = new Date(r.activity_date);
-        if (!isNaN(dt.getTime())) {
-          var istMs = dt.getTime() + (5.5 * 60 * 60 * 1000);
-          istDateStr = new Date(istMs).toISOString().replace(/[Zz]$/, '');
+        if (hasOffset) {
+          var dt = new Date(rawStr);
+          if (!isNaN(dt.getTime())) {
+            actDate = dt.toISOString();
+            var istMs = dt.getTime() + (5.5 * 60 * 60 * 1000);
+            istDateStr = new Date(istMs).toISOString().replace(/[Zz]$/, '');
+          }
+        } else {
+          var parts = rawStr.split('T');
+          var dateParts = parts[0].split('-');
+          var timeParts = parts[1].split(':');
+          var yr = parseInt(dateParts[0]), mo = parseInt(dateParts[1]) - 1, dy = parseInt(dateParts[2]);
+          var hr = parseInt(timeParts[0]), mi = parseInt(timeParts[1]), sc = parseInt(timeParts[2] || 0);
+          
+          var istUtcMs = Date.UTC(yr, mo, dy, hr, mi, sc);
+          istDateStr = new Date(istUtcMs).toISOString().replace(/[Zz]$/, '');
+          
+          var utcMs = istUtcMs - (5.5 * 60 * 60 * 1000);
+          actDate = new Date(utcMs).toISOString();
         }
       } catch(e) {}
     }
@@ -1059,7 +1100,7 @@ function generateSQL(rows) {
       sqlVal(r.strava_athlete_id),
       sqlVal(r.activity_name),
       sqlVal(r.sport_type),
-      sqlVal(r.activity_date),
+      sqlVal(actDate),
       sqlVal(istDateStr),
       sqlVal(r.distance_meters),
       sqlVal(r.moving_time_seconds),
