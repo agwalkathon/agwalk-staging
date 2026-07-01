@@ -239,12 +239,23 @@ async function load(isBackgroundRefresh) {
         if(row.config_key==='base_points') CONFIG_LB.basePer_km=parseFloat(row.config_value.per_km||1);
         if(row.config_key==='base_points_per_km') CONFIG_LB.basePer_km=parseFloat(row.config_value)||1;
         if(row.config_key==='announcements_enabled') CONFIG_LB.announcements_enabled=(row.config_value===true||row.config_value==='true');
+        if(row.config_key==='maintenance_mode') CONFIG_LB.maintenance_mode=(row.config_value===true||row.config_value==='true');
+        if(row.config_key==='maintenance_message') CONFIG_LB.maintenance_message=(typeof row.config_value==='string'?row.config_value:'')||'';
         if(row.config_key==='feed_config') {
           try {
             CONFIG_LB.feed_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
           } catch(e) { console.error("Failed to parse feed_config:", e); }
         }
       });
+    }
+    if (CONFIG_LB.maintenance_mode) {
+      var _ov = document.getElementById('maintenance-overlay');
+      if (_ov) {
+        var _mm = document.getElementById('maintenance-message');
+        if (_mm && CONFIG_LB.maintenance_message) _mm.textContent = CONFIG_LB.maintenance_message;
+        _ov.style.display = 'flex';
+      }
+      return;
     }
     if (window.enforceForceInstallPWA) {
       window.enforceForceInstallPWA();
