@@ -207,9 +207,10 @@ body{
   </nav>
 </div>
 
+<script src="participant-config.js?v=20260702_v50"></script>
 <script>
-var BACKEND = 'https://agwalk-backend.onrender.com';
-var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+BACKEND = 'https://agwalk-backend.onrender.com';
+SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON };
 
@@ -492,6 +493,18 @@ async function loadAppEvents(){
 
 /* ---------- spectator leaderboard ---------- */
 var METRIC_LABELS = { distance_km:'KM', elevation_m:'M', moving_time_min:'MIN', steps:'STEPS', activity_count:'ACTS' };
+async function fetchAllRows(url){
+  var out = [], from = 0, PAGE = 1000;
+  while (true) {
+    var r = await fetch(url, { headers: Object.assign({}, HDR, { 'Range-Unit':'items', Range: from + '-' + (from + PAGE - 1) }) });
+    var rows = await r.json();
+    if (!Array.isArray(rows)) break;
+    out = out.concat(rows);
+    if (rows.length < PAGE) break;
+    from += PAGE;
+  }
+  return out;
+}
 async function openSpectatorBoard(ev){
   document.getElementById('spec-board').classList.remove('hidden');
   document.getElementById('spec-title').textContent = ev.name;
@@ -499,30 +512,58 @@ async function openSpectatorBoard(ev){
   var list = document.getElementById('spec-list');
   list.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   try {
-    var r = await fetch(BACKEND + '/events/' + ev.id + '/spectator-board', { headers: { Authorization: 'Bearer ' + getToken() } });
-    var d = await r.json();
-    if (!d.success) throw new Error(d.error || 'Failed');
-    var unit = METRIC_LABELS[d.metric] || 'PTS';
-    document.getElementById('spec-sub').textContent = d.board.length + ' participants · ranked by total ' + unit.toLowerCase();
+    var rc = ev.rules_config || {};
+    var slim = '&select=strava_athlete_id,strava_activity_id,distance_meters,activity_date,activity_date_time_ist,is_flagged,sport_type,elevation_gain,moving_time_seconds,steps';
+    var results = await Promise.all([
+      fetchAllRows(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + ev.id + '&is_deleted=is.false&order=id.asc' + slim),
+      fetchAllRows(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + ev.id + '&select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
+      fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=eq.' + ev.id + '&select=config_key,config_value', { headers: HDR }).then(function(r){ return r.json(); }),
+      fetch(SUPABASE_URL + '/rest/v1/challenges?event_id=eq.' + ev.id + '&is_active=is.true&select=*', { headers: HDR }).then(function(r){ return r.json(); }),
+      fetch(SUPABASE_URL + '/rest/v1/special_scoring_days?event_id=eq.' + ev.id + '&select=special_date', { headers: HDR }).then(function(r){ return r.json(); })
+    ]);
+    var acts = results[0], regs = results[1];
+    // Load THIS event's scoring config into the shared engine globals (same engine participants use)
+    (Array.isArray(results[2]) ? results[2] : []).forEach(function(row){
+      if (row.config_key === 'bonus_points') CONFIG_LB.bonus = row.config_value.map(function(b){ return { km: Number(b.km), points: Number(b.points || b.pts || 0) }; });
+      if (row.config_key === 'base_points') CONFIG_LB.basePer_km = parseFloat(row.config_value.per_km || 1);
+      if (row.config_key === 'base_points_per_km') CONFIG_LB.basePer_km = parseFloat(row.config_value) || 1;
+    });
+    CHALLENGES_LB = Array.isArray(results[3]) ? results[3] : [];
+    SPECIAL_DAYS_LB = (Array.isArray(results[4]) ? results[4] : []).map(function(x){ return x.special_date; });
+    _LB_EV_RULES = rc.scoring_mode ? rc : null;
+
+    var byAthlete = {};
+    acts.forEach(function(a){ var id = String(a.strava_athlete_id); (byAthlete[id] = byAthlete[id] || []).push(a); });
+    var raw = (rc.scoring_mode === 'raw');
+    var unit = raw ? (METRIC_LABELS[rc.metric] || 'KM') : 'PTS';
+    var board = regs.map(function(p){
+      var pActs = byAthlete[String(p.strava_athlete_id)] || [];
+      var pts = calcFullPtsAdaptive(pActs, p.gender, p.shift);
+      return { full_name: p.full_name, team: p.leaderboard_team || null, total: pts.total };
+    }).filter(function(r){ return r.total > 0; })
+      .sort(function(a, b){ return b.total - a.total; })
+      .slice(0, 50);
+
+    document.getElementById('spec-sub').textContent = board.length + ' participants · ranked by ' + (raw ? 'total ' + unit.toLowerCase() : 'points');
     list.textContent = '';
-    if (!d.board.length) { list.innerHTML = '<div class="placeholder"><div class="big">📊</div>No activity yet.</div>'; return; }
-    d.board.forEach(function(row){
+    if (!board.length) { list.innerHTML = '<div class="placeholder"><div class="big">📊</div>No activity yet.</div>'; return; }
+    board.forEach(function(row, i){
       var item = document.createElement('div');
       item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);';
       var rk = document.createElement('div');
-      rk.style.cssText = 'width:28px;text-align:center;font-size:14px;font-weight:800;color:' + (row.rank<=3?'var(--brand)':'var(--label)') + ';flex-shrink:0;';
-      rk.textContent = row.rank;
+      rk.style.cssText = 'width:28px;text-align:center;font-size:14px;font-weight:800;color:' + (i<3?'var(--brand)':'var(--label)') + ';flex-shrink:0;';
+      rk.textContent = i + 1;
       var av = document.createElement('div'); av.className = 'grad-avatar'; av.style.cssText += 'width:38px;height:38px;font-size:13px;'; av.textContent = initials(row.full_name);
       var nm = document.createElement('div'); nm.style.cssText = 'flex:1;min-width:0;';
       var n1 = document.createElement('div'); n1.style.cssText = 'font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'; n1.textContent = row.full_name || '—';
       var n2 = document.createElement('div'); n2.style.cssText = 'font-size:11px;color:var(--label);'; n2.textContent = row.team || '';
       nm.appendChild(n1); if (row.team) nm.appendChild(n2);
       var val = document.createElement('div'); val.style.cssText = 'font-size:14px;font-weight:800;color:var(--brand-soft);flex-shrink:0;';
-      val.textContent = row.total.toFixed(unit==='KM'?2:0) + ' ' + unit;
+      val.textContent = row.total.toFixed(raw && unit !== 'KM' ? 0 : 2) + ' ' + (raw ? unit : 'pts');
       item.appendChild(rk); item.appendChild(av); item.appendChild(nm); item.appendChild(val);
       list.appendChild(item);
     });
-  } catch(e) { list.innerHTML = '<div class="placeholder">Could not load leaderboard.</div>'; }
+  } catch(e) { console.warn(e); list.innerHTML = '<div class="placeholder">Could not load leaderboard.</div>'; }
 }
 document.getElementById('spec-back').addEventListener('click', function(){ document.getElementById('spec-board').classList.add('hidden'); });
 
