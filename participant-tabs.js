@@ -13,7 +13,7 @@ var _activeInsight = null;
 var _activeRecovery = null;
 var _notificationsList = [];
 var _notificationsLoaded = false;
-var TAB_ORDER = ['dashboard', 'activities', 'leaderboard', 'you'];
+var TAB_ORDER = ['dashboard', 'activities', 'leaderboard', 'events', 'you'];
 
 // Tab Order for indicator rendering
 function updateNavIndicator() {
@@ -95,6 +95,9 @@ function showTab(tab) {
   }
   if (tab === 'leaderboard') {
     lbBoot();
+  }
+  if (tab === 'events') {
+    if (typeof loadEventsTab === 'function') loadEventsTab();
   }
   if (tab === 'feed') {
     safeSetItem('ag_last_viewed_announcements', new Date().toISOString());
@@ -1341,7 +1344,7 @@ function initializeFeedTab(enabled) {
   
   if (enabled) {
     if (TAB_ORDER.indexOf('feed') === -1) {
-      TAB_ORDER.splice(3, 0, 'feed');
+      TAB_ORDER.splice(4, 0, 'feed');
     }
     if (bnavFeed) bnavFeed.style.display = '';
     if (tabFeed) tabFeed.classList.remove('hidden-tab');
