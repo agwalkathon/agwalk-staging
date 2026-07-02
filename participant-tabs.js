@@ -2509,12 +2509,16 @@ function renderNotifications() {
 }
 
 function switchYouTab(tab) {
+  var acts = document.getElementById('you-panel-activities');
   var info = document.getElementById('you-panel-info');
   var chal = document.getElementById('you-panel-challenges');
+  var btnActs = document.getElementById('you-tab-activities');
   var btnInfo = document.getElementById('you-tab-info');
   var btnChal = document.getElementById('you-tab-challenges');
+  if (acts) acts.style.display = (tab === 'activities') ? 'block' : 'none';
   if (info) info.style.display = (tab === 'info') ? 'block' : 'none';
   if (chal) chal.style.display = (tab === 'challenges') ? 'block' : 'none';
+  if (btnActs) btnActs.classList.toggle('active', tab === 'activities');
   if (btnInfo) btnInfo.classList.toggle('active', tab === 'info');
   if (btnChal) btnChal.classList.toggle('active', tab === 'challenges');
 }

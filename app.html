@@ -142,13 +142,17 @@ body{
   </header>
 
   <div class="tab-pane" id="pane-celebrate">
+    <div style="margin-bottom:16px;">
+      <div id="celebrate-greeting" style="font-size:20px;font-weight:800;letter-spacing:-0.02em;">Hello! 👋</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:3px;">Every day has something worth celebrating 🎉</div>
+    </div>
     <button id="btn-new-post" style="width:100%;padding:13px;background:var(--surface2);border:1px dashed var(--border);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">✨ Share something to celebrate…</button>
     <div id="celebrate-feed"><div class="skel"></div><div class="skel"></div></div>
   </div>
 
   <!-- new post drawer -->
-  <div id="post-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end">
-    <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom))">
+  <div id="post-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding-top:calc(20px + env(safe-area-inset-top));overflow-y:auto">
+    <div style="background:var(--surface);width:calc(100% - 24px);max-width:520px;border-radius:20px;padding:18px;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div style="font-size:15px;font-weight:600">Share a celebration</div>
         <button id="post-close" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
@@ -161,7 +165,11 @@ body{
         <div id="post-photo-previews" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
       <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
-      <button id="post-submit" style="width:100%;padding:13px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer">Post</button>
+      <div style="display:flex;justify-content:flex-end">
+        <button id="post-submit" title="Post" style="width:52px;height:52px;background:var(--brand);border:none;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(232,98,42,.4)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -379,6 +387,10 @@ function enterApp(){
   var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('hdr-today-date').textContent = days[dt.getDay()] + ' ' + months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+  var h = dt.getHours();
+  var greet = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+  var first = ((emp.full_name || '').split(' ')[0]) || 'there';
+  document.getElementById('celebrate-greeting').textContent = greet + ', ' + first + '! 👋';
   document.getElementById('hdr-refresh').addEventListener('click', function(){
     _loaded = {}; loadCelebrate(); refreshBell();
     var active = document.querySelector('.bnav-item.active');
@@ -918,8 +930,9 @@ function buildCelebCard(c){
   winp.placeholder = 'Write a wish…'; winp.maxLength = 500;
   winp.style.cssText = 'flex:1;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:11px;color:#fff;font-family:inherit;font-size:13.5px;min-width:0;';
   var wsend = document.createElement('button');
-  wsend.textContent = 'Send';
-  wsend.style.cssText = 'padding:10px 16px;background:var(--brand);border:none;border-radius:11px;color:#fff;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer;';
+  wsend.title = 'Send';
+  wsend.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  wsend.style.cssText = 'width:42px;height:42px;background:var(--brand);border:none;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
   var wcam = document.createElement('button');
   wcam.textContent = '📷';
   wcam.title = 'Attach photo';
@@ -1048,7 +1061,7 @@ document.getElementById('post-submit').addEventListener('click', async function(
   var err = document.getElementById('post-err');
   err.textContent = '';
   if (!title) { err.textContent = 'Please give it a title'; return; }
-  this.disabled = true;
+  this.disabled = true; this.style.opacity = '.5';
   try {
     var r = await fetch(BACKEND + '/celebrate/post', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ title: title, message: msg, media: _postPhotos }) });
     var d = await r.json();
@@ -1059,7 +1072,7 @@ document.getElementById('post-submit').addEventListener('click', async function(
     if (d.status === 'pending') alert('Submitted! Your post will appear after admin approval. 🎉');
     else loadCelebrate();
   } catch(e) { err.textContent = e.message; }
-  this.disabled = false;
+  this.disabled = false; this.style.opacity = '1';
 });
 
 /* ---------- notifications ---------- */

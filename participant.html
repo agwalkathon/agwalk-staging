@@ -457,9 +457,24 @@
 <div class="max-w">
   <!-- Sub-tabs: Challenges first -->
   <div class="lb-tabs" style="margin-bottom:14px;">
-    <button class="lb-tab active" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
+    <button class="lb-tab active" id="you-tab-activities" onclick="switchYouTab('activities')">&#9889; Activities</button>
+    <button class="lb-tab" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
     <button class="lb-tab" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
   </div>
+
+  <!-- Activities panel (moved from old Activities tab) -->
+  <div id="you-panel-activities" style="display:block;">
+<div class="max-w">
+  <div class="flagged-info" id="flagged-banner">
+    <strong>⚑ Flagged activities</strong> — Some activities were flagged for admin review. They're excluded from your score until reviewed.
+  </div>
+  <div class="sec" id="act-section-title">My Activities</div>
+  <div id="act-list">
+    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
+    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
+    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
+  </div>
+</div></div>
 
   <!-- Info panel -->
   <div id="you-panel-info" style="display:none;">
@@ -657,27 +672,13 @@
 </div>
 
   <!-- Challenges panel -->
-  <div id="you-panel-challenges" style="display:block; padding-top:4px;">
+  <div id="you-panel-challenges" style="display:none;display:block; padding-top:4px;">
     <div id="challenges-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
       <div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>Loading challenges...</p></div></div>
     </div>
   </div>
 
-<div style="margin-top:26px;">
-<div style="font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:12px;">My Activities</div>
 
-<div class="max-w">
-  <div class="flagged-info" id="flagged-banner">
-    <strong>⚑ Flagged activities</strong> — Some activities were flagged for admin review. They're excluded from your score until reviewed.
-  </div>
-  <div class="sec" id="act-section-title">My Activities</div>
-  <div id="act-list">
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-  </div>
-</div>
-</div>
 
 </div>
 </div>
