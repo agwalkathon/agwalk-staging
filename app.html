@@ -63,7 +63,7 @@ body{
 .hdr-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
 .hdr-btn:active{transform:scale(0.95);background:rgba(255,255,255,0.12)}
 .hdr-btn svg{width:20px;height:20px}
-.hdr-date-pill{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fff}
+.hdr-date-pill{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:0.5px;color:#fff}
 .grad-avatar{border-radius:50%;background:radial-gradient(circle at 30% 30%, #f472b6 0%, #E8622A 70%, #c94a10 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:0.5px;box-shadow:0 0 0 2px rgba(232,98,42,0.3), 0 2px 8px rgba(232,98,42,0.25);overflow:hidden;flex-shrink:0}
 .grad-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 /* ── Content ── */
@@ -86,7 +86,8 @@ body{
   display:flex;justify-content:space-around;padding:6px;z-index:9999;
   box-shadow:0 10px 40px rgba(0,0,0,0.5);
 }
-.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;background:none;border:none;cursor:pointer;color:var(--muted);gap:4px;transition:color .3s;position:relative;flex:1;border-radius:22px;z-index:2;font-family:inherit}
+.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;background:none;border:none;cursor:pointer;color:var(--muted);gap:4px;transition:color .3s;position:relative;flex:1;border-radius:22px;z-index:2;font-family:inherit;text-decoration:none}
+.bnav-item:hover,.bnav-item:visited,.bnav-item:active{text-decoration:none}
 .bnav-label{font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
 .bnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275)}
 .bnav-item.active{color:var(--brand)}
@@ -172,11 +173,22 @@ body{
     <div id="profile-box"><div class="skel"></div></div>
   </div>
 
-  <div id="notif-panel" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300">
-    <div style="position:absolute;top:calc(56px + env(safe-area-inset-top));right:10px;left:10px;max-width:400px;margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.55);max-height:65dvh;display:flex;flex-direction:column;overflow:hidden">
+  <div id="notif-panel" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300">
+    <div style="position:absolute;top:calc(58px + env(safe-area-inset-top));left:12px;width:300px;max-width:calc(100vw - 24px);background:rgba(30,30,30,0.97);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-height:60dvh;display:flex;flex-direction:column;overflow:hidden">
       <div style="padding:14px 16px;font-size:14px;font-weight:700;border-bottom:1px solid var(--border)">Notifications</div>
       <div id="notif-list" style="overflow-y:auto;flex:1"></div>
     </div>
+  </div>
+
+  <div id="reg-drawer" class="hidden" style="position:fixed;inset:0;background:var(--bg);z-index:260;overflow-y:auto;">
+    <div style="position:sticky;top:0;background:rgba(14,17,21,.95);backdrop-filter:blur(16px);padding:max(14px,env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);z-index:2;">
+      <button id="reg-back" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px 8px;">←</button>
+      <div>
+        <div style="font-size:15px;font-weight:700;">Register</div>
+        <div style="font-size:11px;color:var(--brand-soft);font-weight:600;" id="reg-ev-name"></div>
+      </div>
+    </div>
+    <div id="reg-body" style="padding:16px;max-width:540px;margin:0 auto;"></div>
   </div>
 
   <div id="spec-board" class="hidden" style="position:fixed;inset:0;background:var(--bg);z-index:250;overflow-y:auto;">
@@ -364,9 +376,9 @@ function enterApp(){
   if (emp.photo_url) { var img = document.createElement('img'); img.src = emp.photo_url; av.appendChild(img); }
   else av.textContent = initials(emp.full_name);
   var dt = new Date();
-  var days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  document.getElementById('hdr-today-date').textContent = days[dt.getDay()] + ', ' + dt.getDate() + ' ' + months[dt.getMonth()];
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('hdr-today-date').textContent = days[dt.getDay()] + ' ' + months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
   document.getElementById('hdr-refresh').addEventListener('click', function(){
     _loaded = {}; loadCelebrate(); refreshBell();
     var active = document.querySelector('.bnav-item.active');
@@ -457,7 +469,8 @@ async function loadAppEvents(){
             var rb = document.createElement('button');
             rb.style.cssText = 'margin-top:10px;width:100%;padding:11px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(232,98,42,.3);';
             rb.textContent = 'Register Now';
-            rb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
+            rb.textContent = localStorage.getItem('ag_reg_draft_' + ev.id) ? '▶ Resume Registration' : 'Register Now';
+            rb.addEventListener('click', function(){ openAppRegistration(ev); });
             c.appendChild(rb);
           } else if (ev.registration_open_date && today < ev.registration_open_date) {
             var rl2 = document.createElement('div');
@@ -490,6 +503,104 @@ async function loadAppEvents(){
     box.innerHTML = '<div class="placeholder">Could not load events.</div>';
   }
 }
+
+/* ---------- in-app event registration ---------- */
+var APP_REG_FIELDS = [
+  { k:'full_name', label:'Full Name', type:'text' },
+  { k:'emp_code', label:'Employee Code', type:'text' },
+  { k:'gender', label:'Gender', type:'select', opts:['Male','Female'] },
+  { k:'email', label:'Email', type:'email' },
+  { k:'whatsapp', label:'WhatsApp Number', type:'tel' },
+  { k:'shift', label:'Shift', type:'select', opts:['Day','Night'] },
+  { k:'tshirt_size', label:'T-Shirt Size', type:'select', opts:['XS','S','M','L','XL','XXL'] },
+  { k:'leaderboard_team', label:'Team', type:'text' },
+  { k:'team_lead', label:'Team Lead', type:'text' },
+  { k:'strava_url', label:'Strava Profile URL', type:'text' }
+];
+function appRegDraftKey(id){ return 'ag_reg_draft_' + id; }
+function openAppRegistration(ev){
+  document.getElementById('reg-drawer').classList.remove('hidden');
+  document.getElementById('reg-ev-name').textContent = ev.name;
+  var body = document.getElementById('reg-body');
+  body.textContent = '';
+  var emp = getEmp() || {};
+  var pre = { full_name: emp.full_name, emp_code: emp.emp_code, email: emp.email };
+  if (emp.gender) pre.gender = emp.gender;
+  var draft = {};
+  try { draft = JSON.parse(localStorage.getItem(appRegDraftKey(ev.id)) || '{}'); } catch(e){}
+
+  var form = document.createElement('div'); form.className = 'card';
+  APP_REG_FIELDS.forEach(function(f){
+    var fw = document.createElement('div'); fw.style.cssText = 'margin-bottom:13px;';
+    var lab = document.createElement('label');
+    lab.style.cssText = 'display:block;font-size:11px;font-weight:700;color:var(--label);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;';
+    lab.textContent = f.label; fw.appendChild(lab);
+    var inp;
+    if (f.type === 'select') {
+      inp = document.createElement('select');
+      var ph = document.createElement('option'); ph.value=''; ph.textContent='Select…'; inp.appendChild(ph);
+      f.opts.forEach(function(o){ var op=document.createElement('option'); op.value=o; op.textContent=o; inp.appendChild(op); });
+    } else { inp = document.createElement('input'); inp.type = f.type; }
+    inp.id = 'areg-' + f.k;
+    inp.value = draft[f.k] !== undefined ? draft[f.k] : (pre[f.k] || '');
+    inp.style.cssText = 'width:100%;padding:11px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;';
+    var save = function(){
+      var o = {};
+      APP_REG_FIELDS.forEach(function(g){ var el = document.getElementById('areg-' + g.k); if (el) o[g.k] = el.value; });
+      try { localStorage.setItem(appRegDraftKey(ev.id), JSON.stringify(o)); } catch(e){}
+    };
+    inp.addEventListener('input', save); inp.addEventListener('change', save);
+    fw.appendChild(inp); form.appendChild(fw);
+  });
+  body.appendChild(form);
+  var err = document.createElement('div'); err.style.cssText = 'color:#F87171;font-size:13px;min-height:18px;margin:8px 0;'; body.appendChild(err);
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:14px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(232,98,42,.3);';
+  btn.textContent = 'Submit Registration Request';
+  btn.addEventListener('click', async function(){
+    err.textContent = '';
+    var dta = {}, missing = [];
+    APP_REG_FIELDS.forEach(function(f){
+      var el = document.getElementById('areg-' + f.k);
+      dta[f.k] = (el && el.value || '').trim();
+      if (!dta[f.k]) missing.push(f.label);
+    });
+    if (missing.length) { err.textContent = 'Please fill: ' + missing.join(', '); return; }
+    if (!/^\S+@\S+\.\S+$/.test(dta.email)) { err.textContent = 'Please enter a valid email.'; return; }
+    if (dta.strava_url.indexOf('https://www.strava.com/athletes/') !== 0) { err.textContent = 'Strava URL must start with https://www.strava.com/athletes/'; return; }
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      var payload = Object.assign({}, dta, { event_name: ev.slug, event_id: ev.id, status: 'pending' });
+      var r = await fetch(SUPABASE_URL + '/rest/v1/registration_requests', {
+        method: 'POST',
+        headers: Object.assign({}, HDR, { 'Content-Type':'application/json', Prefer:'return=minimal' }),
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok && r.status !== 201) {
+        var bodyTxt = await r.text();
+        throw new Error(bodyTxt.indexOf('duplicate') > -1 || r.status === 409 ? 'A request with this Employee Code is already under review.' : 'Submission failed (' + r.status + ')');
+      }
+      try { localStorage.removeItem(appRegDraftKey(ev.id)); } catch(e){}
+      body.textContent = '';
+      var ok = document.createElement('div'); ok.style.cssText = 'text-align:center;padding:60px 20px;';
+      ok.innerHTML = '<div style="font-size:52px;margin-bottom:14px">🎉</div><div style="font-size:18px;font-weight:800;margin-bottom:8px">Request Submitted!</div><div style="font-size:13.5px;color:var(--muted);line-height:1.5">Your registration for ' + ev.name + ' is pending admin approval.</div>';
+      var done = document.createElement('button');
+      done.style.cssText = 'margin-top:22px;padding:12px 32px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:700;font-family:inherit;cursor:pointer;';
+      done.textContent = 'Done';
+      done.addEventListener('click', function(){ document.getElementById('reg-drawer').classList.add('hidden'); _loaded.events = false; switchTab('events'); });
+      ok.appendChild(done); body.appendChild(ok);
+    } catch(e){ err.textContent = e.message; btn.disabled = false; btn.textContent = 'Submit Registration Request'; }
+  });
+  body.appendChild(btn);
+  var note = document.createElement('div');
+  note.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:12px;text-align:center;';
+  note.textContent = 'Progress saves automatically — close and resume anytime.';
+  body.appendChild(note);
+}
+document.getElementById('reg-back').addEventListener('click', function(){
+  document.getElementById('reg-drawer').classList.add('hidden');
+  _loaded.events = false; switchTab('events');
+});
 
 /* ---------- spectator leaderboard ---------- */
 var METRIC_LABELS = { distance_km:'KM', elevation_m:'M', moving_time_min:'MIN', steps:'STEPS', activity_count:'ACTS' };
@@ -798,7 +909,7 @@ function buildCelebCard(c){
 
   // ----- inline wishes section (expandable) -----
   var wsec = document.createElement('div');
-  wsec.style.cssText = 'display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
+  wsec.style.cssText = 'display:block;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
   var wlist = document.createElement('div');
   wlist.style.cssText = 'max-height:260px;overflow-y:auto;';
   var wrow = document.createElement('div');
@@ -860,10 +971,20 @@ function buildCelebCard(c){
       wlist.scrollTop = wlist.scrollHeight;
     } catch(e){ wlist.innerHTML = '<div style="color:var(--label);font-size:12.5px">Could not load wishes.</div>'; }
   }
+  // render wishes shipped with the feed (expanded by default)
+  (function initialWishes(){
+    var ws = Array.isArray(c.wishes) ? c.wishes : [];
+    if (!ws.length) {
+      wlist.innerHTML = '<div style="color:var(--label);font-size:12.5px;padding:4px 0 2px">No wishes yet — be the first! 🎈</div>';
+    } else {
+      ws.forEach(function(w){ wlist.appendChild(renderWishRow(w)); });
+      wlist.scrollTop = wlist.scrollHeight;
+    }
+  })();
   function toggleWishes(){
     var open = wsec.style.display !== 'none';
     wsec.style.display = open ? 'none' : 'block';
-    if (!open) { loadWishesInline(); setTimeout(function(){ winp.focus(); }, 100); }
+    if (!open) setTimeout(function(){ winp.focus(); }, 100);
   }
   wb.addEventListener('click', toggleWishes);
 
