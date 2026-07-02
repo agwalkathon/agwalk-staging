@@ -176,8 +176,8 @@ function buildEventCard(ev, group) {
     if (group === 'live' && !enrolled && regOpenNow) {
       var jrb = document.createElement('button');
       jrb.className = 'ev-btn ev-btn-primary';
-      jrb.textContent = 'Register Now';
-      jrb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
+      jrb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
+      jrb.addEventListener('click', function(){ openEventRegistration(ev); });
       actions.appendChild(jrb);
     } else if (group === 'live' && !enrolled) {
       var sp = document.createElement('div');
@@ -197,8 +197,8 @@ function buildEventCard(ev, group) {
     } else if (regOpen) {
       var rb = document.createElement('button');
       rb.className = 'ev-btn ev-btn-primary';
-      rb.textContent = 'Register Now';
-      rb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
+      rb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
+      rb.addEventListener('click', function(){ openEventRegistration(ev); });
       actions.appendChild(rb);
     } else if (ev.registration_open_date) {
       var no = document.createElement('div');
@@ -308,3 +308,183 @@ async function openEventLeaderboard(ev) {
     }
   });
 })();
+
+// ===== In-app event registration (slide-in modal, draft auto-save) =====
+var REG_FIELDS = [
+  { k:'full_name',        label:'Full Name',       type:'text' },
+  { k:'emp_code',         label:'Employee Code',   type:'text' },
+  { k:'gender',           label:'Gender',          type:'select', opts:['Male','Female'] },
+  { k:'email',            label:'Email',           type:'email' },
+  { k:'whatsapp',         label:'WhatsApp Number', type:'tel' },
+  { k:'shift',            label:'Shift',           type:'select', opts:['Day','Night'] },
+  { k:'tshirt_size',      label:'T-Shirt Size',    type:'select', opts:['XS','S','M','L','XL','XXL'] },
+  { k:'leaderboard_team', label:'Team',            type:'text' },
+  { k:'team_lead',        label:'Team Lead',       type:'text' },
+  { k:'strava_url',       label:'Strava Profile URL', type:'text' }
+];
+
+function regDraftKey(evId){ return 'ag_reg_draft_' + evId; }
+function hasRegDraft(evId){ return !!safeGetItem(regDraftKey(evId)); }
+
+function regPrefill() {
+  var pre = {};
+  try {
+    var u = JSON.parse(safeGetItem('wk_user') || '{}');
+    if (u.name) pre.full_name = u.name;
+    if (u.empCode) pre.emp_code = u.empCode;
+    if (u.email) pre.email = u.email;
+    if (u.athleteId) pre.strava_url = 'https://www.strava.com/athletes/' + u.athleteId;
+  } catch(e) {}
+  if (typeof LB_ME !== 'undefined' && LB_ME) {
+    if (LB_ME.gender) pre.gender = LB_ME.gender;
+    if (LB_ME.shift) pre.shift = LB_ME.shift;
+    if (LB_ME.leaderboard_team) pre.leaderboard_team = LB_ME.leaderboard_team;
+  }
+  return pre;
+}
+
+function openEventRegistration(ev) {
+  var modal = document.getElementById('event-reg-modal');
+  if (!modal) return;
+  modal.textContent = '';
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'max-width:560px;margin:0 auto;padding:20px;';
+
+  var head = document.createElement('div');
+  head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;';
+  var h = document.createElement('div');
+  h.style.cssText = 'font-size:19px;font-weight:700;color:#fff;';
+  h.textContent = 'Register';
+  var x = document.createElement('button');
+  x.style.cssText = 'background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:8px;';
+  x.textContent = '✕';
+  x.addEventListener('click', closeEventRegistration);
+  head.appendChild(h); head.appendChild(x);
+  wrap.appendChild(head);
+
+  var sub = document.createElement('div');
+  sub.style.cssText = 'font-size:13px;color:#F97D4E;font-weight:600;margin-bottom:16px;';
+  sub.textContent = ev.name;
+  wrap.appendChild(sub);
+
+  var draft = {};
+  try { draft = JSON.parse(safeGetItem(regDraftKey(ev.id)) || '{}'); } catch(e) {}
+  var pre = regPrefill();
+
+  var form = document.createElement('div');
+  form.className = 'glass-card';
+  REG_FIELDS.forEach(function(f){
+    var fw = document.createElement('div');
+    fw.style.cssText = 'margin-bottom:13px;';
+    var lab = document.createElement('label');
+    lab.style.cssText = 'display:block;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;';
+    lab.textContent = f.label;
+    fw.appendChild(lab);
+    var inp;
+    if (f.type === 'select') {
+      inp = document.createElement('select');
+      var ph = document.createElement('option'); ph.value=''; ph.textContent='Select…'; inp.appendChild(ph);
+      f.opts.forEach(function(o){ var op=document.createElement('option'); op.value=o; op.textContent=o; inp.appendChild(op); });
+    } else {
+      inp = document.createElement('input');
+      inp.type = f.type;
+    }
+    inp.id = 'ereg-' + f.k;
+    inp.value = draft[f.k] !== undefined ? draft[f.k] : (pre[f.k] || '');
+    inp.style.cssText = 'width:100%;padding:11px 12px;background:var(--surface2,#1E2230);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;';
+    inp.addEventListener('input', function(){ saveRegDraft(ev.id); });
+    inp.addEventListener('change', function(){ saveRegDraft(ev.id); });
+    fw.appendChild(inp);
+    form.appendChild(fw);
+  });
+  wrap.appendChild(form);
+
+  var err = document.createElement('div');
+  err.id = 'ereg-err';
+  err.style.cssText = 'color:#F87171;font-size:13px;margin:10px 0;min-height:18px;';
+  wrap.appendChild(err);
+
+  var btn = document.createElement('button');
+  btn.id = 'ereg-submit';
+  btn.className = 'ev-btn ev-btn-primary';
+  btn.style.cssText = 'width:100%;padding:14px;font-size:15px;';
+  btn.textContent = 'Submit Registration Request';
+  btn.addEventListener('click', function(){ submitEventRegistration(ev); });
+  wrap.appendChild(btn);
+
+  var note = document.createElement('div');
+  note.style.cssText = 'font-size:11.5px;color:rgba(255,255,255,.4);margin-top:12px;text-align:center;';
+  note.textContent = 'Your progress is saved automatically — you can close and resume anytime.';
+  wrap.appendChild(note);
+
+  modal.appendChild(wrap);
+  modal.style.display = 'block';
+  requestAnimationFrame(function(){ modal.classList.add('open'); });
+}
+
+function closeEventRegistration() {
+  var modal = document.getElementById('event-reg-modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  setTimeout(function(){ modal.style.display = 'none'; }, 450);
+  _eventsLoaded = false; loadEventsTab(); // refresh cards (Resume label)
+}
+
+function saveRegDraft(evId) {
+  var d = {};
+  REG_FIELDS.forEach(function(f){
+    var el = document.getElementById('ereg-' + f.k);
+    if (el) d[f.k] = el.value;
+  });
+  safeSetItem(regDraftKey(evId), JSON.stringify(d));
+}
+
+async function submitEventRegistration(ev) {
+  var err = document.getElementById('ereg-err');
+  var btn = document.getElementById('ereg-submit');
+  err.textContent = '';
+  var d = {};
+  var missing = [];
+  REG_FIELDS.forEach(function(f){
+    var el = document.getElementById('ereg-' + f.k);
+    d[f.k] = (el && el.value || '').trim();
+    if (!d[f.k]) missing.push(f.label);
+  });
+  if (missing.length) { err.textContent = 'Please fill: ' + missing.join(', '); return; }
+  if (!/^\S+@\S+\.\S+$/.test(d.email)) { err.textContent = 'Please enter a valid email.'; return; }
+  if (d.strava_url.indexOf('https://www.strava.com/athletes/') !== 0) { err.textContent = 'Strava URL must start with https://www.strava.com/athletes/'; return; }
+
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    var payload = Object.assign({}, d, { event_name: ev.slug, event_id: ev.id, status: 'pending' });
+    var r = await fetch(SUPABASE_URL + '/rest/v1/registration_requests', {
+      method: 'POST',
+      headers: Object.assign({}, HDR, { 'Content-Type':'application/json', Prefer:'return=minimal' }),
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok && r.status !== 201) {
+      var body = await r.text();
+      if (body.indexOf('duplicate') > -1 || body.indexOf('unique') > -1 || r.status === 409) {
+        throw new Error('A request with this Employee Code already exists for review.');
+      }
+      throw new Error('Submission failed (' + r.status + '). Please try again.');
+    }
+    safeSetItem(regDraftKey(ev.id), '');
+    try { localStorage.removeItem(regDraftKey(ev.id)); } catch(e) {}
+    var modal = document.getElementById('event-reg-modal');
+    modal.textContent = '';
+    var ok = document.createElement('div');
+    ok.style.cssText = 'max-width:480px;margin:80px auto;text-align:center;padding:20px;';
+    var big = document.createElement('div'); big.style.cssText='font-size:52px;margin-bottom:14px;'; big.textContent='🎉';
+    var t = document.createElement('div'); t.style.cssText='font-size:19px;font-weight:700;color:#fff;margin-bottom:8px;'; t.textContent='Request Submitted!';
+    var p = document.createElement('div'); p.style.cssText='font-size:14px;color:rgba(255,255,255,.6);line-height:1.5;'; p.textContent='Your registration for ' + ev.name + ' is pending admin approval. You\'ll be notified once approved.';
+    var cb = document.createElement('button'); cb.className='ev-btn ev-btn-primary'; cb.style.cssText='margin-top:22px;padding:12px 30px;'; cb.textContent='Done';
+    cb.addEventListener('click', closeEventRegistration);
+    ok.appendChild(big); ok.appendChild(t); ok.appendChild(p); ok.appendChild(cb);
+    modal.appendChild(ok);
+  } catch (e) {
+    err.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Submit Registration Request';
+  }
+}
