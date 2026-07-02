@@ -298,7 +298,7 @@ tr:hover td{background:#FAFAFA}
 <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
 <div class="sb-spacer"></div><div class="sb-divider"></div><button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button></aside>
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Leaderboard</h1><p>Team and individual rankings</p></div><div class="topbar-right"><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
+<header class="topbar"><div class="topbar-left"><h1>Leaderboard</h1><p>Team and individual rankings</p></div><div class="topbar-right"><select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
   <div class="content">
 <!-- Stats row at top -->
   <div class="stats-grid">
@@ -449,6 +449,23 @@ authGuard();
 var currentBoard = 'dayshift-male';
 var CONFIG = { medals: { bronze:{male:125,female:100}, silver:{male:200,female:150}, gold:{male:300,female:250} }, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}], basePer_km: 1 };
 var CHALLENGES = [];
+var EV_ID = null; // null = default event (Walkathon 2026, original date-window queries)
+function evq(){ return EV_ID ? "&event_id=eq."+EV_ID : ""; }
+async function loadEventSelector(){
+  try{
+    var r=await fetch(SB_URL+"/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc",{headers:HDR});
+    var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
+    sel.innerHTML="";
+    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
+    sel.value="1";
+    sel.addEventListener("change",async function(){
+      EV_ID=(this.value==="1")?null:parseInt(this.value);
+      document.getElementById("board").innerHTML="";
+      await loadAll();
+    });
+  }catch(e){console.warn("event selector failed",e);}
+}
+loadEventSelector();
 var SPECIAL_DAYS = []; // dates (YYYY-MM-DD) where 21 km cap is lifted
 var allData = {}; // cache {board: rows}
 
@@ -527,7 +544,7 @@ function applyFilters() {
 
 async function loadConfig() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(), {headers:HDR});
     var rows = await r.json();
     rows.forEach(function(row) {
       if (row.config_key==='medals')       CONFIG.medals     = row.config_value;
@@ -541,7 +558,7 @@ async function loadConfig() {
 
 async function loadChallenges() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/challenges?is_active=is.true&select=*', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/challenges?is_active=is.true&select=*'+evq(), {headers:HDR});
     var raw = await r.json();
     CHALLENGES = Array.isArray(raw) ? raw : [];
     
@@ -560,22 +577,22 @@ async function loadChallenges() {
 
 async function loadSpecialDays() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/special_scoring_days?select=special_date', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/special_scoring_days?select=special_date'+evq(), {headers:HDR});
     var rows = await r.json();
     SPECIAL_DAYS = Array.isArray(rows) ? rows.map(function(x){ return x.special_date; }) : [];
   } catch(e) { SPECIAL_DAYS = []; }
 }
 
 async function loadRegistration() {
-  var r = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team', {headers:HDR});
+  var r = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'+evq(), {headers:HDR});
   return await r.json();
 }
 
 async function loadActivities() {
   // Fetch ALL activities using Supabase pagination
   var baseUrl = SB_URL+'/rest/v1/activities?is_deleted=eq.false'
-    +'&activity_date=gte.2026-06-01T00:00:00'
-    +'&activity_date=lte.2026-07-01T15:00:00'
+    +(EV_ID ? ('&event_id=eq.'+EV_ID)
+            : '&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-07-01T15:00:00')
     +'&select=strava_athlete_id,distance_meters,sport_type,activity_date,avg_speed,elevation_gain,strava_activity_id,is_flagged,manual_bonus,activity_name,start_time,description,activity_date_time_ist'
     +'&order=id.asc';
   var allActs = [];
