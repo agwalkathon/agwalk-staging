@@ -819,6 +819,8 @@ function renderRows(rows, prevRanks) {
   prevRanks = prevRanks || {};
   var meId = LB_ME ? String(LB_ME.strava_athlete_id) : '', list = document.getElementById('lb-list');
   if (!list) return;
+  if (typeof window._lbRenderToken === 'undefined') window._lbRenderToken = 0;
+  var _renderTok = ++window._lbRenderToken;
   if (rows.length === 0) {
     list.innerHTML = '<div class="empty-box"><div class="ei">🏃</div><p>No activities yet in this category.</p></div>';
     safeSetText('lb-my-rank', '—');
@@ -967,6 +969,8 @@ function renderRows(rows, prevRanks) {
     }
   });
   requestAnimationFrame(function() {
+    if (_renderTok !== window._lbRenderToken) return; // a newer render superseded this one
+    list.innerHTML = '';
     list.appendChild(frag);
     var rnkEl = document.getElementById('lb-my-rank');
     if (rnkEl && myRank > 0) rnkEl.textContent = '#' + myRank;
