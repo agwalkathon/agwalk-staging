@@ -457,6 +457,7 @@ function buildCelebCard(c){
   var wb = document.createElement('button');
   wb.style.cssText = 'margin-left:auto;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;cursor:pointer;';
   wb.textContent = '💬 ' + (c.wish_count || 0) + ' wishes';
+  c._wishBtn = wb;
   wb.addEventListener('click', function(){ openWishes(c); });
   bar.appendChild(wb);
   card.appendChild(bar);
@@ -499,7 +500,11 @@ document.getElementById('wish-send').addEventListener('click', async function(){
       if (d.status === 'pending') {
         var list = document.getElementById('wish-list');
         var n = document.createElement('div'); n.style.cssText='text-align:center;color:#F59E0B;font-size:12px;padding:8px'; n.textContent='Your wish is pending admin approval ✓'; list.appendChild(n);
-      } else { openWishes(_wishFor); }
+      } else {
+        _wishFor.wish_count = (_wishFor.wish_count || 0) + 1;
+        if (_wishFor._wishBtn) _wishFor._wishBtn.textContent = '💬 ' + _wishFor.wish_count + ' wishes';
+        openWishes(_wishFor);
+      }
     }
   } catch(e){}
   this.disabled = false;
