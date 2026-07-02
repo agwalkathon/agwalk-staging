@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Events — Arcgate Walkathon</title>
+  <style>
+:root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;align-items:center;padding:16px 0 12px;z-index:300;transition:width .24s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.sidebar:hover{width:var(--sidebar-exp)}
+.sb-logo{display:flex;align-items:center;width:100%;padding:4px 14px 20px;text-decoration:none;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;color:#fff;font-size:20px}
+.sb-logo-text{font-size:13px;font-weight:600;color:#fff;opacity:0;white-space:nowrap;transition:opacity .18s;line-height:1.3}
+.sb-logo-text span{display:block;font-size:10px;font-weight:400;color:rgba(255,255,255,.45)}
+.sidebar:hover .sb-logo-text{opacity:1}
+.sb-section{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:0 14px 6px;width:100%;opacity:0;transition:opacity .15s;white-space:nowrap}
+.sidebar:hover .sb-section{opacity:1}
+.sb-item{display:flex;align-items:center;width:100%;padding:0 12px;min-height:42px;text-decoration:none;gap:10px;border-left:3px solid transparent;transition:all .16s}
+.sb-item:hover{background:rgba(255,255,255,.06);border-left-color:rgba(232,98,42,.5)}
+.sb-item.active{background:rgba(232,98,42,.12);border-left-color:var(--brand)}
+.sb-item i{font-size:19px;color:rgba(255,255,255,.38);flex-shrink:0;width:28px;text-align:center;transition:color .16s}
+.sb-item:hover i{color:rgba(255,255,255,.7)}
+.sb-item.active i{color:var(--brand)}
+.sb-label{font-size:13px;font-weight:500;color:rgba(255,255,255,.5);white-space:nowrap;opacity:0;transition:opacity .15s}
+.sidebar:hover .sb-label{opacity:1}
+.sb-item:hover .sb-label{color:rgba(255,255,255,.9)}
+.sb-item.active .sb-label{color:#fff;font-weight:600}
+.sb-spacer{flex:1}
+.sb-divider{width:calc(100% - 24px);height:1px;background:rgba(255,255,255,.07);margin:6px 12px;flex-shrink:0}
+.sb-signout{display:flex;align-items:center;width:100%;padding:0 12px;min-height:42px;gap:10px;border:none;background:none;cursor:pointer;transition:all .16s;font-family:var(--font)}
+.sb-signout:hover{background:rgba(255,80,80,.08)}
+.sb-signout i{font-size:19px;color:rgba(255,255,255,.25);flex-shrink:0;width:28px;text-align:center}
+.main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--card-bg);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100}
+.topbar-left h1{font-size:20px;font-weight:600}
+.topbar-left p{font-size:12.5px;color:var(--text-secondary)}
+.topbar-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.topbar-back:hover{background:var(--page-bg)}
+.content{padding:26px 28px;max-width:1100px;width:100%}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;cursor:pointer;font-family:var(--font);font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:var(--radius-sm);transition:all .15s}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:#d5551f}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
+.btn-ghost:hover{background:#fff}
+.btn-sm{padding:6px 12px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.ev-card{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);margin-bottom:14px;overflow:hidden;display:flex}
+.ev-accent{width:6px;flex-shrink:0}
+.ev-body{flex:1;padding:18px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ev-info{flex:1;min-width:220px}
+.ev-name{font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px}
+.ev-meta{font-size:12.5px;color:var(--text-secondary);margin-top:4px}
+.ev-actions{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.badge.draft{background:#EEF0F4;color:#6B7280}
+.badge.upcoming{background:#EAF2FF;color:#2563EB}
+.badge.live{background:#EAFBF0;color:#16A34A}
+.badge.ended{background:#FFF4E5;color:#D97706}
+.badge.archived{background:#F3F4F6;color:#9CA3AF}
+.panel{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:24px;margin-bottom:20px;display:none}
+.panel.open{display:block}
+.panel h2{font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 18px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13.5px;background:#fff}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--brand)}
+.fld-full{grid-column:1/-1}
+.subhead{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin:22px 0 12px;padding-top:18px;border-top:1px solid var(--border)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:12.5px;cursor:pointer;user-select:none;transition:all .12s}
+.chip.on{background:var(--brand-light);border-color:var(--brand);color:var(--brand);font-weight:600}
+.metric-row{display:grid;grid-template-columns:24px 1fr 110px 110px;gap:10px;align-items:center;margin-bottom:8px}
+.metric-row .mname{font-size:13px;font-weight:500}
+.metric-row input[type=number]{padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;width:100%}
+.metric-head{display:grid;grid-template-columns:24px 1fr 110px 110px;gap:10px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px}
+.ff-row{display:grid;grid-template-columns:1fr 130px 1fr 34px;gap:8px;margin-bottom:8px}
+.ff-row input,.ff-row select{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px}
+.ff-del{border:none;background:#FEF2F2;color:#DC2626;border-radius:var(--radius-sm);cursor:pointer;font-size:15px}
+.row-end{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;align-items:center}
+.saved-msg{font-size:13px;color:#16A34A;font-weight:500;opacity:0;transition:opacity .3s}
+.saved-msg.show{opacity:1}
+.err-msg{font-size:13px;color:#DC2626}
+.toggle-row{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.empty{text-align:center;padding:50px 20px;color:var(--text-muted);font-size:14px}
+@media(max-width:640px){.content{padding:16px}.ev-body{padding:14px 16px}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+<div class="sb-section">Main</div>
+<a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+<a href="events.html" class="sb-item active"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+<a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+<a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+<a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+<a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+<div class="sb-section" style="margin-top:10px;">Config</div>
+<a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+<a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
+<a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+<a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+<a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+<a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+<div class="sb-spacer"></div><div class="sb-divider"></div><button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button></aside>
+<div class="main">
+<header class="topbar"><div class="topbar-left"><h1>Events</h1><p>Create, configure and manage all fitness events</p></div><div class="topbar-right"><button class="btn btn-primary" id="btn-new"><i class="ti ti-plus"></i> New Event</button></div></header>
+<div class="content">
+
+<div class="panel" id="editor">
+  <h2 id="editor-title"><i class="ti ti-calendar-plus"></i> New Event</h2>
+  <div class="grid">
+    <div class="fld"><label>Event Name</label><input id="f-name" placeholder="Arcgate Cyclathon 2027"></div>
+    <div class="fld"><label>Slug (URL id)</label><input id="f-slug" placeholder="auto-generated"></div>
+    <div class="fld"><label>Event Type</label><select id="f-type"><option value="walkathon">Walkathon</option><option value="cyclathon">Cyclathon</option><option value="steps">Steps Challenge</option><option value="fitness">Fitness / Multi-sport</option><option value="other">Other</option></select></div>
+    <div class="fld"><label>Status</label><select id="f-status"><option value="draft">Draft (hidden)</option><option value="upcoming">Upcoming</option><option value="live">Live</option><option value="ended">Ended</option><option value="archived">Archived</option></select></div>
+    <div class="fld"><label>Start Date</label><input type="date" id="f-start"></div>
+    <div class="fld"><label>End Date</label><input type="date" id="f-end"></div>
+    <div class="fld"><label>Registration Opens</label><input type="date" id="f-ropen"></div>
+    <div class="fld"><label>Registration Closes</label><input type="date" id="f-rclose"></div>
+    <div class="fld"><label>Accent Color</label><input type="color" id="f-color" value="#E8622A" style="height:40px;padding:4px"></div>
+    <div class="fld"><label>Banner Image URL</label><input id="f-banner" placeholder="https://... (optional)"></div>
+    <div class="fld fld-full"><label>Description</label><textarea id="f-desc" rows="2" placeholder="Shown to employees on the Events tab"></textarea></div>
+  </div>
+
+  <div class="subhead">Scoring</div>
+  <div class="grid" style="margin-bottom:14px">
+    <div class="fld"><label>Scoring Mode</label>
+      <select id="f-smode">
+        <option value="raw">Raw Metric — rank by total directly, no points</option>
+        <option value="single_metric" selected>Single Metric → Points (walkathon style)</option>
+        <option value="composite">Composite — points from multiple metrics</option>
+      </select>
+    </div>
+    <div class="fld" id="wrap-metric"><label>Primary Metric</label>
+      <select id="f-metric"><option value="distance_km">Distance (km)</option><option value="steps">Steps</option><option value="moving_time_min">Moving Time (min)</option><option value="elevation_m">Elevation Gain (m)</option><option value="activity_count">Activity Count</option></select>
+    </div>
+    <div class="fld" id="wrap-rate"><label>Points per unit</label><input type="number" id="f-rate" value="1" step="0.1"></div>
+  </div>
+  <div id="composite-box" style="display:none">
+    <div class="metric-head"><span></span><span>Metric</span><span>Pts / unit</span><span>Cap / activity</span></div>
+    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="distance_km" checked><span class="mname">Distance (per km)</span><input type="number" class="cm-rate" data-m="distance_km" value="10"><input type="number" class="cm-cap" data-m="distance_km" value="0" title="0 = no cap"></div>
+    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="elevation_m"><span class="mname">Elevation (per 10 m)</span><input type="number" class="cm-rate" data-m="elevation_m" value="1"><input type="number" class="cm-cap" data-m="elevation_m" value="0"></div>
+    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="moving_time_min"><span class="mname">Moving time (per 15 min)</span><input type="number" class="cm-rate" data-m="moving_time_min" value="1"><input type="number" class="cm-cap" data-m="moving_time_min" value="0"></div>
+    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="steps"><span class="mname">Steps (per 1000)</span><input type="number" class="cm-rate" data-m="steps" value="1"><input type="number" class="cm-cap" data-m="steps" value="0"></div>
+    <div class="fld" style="margin-top:10px;max-width:340px"><label>Bracket bonuses apply on</label><select id="f-bonusbase"><option value="composite_total">Composite total points</option><option value="primary_metric">Primary metric (distance)</option></select></div>
+  </div>
+
+  <div class="subhead">Counted Activity Types</div>
+  <div class="chips" id="sport-chips"></div>
+
+  <div class="subhead">Registration — Extra Questions <span style="font-weight:400;text-transform:none;letter-spacing:0">(core fields are always included)</span></div>
+  <div id="ff-list"></div>
+  <button class="btn btn-ghost btn-sm" id="btn-addff"><i class="ti ti-plus"></i> Add question</button>
+
+  <div class="subhead">After Event Ends</div>
+  <div class="toggle-row"><input type="checkbox" id="f-feedopen"><label for="f-feedopen" style="cursor:pointer">Keep feed open for reactions & comments after event ends</label></div>
+
+  <div class="row-end">
+    <span class="err-msg" id="ed-err"></span>
+    <span class="saved-msg" id="ed-saved">✅ Saved</span>
+    <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
+    <button class="btn btn-primary" id="btn-save"><i class="ti ti-device-floppy"></i> Save Event</button>
+  </div>
+</div>
+
+<div id="ev-list"><div class="empty">Loading events…</div></div>
+</div>
+</div>
+<script>
+var SB_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
+var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON,'Content-Type':'application/json'};
+function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}
+function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+authGuard();
+
+var SPORTS=['Walk','Run','Ride','Hike','Swim','Yoga','Workout','WeightTraining','EBikeRide','VirtualRun','TrailRun'];
+var EVENTS=[], editId=null;
+
+/* ---------- list ---------- */
+function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+async function loadEvents(){
+  var r=await fetch(SB_URL+'/rest/v1/events?select=*&order=start_date.desc',{headers:HDR});
+  EVENTS=await r.json();
+  renderList();
+}
+function renderList(){
+  var box=document.getElementById('ev-list');
+  box.textContent='';
+  if(!EVENTS.length){var e=document.createElement('div');e.className='empty';e.textContent='No events yet. Create your first event.';box.appendChild(e);return;}
+  EVENTS.forEach(function(ev){
+    var card=document.createElement('div');card.className='ev-card';
+    var acc=document.createElement('div');acc.className='ev-accent';acc.style.background=ev.accent_color||'#E8622A';card.appendChild(acc);
+    var body=document.createElement('div');body.className='ev-body';
+    var info=document.createElement('div');info.className='ev-info';
+    var nm=document.createElement('div');nm.className='ev-name';nm.textContent=ev.name;
+    var bd=document.createElement('span');bd.className='badge '+ev.status;bd.textContent=ev.status;nm.appendChild(bd);
+    var mt=document.createElement('div');mt.className='ev-meta';
+    var rc=(ev.rules_config||{});
+    mt.textContent=fmtD(ev.start_date)+' → '+fmtD(ev.end_date)+'  ·  '+(ev.event_type||'')+'  ·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
+    info.appendChild(nm);info.appendChild(mt);body.appendChild(info);
+    var acts=document.createElement('div');acts.className='ev-actions';
+    [['ti-pencil','Edit','edit'],['ti-copy','Clone','clone'],['ti-arrows-exchange','Status','status']].forEach(function(a){
+      var b=document.createElement('button');b.className='btn btn-ghost btn-sm';
+      var i=document.createElement('i');i.className='ti '+a[0];b.appendChild(i);b.appendChild(document.createTextNode(' '+a[1]));
+      b.setAttribute('data-act',a[2]);b.setAttribute('data-id',ev.id);
+      acts.appendChild(b);
+    });
+    body.appendChild(acts);card.appendChild(body);box.appendChild(card);
+  });
+}
+document.getElementById('ev-list').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-act]');if(!b)return;
+  var id=+b.getAttribute('data-id'), act=b.getAttribute('data-act');
+  var ev=EVENTS.find(function(x){return x.id===id});if(!ev)return;
+  if(act==='edit')openEditor(ev);
+  if(act==='clone')cloneEvent(ev);
+  if(act==='status')cycleStatus(ev);
+});
+
+/* ---------- editor ---------- */
+function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+document.getElementById('f-name').addEventListener('input',function(){
+  if(!editId)document.getElementById('f-slug').value=slugify(this.value);
+});
+document.getElementById('f-smode').addEventListener('change',updateScoringUI);
+function updateScoringUI(){
+  var m=document.getElementById('f-smode').value;
+  document.getElementById('composite-box').style.display=(m==='composite')?'block':'none';
+  document.getElementById('wrap-rate').style.display=(m==='single_metric')?'block':'none';
+  document.getElementById('wrap-metric').style.display=(m==='composite')?'none':'block';
+}
+function buildChips(sel){
+  var box=document.getElementById('sport-chips');box.textContent='';
+  SPORTS.forEach(function(s){
+    var c=document.createElement('div');c.className='chip'+((sel||[]).indexOf(s)>=0?' on':'');c.textContent=s;c.setAttribute('data-s',s);
+    box.appendChild(c);
+  });
+}
+document.getElementById('sport-chips').addEventListener('click',function(e){
+  var c=e.target.closest('.chip');if(c)c.classList.toggle('on');
+});
+function addFFRow(f){
+  f=f||{};
+  var row=document.createElement('div');row.className='ff-row';
+  var lab=document.createElement('input');lab.placeholder='Question label';lab.className='ff-label';lab.value=f.label||'';
+  var typ=document.createElement('select');typ.className='ff-type';
+  [['text','Text'],['dropdown','Dropdown'],['checkbox','Checkbox']].forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];typ.appendChild(op);});
+  typ.value=f.type||'text';
+  var opt=document.createElement('input');opt.placeholder='Options, comma separated (dropdown)';opt.className='ff-opts';opt.value=(f.options||[]).join(', ');
+  var del=document.createElement('button');del.className='ff-del';del.textContent='✕';
+  del.addEventListener('click',function(){row.remove();});
+  row.appendChild(lab);row.appendChild(typ);row.appendChild(opt);row.appendChild(del);
+  document.getElementById('ff-list').appendChild(row);
+}
+document.getElementById('btn-addff').addEventListener('click',function(){addFFRow();});
+
+function openEditor(ev){
+  editId=ev?ev.id:null;
+  document.getElementById('editor-title').innerHTML='<i class="ti ti-calendar-'+(ev?'cog':'plus')+'"></i> '+(ev?'Edit: '+ev.name:'New Event');
+  var rc=(ev&&ev.rules_config)||{};
+  document.getElementById('f-name').value=ev?ev.name:'';
+  document.getElementById('f-slug').value=ev?ev.slug:'';
+  document.getElementById('f-type').value=ev?(ev.event_type||'walkathon'):'walkathon';
+  document.getElementById('f-status').value=ev?ev.status:'draft';
+  document.getElementById('f-start').value=ev?(ev.start_date||''):'';
+  document.getElementById('f-end').value=ev?(ev.end_date||''):'';
+  document.getElementById('f-ropen').value=ev?(ev.registration_open_date||''):'';
+  document.getElementById('f-rclose').value=ev?(ev.registration_close_date||''):'';
+  document.getElementById('f-color').value=ev?(ev.accent_color||'#E8622A'):'#E8622A';
+  document.getElementById('f-banner').value=ev?(ev.banner_url||''):'';
+  document.getElementById('f-desc').value=ev?(ev.description||''):'';
+  document.getElementById('f-smode').value=rc.scoring_mode||'single_metric';
+  document.getElementById('f-metric').value=rc.metric||'distance_km';
+  document.getElementById('f-rate').value=(rc.rate!=null)?rc.rate:1;
+  document.getElementById('f-bonusbase').value=rc.bonus_base||'composite_total';
+  document.getElementById('f-feedopen').checked=!!rc.feed_open_after_end;
+  // composite rows
+  var comp=rc.composite||{};
+  document.querySelectorAll('.cm-on').forEach(function(cb){var m=cb.getAttribute('data-m');cb.checked=!!comp[m];});
+  document.querySelectorAll('.cm-rate').forEach(function(inp){var m=inp.getAttribute('data-m');if(comp[m]&&comp[m].rate!=null)inp.value=comp[m].rate;});
+  document.querySelectorAll('.cm-cap').forEach(function(inp){var m=inp.getAttribute('data-m');if(comp[m]&&comp[m].cap!=null)inp.value=comp[m].cap;});
+  buildChips(rc.sport_types||['Walk','Run']);
+  document.getElementById('ff-list').textContent='';
+  (rc.form_fields||[]).forEach(addFFRow);
+  updateScoringUI();
+  document.getElementById('editor').classList.add('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('btn-new').addEventListener('click',function(){openEditor(null);});
+document.getElementById('btn-cancel').addEventListener('click',function(){document.getElementById('editor').classList.remove('open');editId=null;});
+
+function collect(){
+  var name=document.getElementById('f-name').value.trim();
+  if(!name)throw new Error('Event name is required');
+  var start=document.getElementById('f-start').value, end=document.getElementById('f-end').value;
+  if(!start||!end)throw new Error('Start and end dates are required');
+  if(end<start)throw new Error('End date must be after start date');
+  var mode=document.getElementById('f-smode').value;
+  var rc={
+    scoring_mode:mode,
+    metric:document.getElementById('f-metric').value,
+    sport_types:Array.from(document.querySelectorAll('#sport-chips .chip.on')).map(function(c){return c.getAttribute('data-s')}),
+    feed_open_after_end:document.getElementById('f-feedopen').checked,
+    form_fields:Array.from(document.querySelectorAll('#ff-list .ff-row')).map(function(r){
+      return {label:r.querySelector('.ff-label').value.trim(),
+              type:r.querySelector('.ff-type').value,
+              options:r.querySelector('.ff-opts').value.split(',').map(function(s){return s.trim()}).filter(Boolean)};
+    }).filter(function(f){return f.label})
+  };
+  if(mode==='single_metric')rc.rate=parseFloat(document.getElementById('f-rate').value)||1;
+  if(mode==='composite'){
+    rc.composite={};
+    document.querySelectorAll('.cm-on').forEach(function(cb){
+      if(!cb.checked)return;var m=cb.getAttribute('data-m');
+      rc.composite[m]={rate:parseFloat(document.querySelector('.cm-rate[data-m="'+m+'"]').value)||0,
+                       cap:parseFloat(document.querySelector('.cm-cap[data-m="'+m+'"]').value)||0};
+    });
+    rc.bonus_base=document.getElementById('f-bonusbase').value;
+  }
+  return {
+    name:name,
+    slug:document.getElementById('f-slug').value.trim()||slugify(name),
+    event_type:document.getElementById('f-type').value,
+    status:document.getElementById('f-status').value,
+    start_date:start,end_date:end,
+    registration_open_date:document.getElementById('f-ropen').value||null,
+    registration_close_date:document.getElementById('f-rclose').value||null,
+    accent_color:document.getElementById('f-color').value,
+    banner_url:document.getElementById('f-banner').value.trim()||null,
+    description:document.getElementById('f-desc').value.trim()||null,
+    rules_config:rc
+  };
+}
+document.getElementById('btn-save').addEventListener('click',async function(){
+  var err=document.getElementById('ed-err');err.textContent='';
+  var btn=this;btn.disabled=true;
+  try{
+    var data=collect();
+    var r;
+    if(editId){
+      r=await fetch(SB_URL+'/rest/v1/events?id=eq.'+editId,{method:'PATCH',headers:Object.assign({},HDR,{Prefer:'return=representation'}),body:JSON.stringify(data)});
+    }else{
+      r=await fetch(SB_URL+'/rest/v1/events',{method:'POST',headers:Object.assign({},HDR,{Prefer:'return=representation'}),body:JSON.stringify(data)});
+    }
+    if(!r.ok){var eb=await r.text();throw new Error('Save failed '+r.status+': '+eb.slice(0,140));}
+    document.getElementById('ed-saved').classList.add('show');
+    setTimeout(function(){document.getElementById('ed-saved').classList.remove('show')},2200);
+    document.getElementById('editor').classList.remove('open');editId=null;
+    await loadEvents();
+  }catch(e){err.textContent='❌ '+e.message;}
+  btn.disabled=false;
+});
+
+/* ---------- status cycle ---------- */
+async function cycleStatus(ev){
+  var order=['draft','upcoming','live','ended','archived'];
+  var next=order[(order.indexOf(ev.status)+1)%order.length];
+  if(!confirm('Change "'+ev.name+'" status: '+ev.status+' → '+next+' ?'))return;
+  var r=await fetch(SB_URL+'/rest/v1/events?id=eq.'+ev.id,{method:'PATCH',headers:HDR,body:JSON.stringify({status:next})});
+  if(!r.ok){alert('Status change failed '+r.status);return;}
+  loadEvents();
+}
+
+/* ---------- clone ---------- */
+async function cloneEvent(ev){
+  if(!confirm('Clone "'+ev.name+'" with its challenges & special days as a new Draft event?'))return;
+  var copy={name:ev.name+' (Copy)',slug:ev.slug+'-copy-'+Date.now().toString(36),
+    event_type:ev.event_type,status:'draft',start_date:ev.start_date,end_date:ev.end_date,
+    registration_open_date:ev.registration_open_date,registration_close_date:ev.registration_close_date,
+    accent_color:ev.accent_color,banner_url:ev.banner_url,description:ev.description,rules_config:ev.rules_config||{}};
+  var r=await fetch(SB_URL+'/rest/v1/events',{method:'POST',headers:Object.assign({},HDR,{Prefer:'return=representation'}),body:JSON.stringify(copy)});
+  if(!r.ok){alert('Clone failed '+r.status);return;}
+  var newEv=(await r.json())[0];
+  var report=['Event cloned as Draft.'];
+  // copy challenges
+  try{
+    var cr=await fetch(SB_URL+'/rest/v1/challenges?event_id=eq.'+ev.id+'&select=*',{headers:HDR});
+    var chs=await cr.json();
+    for(var i=0;i<chs.length;i++){
+      var c=Object.assign({},chs[i]);delete c.id;c.event_id=newEv.id;c.is_active=false;
+      await fetch(SB_URL+'/rest/v1/challenges',{method:'POST',headers:HDR,body:JSON.stringify(c)});
+    }
+    report.push(chs.length+' challenges copied (inactive).');
+  }catch(e){report.push('⚠️ challenges copy failed');}
+  // copy special days
+  try{
+    var sr=await fetch(SB_URL+'/rest/v1/special_scoring_days?event_id=eq.'+ev.id+'&select=*',{headers:HDR});
+    var sds=await sr.json();
+    for(var j=0;j<sds.length;j++){
+      var s=Object.assign({},sds[j]);delete s.id;s.event_id=newEv.id;
+      await fetch(SB_URL+'/rest/v1/special_scoring_days',{method:'POST',headers:HDR,body:JSON.stringify(s)});
+    }
+    report.push(sds.length+' special days copied.');
+  }catch(e){report.push('⚠️ special days copy failed');}
+  alert(report.join('\n'));
+  loadEvents();
+}
+
+buildChips(['Walk','Run']);
+updateScoringUI();
+loadEvents();
+</script>
+</body>
+</html>
