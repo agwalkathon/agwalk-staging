@@ -13,7 +13,7 @@ var _activeInsight = null;
 var _activeRecovery = null;
 var _notificationsList = [];
 var _notificationsLoaded = false;
-var TAB_ORDER = ['dashboard', 'activities', 'leaderboard', 'events', 'you'];
+var TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'you'];
 
 // Tab Order for indicator rendering
 function updateNavIndicator() {
@@ -21,7 +21,7 @@ function updateNavIndicator() {
   var indicator = document.getElementById('nav-indicator');
   var activeItem = bnav ? bnav.querySelector('.bnav-item.active') : null;
   if (!bnav || !indicator || !activeItem) return;
-  var items = Array.from(bnav.querySelectorAll('.bnav-item'));
+  var items = Array.from(bnav.querySelectorAll('.bnav-item')).filter(function(el){ return el.offsetParent !== null; });
   var idx = items.indexOf(activeItem);
   if (idx === -1) return;
   var w = 100 / items.length;
@@ -1353,7 +1353,7 @@ function initializeFeedTab(enabled) {
   
   if (enabled) {
     if (TAB_ORDER.indexOf('feed') === -1) {
-      TAB_ORDER.splice(4, 0, 'feed');
+      TAB_ORDER.splice(3, 0, 'feed');
     }
     if (bnavFeed) bnavFeed.style.display = '';
     if (tabFeed) tabFeed.classList.remove('hidden-tab');
