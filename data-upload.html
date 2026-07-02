@@ -160,7 +160,6 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
   <div class="sb-section">Main</div>
   <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
-<a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
   <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
   <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
   <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
@@ -287,6 +286,16 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <div class="dz-sub" id="dz-sub">Supports template format (raw) or standard DB format</div>
           </div>
           <input type="file" id="file-input" accept=".csv" style="display:none">
+
+          <div style="margin-top:12px;margin-bottom:16px;display:flex;align-items:center;gap:16px;font-size:13px;color:#555">
+            <span style="font-weight:600">Distance Unit in CSV:</span>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:4px">
+              <input type="radio" name="csv-unit" value="km" checked> Kilometers (default)
+            </label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:4px">
+              <input type="radio" name="csv-unit" value="mi"> Miles (auto-convert to km)
+            </label>
+          </div>
 
           <div class="stats-row" id="stats-row" style="display:none">
             <div class="stat-box"><div class="sv" id="st-total">0</div><div class="sl">Total rows</div></div>
@@ -451,7 +460,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
-var BACKEND_URL  = 'https://agwalk-backend.onrender.com';
+var BACKEND_URL  = 'https://walkathon-backend-hv9j.onrender.com';
       const ADMIN_SECRET = 'agwalk-admin-2026-xK9mPqR7';
 
 function toggleFormatRef() {
@@ -462,7 +471,7 @@ function toggleFormatRef() {
   chev.textContent = open ? '▼ Show' : '▲ Hide';
 }
 
-var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+var _BU='https://walkathon-backend-hv9j.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
 
 // ── Tab switching ────────────────────────────────────────────
@@ -520,11 +529,17 @@ function isRawFormat(headers) {
 }
 
 // Convert a raw-format row to DB-ready object
-function convertRawRow(raw) {
+function convertRawRow(raw, isMiles) {
   var athleteId = extractStravaId(raw['athlete_url'] || raw['strava_athlete_id']);
   var activityId = extractStravaId(raw['activity_url'] || raw['strava_activity_id']);
   var distKm = parseFloat(raw['distance_km'] || raw['distance_meters'] / 1000) || 0;
+  if (isMiles) {
+    distKm = distKm * 1.609344;
+  }
   var distM = raw['distance_km'] ? Math.round(distKm * 1000) : (parseFloat(raw['distance_meters']) || 0);
+  if (!raw['distance_km'] && isMiles) {
+    distM = Math.round(distM * 1.609344);
+  }
   var secs = durationToSeconds(raw['duration']) || parseInt(raw['moving_time_seconds']) || null;
   var speed = (secs && distM) ? parseFloat((distM / secs).toFixed(4)) : null;
   var dateRaw = (raw['activity_date'] || '').trim();
@@ -610,11 +625,18 @@ async function handleFile(file) {
   var raw = isRawFormat(parsed.headers);
   document.getElementById('dz-text').textContent = '✅ ' + file.name + (raw ? ' (raw template — will auto-convert)' : ' (standard format)');
   document.getElementById('dz-sub').textContent  = parsed.rows.length + ' rows found — checking duplicates…';
-
   existingIds = await loadExistingIds();
-
+  var isMiles = false;
+  var unitEl = document.querySelector('input[name="csv-unit"]:checked');
+  if (unitEl && unitEl.value === 'mi') {
+    isMiles = true;
+  }
   parsedRows = parsed.rows.map(function(row, i) {
-    var converted = raw ? convertRawRow(row) : null;
+    if (!raw && isMiles && row['distance_meters']) {
+      var milesVal = parseFloat(row['distance_meters']) || 0;
+      row['distance_meters'] = String(Math.round(milesVal * 1609.344));
+    }
+    var converted = raw ? convertRawRow(row, isMiles) : null;
     var finalRow = raw ? {
       strava_activity_id: String(converted.strava_activity_id || ''),
       strava_athlete_id:  String(converted.strava_athlete_id || ''),
