@@ -88,7 +88,37 @@ body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 
   <div class="tab-pane" id="pane-celebrate">
-    <div class="placeholder"><div class="big">🎉</div><div style="font-size:16px;font-weight:600;color:var(--muted)">Celebrate is coming soon</div><div style="font-size:13px;margin-top:6px">Birthdays, anniversaries and moments worth sharing — all in one feed.</div></div>
+    <button id="btn-new-post" style="width:100%;padding:13px;background:var(--surface2);border:1px dashed var(--border);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">✨ Share something to celebrate…</button>
+    <div id="celebrate-feed"><div class="skel"></div><div class="skel"></div></div>
+  </div>
+
+  <!-- wish drawer -->
+  <div id="wish-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end" >
+    <div style="background:var(--surface);width:100%;max-height:80dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column">
+      <div style="padding:16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
+        <div style="font-size:15px;font-weight:600" id="wish-title">Wishes</div>
+        <button id="wish-close" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div id="wish-list" style="flex:1;overflow-y:auto;padding:14px 18px"></div>
+      <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;padding-bottom:calc(12px + env(safe-area-inset-bottom))">
+        <input id="wish-input" placeholder="Write a wish…" style="flex:1;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px">
+        <button id="wish-send" style="padding:12px 18px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:600;font-family:inherit;cursor:pointer">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- new post drawer -->
+  <div id="post-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end">
+    <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:600">Share a celebration</div>
+        <button id="post-close" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <input id="post-title" placeholder="Title (e.g. We got married! 💍)" maxlength="120" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
+      <textarea id="post-msg" placeholder="Tell everyone about it… (optional)" rows="3" maxlength="2000" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;resize:none"></textarea>
+      <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
+      <button id="post-submit" style="width:100%;padding:13px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer">Post</button>
+    </div>
   </div>
 
   <div class="tab-pane hidden" id="pane-events">
@@ -348,7 +378,158 @@ async function loadProfile(){
   }
 }
 
+/* ---------- Celebrate feed ---------- */
+var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'] };
+var EMOJIS = ['🎉','❤️','👏'];
+var _wishFor = null;
+
+async function loadCelebrate(){
+  var box = document.getElementById('celebrate-feed');
+  try {
+    var r = await fetch(BACKEND + '/celebrate/feed', { headers: { Authorization: 'Bearer ' + getToken() } });
+    if (r.status === 401) { clearSession(); location.reload(); return; }
+    var d = await r.json();
+    box.textContent = '';
+    if (!d.items || !d.items.length) {
+      box.innerHTML = '<div class="placeholder"><div class="big">🎉</div>No celebrations yet.<br>Be the first to share one!</div>';
+      return;
+    }
+    d.items.forEach(function(c){ box.appendChild(buildCelebCard(c)); });
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load the feed. Pull to retry.</div>';
+  }
+}
+
+function buildCelebCard(c){
+  var meta = TYPE_META[c.type] || TYPE_META.custom;
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.style.borderLeft = '4px solid ' + meta[1];
+
+  var head = document.createElement('div');
+  head.style.cssText = 'display:flex;align-items:center;gap:11px;';
+  var av = document.createElement('div');
+  av.style.cssText = 'width:42px;height:42px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0;';
+  if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; im.style.cssText='width:100%;height:100%;object-fit:cover'; av.appendChild(im); }
+  else av.textContent = meta[0];
+  var ht = document.createElement('div');
+  var t1 = document.createElement('div'); t1.style.cssText = 'font-size:14.5px;font-weight:600;line-height:1.35;'; t1.textContent = c.title;
+  var t2 = document.createElement('div'); t2.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:2px;';
+  t2.textContent = (c.employee && c.employee.department ? c.employee.department + ' · ' : '') + c.celebrate_date;
+  ht.appendChild(t1); ht.appendChild(t2);
+  head.appendChild(av); head.appendChild(ht);
+  card.appendChild(head);
+
+  if (c.message) {
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;';
+    msg.textContent = c.message;
+    card.appendChild(msg);
+  }
+
+  var bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:12px;';
+  EMOJIS.forEach(function(em){
+    var b = document.createElement('button');
+    var count = (c.reactions && c.reactions[em]) || 0;
+    var mine = (c.my_reactions || []).indexOf(em) > -1;
+    b.style.cssText = 'padding:6px 12px;border-radius:20px;border:1px solid ' + (mine ? 'var(--brand)' : 'var(--border)') + ';background:' + (mine ? 'rgba(232,98,42,.12)' : 'transparent') + ';color:#fff;font-family:inherit;font-size:13px;cursor:pointer;';
+    b.textContent = em + (count ? ' ' + count : '');
+    b.addEventListener('click', async function(){
+      try {
+        var rr = await fetch(BACKEND + '/celebrate/react', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: c.id, emoji: em }) });
+        var dd = await rr.json();
+        if (dd.success) {
+          c.reactions = c.reactions || {};
+          c.my_reactions = c.my_reactions || [];
+          if (dd.reacted) { c.reactions[em] = (c.reactions[em]||0)+1; c.my_reactions.push(em); }
+          else { c.reactions[em] = Math.max(0,(c.reactions[em]||1)-1); c.my_reactions = c.my_reactions.filter(function(x){return x!==em;}); }
+          var nc = (c.reactions[em]||0);
+          b.textContent = em + (nc ? ' ' + nc : '');
+          var m2 = c.my_reactions.indexOf(em) > -1;
+          b.style.borderColor = m2 ? 'var(--brand)' : 'var(--border)';
+          b.style.background = m2 ? 'rgba(232,98,42,.12)' : 'transparent';
+        }
+      } catch(e){}
+    });
+    bar.appendChild(b);
+  });
+  var wb = document.createElement('button');
+  wb.style.cssText = 'margin-left:auto;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;cursor:pointer;';
+  wb.textContent = '💬 ' + (c.wish_count || 0) + ' wishes';
+  wb.addEventListener('click', function(){ openWishes(c); });
+  bar.appendChild(wb);
+  card.appendChild(bar);
+  return card;
+}
+
+async function openWishes(c){
+  _wishFor = c;
+  document.getElementById('wish-title').textContent = c.title;
+  document.getElementById('wish-list').innerHTML = '<div class="skel" style="height:50px"></div>';
+  document.getElementById('wish-drawer').classList.remove('hidden');
+  try {
+    var r = await fetch(BACKEND + '/celebrate/wishes?celebration_id=' + c.id, { headers: { Authorization: 'Bearer ' + getToken() } });
+    var d = await r.json();
+    var list = document.getElementById('wish-list');
+    list.textContent = '';
+    if (!d.wishes || !d.wishes.length) { list.innerHTML = '<div style="text-align:center;color:var(--label);padding:26px;font-size:13px">No wishes yet — be the first! 🎈</div>'; return; }
+    d.wishes.forEach(function(w){
+      var row = document.createElement('div');
+      row.style.cssText = 'margin-bottom:12px;';
+      var nm = document.createElement('div'); nm.style.cssText = 'font-size:12px;font-weight:600;color:var(--brand-soft);'; nm.textContent = (w.employee && w.employee.full_name) || w.emp_code;
+      var mg = document.createElement('div'); mg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:2px;line-height:1.4;'; mg.textContent = w.message;
+      row.appendChild(nm); row.appendChild(mg); list.appendChild(row);
+    });
+    list.scrollTop = list.scrollHeight;
+  } catch(e){}
+}
+document.getElementById('wish-close').addEventListener('click', function(){ document.getElementById('wish-drawer').classList.add('hidden'); });
+document.getElementById('wish-drawer').addEventListener('click', function(e){ if (e.target === this) this.classList.add('hidden'); });
+document.getElementById('wish-send').addEventListener('click', async function(){
+  var inp = document.getElementById('wish-input');
+  var msg = inp.value.trim();
+  if (!msg || !_wishFor) return;
+  this.disabled = true;
+  try {
+    var r = await fetch(BACKEND + '/celebrate/wish', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: _wishFor.id, message: msg }) });
+    var d = await r.json();
+    if (d.success) {
+      inp.value = '';
+      if (d.status === 'pending') {
+        var list = document.getElementById('wish-list');
+        var n = document.createElement('div'); n.style.cssText='text-align:center;color:#F59E0B;font-size:12px;padding:8px'; n.textContent='Your wish is pending admin approval ✓'; list.appendChild(n);
+      } else { openWishes(_wishFor); }
+    }
+  } catch(e){}
+  this.disabled = false;
+});
+
+document.getElementById('btn-new-post').addEventListener('click', function(){ document.getElementById('post-drawer').classList.remove('hidden'); });
+document.getElementById('post-close').addEventListener('click', function(){ document.getElementById('post-drawer').classList.add('hidden'); });
+document.getElementById('post-drawer').addEventListener('click', function(e){ if (e.target === this) this.classList.add('hidden'); });
+document.getElementById('post-submit').addEventListener('click', async function(){
+  var title = document.getElementById('post-title').value.trim();
+  var msg = document.getElementById('post-msg').value.trim();
+  var err = document.getElementById('post-err');
+  err.textContent = '';
+  if (!title) { err.textContent = 'Please give it a title'; return; }
+  this.disabled = true;
+  try {
+    var r = await fetch(BACKEND + '/celebrate/post', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ title: title, message: msg }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Failed');
+    document.getElementById('post-drawer').classList.add('hidden');
+    document.getElementById('post-title').value = ''; document.getElementById('post-msg').value = '';
+    if (d.status === 'pending') alert('Submitted! Your post will appear after admin approval. 🎉');
+    else loadCelebrate();
+  } catch(e) { err.textContent = e.message; }
+  this.disabled = false;
+});
+
 /* ---------- boot ---------- */
+var _origEnterApp = enterApp;
+enterApp = function(){ _origEnterApp(); loadCelebrate(); };
 if (tokenValid(getToken())) enterApp();
 </script>
 </body>
