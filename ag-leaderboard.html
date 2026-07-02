@@ -460,7 +460,7 @@ async function loadEventSelector(){
     sel.value="1";
     sel.addEventListener("change",async function(){
       EV_ID=(this.value==="1")?null:parseInt(this.value);
-      document.getElementById("board").innerHTML="";
+      
       await loadAll();
     });
   }catch(e){console.warn("event selector failed",e);}
