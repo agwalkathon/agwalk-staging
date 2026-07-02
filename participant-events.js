@@ -168,7 +168,7 @@ function buildEventCard(ev, group) {
     var lb = document.createElement('button');
     lb.className = 'ev-btn';
     lb.textContent = group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard';
-    lb.addEventListener('click', function(){ showTab('leaderboard'); });
+    lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
     actions.appendChild(lb);
     if (group === 'live' && !enrolled) {
       var sp = document.createElement('div');
@@ -205,3 +205,99 @@ function buildEventCard(ev, group) {
   card.appendChild(body);
   return card;
 }
+
+// ===== Event-scoped leaderboard switching =====
+var _lbCurrentEventId = 1;          // event 1 = Walkathon 2026, the data Phase 1/2 loads by default
+var _lbDefaultState = null;         // saved event-1 globals
+var _lbEventCache = {};             // fetched data per event id
+
+function setLbTitle(txt) {
+  var el = document.getElementById('lb-event-title');
+  if (el) { el.textContent = txt || ''; el.style.display = txt ? 'block' : 'none'; }
+}
+
+function saveDefaultLbState() {
+  if (_lbDefaultState) return;
+  _lbDefaultState = {
+    acts: LB_ACTS, reg: LB_REG,
+    bonus: CONFIG_LB.bonus, basePer_km: CONFIG_LB.basePer_km,
+    challenges: CHALLENGES_LB, specialDays: SPECIAL_DAYS_LB
+  };
+}
+
+function applyLbState(st) {
+  LB_ACTS = st.acts; LB_REG = st.reg;
+  CONFIG_LB.bonus = st.bonus; CONFIG_LB.basePer_km = st.basePer_km;
+  CHALLENGES_LB = st.challenges; SPECIAL_DAYS_LB = st.specialDays;
+  LB_SCORES = {};
+  _lbReady = false;
+}
+
+async function fetchEventLbState(evId) {
+  if (_lbEventCache[evId]) return _lbEventCache[evId];
+  var slimActs = '&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist';
+  var results = await Promise.all([
+    fetchAllParallel(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + evId + '&is_deleted=is.false&order=id.asc' + slimActs),
+    fetchAllParallel(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + evId + '&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
+    fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=eq.' + evId + '&select=config_key,config_value', { headers: HDR }).then(function(r){ return r.json(); }),
+    fetch(SUPABASE_URL + '/rest/v1/challenges?event_id=eq.' + evId + '&is_active=is.true&select=*', { headers: HDR }).then(function(r){ return r.json(); }),
+    fetch(SUPABASE_URL + '/rest/v1/special_scoring_days?event_id=eq.' + evId + '&select=special_date', { headers: HDR }).then(function(r){ return r.json(); })
+  ]);
+  var bonus = null, basePer = 1;
+  (Array.isArray(results[2]) ? results[2] : []).forEach(function(row){
+    if (row.config_key === 'bonus_points') bonus = row.config_value.map(function(b){ return { km: Number(b.km), points: Number(b.points || b.pts || 0) }; });
+    if (row.config_key === 'base_points') basePer = parseFloat(row.config_value.per_km || 1);
+    if (row.config_key === 'base_points_per_km') basePer = parseFloat(row.config_value) || 1;
+  });
+  var st = {
+    acts: results[0] || [], reg: results[1] || [],
+    bonus: bonus || [], basePer_km: basePer,
+    challenges: Array.isArray(results[3]) ? results[3] : [],
+    specialDays: (Array.isArray(results[4]) ? results[4] : []).map(function(x){ return x.special_date; })
+  };
+  _lbEventCache[evId] = st;
+  return st;
+}
+
+async function openEventLeaderboard(ev) {
+  try {
+    var suffix = (ev.status === 'ended' || ev.status === 'archived') ? ' — Final Results' : '';
+    if (ev.id === _lbCurrentEventId) {
+      setLbTitle(_lbCurrentEventId === 1 ? '' : '🏆 ' + ev.name + suffix);
+      showTab('leaderboard');
+      return;
+    }
+    if (ev.id === 1 && _lbDefaultState) {
+      applyLbState(_lbDefaultState);
+      _lbCurrentEventId = 1;
+      setLbTitle('');
+      showTab('leaderboard');
+      lbBoot();
+      return;
+    }
+    saveDefaultLbState();
+    var st = await fetchEventLbState(ev.id);
+    applyLbState(st);
+    _lbCurrentEventId = ev.id;
+    setLbTitle('🏆 ' + ev.name + suffix);
+    showTab('leaderboard');
+    lbBoot();
+  } catch (e) {
+    console.warn('openEventLeaderboard failed:', e);
+    showTab('leaderboard');
+  }
+}
+
+// When the nav Leaderboard icon is tapped directly, always show the default (event 1) board
+(function hookNavLeaderboardReset(){
+  var nav = document.getElementById('bnav-leaderboard');
+  if (!nav) return;
+  nav.addEventListener('click', function(){
+    if (_lbCurrentEventId !== 1 && _lbDefaultState) {
+      applyLbState(_lbDefaultState);
+      _lbCurrentEventId = 1;
+      setLbTitle('');
+      lbBoot();
+    }
+  });
+})();
