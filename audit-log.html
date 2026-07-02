@@ -304,7 +304,7 @@
 <script>
 /* audit-log v5 */
 // Inline authGuard — no _nav.js dependency
-var _BU = 'https://walkathon-backend-hv9j.onrender.com';
+var _BU = 'https://agwalk-backend.onrender.com';
 function authGuard() {
   var t = sessionStorage.getItem('wk_admin_token');
   if (!t) { window.location.href = 'admin-login.html'; return; }
@@ -642,7 +642,7 @@ async function flagReportedActivity(reportId, activityId, reason) {
     });
     if (!resp.ok) throw new Error('Database patch failed with status: ' + resp.status);
     
-    var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
+    var BACKEND_URL = 'https://agwalk-backend.onrender.com';
     await fetch(BACKEND_URL + '/flag', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

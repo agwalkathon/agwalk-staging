@@ -1,16 +1,16 @@
   <!-- PWA -->
-  <link rel="manifest" href="/agwalk/manifest.json">
+  <link rel="manifest" href="/agwalk-staging/manifest.json">
   <meta name="theme-color" content="#E8622A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AG Walkathon">
-  <link rel="apple-touch-icon" href="/agwalk/icon-192.png">
+  <link rel="apple-touch-icon" href="/agwalk-staging/icon-192.png">
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Redirecting</title><script>var s=JSON.parse(localStorage.getItem('wk_user')||'{}');if(s&&s.loggedIn){window.location.replace('participant.html');}else{window.location.replace('index.html');}</script></head><body><p>Redirecting...</p>
   <!-- PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/agwalk/sw.js')
+        navigator.serviceWorker.register('/agwalk-staging/sw.js')
           .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
           .catch(function(err) { console.log('[SW] Registration failed:', err); });
       });

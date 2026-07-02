@@ -33,10 +33,10 @@ self.addEventListener('push', function(event) {
   var title   = data.title || 'Walkathon Alert';
   var options = {
     body:    data.body || '',
-    icon:    '/agwalk/logo-icon.png',
-    badge:   '/agwalk/logo-icon.png',
+    icon:    '/agwalk-staging/logo-icon.png',
+    badge:   '/agwalk-staging/logo-icon.png',
     vibrate: [200, 100, 200],
-    data:    { url: data.url || 'https://agwalkathon.github.io/agwalk/participant.html' },
+    data:    { url: data.url || 'https://agwalkathon.github.io/agwalk-staging/participant.html' },
     actions: [{ action: 'open', title: 'View' }]
   };
   event.waitUntil(self.registration.showNotification(title, options));
@@ -44,6 +44,6 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  var url = (event.notification.data && event.notification.data.url) || 'https://agwalkathon.github.io/agwalk/participant.html';
+  var url = (event.notification.data && event.notification.data.url) || 'https://agwalkathon.github.io/agwalk-staging/participant.html';
   event.waitUntil(clients.openWindow(url));
 });

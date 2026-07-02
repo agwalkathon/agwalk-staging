@@ -1,5 +1,5 @@
 // Shared auth guard and nav helper
-const _BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
+const _BACKEND_URL = 'https://agwalk-backend.onrender.com';
 
 function authGuard() {
   var token = sessionStorage.getItem('wk_admin_token');

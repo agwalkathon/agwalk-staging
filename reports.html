@@ -1761,7 +1761,7 @@
         });
         if (!resp.ok) throw new Error('Database patch failed with status: ' + resp.status);
         
-        var BACKEND_URL = 'https://walkathon-backend-hv9j.onrender.com';
+        var BACKEND_URL = 'https://agwalk-backend.onrender.com';
         await fetch(BACKEND_URL + '/flag', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

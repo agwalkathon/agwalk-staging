@@ -2538,7 +2538,7 @@ function clearPWACache(btn) {
 // ── Service Worker & Push Notifications ──────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/agwalk/sw.js')
+    navigator.serviceWorker.register('/agwalk-staging/sw.js')
       .then(function(reg) { 
         console.log('[SW] Registered:', reg.scope); 
         setTimeout(checkPushSubscriptionState, 1000);

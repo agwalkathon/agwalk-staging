@@ -1,6 +1,6 @@
 // Global Configuration and State Variables
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-var BACKEND      = 'https://walkathon-backend-hv9j.onrender.com';
+var BACKEND      = 'https://agwalk-backend.onrender.com';
 var _currentTab  = 'dashboard';
 var _feedData    = [];
 var LB_REG       = [];
