@@ -419,6 +419,32 @@ async function loadProfile(){
       var v = document.createElement('div'); v.className = 'val'; v.textContent = f[1] || '—';
       c.appendChild(l); c.appendChild(v); box.appendChild(c);
     });
+    // push notifications card
+    var pc = document.createElement('div'); pc.className = 'card';
+    pc.style.cssText += 'display:flex;align-items:center;justify-content:space-between;gap:12px;';
+    var pinfo = document.createElement('div');
+    var pl = document.createElement('div'); pl.className = 'lbl'; pl.textContent = 'Push Notifications';
+    var pv = document.createElement('div'); pv.style.cssText = 'font-size:12.5px;color:var(--muted);'; pv.textContent = 'Checking…';
+    pinfo.appendChild(pl); pinfo.appendChild(pv);
+    var pbtn = document.createElement('button');
+    pbtn.style.cssText = 'padding:9px 16px;background:var(--brand);border:none;border-radius:10px;color:#fff;font-weight:700;font-family:inherit;font-size:12.5px;cursor:pointer;flex-shrink:0;';
+    pbtn.textContent = 'Enable';
+    pbtn.style.display = 'none';
+    pc.appendChild(pinfo); pc.appendChild(pbtn);
+    box.appendChild(pc);
+    pushStatus().then(function(st){
+      if (st === 'on') { pv.textContent = 'Enabled — you\'ll get birthday & wish alerts 🎉'; }
+      else if (st === 'unsupported') { pv.textContent = 'Not supported on this browser'; }
+      else if (st === 'denied') { pv.textContent = 'Blocked — allow notifications in browser settings'; }
+      else { pv.textContent = 'Get alerts for wishes and approvals'; pbtn.style.display = 'block'; }
+    });
+    pbtn.addEventListener('click', async function(){
+      pbtn.disabled = true; pbtn.textContent = '…';
+      try { await enablePush(); pv.textContent = 'Enabled — you\'ll get birthday & wish alerts 🎉'; pbtn.style.display = 'none'; }
+      catch(e){ pv.textContent = e.message; pbtn.textContent = 'Enable'; }
+      pbtn.disabled = false;
+    });
+
     var lo = document.createElement('button');
     lo.className = 'logout-btn'; lo.textContent = 'Sign Out';
     lo.addEventListener('click', function(){ clearSession(); location.reload(); });
@@ -754,6 +780,40 @@ document.getElementById('bell-btn').addEventListener('click', function(){
 document.getElementById('notif-panel').addEventListener('click', function(e){
   if (e.target === this) { this.classList.add('hidden'); _notifOpen = false; }
 });
+
+/* ---------- push notifications ---------- */
+function urlB64ToUint8(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = window.atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+async function pushStatus(){
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
+  if (Notification.permission === 'denied') return 'denied';
+  try {
+    var reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return 'off';
+    var sub = await reg.pushManager.getSubscription();
+    return sub ? 'on' : 'off';
+  } catch(e){ return 'off'; }
+}
+async function enablePush(){
+  var reg = await navigator.serviceWorker.register('sw.js');
+  await navigator.serviceWorker.ready;
+  var perm = await Notification.requestPermission();
+  if (perm !== 'granted') throw new Error('Permission not granted');
+  var vk = await fetch(BACKEND + '/vapid-public-key').then(function(r){ return r.json(); });
+  var sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(vk.publicKey) });
+  var r = await fetch(BACKEND + '/employee/push/subscribe', {
+    method: 'POST', headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + getToken() },
+    body: JSON.stringify({ subscription: sub })
+  });
+  var d = await r.json();
+  if (!d.success) throw new Error(d.error || 'Subscribe failed');
+}
 
 /* ---------- boot ---------- */
 var _origEnterApp = enterApp;
