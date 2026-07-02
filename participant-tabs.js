@@ -763,7 +763,7 @@ function precomputeLBScores() {
   LB_REG.forEach(function(p) {
     var aid = String(p.strava_athlete_id);
     var pActs = actsByAthlete[aid] || [];
-    LB_SCORES[aid] = calcFullPts(pActs, p.gender, p.shift);
+    LB_SCORES[aid] = calcFullPtsAdaptive(pActs, p.gender, p.shift);
   });
 }
 
@@ -1080,7 +1080,7 @@ function lbRender() {
         }).map(function(q) {
           var aid = String(q.strava_athlete_id);
           var acts = oldActsMap[aid] || [];
-          return { id: aid, pts: calcFullPts(acts, q.gender, q.shift).total };
+          return { id: aid, pts: calcFullPtsAdaptive(acts, q.gender, q.shift).total };
         }).filter(function(r) { return r.pts > 0; }).sort(function(a, b) { return b.pts - a.pts; });
         
         var oldRank = oldRows.findIndex(function(r) { return r.id === String(meId); }) + 1;

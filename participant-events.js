@@ -276,6 +276,7 @@ async function openEventLeaderboard(ev) {
     }
     if (ev.id === 1 && _lbDefaultState) {
       applyLbState(_lbDefaultState);
+      _LB_EV_RULES = null;
       _lbCurrentEventId = 1;
       setLbTitle('');
       showTab('leaderboard');
@@ -285,6 +286,7 @@ async function openEventLeaderboard(ev) {
     saveDefaultLbState();
     var st = await fetchEventLbState(ev.id);
     applyLbState(st);
+    _LB_EV_RULES = ev.rules_config || null;
     _lbCurrentEventId = ev.id;
     setLbTitle('🏆 ' + ev.name + suffix);
     showTab('leaderboard');
@@ -302,6 +304,7 @@ async function openEventLeaderboard(ev) {
   nav.addEventListener('click', function(){
     if (_lbCurrentEventId !== 1 && _lbDefaultState) {
       applyLbState(_lbDefaultState);
+      _LB_EV_RULES = null;
       _lbCurrentEventId = 1;
       setLbTitle('');
       lbBoot();
