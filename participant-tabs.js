@@ -923,10 +923,7 @@ function renderRows(rows, prevRanks) {
     var _raw = lbScoringMode()==='raw';
     var _metricCell = '<div class="detail-cell"><div class="detail-cell-lbl">📏 ' + (_raw||lbIsLegacyScoring()===false ? _mm.label : 'Distance') + '</div><div class="detail-cell-val blue">' + r.pts.km.toFixed(_mm.dec===0?0:1) + (lbScoringMetric()==='distance_km'?' km':'') + '</div></div>';
     detail.innerHTML = (_raw ?
-      '<div class="detail-grid">' +
-        _metricCell +
-        '<div class="detail-cell" style="grid-column:span 3"><div class="detail-cell-lbl">🏆 Total ' + _mm.short + '</div><div class="detail-cell-val brand" style="font-size:18px;">' + r.pts.total.toFixed(_mm.dec) + '</div></div>' +
-      '</div>'
+      ''
       :
       '<div class="detail-grid">' +
         _metricCell +

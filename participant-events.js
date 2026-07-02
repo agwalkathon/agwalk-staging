@@ -127,10 +127,10 @@ function buildEventCard(ev, group) {
   name.className = 'ev-card-name';
   name.textContent = ev.name;
   top.appendChild(name);
-  if (group === 'live') {
-    var lv = document.createElement('span'); lv.className = 'ev-pill ev-pill-live'; lv.textContent = '● LIVE'; top.appendChild(lv);
-  } else if (enrolled) {
+  if (enrolled) {
     var en = document.createElement('span'); en.className = 'ev-pill ev-pill-enrolled'; en.textContent = '✓ Enrolled'; top.appendChild(en);
+  } else if (group === 'live') {
+    var lv = document.createElement('span'); lv.className = 'ev-pill ev-pill-live'; lv.textContent = '● LIVE'; top.appendChild(lv);
   }
   body.appendChild(top);
 
