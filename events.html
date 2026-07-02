@@ -134,8 +134,21 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="fld fld-full"><label>Description</label><textarea id="f-desc" rows="2" placeholder="Shown to employees on the Events tab"></textarea></div>
   </div>
 
-  <div class="subhead">Scoring</div>
+  <div class="subhead">Activity Tracking</div>
   <div class="grid" style="margin-bottom:14px">
+    <div class="fld"><label>Tracking Mode</label>
+      <select id="f-tracking">
+        <option value="strava" selected>Strava — auto-fetch activities via API</option>
+        <option value="manual">Manual — organizers enter results (cricket, quiz…)</option>
+        <option value="none">None — no leaderboard, participation only</option>
+      </select>
+    </div>
+    <div class="fld" id="wrap-fetch-start"><label>Fetch Data From <span style="font-weight:400;text-transform:none">(blank = event start)</span></label><input type="date" id="f-fetch-start"></div>
+    <div class="fld" id="wrap-fetch-end"><label>Fetch Data Until <span style="font-weight:400;text-transform:none">(blank = event end)</span></label><input type="date" id="f-fetch-end"></div>
+  </div>
+
+  <div class="subhead" id="scoring-head">Scoring</div>
+  <div class="grid" style="margin-bottom:14px" id="scoring-grid">
     <div class="fld"><label>Scoring Mode</label>
       <select id="f-smode">
         <option value="raw">Raw Metric — rank by total directly, no points</option>
@@ -236,11 +249,25 @@ document.getElementById('f-name').addEventListener('input',function(){
   if(!editId)document.getElementById('f-slug').value=slugify(this.value);
 });
 document.getElementById('f-smode').addEventListener('change',updateScoringUI);
+document.getElementById('f-tracking').addEventListener('change',updateScoringUI);
 function updateScoringUI(){
   var m=document.getElementById('f-smode').value;
-  document.getElementById('composite-box').style.display=(m==='composite')?'block':'none';
+  var trk=document.getElementById('f-tracking').value;
+  document.getElementById('composite-box').style.display=(m==='composite'&&trk!=='none')?'block':'none';
   document.getElementById('wrap-rate').style.display=(m==='single_metric')?'block':'none';
   document.getElementById('wrap-metric').style.display=(m==='composite')?'none':'block';
+  // Strava-only pieces
+  var isStrava=(trk==='strava');
+  document.getElementById('wrap-fetch-start').style.display=isStrava?'block':'none';
+  document.getElementById('wrap-fetch-end').style.display=isStrava?'block':'none';
+  var sportsHead=document.getElementById('sport-chips').previousElementSibling;
+  if(sportsHead)sportsHead.style.display=isStrava?'block':'none';
+  document.getElementById('sport-chips').style.display=isStrava?'flex':'none';
+  // scoring hidden entirely for tracking=none
+  var showScoring=(trk!=='none');
+  document.getElementById('scoring-head').style.display=showScoring?'block':'none';
+  document.getElementById('scoring-grid').style.display=showScoring?'grid':'none';
+  if(!showScoring)document.getElementById('composite-box').style.display='none';
 }
 function buildChips(sel){
   var box=document.getElementById('sport-chips');box.textContent='';
@@ -282,6 +309,9 @@ function openEditor(ev){
   document.getElementById('f-color').value=ev?(ev.accent_color||'#E8622A'):'#E8622A';
   document.getElementById('f-banner').value=ev?(ev.banner_url||''):'';
   document.getElementById('f-desc').value=ev?(ev.description||''):'';
+  document.getElementById('f-tracking').value=rc.tracking_mode||'strava';
+  document.getElementById('f-fetch-start').value=rc.fetch_start||'';
+  document.getElementById('f-fetch-end').value=rc.fetch_end||'';
   document.getElementById('f-smode').value=rc.scoring_mode||'single_metric';
   document.getElementById('f-metric').value=rc.metric||'distance_km';
   document.getElementById('f-rate').value=(rc.rate!=null)?rc.rate:1;
@@ -310,6 +340,9 @@ function collect(){
   if(end<start)throw new Error('End date must be after start date');
   var mode=document.getElementById('f-smode').value;
   var rc={
+    tracking_mode:document.getElementById('f-tracking').value,
+    fetch_start:document.getElementById('f-fetch-start').value||null,
+    fetch_end:document.getElementById('f-fetch-end').value||null,
     scoring_mode:mode,
     metric:document.getElementById('f-metric').value,
     sport_types:Array.from(document.querySelectorAll('#sport-chips .chip.on')).map(function(c){return c.getAttribute('data-s')}),
