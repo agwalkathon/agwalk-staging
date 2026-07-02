@@ -524,7 +524,8 @@ async function loadAppEvents(){
 
         // countdown line
         var cd = document.createElement('div');
-        cd.style.cssText = 'font-size:12px;font-weight:600;margin-top:6px;color:var(--brand-soft);';
+        cd.style.cssText = 'font-size:12px;font-weight:600;margin-top:6px;';
+        cd.style.color = ev.accent_color || 'var(--brand-soft)';
         if (ev.status === 'live') {
           var left = daysUntil(ev.end_date);
           if (left >= 0) cd.textContent = '🔥 ' + (left === 0 ? 'Last day today!' : left + ' day' + (left===1?'':'s') + ' remaining');
@@ -551,8 +552,11 @@ async function loadAppEvents(){
             rline.style.cssText = 'font-size:11.5px;color:#F59E0B;font-weight:600;margin-top:6px;';
             rline.textContent = closes === 0 ? '⚠️ Registration closes today!' : 'Registration closes in ' + closes + ' day' + (closes===1?'':'s');
             c.appendChild(rline);
+            var accent = ev.accent_color || '#E8622A';
             var rb = document.createElement('button');
-            rb.style.cssText = 'margin-top:10px;width:100%;padding:11px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(232,98,42,.3);';
+            rb.style.cssText = 'margin-top:10px;width:100%;padding:11px;border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;';
+            rb.style.background = accent;
+            rb.style.boxShadow = '0 4px 14px ' + accent + '55';
             rb.textContent = 'Register Now';
             rb.textContent = localStorage.getItem('ag_reg_draft_' + ev.id) ? '▶ Resume Registration' : 'Register Now';
             rb.addEventListener('click', function(){ openAppRegistration(ev); });
@@ -568,11 +572,12 @@ async function loadAppEvents(){
           var open = document.createElement('button');
           open.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
           open.textContent = 'Open Event App →';
-          open.addEventListener('click', function(){ window.location.href = 'participant.html'; });
+          open.addEventListener('click', function(){ window.location.href = 'participant.html?login=1'; });
           c.appendChild(open);
         } else if ((ev.status === 'live' || ev.status === 'ended') && rc.tracking_mode !== 'none' && rc.tracking_mode !== 'manual') {
           var lbBtn = document.createElement('button');
-          lbBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--brand-soft);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
+          lbBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
+          lbBtn.style.color = ev.accent_color || 'var(--brand-soft)';
           lbBtn.textContent = '🏆 View Leaderboard';
           lbBtn.addEventListener('click', function(){ openSpectatorBoard(ev); });
           c.appendChild(lbBtn);

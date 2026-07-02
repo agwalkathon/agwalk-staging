@@ -316,7 +316,7 @@ async function sendOTP(){
     var d = await res.json();
     if (!d.success) {
       if (d.error === 'not_found') {
-        showErr('⛔ <strong>Email not found.</strong><br>This email is not registered. Please register first.');
+        showErr('⛔ <strong>Email not found.</strong><br>This email is not registered. Please register first.<br><a href="app.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');
       } else if (d.error === 'no_strava_id') {
         showErr('⚠️ <strong>Account setup incomplete.</strong><br>Contact pra@arcgate.com for assistance.');
       } else if (d.error === 'smtp_not_configured') {
@@ -489,7 +489,7 @@ if(oauthCode){
       }));
       if(d.role==='admin'){sessionStorage.setItem('wk_admin',JSON.stringify({loggedIn:true,role:'admin',expires:Date.now()+(8*60*60*1000)}));window.location.replace('admin.html');}
       else{window.location.replace('participant.html');}
-    } else if(d.error==='not_registered'){showErr('⛔ <strong>Not registered.</strong><br>Your Strava account is not in the participant list.');}
+    } else if(d.error==='not_registered'){showErr('⛔ <strong>Not registered.</strong><br>Your Strava account is not in the participant list.<br><a href="app.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');}
     else{showErr('❌ <strong>Login failed.</strong><br>Please try again.');}
   })
   .catch(function(){showErr('❌ Connection error. Please try again.');});

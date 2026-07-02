@@ -176,6 +176,7 @@ function buildEventCard(ev, group) {
     if (group === 'live' && !enrolled && regOpenNow) {
       var jrb = document.createElement('button');
       jrb.className = 'ev-btn ev-btn-primary';
+      jrb.style.background = ev.accent_color || '';
       jrb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
       jrb.addEventListener('click', function(){ openEventRegistration(ev); });
       actions.appendChild(jrb);
@@ -197,6 +198,7 @@ function buildEventCard(ev, group) {
     } else if (regOpen) {
       var rb = document.createElement('button');
       rb.className = 'ev-btn ev-btn-primary';
+      rb.style.background = ev.accent_color || '';
       rb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
       rb.addEventListener('click', function(){ openEventRegistration(ev); });
       actions.appendChild(rb);

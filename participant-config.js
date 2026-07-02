@@ -119,10 +119,24 @@ function safeSetStyle(id, prop, val) {
   if (el) el.style[prop] = val;
 }
 
+function employeeTokenValid() {
+  try {
+    var t = localStorage.getItem('ag_emp_token');
+    if (!t) return false;
+    var p = JSON.parse(atob(t.split('.')[1]));
+    return p.exp && p.exp * 1000 > Date.now();
+  } catch(e){ return false; }
+}
 function userGuard() {
   try {
     var s = JSON.parse(safeGetItem('wk_user') || '{}');
-    if (!s.loggedIn) { window.location.href = 'index.html'; return null; }
+    if (!s.loggedIn) {
+      // Employee (non-participant or not yet Strava-linked) landing here directly:
+      // send them home to the Employee App — unless explicitly coming to log in (?login=1)
+      var wantLogin = new URLSearchParams(window.location.search).get('login') === '1';
+      if (!wantLogin && employeeTokenValid()) { window.location.href = 'app.html'; return null; }
+      window.location.href = 'index.html'; return null;
+    }
     if (!s.athleteId || s.athleteId === 'null' || s.athleteId === 'undefined') {
       if (!s.empCode && !s.email) {
         window.location.href = 'index.html';
