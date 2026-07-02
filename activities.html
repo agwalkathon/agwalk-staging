@@ -2384,7 +2384,7 @@ async function doBulkAction(action) {
     try {
       var act = allActivities.find(function(a) { return String(a.id) === String(id); });
       var reason = action === 'flag' ? flagReason : (act ? act.flag_reason || '' : '');
-      await fetch(BACKEND_URL+'/flag', {
+      var resp = await fetch(BACKEND_URL+'/flag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2392,6 +2392,9 @@ async function doBulkAction(action) {
         },
         body: JSON.stringify({ activity_id: parseInt(id), action: action, flag_reason: reason })
       });
+      if (!resp.ok) {
+        throw new Error('Server returned status: ' + resp.status);
+      }
       if (action === 'review' || action === 'unreview') {
         if (act) act.is_reviewed = (action === 'review');
       }
@@ -4041,7 +4044,7 @@ async function doBulkActionAll(action) {
     try {
       var act = window._exportActs ? window._exportActs.find(function(a) { return String(a.id) === String(id); }) : null;
       var reason = action === 'flag' ? flagReason : (act ? act.flag_reason || '' : '');
-      await fetch(BACKEND_URL+'/flag', {
+      var resp = await fetch(BACKEND_URL+'/flag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -4049,6 +4052,9 @@ async function doBulkActionAll(action) {
         },
         body: JSON.stringify({ activity_id: parseInt(id), action: action, flag_reason: reason })
       });
+      if (!resp.ok) {
+        throw new Error('Server returned status: ' + resp.status);
+      }
       success++;
       var progEl = document.getElementById('bulk-prog-all');
       if (progEl) progEl.textContent = success;
