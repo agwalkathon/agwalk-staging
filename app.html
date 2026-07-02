@@ -403,10 +403,57 @@ async function loadAppEvents(){
         if (enrolled) { pill.style.background = 'rgba(232,98,42,.15)'; pill.style.color = '#F97D4E'; pill.textContent = '✓ Enrolled'; }
         else if (ev.status === 'live') { pill.style.background = 'rgba(34,197,94,.15)'; pill.style.color = '#4ADE80'; pill.textContent = '● LIVE'; }
         if (pill.textContent) nm.appendChild(pill);
+        function fmtD(s){ if(!s) return ''; var p=s.split('-'); var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(p[1],10)-1]; return parseInt(p[2],10)+' '+mo+' '+p[0]; }
+        function daysUntil(s){ var t=new Date(); t.setHours(0,0,0,0); return Math.ceil((new Date(s+'T00:00:00')-t)/86400000); }
+        var today = new Date().toISOString().split('T')[0];
+        var rc = ev.rules_config || {};
+
         var dt = document.createElement('div');
         dt.style.cssText = 'font-size:12px;color:var(--muted);margin-top:4px;';
-        dt.textContent = (ev.start_date || '') + ' → ' + (ev.end_date || '');
+        dt.textContent = fmtD(ev.start_date) + ' → ' + fmtD(ev.end_date);
         c.appendChild(nm); c.appendChild(dt);
+
+        // countdown line
+        var cd = document.createElement('div');
+        cd.style.cssText = 'font-size:12px;font-weight:600;margin-top:6px;color:var(--brand-soft);';
+        if (ev.status === 'live') {
+          var left = daysUntil(ev.end_date);
+          if (left >= 0) cd.textContent = '🔥 ' + (left === 0 ? 'Last day today!' : left + ' day' + (left===1?'':'s') + ' remaining');
+        } else if (ev.status === 'upcoming') {
+          var du = daysUntil(ev.start_date);
+          if (du > 0) cd.textContent = '⏳ Starts in ' + du + ' day' + (du===1?'':'s');
+        }
+        if (cd.textContent) c.appendChild(cd);
+
+        // tracking hint
+        var trk = rc.tracking_mode || 'strava';
+        var th = document.createElement('div');
+        th.style.cssText = 'font-size:11px;color:var(--label);margin-top:4px;';
+        th.textContent = trk === 'strava' ? '📡 Tracked via Strava' : (trk === 'manual' ? '📋 Results posted by organizers' : '');
+        if (th.textContent) c.appendChild(th);
+
+        // registration state
+        var regOpen = ev.registration_open_date && ev.registration_close_date &&
+                      today >= ev.registration_open_date && today <= ev.registration_close_date;
+        if (!enrolled && (ev.status === 'live' || ev.status === 'upcoming')) {
+          if (regOpen) {
+            var closes = daysUntil(ev.registration_close_date);
+            var rline = document.createElement('div');
+            rline.style.cssText = 'font-size:11.5px;color:#F59E0B;font-weight:600;margin-top:6px;';
+            rline.textContent = closes === 0 ? '⚠️ Registration closes today!' : 'Registration closes in ' + closes + ' day' + (closes===1?'':'s');
+            c.appendChild(rline);
+            var rb = document.createElement('button');
+            rb.style.cssText = 'margin-top:10px;width:100%;padding:11px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(232,98,42,.3);';
+            rb.textContent = 'Register Now';
+            rb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
+            c.appendChild(rb);
+          } else if (ev.registration_open_date && today < ev.registration_open_date) {
+            var rl2 = document.createElement('div');
+            rl2.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:6px;';
+            rl2.textContent = 'Registration opens ' + fmtD(ev.registration_open_date);
+            c.appendChild(rl2);
+          }
+        }
         if (enrolled) {
           var open = document.createElement('button');
           open.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
