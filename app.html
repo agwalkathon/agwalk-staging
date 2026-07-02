@@ -143,6 +143,11 @@ body{
       </div>
       <input id="post-title" placeholder="Title (e.g. We got married! 💍)" maxlength="120" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
       <textarea id="post-msg" placeholder="Tell everyone about it… (optional)" rows="3" maxlength="2000" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;resize:none"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <button id="post-photo-btn" style="padding:9px 14px;background:var(--surface2);border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-family:inherit;font-size:12.5px;cursor:pointer">📷 Add photos</button>
+        <input type="file" id="post-photo-file" accept="image/*" multiple style="display:none">
+        <div id="post-photo-previews" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
       <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
       <button id="post-submit" style="width:100%;padding:13px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer">Post</button>
     </div>
@@ -423,6 +428,35 @@ async function loadProfile(){
   }
 }
 
+/* ---------- photo compression + upload ---------- */
+function compressImage(file){
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function(){
+      URL.revokeObjectURL(url);
+      var MAX = 1600;
+      var w = img.width, h = img.height;
+      if (w > MAX || h > MAX) { var s = MAX / Math.max(w, h); w = Math.round(w*s); h = Math.round(h*s); }
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(cv.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+    img.src = url;
+  });
+}
+async function uploadPhoto(file){
+  var dataUrl = await compressImage(file);
+  var r = await fetch(BACKEND + '/celebrate/upload', {
+    method: 'POST', headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + getToken() },
+    body: JSON.stringify({ data: dataUrl })
+  });
+  var d = await r.json();
+  if (!d.success) throw new Error(d.error || 'Upload failed');
+  return d.url;
+}
+
 /* ---------- Celebrate feed ---------- */
 var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'] };
 var EMOJIS = ['🎉','❤️','👏'];
@@ -469,6 +503,19 @@ function buildCelebCard(c){
     msg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;';
     msg.textContent = c.message;
     card.appendChild(msg);
+  }
+  var mediaArr = Array.isArray(c.media) ? c.media : [];
+  if (mediaArr.length) {
+    var mg = document.createElement('div');
+    mg.style.cssText = 'display:grid;grid-template-columns:' + (mediaArr.length > 1 ? '1fr 1fr' : '1fr') + ';gap:6px;margin-top:10px;';
+    mediaArr.forEach(function(u){
+      var im = document.createElement('img');
+      im.src = u; im.loading = 'lazy';
+      im.style.cssText = 'width:100%;border-radius:10px;max-height:280px;object-fit:cover;cursor:pointer;';
+      im.addEventListener('click', function(){ window.open(u, '_blank'); });
+      mg.appendChild(im);
+    });
+    card.appendChild(mg);
   }
 
   var bar = document.createElement('div');
@@ -518,7 +565,23 @@ function buildCelebCard(c){
   var wsend = document.createElement('button');
   wsend.textContent = 'Send';
   wsend.style.cssText = 'padding:10px 16px;background:var(--brand);border:none;border-radius:11px;color:#fff;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer;';
-  wrow.appendChild(winp); wrow.appendChild(wsend);
+  var wcam = document.createElement('button');
+  wcam.textContent = '📷';
+  wcam.title = 'Attach photo';
+  wcam.style.cssText = 'padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:11px;font-size:15px;cursor:pointer;';
+  var wfile = document.createElement('input');
+  wfile.type = 'file'; wfile.accept = 'image/*'; wfile.style.display = 'none';
+  var _wishPhotoUrl = null;
+  wcam.addEventListener('click', function(){ wfile.click(); });
+  wfile.addEventListener('change', async function(){
+    var f = this.files[0]; this.value = '';
+    if (!f) return;
+    wcam.textContent = '⏳'; wcam.disabled = true;
+    try { _wishPhotoUrl = await uploadPhoto(f); wcam.textContent = '🖼️'; wcam.style.borderColor = 'var(--brand)'; }
+    catch(e){ wcam.textContent = '📷'; alert(e.message); }
+    wcam.disabled = false;
+  });
+  wrow.appendChild(wcam); wrow.appendChild(wfile); wrow.appendChild(winp); wrow.appendChild(wsend);
   wsec.appendChild(wlist); wsec.appendChild(wrow);
   card.appendChild(wsec);
 
@@ -528,8 +591,15 @@ function buildCelebCard(c){
     var nm = document.createElement('span'); nm.style.cssText = 'font-size:12.5px;font-weight:600;color:var(--brand-soft);margin-right:6px;';
     nm.textContent = (w.employee && w.employee.full_name) || w.emp_code || 'You';
     var mg = document.createElement('span'); mg.style.cssText = 'font-size:13px;color:var(--muted);line-height:1.4;';
-    mg.textContent = w.message;
+    mg.textContent = w.message || '';
     row.appendChild(nm); row.appendChild(mg);
+    if (w.media_url) {
+      var im = document.createElement('img');
+      im.src = w.media_url; im.loading = 'lazy';
+      im.style.cssText = 'display:block;max-width:180px;border-radius:10px;margin-top:6px;cursor:pointer;';
+      im.addEventListener('click', function(){ window.open(w.media_url, '_blank'); });
+      row.appendChild(im);
+    }
     return row;
   }
   async function loadWishesInline(){
@@ -555,20 +625,21 @@ function buildCelebCard(c){
 
   wsend.addEventListener('click', async function(){
     var msg = winp.value.trim();
-    if (!msg) return;
+    if (!msg && !_wishPhotoUrl) return;
     wsend.disabled = true;
     try {
-      var r = await fetch(BACKEND + '/celebrate/wish', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: c.id, message: msg }) });
+      var r = await fetch(BACKEND + '/celebrate/wish', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: c.id, message: msg, media_url: _wishPhotoUrl }) });
       var d2 = await r.json();
       if (d2.success) {
         winp.value = '';
+        _wishPhotoUrl = null; wcam.textContent = '📷'; wcam.style.borderColor = 'var(--border)';
         if (d2.status === 'pending') {
           var n = document.createElement('div'); n.style.cssText='color:#F59E0B;font-size:12px;padding:4px 0'; n.textContent='Pending admin approval ✓'; wlist.appendChild(n);
         } else {
           var emp = getEmp() || {};
           var placeholder = wlist.querySelector('div');
           if (placeholder && placeholder.textContent.indexOf('No wishes yet') > -1) wlist.textContent = '';
-          wlist.appendChild(renderWishRow({ message: msg, employee: { full_name: emp.full_name } }));
+          wlist.appendChild(renderWishRow({ message: msg, media_url: _wishPhotoUrl, employee: { full_name: emp.full_name } }));
           wlist.scrollTop = wlist.scrollHeight;
           c.wish_count = (c.wish_count || 0) + 1;
           wb.textContent = '💬 ' + c.wish_count + ' wishes';
@@ -585,6 +656,27 @@ function buildCelebCard(c){
 document.getElementById('btn-new-post').addEventListener('click', function(){ document.getElementById('post-drawer').classList.remove('hidden'); });
 document.getElementById('post-close').addEventListener('click', function(){ document.getElementById('post-drawer').classList.add('hidden'); });
 document.getElementById('post-drawer').addEventListener('click', function(e){ if (e.target === this) this.classList.add('hidden'); });
+var _postPhotos = [];
+document.getElementById('post-photo-btn').addEventListener('click', function(){ document.getElementById('post-photo-file').click(); });
+document.getElementById('post-photo-file').addEventListener('change', async function(){
+  var files = Array.from(this.files || []).slice(0, 4 - _postPhotos.length);
+  this.value = '';
+  var btn = document.getElementById('post-photo-btn');
+  for (var i = 0; i < files.length; i++) {
+    btn.textContent = '⏳ Uploading…';
+    try {
+      var url = await uploadPhoto(files[i]);
+      _postPhotos.push(url);
+      var pv = document.createElement('img');
+      pv.src = url;
+      pv.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;';
+      pv.title = 'Tap to remove';
+      pv.addEventListener('click', function(){ _postPhotos = _postPhotos.filter(function(u){ return u !== this.src; }.bind(this)); this.remove(); }.bind(pv));
+      document.getElementById('post-photo-previews').appendChild(pv);
+    } catch(e){ alert(e.message); }
+  }
+  btn.textContent = '📷 Add photos';
+});
 document.getElementById('post-submit').addEventListener('click', async function(){
   var title = document.getElementById('post-title').value.trim();
   var msg = document.getElementById('post-msg').value.trim();
@@ -593,11 +685,12 @@ document.getElementById('post-submit').addEventListener('click', async function(
   if (!title) { err.textContent = 'Please give it a title'; return; }
   this.disabled = true;
   try {
-    var r = await fetch(BACKEND + '/celebrate/post', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ title: title, message: msg }) });
+    var r = await fetch(BACKEND + '/celebrate/post', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ title: title, message: msg, media: _postPhotos }) });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Failed');
     document.getElementById('post-drawer').classList.add('hidden');
     document.getElementById('post-title').value = ''; document.getElementById('post-msg').value = '';
+    _postPhotos = []; document.getElementById('post-photo-previews').textContent = '';
     if (d.status === 'pending') alert('Submitted! Your post will appear after admin approval. 🎉');
     else loadCelebrate();
   } catch(e) { err.textContent = e.message; }
