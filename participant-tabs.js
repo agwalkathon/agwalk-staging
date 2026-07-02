@@ -902,8 +902,8 @@ function renderRows(rows, prevRanks) {
         '</div>' +
         '<div class="row-right" style="display:flex;align-items:center;gap:6px;">' +
           '<div class="row-pts">' +
-            '<span class="row-pts-num">' + r.pts.total.toFixed(2) + '</span>' +
-            '<span class="row-pts-unit"> pts</span>' +
+            '<span class="row-pts-num">' + r.pts.total.toFixed(lbScoringMode()==='raw'?lbMetricMeta().dec:2) + '</span>' +
+            '<span class="row-pts-unit"> ' + (lbScoringMode()==='raw' ? lbMetricMeta().short.toLowerCase() : 'pts') + '</span>' +
             (rowMedal ? '<span class="row-medal">' + rowMedal + '</span>' : '') +
           '</div>' +
           '<span class="row-chevron">▼</span>' +
@@ -917,10 +917,18 @@ function renderRows(rows, prevRanks) {
       ? '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val green">' + r.pts.challengePts.toFixed(1) + '</div></div>'
       : '';
 
-    detail.innerHTML =
+    var _mm = lbMetricMeta();
+    var _raw = lbScoringMode()==='raw';
+    var _metricCell = '<div class="detail-cell"><div class="detail-cell-lbl">📏 ' + (_raw||lbIsLegacyScoring()===false ? _mm.label : 'Distance') + '</div><div class="detail-cell-val blue">' + r.pts.km.toFixed(_mm.dec===0?0:1) + (lbScoringMetric()==='distance_km'?' km':'') + '</div></div>';
+    detail.innerHTML = _raw ?
       '<div class="detail-grid">' +
-        '<div class="detail-cell"><div class="detail-cell-lbl">📏 Distance</div><div class="detail-cell-val blue">' + r.pts.km.toFixed(1) + ' km</div></div>' +
-        '<div class="detail-cell"><div class="detail-cell-lbl">⭐ Dist Pts</div><div class="detail-cell-val brand">' + r.pts.distPts.toFixed(1) + '</div></div>' +
+        _metricCell +
+        '<div class="detail-cell" style="grid-column:span 3"><div class="detail-cell-lbl">🏆 Total ' + _mm.short + '</div><div class="detail-cell-val brand" style="font-size:18px;">' + r.pts.total.toFixed(_mm.dec) + '</div></div>' +
+      '</div>'
+      :
+      '<div class="detail-grid">' +
+        _metricCell +
+        '<div class="detail-cell"><div class="detail-cell-lbl">⭐ ' + (lbIsLegacyScoring() ? 'Dist Pts' : 'Metric Pts') + '</div><div class="detail-cell-val brand">' + r.pts.distPts.toFixed(1) + '</div></div>' +
         '<div class="detail-cell"><div class="detail-cell-lbl">⚡ Bonus</div><div class="detail-cell-val gold">' + r.pts.bonusPts + '</div></div>' +
         (chalHtml || '<div class="detail-cell"><div class="detail-cell-lbl">🎯 Challenge</div><div class="detail-cell-val" style="color:var(--label)">—</div></div>') +
         '<div class="detail-cell" style="grid-column:span ' + (r.pts.challengePts > 0 ? '2' : '3') + '"><div class="detail-cell-lbl">🏆 Total</div><div class="detail-cell-val brand" style="font-size:18px;">' + r.pts.total.toFixed(2) + '</div></div>' +
