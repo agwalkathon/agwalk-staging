@@ -166,7 +166,7 @@ body{
       </div>
       <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
       <div style="display:flex;justify-content:flex-end">
-        <button id="post-submit" title="Post" style="width:52px;height:52px;background:var(--brand);border:none;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(232,98,42,.4)">
+        <button id="post-submit" title="Post" style="width:40px;height:40px;background:none;border:none;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
@@ -932,7 +932,7 @@ function buildCelebCard(c){
   var wsend = document.createElement('button');
   wsend.title = 'Send';
   wsend.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-  wsend.style.cssText = 'width:42px;height:42px;background:var(--brand);border:none;border-radius:50%;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+  wsend.style.cssText = 'width:36px;height:36px;background:none;border:none;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;';
   var wcam = document.createElement('button');
   wcam.textContent = '📷';
   wcam.title = 'Attach photo';
@@ -1165,6 +1165,16 @@ async function enablePush(){
   });
   var d = await r.json();
   if (!d.success) throw new Error(d.error || 'Subscribe failed');
+}
+
+/* ---------- embed mode (inside participant.html iframe) ---------- */
+var IS_EMBED = new URLSearchParams(window.location.search).get('embed') === '1';
+if (IS_EMBED) {
+  document.addEventListener('DOMContentLoaded', function(){
+    var hd = document.querySelector('.header'); if (hd) hd.style.display = 'none';
+    var nv = document.querySelector('.bottom-nav'); if (nv) nv.style.display = 'none';
+    var scr = document.getElementById('app-screen'); if (scr) scr.style.paddingBottom = '20px';
+  });
 }
 
 /* ---------- boot ---------- */
