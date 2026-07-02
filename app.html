@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e1115">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.json">
+<title>Arcgate — Employee App</title>
+<style>
+:root{--bg:#0e1115;--surface:#171b21;--surface2:#1E2230;--brand:#E8622A;--brand-soft:#F97D4E;--text:#fff;--muted:rgba(255,255,255,.55);--label:rgba(255,255,255,.4);--border:rgba(255,255,255,.08)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh}
+.hidden{display:none!important}
+/* ===== Login ===== */
+#login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.login-card{width:100%;max-width:380px}
+.login-logo{width:64px;height:64px;border-radius:18px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
+.login-title{font-size:22px;font-weight:700;text-align:center}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin:6px 0 26px}
+.login-field{width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px}
+.login-field:focus{outline:none;border-color:var(--brand)}
+.login-btn{width:100%;padding:14px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
+.login-btn:disabled{opacity:.5}
+.login-err{color:#F87171;font-size:13px;min-height:18px;margin:8px 0;text-align:center}
+.login-hint{font-size:12px;color:var(--label);text-align:center;margin-top:14px}
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.otp-box{width:46px;height:54px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
+.otp-box:focus{outline:none;border-color:var(--brand)}
+.login-link{background:none;border:none;color:var(--brand-soft);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px}
+/* ===== App shell ===== */
+#app-screen{padding-bottom:78px;min-height:100dvh}
+.app-header{padding:18px 20px 8px;display:flex;align-items:center;justify-content:space-between}
+.app-header h1{font-size:21px;font-weight:700}
+.app-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--brand-soft);overflow:hidden}
+.app-avatar img{width:100%;height:100%;object-fit:cover}
+.tab-pane{padding:8px 16px 20px;max-width:640px;margin:0 auto}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,17,21,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;cursor:pointer;font-family:inherit}
+.nav-item svg{width:23px;height:23px;stroke:var(--label);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .18s}
+.nav-item span{font-size:10.5px;color:var(--label);font-weight:500;transition:color .18s}
+.nav-item.active svg{stroke:var(--brand);transform:scale(1.08)}
+.nav-item.active span{color:var(--brand);font-weight:600}
+.placeholder{text-align:center;padding:70px 20px;color:var(--label)}
+.placeholder .big{font-size:46px;margin-bottom:12px}
+.card{background:var(--surface2);border-radius:16px;padding:16px;margin-bottom:12px}
+.card .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--label);margin-bottom:4px}
+.card .val{font-size:15px;font-weight:500}
+.logout-btn{width:100%;padding:13px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:12px;color:#F87171;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:18px}
+.skel{height:80px;border-radius:16px;background:linear-gradient(90deg,#171b21 25%,#1e242c 50%,#171b21 75%);background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:12px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🏆</div>
+    <div class="login-title">Arcgate Employee App</div>
+    <div class="login-sub" id="login-sub">Sign in with your company email</div>
+
+    <div id="step-email">
+      <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
+      <div class="login-err" id="err-email"></div>
+      <button class="login-btn" id="btn-send">Send Login Code</button>
+    </div>
+
+    <div id="step-otp" class="hidden">
+      <div class="otp-boxes" id="otp-boxes"></div>
+      <div class="login-err" id="err-otp"></div>
+      <button class="login-btn" id="btn-verify">Verify &amp; Sign In</button>
+      <div style="text-align:center"><button class="login-link" id="btn-resend">Resend code</button>
+      <button class="login-link" id="btn-back">Change email</button></div>
+    </div>
+    <div class="login-hint">A 6-digit code will be emailed to you. Sessions last 30 days.</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app-screen" class="hidden">
+  <div class="app-header">
+    <h1 id="header-title">Celebrate</h1>
+    <div class="app-avatar" id="header-avatar">?</div>
+  </div>
+
+  <div class="tab-pane" id="pane-celebrate">
+    <div class="placeholder"><div class="big">🎉</div><div style="font-size:16px;font-weight:600;color:var(--muted)">Celebrate is coming soon</div><div style="font-size:13px;margin-top:6px">Birthdays, anniversaries and moments worth sharing — all in one feed.</div></div>
+  </div>
+
+  <div class="tab-pane hidden" id="pane-events">
+    <div id="app-events-list"><div class="skel"></div><div class="skel"></div></div>
+  </div>
+
+  <div class="tab-pane hidden" id="pane-profile">
+    <div id="profile-box"><div class="skel"></div></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="celebrate">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.9 8.6 3 5 6.5 5c2 0 3.5 1 4.5 2.5v0H12v0C13 6 14.5 5 16.5 5 20 5 22.1 8.6 20.5 12 18 16.5 12 21 12 21z" transform="scale(0.9) translate(1.3,1)"/></svg>
+      <span>Celebrate</span>
+    </button>
+    <button class="nav-item" data-tab="events">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Events</span>
+    </button>
+    <button class="nav-item" data-tab="profile">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+var BACKEND = 'https://agwalk-backend.onrender.com';
+var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON };
+
+/* ---------- session ---------- */
+function getToken(){ try { return localStorage.getItem('ag_emp_token'); } catch(e){ return null; } }
+function setToken(t){ try { localStorage.setItem('ag_emp_token', t); } catch(e){} }
+function getEmp(){ try { return JSON.parse(localStorage.getItem('ag_emp') || 'null'); } catch(e){ return null; } }
+function setEmp(e){ try { localStorage.setItem('ag_emp', JSON.stringify(e)); } catch(ex){} }
+function clearSession(){ try { localStorage.removeItem('ag_emp_token'); localStorage.removeItem('ag_emp'); } catch(e){} }
+
+function tokenValid(t){
+  if (!t) return false;
+  try {
+    var p = JSON.parse(atob(t.split('.')[1]));
+    return p.exp && p.exp * 1000 > Date.now();
+  } catch(e){ return false; }
+}
+
+/* ---------- login flow ---------- */
+var _loginEmail = '';
+function buildOtpBoxes(){
+  var box = document.getElementById('otp-boxes');
+  box.textContent = '';
+  for (var i = 0; i < 6; i++) {
+    var inp = document.createElement('input');
+    inp.className = 'otp-box';
+    inp.type = 'tel'; inp.maxLength = 1; inp.inputMode = 'numeric';
+    inp.setAttribute('data-i', i);
+    inp.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g, '');
+      if (this.value && this.nextElementSibling) this.nextElementSibling.focus();
+    });
+    inp.addEventListener('keydown', function(ev){
+      if (ev.key === 'Backspace' && !this.value && this.previousElementSibling) this.previousElementSibling.focus();
+    });
+    inp.addEventListener('paste', function(ev){
+      var txt = (ev.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      if (txt.length >= 6) {
+        ev.preventDefault();
+        var boxes = document.querySelectorAll('.otp-box');
+        for (var j = 0; j < 6; j++) boxes[j].value = txt[j] || '';
+        boxes[5].focus();
+      }
+    });
+    box.appendChild(inp);
+  }
+}
+function otpValue(){
+  return Array.from(document.querySelectorAll('.otp-box')).map(function(b){ return b.value; }).join('');
+}
+
+async function sendCode(){
+  var email = document.getElementById('in-email').value.trim().toLowerCase();
+  var err = document.getElementById('err-email');
+  err.textContent = '';
+  if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Enter a valid email address'; return; }
+  var btn = document.getElementById('btn-send');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    var r = await fetch(BACKEND + '/employee/request-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Could not send code');
+    _loginEmail = email;
+    document.getElementById('step-email').classList.add('hidden');
+    document.getElementById('step-otp').classList.remove('hidden');
+    document.getElementById('login-sub').textContent = 'Enter the 6-digit code sent to ' + email;
+    buildOtpBoxes();
+    document.querySelector('.otp-box').focus();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = 'Send Login Code';
+}
+
+async function verifyCode(){
+  var err = document.getElementById('err-otp');
+  err.textContent = '';
+  var code = otpValue();
+  if (code.length !== 6) { err.textContent = 'Enter all 6 digits'; return; }
+  var btn = document.getElementById('btn-verify');
+  btn.disabled = true; btn.textContent = 'Verifying…';
+  try {
+    var r = await fetch(BACKEND + '/employee/verify-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _loginEmail, code: code })
+    });
+    var d = await r.json();
+    if (!r.ok || !d.success) throw new Error(d.error || 'Verification failed');
+    setToken(d.token); setEmp(d.employee);
+    enterApp();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = 'Verify & Sign In';
+}
+
+document.getElementById('btn-send').addEventListener('click', sendCode);
+document.getElementById('in-email').addEventListener('keydown', function(e){ if (e.key === 'Enter') sendCode(); });
+document.getElementById('btn-verify').addEventListener('click', verifyCode);
+document.getElementById('btn-resend').addEventListener('click', async function(){
+  var err = document.getElementById('err-otp'); err.textContent = '';
+  try {
+    var r = await fetch(BACKEND + '/employee/request-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _loginEmail })
+    });
+    var d = await r.json();
+    err.style.color = r.ok ? '#4ADE80' : '#F87171';
+    err.textContent = r.ok ? 'New code sent ✓' : (d.error || 'Failed');
+    setTimeout(function(){ err.style.color = '#F87171'; }, 3000);
+  } catch(e) { err.textContent = 'Failed to resend'; }
+});
+document.getElementById('btn-back').addEventListener('click', function(){
+  document.getElementById('step-otp').classList.add('hidden');
+  document.getElementById('step-email').classList.remove('hidden');
+  document.getElementById('login-sub').textContent = 'Sign in with your company email';
+});
+
+/* ---------- app shell ---------- */
+var TITLES = { celebrate: 'Celebrate', events: 'Events', profile: 'Profile' };
+var _loaded = {};
+function switchTab(tab){
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.add('hidden'); });
+  document.getElementById('pane-' + tab).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    n.classList.toggle('active', n.getAttribute('data-tab') === tab);
+  });
+  document.getElementById('header-title').textContent = TITLES[tab];
+  if (tab === 'events' && !_loaded.events) { _loaded.events = true; loadAppEvents(); }
+  if (tab === 'profile' && !_loaded.profile) { _loaded.profile = true; loadProfile(); }
+}
+document.querySelectorAll('.nav-item').forEach(function(n){
+  n.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+});
+
+function enterApp(){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+  var emp = getEmp() || {};
+  var av = document.getElementById('header-avatar');
+  av.textContent = '';
+  if (emp.photo_url) { var img = document.createElement('img'); img.src = emp.photo_url; av.appendChild(img); }
+  else av.textContent = (emp.full_name || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+}
+
+/* ---------- Events tab (employee view) ---------- */
+var _myEnrollments = [];
+async function loadAppEvents(){
+  var box = document.getElementById('app-events-list');
+  try {
+    var me = null;
+    try {
+      var mr = await fetch(BACKEND + '/employee/me', { headers: { Authorization: 'Bearer ' + getToken() } });
+      me = await mr.json();
+      _myEnrollments = (me.enrollments || []).map(function(x){ return x.event_id; });
+    } catch(e){}
+    var r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+    var evs = await r.json();
+    box.textContent = '';
+    if (!Array.isArray(evs) || !evs.length) {
+      box.innerHTML = '<div class="placeholder"><div class="big">📅</div>No events yet. Stay tuned!</div>';
+      return;
+    }
+    var groups = [['live','LIVE NOW'],['upcoming','UPCOMING'],['ended','PAST EVENTS'],['archived',null]];
+    groups.forEach(function(g){
+      var list = evs.filter(function(e){ return e.status === g[0]; });
+      if (!list.length || g[1] === null && !list.length) return;
+      if (g[1]) {
+        var h = document.createElement('div');
+        h.style.cssText = 'font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted);margin:16px 0 8px;';
+        h.textContent = g[1];
+        box.appendChild(h);
+      }
+      list.forEach(function(ev){
+        var enrolled = _myEnrollments.indexOf(ev.id) > -1;
+        var c = document.createElement('div');
+        c.className = 'card';
+        c.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
+        var nm = document.createElement('div');
+        nm.style.cssText = 'font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;';
+        nm.textContent = ev.name;
+        var pill = document.createElement('span');
+        pill.style.cssText = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;';
+        if (enrolled) { pill.style.background = 'rgba(232,98,42,.15)'; pill.style.color = '#F97D4E'; pill.textContent = '✓ Enrolled'; }
+        else if (ev.status === 'live') { pill.style.background = 'rgba(34,197,94,.15)'; pill.style.color = '#4ADE80'; pill.textContent = '● LIVE'; }
+        if (pill.textContent) nm.appendChild(pill);
+        var dt = document.createElement('div');
+        dt.style.cssText = 'font-size:12px;color:var(--muted);margin-top:4px;';
+        dt.textContent = (ev.start_date || '') + ' → ' + (ev.end_date || '');
+        c.appendChild(nm); c.appendChild(dt);
+        if (enrolled) {
+          var open = document.createElement('button');
+          open.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
+          open.textContent = 'Open Event App →';
+          open.addEventListener('click', function(){ window.location.href = 'participant.html'; });
+          c.appendChild(open);
+        }
+        box.appendChild(c);
+      });
+    });
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load events.</div>';
+  }
+}
+
+/* ---------- Profile tab ---------- */
+async function loadProfile(){
+  var box = document.getElementById('profile-box');
+  try {
+    var r = await fetch(BACKEND + '/employee/me', { headers: { Authorization: 'Bearer ' + getToken() } });
+    if (r.status === 401) { clearSession(); location.reload(); return; }
+    var d = await r.json();
+    var e = d.employee || {};
+    setEmp(e);
+    box.textContent = '';
+    [['Name', e.full_name], ['Employee Code', e.emp_code], ['Email', e.email],
+     ['Department', e.department || '—'], ['Enrolled Events', String((d.enrollments || []).length)]].forEach(function(f){
+      var c = document.createElement('div'); c.className = 'card';
+      var l = document.createElement('div'); l.className = 'lbl'; l.textContent = f[0];
+      var v = document.createElement('div'); v.className = 'val'; v.textContent = f[1] || '—';
+      c.appendChild(l); c.appendChild(v); box.appendChild(c);
+    });
+    var lo = document.createElement('button');
+    lo.className = 'logout-btn'; lo.textContent = 'Sign Out';
+    lo.addEventListener('click', function(){ clearSession(); location.reload(); });
+    box.appendChild(lo);
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load profile.</div>';
+  }
+}
+
+/* ---------- boot ---------- */
+if (tokenValid(getToken())) enterApp();
+</script>
+</body>
+</html>
