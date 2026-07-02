@@ -6,52 +6,85 @@
 <meta name="theme-color" content="#0e1115">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.json">
 <title>Arcgate — Employee App</title>
 <style>
-:root{--bg:#0e1115;--surface:#171b21;--surface2:#1E2230;--brand:#E8622A;--brand-soft:#F97D4E;--text:#fff;--muted:rgba(255,255,255,.55);--label:rgba(255,255,255,.4);--border:rgba(255,255,255,.08)}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
+  --bg:#0e1115; --surface:#282e36; --surface2:#363c46;
+  --border:rgba(255,255,255,0.07);
+  --text:#FFFFFF; --muted:rgba(255,255,255,0.52); --label:rgba(255,255,255,0.48); --dim:rgba(255,255,255,0.20);
+  --green:#22C55E; --gold:#FFD000;
+  --radius:16px; --radius-sm:12px; --radius-xs:8px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --brand-soft:#F97D4E;
+}
+html{background:#0e1115}
+body{
+  font-family:var(--font);
+  background:linear-gradient(180deg,#1f262d 0%,#0e1115 100%);
+  background-attachment:fixed;background-size:100% 100dvh;
+  color:var(--text);min-height:100dvh;
+  -webkit-font-smoothing:antialiased;letter-spacing:-0.011em;
+}
 .hidden{display:none!important}
-/* ===== Login ===== */
+/* ── Login ── */
 #login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .login-card{width:100%;max-width:380px}
-.login-logo{width:64px;height:64px;border-radius:18px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
-.login-title{font-size:22px;font-weight:700;text-align:center}
-.login-sub{font-size:13px;color:var(--muted);text-align:center;margin:6px 0 26px}
-.login-field{width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px}
+.login-logo{height:44px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.login-logo img{height:100%;width:auto}
+.login-logo .fallback{width:60px;height:60px;border-radius:18px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:28px}
+.login-title{font-size:21px;font-weight:800;text-align:center;letter-spacing:-0.02em}
+.login-sub{font-size:13.5px;color:var(--muted);text-align:center;margin:6px 0 26px}
+.login-field{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px}
 .login-field:focus{outline:none;border-color:var(--brand)}
-.login-btn{width:100%;padding:14px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
+.login-btn{width:100%;padding:14px;background:var(--brand);border:none;border-radius:var(--radius-sm);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(232,98,42,.3)}
 .login-btn:disabled{opacity:.5}
 .login-err{color:#F87171;font-size:13px;min-height:18px;margin:8px 0;text-align:center}
 .login-hint{font-size:12px;color:var(--label);text-align:center;margin-top:14px}
 .otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
-.otp-box{width:46px;height:54px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
+.otp-box{width:46px;height:54px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
 .otp-box:focus{outline:none;border-color:var(--brand)}
 .login-link{background:none;border:none;color:var(--brand-soft);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px}
-/* ===== App shell ===== */
-#app-screen{padding-bottom:78px;min-height:100dvh}
-.app-header{padding:18px 20px 8px;display:flex;align-items:center;justify-content:space-between}
-.app-header h1{font-size:21px;font-weight:700}
-.app-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--brand-soft);overflow:hidden}
+/* ── App header (glass, exact participant pattern) ── */
+#app-screen{padding-bottom:96px;min-height:100dvh}
+.header{position:sticky;top:0;z-index:200;background:rgba(31,38,45,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:max(14px,env(safe-area-inset-top)) 16px 14px}
+.hdr-inner{max-width:540px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hdr-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.hdr-logo-img{height:26px;width:auto}
+.hdr-center{display:flex;align-items:center;justify-content:center;flex:1.5;min-width:0;font-size:12px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap}
+.hdr-right{display:flex;align-items:center;flex:1;justify-content:flex-end;min-width:0}
+.app-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand-soft);overflow:hidden}
 .app-avatar img{width:100%;height:100%;object-fit:cover}
-.tab-pane{padding:8px 16px 20px;max-width:640px;margin:0 auto}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,17,21,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;cursor:pointer;font-family:inherit}
-.nav-item svg{width:23px;height:23px;stroke:var(--label);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:all .18s}
-.nav-item span{font-size:10.5px;color:var(--label);font-weight:500;transition:color .18s}
-.nav-item.active svg{stroke:var(--brand);transform:scale(1.08)}
-.nav-item.active span{color:var(--brand);font-weight:600}
+/* ── Content ── */
+.tab-pane{padding:16px 16px 20px;max-width:540px;margin:0 auto}
 .placeholder{text-align:center;padding:70px 20px;color:var(--label)}
 .placeholder .big{font-size:46px;margin-bottom:12px}
-.card{background:var(--surface2);border-radius:16px;padding:16px;margin-bottom:12px}
-.card .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--label);margin-bottom:4px}
-.card .val{font-size:15px;font-weight:500}
-.logout-btn{width:100%;padding:13px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:12px;color:#F87171;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:18px}
-.skel{height:80px;border-radius:16px;background:linear-gradient(90deg,#171b21 25%,#1e242c 50%,#171b21 75%);background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:12px}
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 8px 32px 0 rgba(0,0,0,0.3)}
+.card .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--label);margin-bottom:4px}
+.card .val{font-size:15px;font-weight:600}
+.logout-btn{width:100%;padding:13px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--radius-sm);color:#F87171;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
+.skel{height:80px;border-radius:var(--radius);background:linear-gradient(90deg,#282e36 25%,#323a44 50%,#282e36 75%);background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:14px}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* ── Floating pill bottom nav (exact participant pattern) ── */
+.bottom-nav{
+  position:fixed;bottom:calc(2px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  width:92%;max-width:480px;
+  background:rgba(10,12,16,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.07);border-radius:28px;
+  display:flex;justify-content:space-around;padding:6px;z-index:9999;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;background:none;border:none;cursor:pointer;color:var(--muted);gap:4px;transition:color .3s;position:relative;flex:1;border-radius:22px;z-index:2;font-family:inherit}
+.bnav-label{font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.bnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275)}
+.bnav-item.active{color:var(--brand)}
+.bnav-item.active svg{transform:scale(1.12);filter:drop-shadow(0 2px 6px rgba(232,98,42,0.45))}
+.bnav-indicator{position:absolute;top:6px;bottom:6px;left:0;width:0;background:linear-gradient(135deg,rgba(232,98,42,0.14) 0%,rgba(252,97,0,0.05) 100%);border:1.5px solid rgba(232,98,42,0.2);border-radius:22px;z-index:1;transition:all .38s cubic-bezier(0.25,1,0.25,1.12);pointer-events:none}
 </style>
 </head>
 <body>
@@ -59,7 +92,7 @@ body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:v
 <!-- ============ LOGIN ============ -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">🏆</div>
+    <div class="login-logo"><img src="logo-white.png" alt="Arcgate" onerror="this.parentNode.innerHTML='<div class=fallback>🏆</div>'"></div>
     <div class="login-title">Arcgate Employee App</div>
     <div class="login-sub" id="login-sub">Sign in with your company email</div>
 
@@ -82,10 +115,13 @@ body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:v
 
 <!-- ============ APP ============ -->
 <div id="app-screen" class="hidden">
-  <div class="app-header">
-    <h1 id="header-title">Celebrate</h1>
-    <div class="app-avatar" id="header-avatar">?</div>
-  </div>
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="hdr-left"><img src="logo-white.png" alt="Arcgate" class="hdr-logo-img" onerror="this.style.display='none'"></div>
+      <div class="hdr-center" id="header-title">Celebrate</div>
+      <div class="hdr-right"><div class="app-avatar" id="header-avatar">?</div></div>
+    </div>
+  </header>
 
   <div class="tab-pane" id="pane-celebrate">
     <button id="btn-new-post" style="width:100%;padding:13px;background:var(--surface2);border:1px dashed var(--border);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">✨ Share something to celebrate…</button>
@@ -115,17 +151,18 @@ body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="celebrate">
+    <div class="bnav-indicator" id="bnav-indicator"></div>
+    <button class="bnav-item active" data-tab="celebrate">
       <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.9 8.6 3 5 6.5 5c2 0 3.5 1 4.5 2.5v0H12v0C13 6 14.5 5 16.5 5 20 5 22.1 8.6 20.5 12 18 16.5 12 21 12 21z" transform="scale(0.9) translate(1.3,1)"/></svg>
-      <span>Celebrate</span>
+      <span class="bnav-label">Celebrate</span>
     </button>
-    <button class="nav-item" data-tab="events">
+    <button class="bnav-item" data-tab="events">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Events</span>
+      <span class="bnav-label">Events</span>
     </button>
-    <button class="nav-item" data-tab="profile">
+    <button class="bnav-item" data-tab="profile">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
-      <span>Profile</span>
+      <span class="bnav-label">Profile</span>
     </button>
   </nav>
 </div>
@@ -253,23 +290,33 @@ document.getElementById('btn-back').addEventListener('click', function(){
 /* ---------- app shell ---------- */
 var TITLES = { celebrate: 'Celebrate', events: 'Events', profile: 'Profile' };
 var _loaded = {};
+function moveIndicator(){
+  var ind = document.getElementById('bnav-indicator');
+  var active = document.querySelector('.bnav-item.active');
+  if (!ind || !active) return;
+  ind.style.left = active.offsetLeft + 'px';
+  ind.style.width = active.offsetWidth + 'px';
+}
+window.addEventListener('resize', moveIndicator);
 function switchTab(tab){
   document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.add('hidden'); });
   document.getElementById('pane-' + tab).classList.remove('hidden');
-  document.querySelectorAll('.nav-item').forEach(function(n){
+  document.querySelectorAll('.bnav-item').forEach(function(n){
     n.classList.toggle('active', n.getAttribute('data-tab') === tab);
   });
+  moveIndicator();
   document.getElementById('header-title').textContent = TITLES[tab];
   if (tab === 'events' && !_loaded.events) { _loaded.events = true; loadAppEvents(); }
   if (tab === 'profile' && !_loaded.profile) { _loaded.profile = true; loadProfile(); }
 }
-document.querySelectorAll('.nav-item').forEach(function(n){
+document.querySelectorAll('.bnav-item').forEach(function(n){
   n.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
 });
 
 function enterApp(){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
+  requestAnimationFrame(moveIndicator);
   var emp = getEmp() || {};
   var av = document.getElementById('header-avatar');
   av.textContent = '';
