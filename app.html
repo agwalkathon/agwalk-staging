@@ -76,23 +76,78 @@ body{
 .logout-btn{width:100%;padding:13px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--radius-sm);color:#F87171;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
 .skel{height:80px;border-radius:var(--radius);background:linear-gradient(90deg,#282e36 25%,#323a44 50%,#282e36 75%);background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:14px}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
-/* ── Floating pill bottom nav (exact participant pattern) ── */
-.bottom-nav{
-  position:fixed;bottom:calc(2px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
-  width:92%;max-width:480px;
-  background:rgba(10,12,16,0.88);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.07);border-radius:28px;
-  display:flex;justify-content:space-around;padding:6px;z-index:9999;
-  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+/* ── Floating pill bottom nav (verbatim participant.css) ── */
+.bottom-nav {
+  position: fixed;
+  bottom: calc(2px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 480px;
+  background: rgba(10, 12, 16, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 28px;
+  display: flex;
+  justify-content: space-around;
+  padding: 6px;
+  z-index: 9999;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;background:none;border:none;cursor:pointer;color:var(--muted);gap:4px;transition:color .3s;position:relative;flex:1;border-radius:22px;z-index:2;font-family:inherit;text-decoration:none}
-.bnav-item:hover,.bnav-item:visited,.bnav-item:active{text-decoration:none}
-.bnav-label{font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
-.bnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275)}
-.bnav-item.active{color:var(--brand)}
-.bnav-item.active svg{transform:scale(1.12);filter:drop-shadow(0 2px 6px rgba(232,98,42,0.45))}
-.bnav-indicator{position:absolute;top:6px;bottom:6px;left:0;width:0;background:linear-gradient(135deg,rgba(232,98,42,0.14) 0%,rgba(252,97,0,0.05) 100%);border:1.5px solid rgba(232,98,42,0.2);border-radius:22px;z-index:1;transition:all .38s cubic-bezier(0.25,1,0.25,1.12);pointer-events:none}
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  text-decoration: none;
+  color: var(--muted);
+  gap: 4px;
+  transition: color 0.3s;
+  position: relative;
+  flex: 1;
+  border-radius: 22px;
+  z-index: 2;
+  cursor: pointer;
+}
+.bnav-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.bnav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bnav-item.active {
+  color: var(--brand);
+}
+.bnav-item.active svg {
+  transform: scale(1.12);
+  filter: drop-shadow(0 2px 6px rgba(232, 98, 42, 0.45));
+}
+.bnav-indicator {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 0;
+  background: linear-gradient(135deg, rgba(232, 98, 42, 0.14) 0%, rgba(252, 97, 0, 0.05) 100%);
+  border: 1.5px solid rgba(232, 98, 42, 0.2);
+  border-radius: 22px;
+  z-index: 1;
+  transition: all 0.38s cubic-bezier(0.25, 1, 0.25, 1.12);
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  .bottom-nav { width: 94%; padding: 5px; }
+}
 </style>
 </head>
 <body>
@@ -805,6 +860,45 @@ async function uploadPhoto(file){
 var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'] };
 var EMOJIS = ['🎉','❤️','👏'];
 
+async function maybeShowPushPrompt(){
+  try {
+    if (IS_EMBED === undefined) {}
+  } catch(e){}
+  try {
+    var st = await pushStatus();
+    if (st !== 'off') return;
+    var snooze = 0;
+    try { snooze = parseInt(localStorage.getItem('ag_push_snooze') || '0'); } catch(e){}
+    if (snooze && Date.now() - snooze < 7 * 86400000) return; // asked within last 7 days
+    var feed = document.getElementById('celebrate-feed');
+    if (!feed || document.getElementById('push-prompt')) return;
+    var b = document.createElement('div');
+    b.id = 'push-prompt';
+    b.className = 'card';
+    b.style.cssText += 'display:flex;align-items:center;gap:12px;border-left:4px solid var(--brand);';
+    var ic = document.createElement('div'); ic.style.cssText = 'font-size:24px;'; ic.textContent = '🔔';
+    var tx = document.createElement('div'); tx.style.cssText = 'flex:1;min-width:0;';
+    tx.innerHTML = '<div style="font-size:13.5px;font-weight:700;">Never miss a celebration</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Get alerts for birthdays, wishes and approvals</div>';
+    var en = document.createElement('button');
+    en.style.cssText = 'padding:9px 15px;background:var(--brand);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:12.5px;font-family:inherit;cursor:pointer;flex-shrink:0;';
+    en.textContent = 'Enable';
+    var la = document.createElement('button');
+    la.style.cssText = 'background:none;border:none;color:var(--label);font-size:12px;font-family:inherit;cursor:pointer;flex-shrink:0;padding:6px;';
+    la.textContent = 'Later';
+    en.addEventListener('click', async function(){
+      en.disabled = true; en.textContent = '…';
+      try { await enablePush(); b.remove(); }
+      catch(e){ en.textContent = 'Enable'; en.disabled = false; tx.innerHTML = '<div style="font-size:12px;color:#F87171;">' + e.message + '</div>'; }
+    });
+    la.addEventListener('click', function(){
+      try { localStorage.setItem('ag_push_snooze', String(Date.now())); } catch(e){}
+      b.remove();
+    });
+    b.appendChild(ic); b.appendChild(tx); b.appendChild(en); b.appendChild(la);
+    feed.parentNode.insertBefore(b, feed);
+  } catch(e){}
+}
+
 async function loadCelebrate(){
   var box = document.getElementById('celebrate-feed');
   try {
@@ -1133,6 +1227,23 @@ async function openNotifPanel(){
       if (n.body) { var b = document.createElement('div'); b.style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:2px;'; b.textContent = n.body; bd.appendChild(b); }
       var tm = document.createElement('div'); tm.style.cssText = 'font-size:11px;color:var(--label);flex-shrink:0;'; tm.textContent = timeAgo(n.created_at);
       row.appendChild(ic); row.appendChild(bd); row.appendChild(tm);
+      if (n.ref_id) {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function(){
+          document.getElementById('notif-panel').classList.add('hidden');
+          _notifOpen = false;
+          switchTab('celebrate');
+          setTimeout(function(){
+            var target = document.querySelector('[data-celeb-id="' + n.ref_id + '"]');
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              target.style.transition = 'box-shadow .4s';
+              target.style.boxShadow = '0 0 0 2px var(--brand)';
+              setTimeout(function(){ target.style.boxShadow = ''; }, 2000);
+            }
+          }, 250);
+        });
+      }
       list.appendChild(row);
     });
   }
@@ -1197,7 +1308,7 @@ if (IS_EMBED) {
 
 /* ---------- boot ---------- */
 var _origEnterApp = enterApp;
-enterApp = function(){ _origEnterApp(); loadCelebrate(); refreshBell(); setInterval(refreshBell, 90000); };
+enterApp = function(){ _origEnterApp(); loadCelebrate(); refreshBell(); setInterval(refreshBell, 90000); setTimeout(maybeShowPushPrompt, 1200); };
 if (tokenValid(getToken())) enterApp();
 </script>
 </body>
