@@ -164,13 +164,22 @@ function buildEventCard(ev, group) {
   var actions = document.createElement('div');
   actions.className = 'ev-card-actions';
 
+  var today0 = new Date().toISOString().split('T')[0];
+  var regOpenNow = ev.registration_open_date && ev.registration_close_date &&
+                   today0 >= ev.registration_open_date && today0 <= ev.registration_close_date;
   if (group === 'live' || group === 'past') {
     var lb = document.createElement('button');
     lb.className = 'ev-btn';
     lb.textContent = group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard';
     lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
     actions.appendChild(lb);
-    if (group === 'live' && !enrolled) {
+    if (group === 'live' && !enrolled && regOpenNow) {
+      var jrb = document.createElement('button');
+      jrb.className = 'ev-btn ev-btn-primary';
+      jrb.textContent = 'Register Now';
+      jrb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
+      actions.appendChild(jrb);
+    } else if (group === 'live' && !enrolled) {
       var sp = document.createElement('div');
       sp.className = 'ev-spectator-note';
       sp.textContent = "You're watching — join the next event to compete!";
@@ -179,9 +188,7 @@ function buildEventCard(ev, group) {
   }
 
   if (group === 'upcoming') {
-    var today = new Date().toISOString().split('T')[0];
-    var regOpen = ev.registration_open_date && ev.registration_close_date &&
-                  today >= ev.registration_open_date && today <= ev.registration_close_date;
+    var regOpen = regOpenNow;
     if (enrolled) {
       var ok = document.createElement('div');
       ok.className = 'ev-spectator-note';
@@ -191,7 +198,7 @@ function buildEventCard(ev, group) {
       var rb = document.createElement('button');
       rb.className = 'ev-btn ev-btn-primary';
       rb.textContent = 'Register Now';
-      rb.addEventListener('click', function(){ window.location.href = 'register.html?event=' + encodeURIComponent(ev.slug); });
+      rb.addEventListener('click', function(){ window.location.href = 'new-participant.html?event=' + encodeURIComponent(ev.slug); });
       actions.appendChild(rb);
     } else if (ev.registration_open_date) {
       var no = document.createElement('div');

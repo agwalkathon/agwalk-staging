@@ -331,7 +331,8 @@ async function submitForm() {
         leaderboard_team: leaderboard_team,
         team_lead:   team_lead,
         strava_url:  strava_url,
-        event_name:  'walkathon2026',
+        event_name:  (window._regEvent && window._regEvent.slug) || 'walkathon2026',
+        event_id:    (window._regEvent && window._regEvent.id) || null,
         status:      'pending'
       })
     });
@@ -357,6 +358,23 @@ async function submitForm() {
     btn.innerHTML = 'Submit Registration Request';
   }
 }
+
+// Event-aware registration: ?event=<slug> selects which event this request is for
+(async function resolveRegEvent(){
+  try{
+    var slug=new URLSearchParams(window.location.search).get('event');
+    var url=SB_URL+'/rest/v1/events?select=id,name,slug,status,registration_open_date,registration_close_date&order=start_date.desc';
+    url+=slug?('&slug=eq.'+encodeURIComponent(slug)):'&status=in.(live,upcoming)';
+    var r=await fetch(url,{headers:HDR});var evs=await r.json();
+    if(!Array.isArray(evs)||!evs.length)return;
+    var today=new Date().toISOString().split('T')[0];
+    var ev=slug?evs[0]:evs.find(function(e){return e.registration_open_date&&e.registration_close_date&&today>=e.registration_open_date&&today<=e.registration_close_date;});
+    if(!ev)return;
+    window._regEvent={id:ev.id,slug:ev.slug,name:ev.name};
+    var h=document.querySelector('h1,.page-title,.form-title');
+    if(h)h.textContent='Register — '+ev.name;
+  }catch(e){console.warn('resolveRegEvent failed',e);}
+})();
 </script>
 </body>
 </html>
