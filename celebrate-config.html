@@ -199,6 +199,12 @@ input[type=checkbox].sw:checked::after{left:21px}
     <div class="row-end"><span class="saved-msg" id="saved-autoposts">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="autoposts">Save Auto-Post Rules</button></div>
   </div>
   <div class="scope-note">Note: enable/disable takes effect from the next nightly run. The generator never duplicates a card for the same person on the same date.</div>
+  <div class="card">
+    <div class="subhead">Post an Announcement 📢</div>
+    <div class="fld" style="margin-bottom:10px"><label>Title</label><input id="an-title" maxlength="120" placeholder="Happy Diwali to the Arcgate family! 🪔"></div>
+    <div class="fld" style="margin-bottom:10px"><label>Message (optional)</label><input id="an-msg" maxlength="2000" placeholder="Wishing everyone light, joy and prosperity…"></div>
+    <div class="row-end"><span style="color:#DC2626;font-size:12.5px;margin-right:auto" id="an-err"></span><span class="saved-msg" id="saved-announce">✅ Posted to feed</span><button class="btn btn-primary btn-sm" id="btn-announce">Post Announcement</button></div>
+  </div>
 </div>
 
 <!-- ==================== NOTIFICATIONS ==================== -->
@@ -440,6 +446,17 @@ document.getElementById('csv-file').addEventListener('change',function(){
   };
   reader.readAsText(f);
   this.value='';
+});
+
+document.getElementById('btn-announce').addEventListener('click',async function(){
+  var t=document.getElementById('an-title').value.trim();
+  var err=document.getElementById('an-err');err.textContent='';
+  if(!t){err.textContent='Title required';return;}
+  this.disabled=true;
+  var r=await api('/admin/celebrate/announce',{method:'POST',body:JSON.stringify({title:t,message:document.getElementById('an-msg').value.trim()})});
+  this.disabled=false;
+  if(r.success){document.getElementById('an-title').value='';document.getElementById('an-msg').value='';flashSaved('saved-announce');}
+  else err.textContent=r.error||'Failed';
 });
 
 loadConfig();loadPending();loadEmployees();

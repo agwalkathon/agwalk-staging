@@ -563,7 +563,7 @@ async function uploadPhoto(file){
 }
 
 /* ---------- Celebrate feed ---------- */
-var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'] };
+var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'] };
 var EMOJIS = ['🎉','❤️','👏'];
 
 async function loadCelebrate(){
@@ -577,6 +577,45 @@ async function loadCelebrate(){
       box.innerHTML = '<div class="placeholder"><div class="big">🎉</div>No celebrations yet.<br>Be the first to share one!</div>';
       return;
     }
+    // ── Today strip: today's birthdays / anniversaries / welcomes ──
+    var todayStr = new Date(Date.now() + 5.5*3600*1000).toISOString().split('T')[0];
+    var todays = d.items.filter(function(c){
+      return c.celebrate_date === todayStr && ['birthday','anniversary','welcome'].indexOf(c.type) > -1;
+    });
+    if (todays.length) {
+      var stripWrap = document.createElement('div');
+      stripWrap.style.cssText = 'margin-bottom:16px;';
+      var sh = document.createElement('div');
+      sh.style.cssText = 'font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--label);margin-bottom:10px;';
+      sh.textContent = "🎉 Today's Celebrations";
+      stripWrap.appendChild(sh);
+      var strip = document.createElement('div');
+      strip.style.cssText = 'display:flex;gap:14px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;';
+      todays.forEach(function(c){
+        var it = document.createElement('div');
+        it.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;width:64px;';
+        var av = document.createElement('div');
+        av.className = 'grad-avatar';
+        av.style.cssText += 'width:54px;height:54px;font-size:17px;position:relative;';
+        if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; av.appendChild(im); }
+        else av.textContent = initials(c.employee && c.employee.full_name);
+        var badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;bottom:-3px;right:-3px;font-size:15px;';
+        badge.textContent = (TYPE_META[c.type]||['🎉'])[0];
+        av.appendChild(badge);
+        var nm = document.createElement('div');
+        nm.style.cssText = 'font-size:10.5px;font-weight:600;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;';
+        nm.textContent = ((c.employee && c.employee.full_name) || '').split(' ')[0];
+        it.appendChild(av); it.appendChild(nm);
+        it.addEventListener('click', function(){
+          var target = document.querySelector('[data-celeb-id="' + c.id + '"]');
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        strip.appendChild(it);
+      });
+      stripWrap.appendChild(strip);
+      box.appendChild(stripWrap);
+    }
     d.items.forEach(function(c){ box.appendChild(buildCelebCard(c)); });
   } catch(e) {
     box.innerHTML = '<div class="placeholder">Could not load the feed. Pull to retry.</div>';
@@ -587,7 +626,9 @@ function buildCelebCard(c){
   var meta = TYPE_META[c.type] || TYPE_META.custom;
   var card = document.createElement('div');
   card.className = 'card';
+  card.setAttribute('data-celeb-id', c.id);
   card.style.borderLeft = '4px solid ' + meta[1];
+  if (c.type === 'announcement') card.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.10) 0%, var(--surface) 45%)';
 
   var head = document.createElement('div');
   head.style.cssText = 'display:flex;align-items:center;gap:11px;';
