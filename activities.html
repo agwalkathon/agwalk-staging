@@ -1186,7 +1186,7 @@ td button.btn:last-child { margin-right: 0; }
               <tr style="background:var(--page-bg);">
                 <th style="padding:10px 12px; text-align:center; width:36px;"><input type="checkbox" id="chk-all-preview" onchange="toggleAllPreviewCheckboxes(this.checked)" style="cursor:pointer; width:15px; height:15px;"></th>
                 <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase;">ATHLETE</th>
-                <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase; max-width:120px; width:120px;">ACTIVITY</th>
+                <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase; max-width:24ch; width:24ch;">ACTIVITY</th>
                 <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase;">TYPE</th>
                 <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase;">DATE</th>
                 <th style="padding:10px 12px; text-align:left; color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase;">DISTANCE</th>
@@ -3049,7 +3049,7 @@ async function previewFlagRules() {
       return '<tr' + already + ' data-idx="' + flagPreviewData.indexOf(m) + '"' + (a.is_flagged ? ' class="row-already-flagged"' : '') + '>'
         + ' <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="row-preview-chk" data-idx="' + flagPreviewData.indexOf(m) + '"' + chkChecked + chkDisabled + ' onchange="updateSelectedPreviewCount()" style="cursor:pointer;width:15px;height:15px"></td>'
         + '<td style="padding:8px 12px">' + (a.is_flagged ? '<span style="color:#bbb;font-size:11px">✓ already</span> ' : '') + '<a href="' + athleteUrl + '" target="_blank" style="color:#E8622A;font-weight:600;text-decoration:none">' + esc(m.name) + '</a></td>'
-        + '<td style="padding:8px 12px; max-width:120px;"><a href="' + actUrl + '" target="_blank" title="' + actName + '" style="color:#1A1A1A;text-decoration:none; display:inline-block; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + actName + '</a></td>'
+        + '<td style="padding:8px 12px; max-width:24ch; width:24ch;"><a href="' + actUrl + '" target="_blank" title="' + actName + '" style="color:#1A1A1A;text-decoration:none; display:inline-block; max-width:22ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + actName + '</a></td>'
         + '<td style="padding:8px 12px">' + esc(a.sport_type || '—') + '</td>'
         + '<td style="padding:8px 12px">' + dt + '</td>'
         + '<td style="padding:8px 12px">' + km + ' km</td>'
