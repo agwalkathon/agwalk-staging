@@ -119,7 +119,13 @@ body{
     <div class="hdr-inner">
       <div class="hdr-left"><img src="logo-white.png" alt="Arcgate" class="hdr-logo-img" onerror="this.style.display='none'"></div>
       <div class="hdr-center" id="header-title">Celebrate</div>
-      <div class="hdr-right"><div class="app-avatar" id="header-avatar">?</div></div>
+      <div class="hdr-right">
+        <button id="bell-btn" style="position:relative;background:none;border:none;cursor:pointer;padding:6px;margin-right:6px;color:var(--muted)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span id="bell-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--brand);border-radius:9px;font-size:10px;font-weight:700;color:#fff;line-height:16px;text-align:center;padding:0 4px"></span>
+        </button>
+        <div class="app-avatar" id="header-avatar">?</div>
+      </div>
     </div>
   </header>
 
@@ -148,6 +154,13 @@ body{
 
   <div class="tab-pane hidden" id="pane-profile">
     <div id="profile-box"><div class="skel"></div></div>
+  </div>
+
+  <div id="notif-panel" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300">
+    <div style="position:absolute;top:calc(56px + env(safe-area-inset-top));right:10px;left:10px;max-width:400px;margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.55);max-height:65dvh;display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:14px 16px;font-size:14px;font-weight:700;border-bottom:1px solid var(--border)">Notifications</div>
+      <div id="notif-list" style="overflow-y:auto;flex:1"></div>
+    </div>
   </div>
 
   <nav class="bottom-nav">
@@ -591,9 +604,67 @@ document.getElementById('post-submit').addEventListener('click', async function(
   this.disabled = false;
 });
 
+/* ---------- notifications ---------- */
+var _notifOpen = false;
+async function refreshBell(){
+  try {
+    var r = await fetch(BACKEND + '/employee/notifications', { headers: { Authorization: 'Bearer ' + getToken() } });
+    var d = await r.json();
+    var badge = document.getElementById('bell-badge');
+    if (d.unread > 0) { badge.textContent = d.unread > 9 ? '9+' : d.unread; badge.style.display = 'block'; }
+    else badge.style.display = 'none';
+    window._notifItems = d.items || [];
+  } catch(e){}
+}
+function timeAgo(iso){
+  var s = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if (s < 60) return 'now';
+  if (s < 3600) return Math.floor(s/60) + 'm';
+  if (s < 86400) return Math.floor(s/3600) + 'h';
+  return Math.floor(s/86400) + 'd';
+}
+var NOTIF_ICONS = { wish_received:'💬', post_approved:'✅', post_rejected:'🚫', birthday:'🎂' };
+async function openNotifPanel(){
+  var panel = document.getElementById('notif-panel');
+  var list = document.getElementById('notif-list');
+  panel.classList.remove('hidden');
+  _notifOpen = true;
+  var items = window._notifItems || [];
+  list.textContent = '';
+  if (!items.length) {
+    list.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--label);font-size:13px">No notifications yet 🔕</div>';
+  } else {
+    items.forEach(function(n){
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:11px;padding:12px 16px;border-bottom:1px solid var(--border);' + (n.is_read ? 'opacity:.6;' : '');
+      var ic = document.createElement('div'); ic.style.cssText = 'font-size:19px;flex-shrink:0;'; ic.textContent = NOTIF_ICONS[n.type] || '🔔';
+      var bd = document.createElement('div'); bd.style.cssText = 'flex:1;min-width:0;';
+      var t = document.createElement('div'); t.style.cssText = 'font-size:13.5px;font-weight:600;line-height:1.35;'; t.textContent = n.title;
+      bd.appendChild(t);
+      if (n.body) { var b = document.createElement('div'); b.style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:2px;'; b.textContent = n.body; bd.appendChild(b); }
+      var tm = document.createElement('div'); tm.style.cssText = 'font-size:11px;color:var(--label);flex-shrink:0;'; tm.textContent = timeAgo(n.created_at);
+      row.appendChild(ic); row.appendChild(bd); row.appendChild(tm);
+      list.appendChild(row);
+    });
+  }
+  // mark all read
+  try {
+    await fetch(BACKEND + '/employee/notifications/read', { method:'POST', headers: { Authorization: 'Bearer ' + getToken() } });
+    document.getElementById('bell-badge').style.display = 'none';
+    (window._notifItems || []).forEach(function(n){ n.is_read = true; });
+  } catch(e){}
+}
+document.getElementById('bell-btn').addEventListener('click', function(){
+  if (_notifOpen) { document.getElementById('notif-panel').classList.add('hidden'); _notifOpen = false; }
+  else openNotifPanel();
+});
+document.getElementById('notif-panel').addEventListener('click', function(e){
+  if (e.target === this) { this.classList.add('hidden'); _notifOpen = false; }
+});
+
 /* ---------- boot ---------- */
 var _origEnterApp = enterApp;
-enterApp = function(){ _origEnterApp(); loadCelebrate(); };
+enterApp = function(){ _origEnterApp(); loadCelebrate(); refreshBell(); setInterval(refreshBell, 90000); };
 if (tokenValid(getToken())) enterApp();
 </script>
 </body>
