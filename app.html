@@ -49,16 +49,23 @@ body{
 .otp-box{width:46px;height:54px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
 .otp-box:focus{outline:none;border-color:var(--brand)}
 .login-link{background:none;border:none;color:var(--brand-soft);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px}
-/* ── App header (glass, exact participant pattern) ── */
+/* ── App header (exact participant classes) ── */
 #app-screen{padding-bottom:96px;min-height:100dvh}
 .header{position:sticky;top:0;z-index:200;background:rgba(31,38,45,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:max(14px,env(safe-area-inset-top)) 16px 14px}
 .hdr-inner{max-width:540px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hdr-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
 .hdr-logo-img{height:26px;width:auto}
 .hdr-center{display:flex;align-items:center;justify-content:center;flex:1.5;min-width:0;font-size:12px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap}
-.hdr-right{display:flex;align-items:center;flex:1;justify-content:flex-end;min-width:0}
-.app-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand-soft);overflow:hidden}
-.app-avatar img{width:100%;height:100%;object-fit:cover}
+.hdr-right{display:flex;align-items:center;gap:0;flex:1;justify-content:flex-end;min-width:0}
+.hdr-avatar{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #f472b6 0%, #E8622A 70%, #c94a10 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:0.5px;border:none;box-shadow:0 0 0 2px rgba(232,98,42,0.3), 0 2px 8px rgba(232,98,42,0.25);flex-shrink:0;cursor:pointer;transition:box-shadow 0.2s ease;overflow:hidden}
+.hdr-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.hdr-btn{width:38px;height:38px;border-radius:50%;background:none;border:none;color:rgba(255,255,255,0.90);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease}
+.hdr-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
+.hdr-btn:active{transform:scale(0.95);background:rgba(255,255,255,0.12)}
+.hdr-btn svg{width:20px;height:20px}
+.hdr-date-pill{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fff}
+.grad-avatar{border-radius:50%;background:radial-gradient(circle at 30% 30%, #f472b6 0%, #E8622A 70%, #c94a10 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:0.5px;box-shadow:0 0 0 2px rgba(232,98,42,0.3), 0 2px 8px rgba(232,98,42,0.25);overflow:hidden;flex-shrink:0}
+.grad-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 /* ── Content ── */
 .tab-pane{padding:16px 16px 20px;max-width:540px;margin:0 auto}
 .placeholder{text-align:center;padding:70px 20px;color:var(--label)}
@@ -117,14 +124,18 @@ body{
 <div id="app-screen" class="hidden">
   <header class="header">
     <div class="hdr-inner">
-      <div class="hdr-left"><img src="logo-white.png" alt="Arcgate" class="hdr-logo-img" onerror="this.style.display='none'"></div>
-      <div class="hdr-center" id="header-title">Celebrate</div>
-      <div class="hdr-right">
-        <button id="bell-btn" style="position:relative;background:none;border:none;cursor:pointer;padding:6px;margin-right:6px;color:var(--muted)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          <span id="bell-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--brand);border-radius:9px;font-size:10px;font-weight:700;color:#fff;line-height:16px;text-align:center;padding:0 4px"></span>
+      <div class="hdr-left">
+        <div class="hdr-avatar" id="header-avatar" onclick="switchTab('profile')">?</div>
+        <button class="hdr-btn" id="bell-btn" title="Notifications" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="bell-badge" style="position:absolute;top:2px;right:2px;background:#FC6100;color:#fff;border-radius:9px;min-width:10px;height:10px;display:none;border:1.5px solid var(--surface);font-size:8px;line-height:10px;text-align:center;padding:0 2px"></span>
         </button>
-        <div class="app-avatar" id="header-avatar">?</div>
+      </div>
+      <div class="hdr-center"><div class="hdr-date-pill"><span id="hdr-today-date">—</span></div></div>
+      <div class="hdr-right">
+        <button class="hdr-btn" id="hdr-refresh" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -170,18 +181,18 @@ body{
 
   <nav class="bottom-nav">
     <div class="bnav-indicator" id="bnav-indicator"></div>
-    <button class="bnav-item active" data-tab="celebrate">
-      <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.9 8.6 3 5 6.5 5c2 0 3.5 1 4.5 2.5v0H12v0C13 6 14.5 5 16.5 5 20 5 22.1 8.6 20.5 12 18 16.5 12 21 12 21z" transform="scale(0.9) translate(1.3,1)"/></svg>
+    <a class="bnav-item active" id="bnav-celebrate" href="#" data-tab="celebrate" onclick="return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       <span class="bnav-label">Celebrate</span>
-    </button>
-    <button class="bnav-item" data-tab="events">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </a>
+    <a class="bnav-item" id="bnav-events" href="#" data-tab="events" onclick="return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span class="bnav-label">Events</span>
-    </button>
-    <button class="bnav-item" data-tab="profile">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+    </a>
+    <a class="bnav-item" id="bnav-profile" href="#" data-tab="profile" onclick="return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="bnav-label">Profile</span>
-    </button>
+    </a>
   </nav>
 </div>
 
@@ -323,7 +334,6 @@ function switchTab(tab){
     n.classList.toggle('active', n.getAttribute('data-tab') === tab);
   });
   moveIndicator();
-  document.getElementById('header-title').textContent = TITLES[tab];
   if (tab === 'events' && !_loaded.events) { _loaded.events = true; loadAppEvents(); }
   if (tab === 'profile' && !_loaded.profile) { _loaded.profile = true; loadProfile(); }
 }
@@ -331,6 +341,7 @@ document.querySelectorAll('.bnav-item').forEach(function(n){
   n.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
 });
 
+function initials(name){ return (name || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase(); }
 function enterApp(){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
@@ -339,7 +350,16 @@ function enterApp(){
   var av = document.getElementById('header-avatar');
   av.textContent = '';
   if (emp.photo_url) { var img = document.createElement('img'); img.src = emp.photo_url; av.appendChild(img); }
-  else av.textContent = (emp.full_name || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+  else av.textContent = initials(emp.full_name);
+  var dt = new Date();
+  var days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('hdr-today-date').textContent = days[dt.getDay()] + ', ' + dt.getDate() + ' ' + months[dt.getMonth()];
+  document.getElementById('hdr-refresh').addEventListener('click', function(){
+    _loaded = {}; loadCelebrate(); refreshBell();
+    var active = document.querySelector('.bnav-item.active');
+    if (active) switchTab(active.getAttribute('data-tab'));
+  });
 }
 
 /* ---------- Events tab (employee view) ---------- */
@@ -412,7 +432,19 @@ async function loadProfile(){
     var e = d.employee || {};
     setEmp(e);
     box.textContent = '';
-    [['Name', e.full_name], ['Employee Code', e.emp_code], ['Email', e.email],
+    var hero = document.createElement('div');
+    hero.className = 'card';
+    hero.style.cssText += 'display:flex;flex-direction:column;align-items:center;padding:26px 16px;';
+    var ha = document.createElement('div');
+    ha.className = 'grad-avatar';
+    ha.style.cssText += 'width:76px;height:76px;font-size:26px;margin-bottom:12px;';
+    if (e.photo_url) { var hi = document.createElement('img'); hi.src = e.photo_url; ha.appendChild(hi); }
+    else ha.textContent = initials(e.full_name);
+    var hn = document.createElement('div'); hn.style.cssText = 'font-size:17px;font-weight:800;'; hn.textContent = e.full_name || '';
+    var hd = document.createElement('div'); hd.style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:3px;'; hd.textContent = (e.designation ? e.designation + ' · ' : '') + (e.department || '');
+    hero.appendChild(ha); hero.appendChild(hn); hero.appendChild(hd);
+    box.appendChild(hero);
+    [['Employee Code', e.emp_code], ['Email', e.email],
      ['Department', e.department || '—'], ['Enrolled Events', String((d.enrollments || []).length)]].forEach(function(f){
       var c = document.createElement('div'); c.className = 'card';
       var l = document.createElement('div'); l.className = 'lbl'; l.textContent = f[0];
