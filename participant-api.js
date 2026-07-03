@@ -265,26 +265,19 @@ async function load(isBackgroundRefresh) {
     LB_ME=reg;
     var name=reg.full_name||s.name||'Participant';
 
-    var photo = s.profilePhoto || '';
-    var hasPhoto = photo && photo !== 'null' && photo !== 'undefined' && !photo.includes('large.png') && !photo.includes('avatar/athlete');
-    var initials=(function(){var parts=(name||'').trim().split(/\s+/);if(parts.length>=2)return(parts[0][0]+(parts[parts.length-1][0])).toUpperCase();return(parts[0]||'?')[0].toUpperCase();})();
-    var avatarEl=document.getElementById('hdr-avatar');
-    if(avatarEl) {
-      if (hasPhoto) {
-        avatarEl.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      } else {
-        avatarEl.textContent = initials;
-        avatarEl.setAttribute('style', getAvatarStyle(name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;');
-      }
+    var initials = typeof get2Initials === 'function' ? get2Initials(name) : name.substring(0,2).toUpperCase();
+    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
+    
+    var avatarEl = document.getElementById('hdr-avatar');
+    if (avatarEl) {
+      avatarEl.textContent = initials;
+      avatarEl.setAttribute('style', styleFunc(name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px;');
     }
-    var youAvatarEl=document.getElementById('you-avatar');
-    if(youAvatarEl) {
-      if (hasPhoto) {
-        youAvatarEl.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      } else {
-        youAvatarEl.textContent = initials;
-        youAvatarEl.setAttribute('style', getAvatarStyle(name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center;');
-      }
+    
+    var youAvatarEl = document.getElementById('you-avatar');
+    if (youAvatarEl) {
+      youAvatarEl.textContent = initials;
+      youAvatarEl.setAttribute('style', styleFunc(name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:1px;');
     }
     var youNameEl=document.getElementById('you-name');if(youNameEl)youNameEl.textContent=name.toUpperCase();
     if(document.getElementById('you-emp-code'))document.getElementById('you-emp-code').textContent=reg.emp_code||'—';
@@ -1254,17 +1247,19 @@ async function bootAppUnified() {
     if (typeof loadCelebrate === 'function') loadCelebrate();
     if (typeof initEmployeeModeListeners === 'function') initEmployeeModeListeners();
     
-    var initials=(function(){var parts=(emp.full_name||'').trim().split(/\s+/);if(parts.length>=2)return(parts[0][0]+(parts[parts.length-1][0])).toUpperCase();return(parts[0]||'?')[0].toUpperCase();})();
-    var avatarEl=document.getElementById('hdr-avatar');
-    if(avatarEl) {
+    var initials = typeof get2Initials === 'function' ? get2Initials(emp.full_name) : emp.full_name.substring(0,2).toUpperCase();
+    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
+    
+    var avatarEl = document.getElementById('hdr-avatar');
+    if (avatarEl) {
       avatarEl.textContent = initials;
-      avatarEl.setAttribute('style', getGlassmorphicAvatarStyle(emp.full_name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;');
+      avatarEl.setAttribute('style', styleFunc(emp.full_name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px;');
     }
     
-    var youAvatarEl=document.getElementById('you-avatar');
-    if(youAvatarEl) {
+    var youAvatarEl = document.getElementById('you-avatar');
+    if (youAvatarEl) {
       youAvatarEl.textContent = initials;
-      youAvatarEl.setAttribute('style', getGlassmorphicAvatarStyle(emp.full_name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center;');
+      youAvatarEl.setAttribute('style', styleFunc(emp.full_name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:1px;');
     }
     var youNameEl=document.getElementById('you-name');if(youNameEl)youNameEl.textContent=emp.full_name.toUpperCase();
     if(document.getElementById('you-emp-code'))document.getElementById('you-emp-code').textContent=emp.emp_code||'—';
