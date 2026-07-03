@@ -106,6 +106,7 @@
     .foot-note{text-align:center;font-size:11px;color:var(--muted);margin-top:20px;
                line-height:1.7;}
     .foot-note a{color:var(--brand);text-decoration:none;}
+    .hidden{display:none!important;}
   </style>
 </head>
 <body>
@@ -128,45 +129,71 @@
   <!-- Form -->
   <div id="form-wrap">
 
-    <div class="card">
-      <div class="card-title">Personal Details</div>
-
-      <div class="field" id="f-name">
-        <label>Full Name <span class="req">*</span></label>
-        <input type="text" id="full_name" placeholder="e.g. Priya Sharma" autocomplete="name">
-        <div class="err-msg">Please enter your full name</div>
-      </div>
-
+    <!-- Step 1: Verification -->
+    <div class="card" id="verify-card">
+      <div class="card-title">Verify Employee Details</div>
+      <p style="font-size: 13px; color: var(--text2); margin-bottom: 15px; line-height: 1.5;">Please enter your Employee Code and Email to verify your active employment before registering.</p>
+      
       <div class="grid-2">
-        <div class="field" id="f-emp">
+        <div class="field" id="f-emp-verify">
           <label>Employee Code <span class="req">*</span></label>
-          <input type="text" id="emp_code" placeholder="e.g. AG1234" autocomplete="off">
-          <div class="err-msg">Required</div>
+          <input type="text" id="verify_emp_code" placeholder="e.g. AG1234" autocomplete="off">
+          <div class="err-msg" id="err-emp-verify">Required</div>
         </div>
-        <div class="field" id="f-gender">
-          <label>Gender <span class="req">*</span></label>
-          <select id="gender">
-            <option value="">— Select —</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          <div class="err-msg">Required</div>
+        <div class="field" id="f-email-verify">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="verify_email" placeholder="you@arcgate.com" autocomplete="email">
+          <div class="err-msg" id="err-email-verify">Required</div>
         </div>
       </div>
-
-      <div class="field" id="f-email">
-        <label>Personal Email <span class="req">*</span></label>
-        <input type="email" id="email" placeholder="you@gmail.com" autocomplete="email">
-        <div class="err-msg">Please enter a valid email</div>
-      </div>
-
-      <div class="field" id="f-whatsapp">
-        <label>WhatsApp Number <span class="req">*</span></label>
-        <input type="tel" id="whatsapp" placeholder="+91 98765 43210" autocomplete="tel">
-        <div class="hint">Used for walkathon updates only</div>
-        <div class="err-msg">Required</div>
-      </div>
+      
+      <button class="btn-submit" id="verify-btn" onclick="verifyEmployee()" style="margin-top: 15px; background: #4F46E5; box-shadow: 0 4px 14px rgba(79,70,229,0.3);">
+        Verify Employee
+      </button>
     </div>
+
+    <!-- Step 2: Remaining Details (Initially Hidden) -->
+    <div id="remaining-fields" class="hidden">
+      
+      <div class="card">
+        <div class="card-title">Personal Details</div>
+
+        <div class="field" id="f-name">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="full_name" placeholder="e.g. Priya Sharma" autocomplete="name" disabled style="opacity: 0.7; cursor: not-allowed;">
+          <div class="err-msg">Please enter your full name</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field" id="f-emp">
+            <label>Employee Code <span class="req">*</span></label>
+            <input type="text" id="emp_code" placeholder="e.g. AG1234" autocomplete="off" disabled style="opacity: 0.7; cursor: not-allowed;">
+            <div class="err-msg">Required</div>
+          </div>
+          <div class="field" id="f-gender">
+            <label>Gender <span class="req">*</span></label>
+            <select id="gender">
+              <option value="">— Select —</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <div class="err-msg">Required</div>
+          </div>
+        </div>
+
+        <div class="field" id="f-email">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="you@arcgate.com" autocomplete="email" disabled style="opacity: 0.7; cursor: not-allowed;">
+          <div class="err-msg">Please enter a valid email</div>
+        </div>
+
+        <div class="field" id="f-whatsapp">
+          <label>WhatsApp Number <span class="req">*</span></label>
+          <input type="tel" id="whatsapp" placeholder="+91 98765 43210" autocomplete="tel">
+          <div class="hint">Used for walkathon updates only</div>
+          <div class="err-msg">Required</div>
+        </div>
+      </div>
 
     <div class="card">
       <div class="card-title">Walkathon Details</div>
@@ -251,6 +278,7 @@
 var SB_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR    = { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json' };
+var BACKEND_URL = 'https://agwalk-backend.onrender.com';
 
 function val(id) { return document.getElementById(id).value.trim(); }
 
@@ -262,20 +290,75 @@ function setError(fieldId, show) {
 function showAlert(msg) {
   ['alert','alert-bottom'].forEach(function(id) {
     var el = document.getElementById(id);
-    el.textContent = msg;
-    el.classList.add('show');
+    if (el) {
+      el.textContent = msg;
+      el.classList.add('show');
+    }
   });
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function hideAlert() {
   ['alert','alert-bottom'].forEach(function(id) {
-    document.getElementById(id).classList.remove('show');
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('show');
   });
 }
 
 function validateEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+async function verifyEmployee() {
+  hideAlert();
+  var empCode = val('verify_emp_code');
+  var email = val('verify_email');
+
+  var ok = true;
+  setError('f-emp-verify', !empCode); if (!empCode) ok = false;
+  setError('f-email-verify', !validateEmail(email)); if (!validateEmail(email)) ok = false;
+
+  if (!ok) {
+    showAlert('Please enter your Employee Code and Email.');
+    return;
+  }
+
+  var btn = document.getElementById('verify-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Verifying...';
+
+  try {
+    var res = await fetch(BACKEND_URL + '/verify-employee', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, emp_code: empCode })
+    });
+    var d = await res.json();
+    if (!res.ok || !d.success) {
+      throw new Error(d.error || 'Employee verification failed.');
+    }
+    
+    // Success: pre-fill and lock
+    var emp = d.employee;
+    document.getElementById('full_name').value = emp.full_name;
+    document.getElementById('emp_code').value = emp.emp_code;
+    document.getElementById('email').value = emp.email;
+    if (emp.gender) {
+      document.getElementById('gender').value = emp.gender;
+      document.getElementById('gender').disabled = true;
+      document.getElementById('gender').style.opacity = '0.7';
+      document.getElementById('gender').style.cursor = 'not-allowed';
+    }
+
+    document.getElementById('verify-card').classList.add('hidden');
+    document.getElementById('remaining-fields').classList.remove('hidden');
+    hideAlert();
+  } catch(e) {
+    showAlert('⚠️ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Verify Employee';
+  }
 }
 
 async function submitForm() {
@@ -317,9 +400,9 @@ async function submitForm() {
   btn.innerHTML = '<div class="spinner"></div> Submitting...';
 
   try {
-    var res = await fetch(SB_URL + '/rest/v1/registration_requests', {
+    var res = await fetch(BACKEND_URL + '/register-request', {
       method: 'POST',
-      headers: Object.assign({}, HDR, { Prefer: 'return=minimal' }),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         full_name:   full_name,
         emp_code:    emp_code,
@@ -332,22 +415,21 @@ async function submitForm() {
         team_lead:   team_lead,
         strava_url:  strava_url,
         event_name:  (window._regEvent && window._regEvent.slug) || 'walkathon2026',
-        event_id:    (window._regEvent && window._regEvent.id) || null,
-        status:      'pending'
+        event_id:    (window._regEvent && window._regEvent.id) || null
       })
     });
 
-    if (res.ok || res.status === 201) {
+    var d = await res.json().catch(function(){return{};});
+    if (res.ok && d.success) {
       document.getElementById('form-wrap').style.display = 'none';
       document.getElementById('success-card').style.display = 'block';
       window.scrollTo({top: 0, behavior: 'smooth'});
     } else {
-      var body = await res.text();
-      // Check for duplicate emp_code
-      if (body.includes('duplicate') || body.includes('unique') || res.status === 409) {
+      var errText = d.error || 'Failed';
+      if (errText.indexOf('duplicate') > -1 || errText.indexOf('exists') > -1) {
         showAlert('⚠️ A request with this Employee Code already exists. If you need help, contact pra@arcgate.com');
       } else {
-        showAlert('❌ Submission failed (error ' + res.status + '). Please try again.');
+        showAlert('❌ Submission failed: ' + errText);
       }
       btn.disabled = false;
       btn.innerHTML = 'Submit Registration Request';
