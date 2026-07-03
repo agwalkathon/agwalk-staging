@@ -1200,14 +1200,13 @@ async function bootAppUnified() {
   var emp = getEmp();
 
   if (!isParticipant && (!tokenValid(token) || !emp)) {
-    document.getElementById('app-screen').classList.add('hidden');
-    document.getElementById('login-screen').classList.remove('hidden');
+    document.documentElement.classList.remove('app-logged-in');
     if (typeof hideSplash === 'function') hideSplash();
     return;
   }
 
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app-screen').classList.remove('hidden');
+  // Apply the FOUC class — this is what the CSS uses to show #app-screen and hide #login-screen
+  document.documentElement.classList.add('app-logged-in');
 
   if (!isParticipant) {
     try {
