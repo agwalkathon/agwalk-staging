@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="960" height="720" fill="#0E1012" rx="16"/>
+  
+  <!-- Definitions for gradients and markers -->
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FC6100"/>
+      <stop offset="100%" stop-color="#E8622A"/>
+    </linearGradient>
+    <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="green-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#E8622A"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="45" fill="#FFFFFF" font-family="'Segoe UI', sans-serif" font-size="22" font-weight="800" text-anchor="middle" letter-spacing="0.5">Arcgate Walkathon 2026</text>
+  <text x="480" y="70" fill="#9CA3AF" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="600" text-anchor="middle">Application Navigation Flow Diagram</text>
+
+  <!-- Nodes Group -->
+  <g font-family="'Segoe UI', sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+    
+    <!-- Start Node -->
+    <rect x="400" y="100" width="160" height="40" rx="20" fill="url(#blue-grad)"/>
+    <text x="480" y="124" fill="#FFFFFF">User Visits App URL</text>
+
+    <!-- Session Check Decision -->
+    <rect x="380" y="180" width="200" height="50" rx="10" fill="#282E36" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="480" y="204" fill="#FFFFFF">Has Active Token/Session?</text>
+    <text x="480" y="220" font-size="10" fill="#9CA3AF" font-weight="500">localStorage check</text>
+
+    <!-- Login Page Step 1 (Email) -->
+    <rect x="180" y="270" width="180" height="46" rx="8" fill="#181B20" stroke="url(#brand-grad)" stroke-width="1.5"/>
+    <text x="270" y="292" fill="#FFFFFF">Login: Email Input</text>
+    <text x="270" y="306" font-size="10" fill="#9CA3AF" font-weight="500">participant.html</text>
+
+    <!-- Login Page Step 2 (OTP) -->
+    <rect x="180" y="360" width="180" height="46" rx="8" fill="#181B20" stroke="url(#brand-grad)" stroke-width="1.5"/>
+    <text x="270" y="382" fill="#FFFFFF">OTP Verification</text>
+    <text x="270" y="396" font-size="10" fill="#9CA3AF" font-weight="500">step-otp</text>
+
+    <!-- Main Viewport Router -->
+    <rect x="400" y="440" width="160" height="44" rx="22" fill="url(#green-grad)"/>
+    <text x="480" y="466" fill="#FFFFFF">Main App Screen</text>
+
+    <!-- Participant (5 Tabs) -->
+    <rect x="580" y="440" width="200" height="50" rx="10" fill="#181B20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="680" y="464" fill="#FFFFFF">Participant View (5 Tabs)</text>
+    <text x="680" y="480" font-size="10" fill="#10B981" font-weight="600">DASHBOARD • LEADERS • EVENTS • POSTS • YOU</text>
+
+    <!-- Employee View (3 Tabs) -->
+    <rect x="580" y="530" width="200" height="50" rx="10" fill="#181B20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="680" y="554" fill="#FFFFFF">Employee View (3 Tabs)</text>
+    <text x="680" y="570" font-size="10" fill="#3B82F6" font-weight="600">CELEBRATE • EVENTS • PROFILE</text>
+
+    <!-- Sub-Screens Modals / Drawers -->
+    <rect x="360" y="620" width="240" height="50" rx="10" fill="#1E293B" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="480" y="644" fill="#FFFFFF">Overlays (Modals &amp; Drawers)</text>
+    <text x="480" y="660" font-size="9.5" fill="#9CA3AF" font-weight="500">Activity/Profile Detail • Post Drawer • Share Sheet</text>
+
+  </g>
+
+  <!-- Connection Lines Group -->
+  <g fill="none" stroke-width="1.8" stroke-linecap="round">
+    
+    <!-- Start -> Session Check -->
+    <path d="M 480 140 L 480 180" stroke="#4B5563" marker-end="url(#arrow)"/>
+
+    <!-- Session Check -> Login Page (No Session) -->
+    <path d="M 380 205 L 270 205 L 270 270" stroke="#4B5563" marker-end="url(#arrow)"/>
+    <text x="310" y="196" fill="#EF4444" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" text-anchor="middle">No Session</text>
+
+    <!-- Session Check -> Main App (Active Session) -->
+    <path d="M 480 230 L 480 440" stroke="#10B981" marker-end="url(#arrow)"/>
+    <text x="522" y="250" fill="#10B981" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Token Valid</text>
+
+    <!-- Email Step -> OTP Step -->
+    <path d="M 270 316 L 270 360" stroke="#E8622A" marker-end="url(#arrow-brand)"/>
+    <text x="315" y="342" fill="#E8622A" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Send Code</text>
+
+    <!-- OTP Step -> Main App Screen -->
+    <path d="M 270 406 L 270 462 L 400 462" stroke="#10B981" marker-end="url(#arrow)"/>
+    <text x="330" y="454" fill="#10B981" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Verified</text>
+
+    <!-- Router -> Participant (If Athlete) -->
+    <path d="M 560 465 L 580 465" stroke="#10B981" marker-end="url(#arrow)"/>
+
+    <!-- Router -> Employee (If SPECTATOR / No Strava) -->
+    <path d="M 480 484 L 480 555 L 580 555" stroke="#3B82F6" marker-end="url(#arrow)"/>
+    <text x="500" y="525" fill="#3B82F6" font-family="'Segoe UI', sans-serif" font-size="9" font-weight="bold" text-anchor="left">Spectator / Employee</text>
+
+    <!-- Tabs views -> Overlays -->
+    <path d="M 680 490 L 680 645 L 600 645" stroke="#9CA3AF" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+    <path d="M 680 580 L 680 645" stroke="#9CA3AF" stroke-dasharray="4 4"/>
+    <text x="690" y="620" fill="#9CA3AF" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="bold" text-anchor="left">Launch Modals</text>
+
+    <!-- Overlays back to Main App -->
+    <path d="M 360 645 L 290 645 L 290 520 L 420 520 L 420 484" stroke="#4B5563" stroke-dasharray="3 3" marker-end="url(#arrow)"/>
+    <text x="280" y="580" fill="#9CA3AF" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="bold" text-anchor="end">Click Back / Exit</text>
+
+    <!-- Main App -> Sign Out -> Login (Session Clear) -->
+    <path d="M 400 450 L 130 450 L 130 292 L 180 292" stroke="#EF4444" marker-end="url(#arrow)"/>
+    <text x="120" y="334" fill="#EF4444" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="bold" text-anchor="end">Sign Out (Clears Token)</text>
+
+  </g>
+</svg>
