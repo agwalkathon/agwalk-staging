@@ -1187,6 +1187,9 @@ async function loadNotifications() {
 }
 
 async function bootAppUnified() {
+  if (typeof loadBranding === 'function') {
+    await loadBranding();
+  }
   var isParticipant = false;
   var s = null;
   try {
