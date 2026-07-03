@@ -123,6 +123,7 @@ input[type=checkbox].sw:checked::after{left:21px}
   <button class="tab-btn" data-tab="autoposts">Auto-Posts</button>
   <button class="tab-btn" data-tab="notifications">Notifications</button>
   <button class="tab-btn" data-tab="media">Media</button>
+  <button class="tab-btn" data-tab="branding">Branding</button>
 </div>
 
 <!-- ==================== MODERATION ==================== -->
@@ -244,6 +245,21 @@ input[type=checkbox].sw:checked::after{left:21px}
   </div>
 </div>
 
+<!-- ==================== BRANDING ==================== -->
+<div class="panel" id="panel-branding">
+  <div class="card">
+    <div class="subhead">Employee App Branding</div>
+    <div class="scope-note">Applied to the app.html login screen and header. Changes are live on next app load — no deploy needed.</div>
+    <div class="grid">
+      <div class="fld"><label>App Name</label><input id="br-name" maxlength="40" placeholder="Arcgate"></div>
+      <div class="fld"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
+      <div class="fld"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
+      <div class="fld"><label>Logo URL</label><input id="br-logo" placeholder="https://…/arcgate-logo.png"></div>
+    </div>
+    <div class="row-end"><span class="saved-msg" id="saved-branding">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="branding">Save Branding</button></div>
+  </div>
+</div>
+
 </div>
 </div>
 <script>
@@ -295,6 +311,11 @@ async function loadConfig(){
   document.getElementById('wa-phone').value=wa.phone_id||'';
   document.getElementById('wa-tpl-bday').value=wa.tpl_birthday||'';
   document.getElementById('wa-tpl-approve').value=wa.tpl_approved||'';
+  var br=CFG.branding||{};
+  document.getElementById('br-name').value=br.app_name||'';
+  document.getElementById('br-title').value=br.login_title||'';
+  document.getElementById('br-tag').value=br.tagline||'';
+  document.getElementById('br-logo').value=br.logo_url||'';
   var crm=CFG.crm||{};
   document.getElementById('crm-url').value=crm.url||'';
   document.getElementById('crm-key').value=crm.api_key||'';
@@ -317,6 +338,7 @@ document.querySelectorAll('[data-save]').forEach(function(btn){
     if(which==='media'){key='media';value={photos:document.getElementById('md-photos').checked,videos:document.getElementById('md-videos').checked,max_photo_mb:parseInt(document.getElementById('md-photo-mb').value)||5,max_video_mb:parseInt(document.getElementById('md-video-mb').value)||25,provider:document.getElementById('md-provider').value};}
     if(which==='channels'){key='channels';value={inapp:document.getElementById('nt-inapp').checked,push:document.getElementById('nt-push').checked,whatsapp:document.getElementById('nt-wa').checked};}
     if(which==='wa'){key='whatsapp';value={provider:document.getElementById('wa-provider').value,api_key:document.getElementById('wa-key').value,phone_id:document.getElementById('wa-phone').value,tpl_birthday:document.getElementById('wa-tpl-bday').value,tpl_approved:document.getElementById('wa-tpl-approve').value};}
+    if(which==='branding'){key='branding';value={app_name:document.getElementById('br-name').value.trim(),login_title:document.getElementById('br-title').value.trim(),tagline:document.getElementById('br-tag').value.trim(),logo_url:document.getElementById('br-logo').value.trim()};}
     if(which==='crm'){key='crm';value={url:document.getElementById('crm-url').value,api_key:document.getElementById('crm-key').value,frequency:document.getElementById('crm-freq').value,enabled:document.getElementById('crm-enabled').checked};}
     var r=await api('/admin/celebrate/config',{method:'POST',body:JSON.stringify({config_key:key,config_value:value})});
     if(r.success)flashSaved('saved-'+which);else alert('Save failed: '+(r.error||''));

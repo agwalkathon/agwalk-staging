@@ -156,8 +156,8 @@ body{
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo"><img src="logo-white.png" alt="Arcgate" onerror="this.parentNode.innerHTML='<div class=fallback>🏆</div>'"></div>
-    <div class="login-title">Arcgate Employee App</div>
-    <div class="login-sub" id="login-sub">Sign in with your company email</div>
+    <div class="login-title" id="br-login-title">Arcgate Employee App</div>
+    <div class="login-sub" id="br-login-sub">Sign in with your company email</div>
 
     <div id="step-email">
       <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
@@ -1300,6 +1300,27 @@ async function enablePush(){
   var d = await r.json();
   if (!d.success) throw new Error(d.error || 'Subscribe failed');
 }
+
+/* ---------- branding ---------- */
+(function applyBranding(){
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem('ag_branding') || 'null'); } catch(e){}
+  function apply(b){
+    if (!b) return;
+    try {
+      if (b.login_title) document.getElementById('br-login-title').textContent = b.login_title;
+      if (b.tagline) document.getElementById('br-login-sub').textContent = b.tagline;
+      if (b.app_name) document.title = b.app_name;
+      if (b.logo_url) {
+        document.querySelectorAll('.login-logo img, .hdr-logo-img').forEach(function(im){ im.src = b.logo_url; im.style.display = ''; });
+      }
+    } catch(e){}
+  }
+  if (cached) apply(cached);
+  fetch(BACKEND + '/branding').then(function(r){ return r.json(); }).then(function(d){
+    if (d.branding) { try { localStorage.setItem('ag_branding', JSON.stringify(d.branding)); } catch(e){} apply(d.branding); }
+  }).catch(function(){});
+})();
 
 /* ---------- embed mode (inside participant.html iframe) ---------- */
 var IS_EMBED = new URLSearchParams(window.location.search).get('embed') === '1';
