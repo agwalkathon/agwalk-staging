@@ -599,6 +599,44 @@ async function loadBranding() {
           appNameEl.style.opacity = '1';
         }
       }
+
+      // Inject custom accent color style overrides if set
+      if (b.accent_color) {
+        var styleEl = document.createElement('style');
+        styleEl.id = 'dynamic-branding-style';
+        
+        // Helper to convert hex to rgba for shadow opacity
+        var hexToRgba = function(hex, alpha) {
+          var c = hex.replace('#', '');
+          if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+          var rVal = parseInt(c.substring(0, 2), 16);
+          var gVal = parseInt(c.substring(2, 4), 16);
+          var bVal = parseInt(c.substring(4, 6), 16);
+          return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
+        };
+        
+        styleEl.textContent = `
+          .login-btn {
+            background: ${b.accent_color} !important;
+            box-shadow: 0 4px 20px ${hexToRgba(b.accent_color, 0.28)} !important;
+          }
+          .login-btn:hover {
+            opacity: 0.95;
+          }
+          .login-link, .login-terms a {
+            color: ${b.accent_color} !important;
+          }
+          #br-app-name {
+            color: ${b.accent_color} !important;
+          }
+          input.login-field:focus {
+            border-color: ${b.accent_color} !important;
+          }
+        `;
+        var oldStyle = document.getElementById('dynamic-branding-style');
+        if (oldStyle) oldStyle.remove();
+        document.head.appendChild(styleEl);
+      }
     } else {
       if (lEl) {
         lEl.onerror = function() {
