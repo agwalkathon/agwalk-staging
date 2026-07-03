@@ -563,3 +563,32 @@ function initEmployeeModeListeners() {
     });
   }
 }
+
+async function loadBranding() {
+  try {
+    var r = await fetch(BACKEND + '/branding');
+    var d = await r.json();
+    if (d && d.success && d.branding) {
+      var b = d.branding;
+      if (b.login_title) {
+        var tEl = document.getElementById('br-login-title');
+        if (tEl) tEl.textContent = b.login_title;
+      }
+      if (b.tagline) {
+        var sEl = document.getElementById('br-login-sub');
+        if (sEl) sEl.textContent = b.tagline;
+      }
+      if (b.logo_url) {
+        var lEl = document.getElementById('login-logo-img');
+        if (lEl) lEl.src = b.logo_url;
+        var aEl = document.getElementById('app-logo');
+        if (aEl) aEl.src = b.logo_url;
+      }
+      if (b.app_name) {
+        document.title = b.app_name + ' — Dashboard';
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load branding:', e);
+  }
+}
