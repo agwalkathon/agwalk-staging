@@ -425,7 +425,7 @@ async function verifyCode(){
     try {
       var regRes = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(_loginEmail) + '&select=*', { headers: HDR });
       var regs = await regRes.json();
-      if (Array.isArray(regs) && regs.length > 0) {
+      if (Array.isArray(regs) && regs.length > 0 && !IS_EMBED) {
         var reg = regs[0];
         localStorage.setItem('wk_user', JSON.stringify({
           loggedIn: true,
@@ -1544,7 +1544,7 @@ try {
   s = JSON.parse(localStorage.getItem('wk_user') || '{}');
 } catch(e){}
 
-if (s && s.loggedIn && s.athleteId) {
+if (s && s.loggedIn && s.athleteId && !IS_EMBED) {
   window.location.replace('participant.html');
 } else if (tokenValid(getToken())) {
   enterApp();
