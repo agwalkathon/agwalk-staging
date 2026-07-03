@@ -1185,3 +1185,90 @@ async function loadNotifications() {
     console.warn('Failed to load notifications:', e);
   }
 }
+
+async function bootAppUnified() {
+  var token = getToken();
+  var emp = getEmp();
+  if (!tokenValid(token) || !emp) {
+    document.getElementById('app-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    if (typeof hideSplash === 'function') hideSplash();
+    return;
+  }
+
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+
+  var isParticipant = false;
+  var s = null;
+  try {
+    s = JSON.parse(safeGetItem('wk_user') || '{}');
+    if (s && s.loggedIn && s.athleteId) {
+      isParticipant = true;
+    }
+  } catch(e){}
+
+  if (!isParticipant) {
+    try {
+      var email = emp.email || '';
+      var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(email) + '&select=*', { headers: HDR });
+      var regs = await r.json();
+      if (Array.isArray(regs) && regs.length > 0) {
+        var reg = regs[0];
+        if (reg.status === 'approved' || reg.strava_athlete_id) {
+          s = {
+            loggedIn: true,
+            role: reg.role || 'user',
+            athleteId: reg.strava_athlete_id,
+            name: reg.full_name || emp.full_name || 'Participant',
+            empCode: reg.emp_code || emp.emp_code || '',
+            email: email,
+            profilePhoto: reg.profile_photo || '',
+            expires: Date.now() + (30 * 24 * 60 * 60 * 1000)
+          };
+          safeSetItem('wk_user', JSON.stringify(s));
+          isParticipant = !!s.athleteId;
+        }
+      }
+    } catch(ex) {
+      console.warn('Silent participant check failed:', ex);
+    }
+  }
+
+  if (typeof setupAppLayout === 'function') {
+    setupAppLayout(isParticipant);
+  }
+
+  if (typeof hideSplash === 'function') hideSplash();
+
+  if (isParticipant) {
+    currentSession = s;
+    loadNotifications();
+    var _maintBlocked = await checkMaintenanceGate(s.athleteId);
+    if (_maintBlocked) return;
+    await load(false);
+  } else {
+    if (typeof loadCelebrate === 'function') loadCelebrate();
+    if (typeof initEmployeeModeListeners === 'function') initEmployeeModeListeners();
+    
+    var initials=(function(){var parts=(emp.full_name||'').trim().split(/\s+/);if(parts.length>=2)return(parts[0][0]+(parts[parts.length-1][0])).toUpperCase();return(parts[0]||'?')[0].toUpperCase();})();
+    var avatarEl=document.getElementById('hdr-avatar');
+    if(avatarEl) {
+      avatarEl.textContent = initials;
+      avatarEl.setAttribute('style', getGlassmorphicAvatarStyle(emp.full_name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;');
+    }
+    
+    var youAvatarEl=document.getElementById('you-avatar');
+    if(youAvatarEl) {
+      youAvatarEl.textContent = initials;
+      youAvatarEl.setAttribute('style', getGlassmorphicAvatarStyle(emp.full_name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center;');
+    }
+    var youNameEl=document.getElementById('you-name');if(youNameEl)youNameEl.textContent=emp.full_name.toUpperCase();
+    if(document.getElementById('you-emp-code'))document.getElementById('you-emp-code').textContent=emp.emp_code||'—';
+    if(document.getElementById('you-email'))document.getElementById('you-email').textContent=emp.email||'—';
+    if(document.getElementById('you-gender'))document.getElementById('you-gender').textContent=emp.gender||'—';
+    if(document.getElementById('you-shift'))document.getElementById('you-shift').textContent=emp.shift||'—';
+    if(document.getElementById('you-team'))document.getElementById('you-team').textContent=emp.team||'—';
+  }
+}
+window.bootAppUnified = bootAppUnified;
