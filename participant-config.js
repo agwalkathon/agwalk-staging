@@ -131,10 +131,12 @@ function userGuard() {
   try {
     var s = JSON.parse(safeGetItem('wk_user') || '{}');
     if (!s.loggedIn) {
-      // Employee (non-participant or not yet Strava-linked) landing here directly:
-      // send them home to the Employee App — unless explicitly coming to log in (?login=1)
+      // Post-rename routing: index.html is now the universal Employee App home.
+      // Only an explicit "Open Event App" tap (?login=1) sends someone straight to Strava connect;
+      // every other session-less visitor (known employee or total stranger) lands home first,
+      // where OTP login (checked against employees_master) decides who they really are.
       var wantLogin = new URLSearchParams(window.location.search).get('login') === '1';
-      if (!wantLogin && employeeTokenValid()) { window.location.href = 'app.html'; return null; }
+      if (wantLogin) { window.location.href = 'connect-strava.html'; return null; }
       window.location.href = 'index.html'; return null;
     }
     if (!s.athleteId || s.athleteId === 'null' || s.athleteId === 'undefined') {

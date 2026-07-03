@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- PWA -->
+  <link rel="manifest" href="/agwalk-staging/manifest.json">
+  <meta name="theme-color" content="#E8622A">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AG Walkathon">
+  <link rel="apple-touch-icon" href="/agwalk-staging/icon-192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0F1117">
+  <title>Arcgate Walkathon 2026</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{
+      background:#0F1117;color:#fff;
+      min-height:100dvh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:max(32px,env(safe-area-inset-top)) 24px max(32px,env(safe-area-inset-bottom));
+    }
+    body::before{
+      content:'';position:fixed;top:-160px;left:50%;transform:translateX(-50%);
+      width:520px;height:520px;
+      background:radial-gradient(circle,rgba(232,98,42,0.13) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .wrap{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+    .main-logo{width:min(280px,82vw);height:auto;object-fit:contain;margin-bottom:22px;filter:brightness(0) invert(1);}
+    .edition{font-size:10px;font-weight:700;letter-spacing:3px;color:#E8622A;text-transform:uppercase;margin-bottom:14px;}
+    h1{font-size:clamp(22px,6.5vw,30px);font-weight:900;text-align:center;line-height:1.18;margin-bottom:10px;letter-spacing:-0.3px;}
+    h1 em{color:#E8622A;font-style:normal;display:block;}
+    .sub{font-size:13px;color:rgba(255,255,255,0.35);text-align:center;line-height:1.75;margin-bottom:30px;max-width:260px;}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:30px;width:100%;}
+    .stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 12px;text-align:center;}
+    .stat .v{font-size:19px;font-weight:800;color:#fff;line-height:1;}
+    .stat .v.live{color:#E8622A;}
+    .stat .l{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-top:5px;}
+
+    /* ── Login box ── */
+    .auth{width:100%;}
+    .login-card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.09);
+      border-radius:18px;
+      padding:22px 20px 20px;
+    }
+    .login-title{font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:18px;letter-spacing:0.3px;text-transform:uppercase;}
+    .field-wrap{margin-bottom:14px;}
+    .field-wrap label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+    .field-wrap input{
+      width:100%;padding:13px 15px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:11px;
+      color:#fff;font-size:15px;font-family:'Inter',sans-serif;font-weight:500;
+      outline:none;transition:border-color 0.15s;
+    }
+    .field-wrap input::placeholder{color:rgba(255,255,255,0.2);}
+    .field-wrap input:focus{border-color:rgba(232,98,42,0.6);}
+    .field-wrap input.err-field{border-color:rgba(220,38,38,0.6);}
+    .btn-login{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      width:100%;padding:15px;
+      background:#E8622A;color:#fff;
+      border:none;border-radius:12px;
+      font-size:15px;font-weight:700;font-family:'Inter',sans-serif;
+      cursor:pointer;
+      box-shadow:0 4px 20px rgba(232,98,42,0.28);
+      transition:transform 0.12s,box-shadow 0.12s;
+      margin-top:4px;
+    }
+    .btn-login:active{transform:scale(0.97);}
+    .btn-login:disabled{opacity:0.5;cursor:not-allowed;}
+
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .proc{display:none;align-items:center;justify-content:center;gap:10px;padding:14px;font-size:13px;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;}
+    .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.12);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+    .err{display:none;margin-top:12px;padding:12px 14px;border-radius:11px;font-size:12px;line-height:1.6;background:rgba(220,38,38,0.1);color:#fca5a5;border:1px solid rgba(220,38,38,0.18);}
+    .success{display:none;margin-top:12px;padding:12px 14px;border-radius:11px;font-size:12px;line-height:1.6;background:rgba(16,185,129,0.1);color:#a7f3d0;border:1px solid rgba(16,185,129,0.18);text-align:center;}
+
+
+
+    .note{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.16);text-align:center;line-height:2;}
+    .note a{color:rgba(232,98,42,0.65);text-decoration:none;}
+    .note a:hover{color:#E8622A;}
+    .note span{color:rgba(255,255,255,0.1);margin:0 4px;}
+
+    .field-hint{margin-top:7px;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.2px;}
+    .hint-code{font-family:'Courier New',monospace;color:rgba(232,98,42,0.7);font-weight:600;letter-spacing:1px;}
+    .points,.distance,.rank,td,th{font-variant-numeric:tabular-nums;}
+
+    .resend-container {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .resend-link {
+      color: #E8622A;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .resend-link.disabled {
+      color: rgba(255, 255, 255, 0.25);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <img src="logo-white.png" alt="Arcgate Walkathon" class="main-logo">
+  <div class="edition">2026 Edition</div>
+  <h1>Healthy Arcgatians.<br><span style="display:block;margin-top:6px;"><em>Stronger Arcgate.</em></span></h1>
+  <p class="sub">A whole month to move, connect and grow — one kilometre at a time.</p>
+
+  <div class="auth" style="opacity: 0;">
+    <div class="login-card">
+      <div class="login-title" id="login-card-title">Participant Login</div>
+      
+      <!-- Stage 1: Employee Code -->
+      <div id="stage-emp">
+        <div class="field-wrap">
+          <label>Employee Code</label>
+          <input type="text" id="emp-code" placeholder="EMP-05-00123-PM" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <div class="field-hint">Format: <span class="hint-code">EMP-05-00123-PM</span></div>
+        </div>
+        <button class="btn-login" id="btn-login" onclick="doLogin()">View My Dashboard</button>
+      </div>
+
+      <!-- Stage 2: Email OTP Request -->
+      <div id="stage-email-request" class="hidden">
+        <div class="field-wrap">
+          <label for="email-input">Registered Email</label>
+          <input type="email" id="email-input" placeholder="yourname@email.com" autocomplete="email" spellcheck="false">
+          <div class="field-hint">Enter your registered email address</div>
+        </div>
+        <button class="btn-login" id="btn-send" onclick="sendOTP()">Send OTP to Email</button>
+      </div>
+
+      <!-- Stage 3: Email OTP Verification -->
+      <div id="stage-email-verify" class="hidden">
+        <div class="field-wrap">
+          <label for="otp-input">Verification Code</label>
+          <input type="text" id="otp-input" placeholder="123456" autocomplete="one-time-code" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          <div class="field-hint">Enter the 6-digit code sent to your email</div>
+        </div>
+        <button class="btn-login" id="btn-verify" onclick="verifyOTP()">Verify & Login</button>
+        <div class="resend-container">
+          Didn't receive code? <span id="resend-timer" class="resend-link disabled">Resend OTP</span>
+        </div>
+      </div>
+
+      <!-- General Feedback -->
+      <div class="proc" id="proc"><div class="spinner"></div><span id="proc-text">Verifying...</span></div>
+      <div class="err" id="err"></div>
+      <div class="success" id="success"></div>
+
+      <!-- Agreement Disclaimer -->
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:20px;line-height:1.5;text-align:center;">
+        By continuing, you are agreeing to our <a href="terms.html" style="color:#E8622A;text-decoration:none;font-weight:500;">Terms of Service</a> and <a href="privacy.html" style="color:#E8622A;text-decoration:none;font-weight:500;">Privacy Policy</a>.
+      </div>
+    </div>
+
+    <p class="note">
+      Approved participants only <span>·</span> Read-only <span>·</span> Never posts to Strava
+    </p>
+  </div>
+</div>
+<script>
+var SUPABASE_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
+var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR={'apikey':ANON,'Authorization':'Bearer '+ANON};
+var CLIENT_ID='29159';
+var BACKEND='https://agwalk-backend.onrender.com';
+var REDIRECT=window.location.origin+window.location.pathname;
+var AUTH_URL='https://www.strava.com/oauth/authorize?client_id='+CLIENT_ID+'&redirect_uri='+encodeURIComponent(REDIRECT)+'&response_type=code&scope=read,activity:read&state=walkathon2026';
+
+var currentMethod = 'emp_code';
+var countdownInterval = null;
+var resendCooldown = 60; // 60 seconds
+
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
+
+function showErr(msg){
+  document.getElementById('proc').style.display='none';
+  document.getElementById('success').style.display='none';
+  document.getElementById('btn-login').disabled=false;
+  document.getElementById('btn-send').disabled=false;
+  document.getElementById('btn-verify').disabled=false;
+  var el=document.getElementById('err');
+  el.innerHTML=msg;
+  el.style.display='block';
+}
+
+function showSuccess(msg){
+  document.getElementById('proc').style.display='none';
+  document.getElementById('err').style.display='none';
+  var el=document.getElementById('success');
+  el.innerHTML=msg;
+  el.style.display='block';
+}
+
+function showProc(text){
+  document.getElementById('btn-login').disabled=true;
+  document.getElementById('btn-send').disabled=true;
+  document.getElementById('btn-verify').disabled=true;
+  document.getElementById('proc').style.display='flex';
+  document.getElementById('proc-text').textContent=text;
+  document.getElementById('err').style.display='none';
+  document.getElementById('success').style.display='none';
+}
+
+function hideProc() {
+  document.getElementById('btn-login').disabled=false;
+  document.getElementById('btn-send').disabled=false;
+  document.getElementById('btn-verify').disabled=false;
+  document.getElementById('proc').style.display='none';
+}
+
+function switchUI(method) {
+  currentMethod = method;
+  var empStage = document.getElementById('stage-emp');
+  var reqStage = document.getElementById('stage-email-request');
+  var verStage = document.getElementById('stage-email-verify');
+  var toggleLink = document.getElementById('toggle-method-link');
+  var titleEl = document.getElementById('login-card-title');
+  
+  // Clear status
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('success').style.display = 'none';
+  document.getElementById('proc').style.display = 'none';
+  
+  // Re-enable
+  document.getElementById('btn-login').disabled = false;
+  document.getElementById('btn-send').disabled = false;
+  document.getElementById('btn-verify').disabled = false;
+  
+  if (method === 'emp_code') {
+    empStage.classList.remove('hidden');
+    reqStage.classList.add('hidden');
+    verStage.classList.add('hidden');
+    if (toggleLink) toggleLink.textContent = 'Login with Email OTP';
+    if (titleEl) titleEl.textContent = 'Participant Login';
+  } else {
+    empStage.classList.add('hidden');
+    reqStage.classList.remove('hidden');
+    verStage.classList.add('hidden');
+    if (toggleLink) toggleLink.textContent = 'Login with Employee Code';
+    if (titleEl) titleEl.textContent = 'Email OTP Login';
+  }
+}
+
+function toggleMethod(e) {
+  if (e) e.preventDefault();
+  if (currentMethod === 'emp_code') {
+    switchUI('email_otp');
+  } else {
+    switchUI('emp_code');
+  }
+}
+
+async function checkLoginMethod() {
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?config_key=eq.login_method&select=config_value', { headers: HDR });
+    var data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      var method = data[0].config_value;
+      switchUI(method);
+    } else {
+      switchUI('emp_code');
+    }
+  } catch (e) {
+    console.error('Error fetching login method config:', e);
+    switchUI('emp_code');
+  }
+  var authCard = document.querySelector('.auth');
+  if (authCard) {
+    authCard.style.opacity = '1';
+    authCard.style.transition = 'opacity 0.25s ease-in-out';
+  }
+}
+checkLoginMethod();
+
+async function sendOTP(){
+  var email = document.getElementById('email-input').value.trim();
+  var inp = document.getElementById('email-input');
+  inp.classList.remove('err-field');
+  document.getElementById('err').style.display='none';
+
+  if (!email || !validateEmail(email)) {
+    inp.classList.add('err-field');
+    inp.focus();
+    showErr('❌ Please enter a valid email address.');
+    return;
+  }
+
+  showProc('Sending OTP to your email...');
+  try {
+    var res = await fetch(BACKEND + '/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await res.json();
+    if (!d.success) {
+      if (d.error === 'not_found') {
+        showErr('⛔ <strong>Email not found.</strong><br>This email is not registered. Please register first.<br><a href="index.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');
+      } else if (d.error === 'no_strava_id') {
+        showErr('⚠️ <strong>Account setup incomplete.</strong><br>Contact pra@arcgate.com for assistance.');
+      } else if (d.error === 'smtp_not_configured') {
+        showErr('⚠️ <strong>Email service not ready.</strong><br>Brevo key is not configured. Contact pra@arcgate.com');
+      } else {
+        showErr('❌ <strong>Failed to send OTP.</strong><br>Please try again later.');
+      }
+      return;
+    }
+
+    // Success: transition to OTP verification screen
+    hideProc();
+    document.getElementById('stage-email-request').classList.add('hidden');
+    document.getElementById('stage-email-verify').classList.remove('hidden');
+    document.getElementById('otp-input').focus();
+    startResendTimer();
+    showSuccess('🎉 <strong>OTP Sent!</strong><br>Check your email inbox for the verification code.');
+  } catch (e) {
+    showErr('❌ Connection error. Please check your network and try again.');
+  }
+}
+
+async function verifyOTP(){
+  var email = document.getElementById('email-input').value.trim();
+  var otp = document.getElementById('otp-input').value.trim();
+  var inp = document.getElementById('otp-input');
+  inp.classList.remove('err-field');
+  document.getElementById('err').style.display='none';
+  document.getElementById('success').style.display='none';
+
+  if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
+    inp.classList.add('err-field');
+    inp.focus();
+    showErr('❌ Please enter the 6-digit numeric OTP.');
+    return;
+  }
+
+  showProc('Verifying OTP...');
+  try {
+    var res = await fetch(BACKEND + '/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, otp: otp })
+    });
+    var d = await res.json();
+    if (!d.success) {
+      if (d.error === 'expired') {
+        showErr('⏳ <strong>OTP Expired.</strong><br>Your login code has expired. Please request a new one.');
+      } else if (d.error === 'incorrect') {
+        showErr('❌ <strong>Incorrect OTP.</strong><br>The code you entered is invalid. Please check and try again.');
+      } else if (d.error === 'invalid_or_expired') {
+        showErr('⚠️ <strong>Session invalid.</strong><br>No active request found for this email. Please request OTP again.');
+      } else {
+        showErr('❌ <strong>Verification failed.</strong><br>Please try again.');
+      }
+      return;
+    }
+
+    showProc('Loading your dashboard...');
+    localStorage.setItem('wk_user', JSON.stringify({
+      loggedIn: true,
+      role: 'user',
+      athleteId: d.athlete_id,
+      name: d.name || 'Participant',
+      email: email,
+      expires: Date.now() + (8 * 60 * 60 * 1000)
+    }));
+    window.location.replace('participant.html');
+  } catch (e) {
+    showErr('❌ Connection error. Please try again.');
+  }
+}
+
+function startResendTimer() {
+  var timerEl = document.getElementById('resend-timer');
+  var secondsLeft = resendCooldown;
+  
+  timerEl.classList.add('disabled');
+  timerEl.onclick = null;
+  timerEl.textContent = 'Resend OTP in ' + secondsLeft + 's';
+
+  if (countdownInterval) clearInterval(countdownInterval);
+  
+  countdownInterval = setInterval(function() {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      clearInterval(countdownInterval);
+      timerEl.classList.remove('disabled');
+      timerEl.textContent = 'Resend OTP';
+      timerEl.onclick = function() {
+        sendOTP();
+      };
+    } else {
+      timerEl.textContent = 'Resend OTP in ' + secondsLeft + 's';
+    }
+  }, 1000);
+}
+
+function validateEmail(email) {
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+async function doLogin(){
+  var code=document.getElementById('emp-code').value.trim().toUpperCase();
+  var inp=document.getElementById('emp-code');
+  inp.classList.remove('err-field');
+  document.getElementById('err').style.display='none';
+  if(!code){inp.classList.add('err-field');inp.focus();return;}
+  showProc('Verifying employee code...');
+  try{
+    var res=await fetch(BACKEND+'/emp-login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({emp_code:code})
+    });
+    var d=await res.json();
+    if(!d.success){
+      if(d.error==='not_found') showErr('⛔ <strong>Employee code not found.</strong><br>Check your code or contact pra@arcgate.com');
+      else if(d.error==='not_approved') showErr('⏳ <strong>Registration pending approval.</strong><br>You will be notified once approved.');
+      else if(d.error==='no_strava_id') showErr('⚠️ <strong>Account setup incomplete.</strong><br>Contact pra@arcgate.com for assistance.');
+      else if(res.status===429 || (d.error && d.error.indexOf('Too many')>-1)) showErr('⏳ <strong>Too many login attempts.</strong><br>Please try again in 15 minutes or switch to mobile data.');
+      else showErr('❌ <strong>Login failed.</strong><br>' + esc(d.error || 'Please try again.'));
+      return;
+    }
+    showProc('Loading your dashboard...');
+    localStorage.setItem('wk_user',JSON.stringify({
+      loggedIn:true,
+      role:'user',
+      athleteId:d.athlete_id,
+      name:d.name||'Participant',
+      empCode:code,
+      expires:Date.now()+(8*60*60*1000)
+    }));
+    window.location.replace('participant.html');
+  }catch(e){
+    showErr('❌ Connection error. Please try again.');
+  }
+}
+
+// Allow Enter key
+document.getElementById('emp-code').addEventListener('keydown',function(e){
+  if(e.key==='Enter') doLogin();
+});
+document.getElementById('email-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') sendOTP();
+});
+document.getElementById('otp-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') verifyOTP();
+});
+
+// Handle Strava OAuth callback (for future use)
+var oauthCode=new URLSearchParams(window.location.search).get('code');
+if(oauthCode){
+  window.history.replaceState({},'',window.location.pathname);
+  showProc('Connecting your Strava account...');
+  fetch(BACKEND+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:oauthCode,event_code:'walkathon2026'})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.success){
+      localStorage.setItem('wk_user',JSON.stringify({
+        loggedIn:true,
+        role:d.role||'user',
+        athleteId:d.athlete_id,
+        name:d.name,
+        profilePhoto:d.profile_photo||'',
+        empCode:d.emp_code||'',
+        email:d.email||'',
+        expires:Date.now()+(8*60*60*1000)
+      }));
+      if(d.role==='admin'){sessionStorage.setItem('wk_admin',JSON.stringify({loggedIn:true,role:'admin',expires:Date.now()+(8*60*60*1000)}));window.location.replace('admin.html');}
+      else{window.location.replace('participant.html');}
+    } else if(d.error==='not_registered'){showErr('⛔ <strong>Not registered.</strong><br>Your Strava account is not in the participant list.<br><a href="index.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');}
+    else{showErr('❌ <strong>Login failed.</strong><br>Please try again.');}
+  })
+  .catch(function(){showErr('❌ Connection error. Please try again.');});
+}
+</script>
+
+  <!-- PWA Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/agwalk-staging/sw.js')
+          .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
+          .catch(function(err) { console.log('[SW] Registration failed:', err); });
+      });
+    }
+  </script>
+</body>
+</html>
+
