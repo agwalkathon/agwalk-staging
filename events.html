@@ -147,6 +147,15 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="fld" id="wrap-fetch-end"><label>Fetch Data Until <span style="font-weight:400;text-transform:none">(blank = event end)</span></label><input type="date" id="f-fetch-end"></div>
   </div>
 
+  <div class="grid" style="margin-bottom:14px">
+    <div class="fld"><label>Event Logo (shown above rings)</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
+        <input type="file" id="logo-file" accept="image/*" style="display:none">
+      </div>
+    </div>
+  </div>
   <div class="subhead">Participant Dashboard</div>
   <div class="scope-note" style="margin-bottom:10px">Configure rings (max 5), stat tiles, sections and activity columns. Leave empty for the classic Walkathon layout.</div>
   <div id="rings-box" style="margin-bottom:12px"></div>
@@ -341,6 +350,17 @@ function collectDashboardCfg(){
   db.sections={streak:document.getElementById('sec-streak').checked,medals:document.getElementById('sec-medals').checked,challenges:document.getElementById('sec-challenges').checked};
   return db;
 }
+document.getElementById('btn-logo-up').addEventListener('click',function(){document.getElementById('logo-file').click();});
+document.getElementById('logo-file').addEventListener('change',function(){
+  var f=this.files[0];this.value='';if(!f)return;
+  var rd=new FileReader();
+  rd.onload=async function(){
+    var r=await fetch(BACKEND+'/admin/upload-image',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+sessionStorage.getItem('wk_admin_token')},body:JSON.stringify({data:rd.result})});
+    var d2=await r.json();
+    if(d2.success)document.getElementById('f-logo-url').value=d2.url;else alert(d2.error||'Upload failed');
+  };
+  rd.readAsDataURL(f);
+});
 document.getElementById('f-smode').addEventListener('change',updateScoringUI);
 document.getElementById('f-tracking').addEventListener('change',updateScoringUI);
 function updateScoringUI(){
@@ -403,6 +423,7 @@ function openEditor(ev){
   document.getElementById('f-banner').value=ev?(ev.banner_url||''):'';
   document.getElementById('f-desc').value=ev?(ev.description||''):'';
   document.getElementById('f-tracking').value=rc.tracking_mode||'strava';
+  document.getElementById('f-logo-url').value=rc.logo_url||'';
   loadDashboardCfg(rc);
   document.getElementById('f-fetch-start').value=rc.fetch_start||'';
   document.getElementById('f-fetch-end').value=rc.fetch_end||'';
@@ -434,6 +455,7 @@ function collect(){
   if(end<start)throw new Error('End date must be after start date');
   var mode=document.getElementById('f-smode').value;
   var rc={
+    logo_url:document.getElementById('f-logo-url').value.trim()||null,
     dashboard:collectDashboardCfg(),
     tracking_mode:document.getElementById('f-tracking').value,
     fetch_start:document.getElementById('f-fetch-start').value||null,
