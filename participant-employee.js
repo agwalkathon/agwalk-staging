@@ -4,6 +4,14 @@
 var _loginEmail = '';
 var _postPhotos = [];
 
+function initials(name) {
+  var parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return (parts[0] || '?')[0].toUpperCase();
+}
+
 /* ---------- session helpers ---------- */
 function getToken(){ try { return localStorage.getItem('ag_emp_token'); } catch(e){ return null; } }
 function setToken(t){ try { localStorage.setItem('ag_emp_token', t); } catch(e){} }
