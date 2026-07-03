@@ -185,6 +185,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <p>Batch import activities from raw Excel/CSV data</p>
     </div>
     <div class="topbar-right">
+      <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
       <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
     </div>
   </header>
@@ -460,6 +461,22 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
 <script>
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var EV_ID = 1;
+async function loadEventSelector(){
+  try{
+    var r=await fetch(SUPABASE_URL+"/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc",{headers:HDR});
+    var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
+    sel.innerHTML="";
+    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
+    sel.value="1"; EV_ID=1;
+    sel.addEventListener("change",function(){
+      EV_ID=parseInt(this.value)||1;
+      var log=document.getElementById('progress-log');
+      if(log){ document.getElementById('progress-wrap').style.display='block'; log.innerHTML += '<div style="color:#90caf9">\ud83d\udccc Import target set to: '+sel.options[sel.selectedIndex].textContent+'</div>'; }
+    });
+  }catch(e){console.warn("event selector failed",e);}
+}
+document.addEventListener('DOMContentLoaded', loadEventSelector);
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
 var BACKEND_URL  = 'https://agwalk-backend.onrender.com';
@@ -800,8 +817,9 @@ async function startImport(mode) {
 
   // Use converted data if raw format was uploaded
   var allActivities = toImport.map(function(r){
-    if (r.isRaw && r.converted) return r.converted;
-    return rowToActivity(r.row);
+    var act = (r.isRaw && r.converted) ? r.converted : rowToActivity(r.row);
+    act.event_id = EV_ID;
+    return act;
   });
 
   addLog('🚀 Starting import of ' + allActivities.length + ' activities…');

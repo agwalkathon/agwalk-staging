@@ -156,6 +156,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       </div>
     </div>
   </div>
+  <div id="dashboard-config-block">
   <div class="subhead">Participant Dashboard</div>
   <div class="scope-note" style="margin-bottom:10px">Configure rings (max 5), stat tiles, sections and activity columns. Leave empty for the classic Walkathon layout.</div>
   <div id="rings-box" style="margin-bottom:12px"></div>
@@ -170,6 +171,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div></div>
   </div>
 
+  </div>
+  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
   <div class="subhead" id="scoring-head">Scoring</div>
   <div class="grid" style="margin-bottom:14px" id="scoring-grid">
     <div class="fld"><label>Scoring Mode</label>
@@ -376,11 +379,13 @@ function updateScoringUI(){
   var sportsHead=document.getElementById('sport-chips').previousElementSibling;
   if(sportsHead)sportsHead.style.display=isStrava?'block':'none';
   document.getElementById('sport-chips').style.display=isStrava?'flex':'none';
-  // scoring hidden entirely for tracking=none
-  var showScoring=(trk!=='none');
+  // scoring + dashboard hidden entirely for tracking=none or manual (no activity data to plot)
+  var showScoring=(trk!=='none' && trk!=='manual');
   document.getElementById('scoring-head').style.display=showScoring?'block':'none';
   document.getElementById('scoring-grid').style.display=showScoring?'grid':'none';
   if(!showScoring)document.getElementById('composite-box').style.display='none';
+  document.getElementById('dashboard-config-block').style.display=showScoring?'block':'none';
+  document.getElementById('manual-event-note').style.display=showScoring?'none':'block';
 }
 function buildChips(sel){
   var box=document.getElementById('sport-chips');box.textContent='';
