@@ -1373,12 +1373,24 @@ function initializeFeedTab(enabled) {
   
   if (track) {
     track.style.width = (TAB_ORDER.length * 100) + '%';
-    var contents = track.querySelectorAll('.content:not(.hidden-tab)');
-    var contentWidth = (100 / TAB_ORDER.length) + '%';
-    contents.forEach(function(el) {
-      el.style.width = contentWidth;
+    TAB_ORDER.forEach(function(tab) {
+      var pane = document.getElementById('tab-' + tab);
+      if (pane) {
+        pane.style.width = (100 / TAB_ORDER.length) + '%';
+        track.appendChild(pane);
+      }
     });
   }
+  
+  if (bnav) {
+    TAB_ORDER.forEach(function(tab) {
+      var btn = document.getElementById('bnav-' + tab);
+      if (btn) {
+        bnav.appendChild(btn);
+      }
+    });
+  }
+  
   setTimeout(updateNavIndicator, 50);
 }
 
