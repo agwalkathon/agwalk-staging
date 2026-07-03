@@ -584,6 +584,9 @@ async function loadBranding() {
       
       var logoSrc = b.logo_url || 'logo-white.png';
       if (lEl) {
+        lEl.onerror = function() {
+          this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
+        };
         lEl.src = logoSrc;
         lEl.style.opacity = '1';
       }
@@ -598,6 +601,9 @@ async function loadBranding() {
       }
     } else {
       if (lEl) {
+        lEl.onerror = function() {
+          this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
+        };
         lEl.src = 'logo-white.png';
         lEl.style.opacity = '1';
       }
@@ -609,6 +615,9 @@ async function loadBranding() {
   } catch (e) {
     console.warn('Failed to load branding:', e);
     if (lEl) {
+      lEl.onerror = function() {
+        this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
+      };
       lEl.src = 'logo-white.png';
       lEl.style.opacity = '1';
     }
