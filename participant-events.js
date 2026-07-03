@@ -340,6 +340,13 @@ function regPrefill() {
     if (u.email) pre.email = u.email;
     if (u.athleteId) pre.strava_url = 'https://www.strava.com/athletes/' + u.athleteId;
   } catch(e) {}
+  try {
+    var emp = JSON.parse(safeGetItem('ag_emp') || '{}');
+    if (!pre.full_name && emp.full_name) pre.full_name = emp.full_name;
+    if (!pre.emp_code && emp.emp_code) pre.emp_code = emp.emp_code;
+    if (!pre.email && emp.email) pre.email = emp.email;
+    if (!pre.gender && emp.gender) pre.gender = emp.gender;
+  } catch(e) {}
   if (typeof LB_ME !== 'undefined' && LB_ME) {
     if (LB_ME.gender) pre.gender = LB_ME.gender;
     if (LB_ME.shift) pre.shift = LB_ME.shift;
