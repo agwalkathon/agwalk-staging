@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -16,10 +16,65 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="participant.css?v=20260702_v81">
-</head>
+  <script>
+    (function(){
+      var isEmp = false;
+      try {
+        var t = localStorage.getItem('ag_emp_token');
+        if (t) {
+          var p = JSON.parse(atob(t.split('.')[1]));
+          isEmp = p && p.exp && p.exp * 1000 > Date.now();
+        }
+      } catch(e){}
+      var isPart = false;
+      try {
+        var u = JSON.parse(localStorage.getItem('wk_user') || '{}');
+        isPart = u && u.loggedIn;
+      } catch(e){}
+      if (isEmp || isPart) {
+        document.documentElement.classList.add('app-logged-in');
+      }
+    })();
+  </script>
 </head>
 <body>
 
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><img src="logo-white.png" alt="Arcgate" onerror="this.parentNode.innerHTML='<div class=fallback>🏆</div>'"></div>
+    <div class="login-title" id="br-login-title">Arcgate Employee App</div>
+    <div class="login-sub" id="br-login-sub">Sign in with your company email</div>
+
+    <div class="login-glass">
+      <div id="step-email">
+        <label class="login-field-label" for="in-email">Registered Email</label>
+        <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
+        <button class="login-btn" id="btn-send" onclick="sendCode()">Send Login Code</button>
+        <div class="login-err" id="err-email"></div>
+      </div>
+
+      <div id="step-otp" class="hidden">
+        <label class="login-field-label" style="text-align:center">Verification Code</label>
+        <div class="otp-boxes" id="otp-boxes"></div>
+        <div class="login-field-hint">A 6-digit code was emailed to you</div>
+        <button class="login-btn" id="btn-verify" onclick="verifyCode()">Verify &amp; Sign In</button>
+        <div class="login-err" id="err-otp"></div>
+        <div class="login-resend-row">
+          <button class="login-link" id="btn-resend" onclick="sendCode()">Resend code</button>
+          &nbsp;·&nbsp;
+          <button class="login-link" id="btn-back" onclick="document.getElementById('step-otp').classList.add('hidden');document.getElementById('step-email').classList.remove('hidden');">Change email</button>
+        </div>
+      </div>
+
+      <div class="login-terms">
+        By continuing, you are agreeing to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.
+      </div>
+    </div>
+
+    <p class="login-footnote">Sessions last 30 days <span>·</span> Read-only <span>·</span> Never posts to Strava</p>
+  </div>
+</div>
 
 
 <!-- ── Splash Screen ──────────────────────────────────────────────────── -->
@@ -83,6 +138,7 @@
 </style>
 <!-- ──────────────────────────────────────────────────────────────────────── -->
 
+<div id="app-screen" class="hidden">
 <header class="header">
   <div class="hdr-inner">
   <div class="hdr-left" style="display: flex; align-items: center; gap: 8px;">
@@ -422,8 +478,15 @@
 </div>
 </div>
 
-<div class="content" id="tab-celebrate" style="padding:0;">
-  <iframe id="celebrate-frame" data-src="index.html?embed=1" style="width:100%;height:calc(100dvh - 90px);border:none;display:block;background:transparent;"></iframe>
+<div class="content" id="tab-celebrate" style="padding:16px 16px 120px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+  <div class="max-w">
+    <div style="margin-bottom:16px;">
+      <div id="celebrate-greeting" style="font-size:20px;font-weight:800;letter-spacing:-0.02em;">Hello! 👋</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:3px;">Every day has something worth celebrating 🎉</div>
+    </div>
+    <button id="btn-new-post" style="width:100%;padding:13px;background:var(--surface2);border:1px dashed var(--border);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">➕ Share something to celebrate.</button>
+    <div id="celebrate-feed"><div class="skel"></div><div class="skel"></div></div>
+  </div>
 </div>
 
 <div class="content hidden-tab" id="tab-feed">
@@ -460,7 +523,7 @@
 <div class="content" id="tab-you">
 <div class="max-w">
   <!-- Sub-tabs: Challenges first -->
-  <div class="lb-tabs" style="margin-bottom:14px;">
+  <div class="lb-tabs part-only" style="margin-bottom:14px;">
     <button class="lb-tab active" id="you-tab-activities" onclick="switchYouTab('activities')">&#9889; Activities</button>
     <button class="lb-tab" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
     <button class="lb-tab" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
@@ -502,6 +565,7 @@
     <button class="btn btn-sm" id="btn-enable-push" onclick="enablePushNotifications()" style="font-size:11px;font-weight:700;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;background:var(--brand);color:#fff;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;">Enable</button>
   </div>
 
+  <div class="part-only">
   <!-- Connect with Strava Button (Moved here) -->
   <div style="margin-top:12px; margin-bottom:16px;">
     <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)" onclick="handleStravaConnect(event)">
@@ -600,8 +664,7 @@
       <div class="you-card-sub" id="you-last-sync-date"></div>
     </div>
   </div>
-
-
+  </div>
 
   <!-- Profile Details — collapsed by default -->
   <div style="margin-top:8px;">
@@ -717,6 +780,7 @@
     <span class="bnav-label">You</span>
   </a>
 </nav>
+</div>
 
 <!-- Date Details sliding view screen -->
 <div id="date-details-view">
@@ -737,6 +801,7 @@
   <!-- Modular App Assets -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="participant-config.js?v=20260703_v51"></script>
+  <script src="participant-employee.js?v=20260703_v1"></script>
   <script src="participant-api.js?v=20260701_v36"></script>
   <script src="participant-drawers.js?v=20260701_v33"></script>
   <script src="participant-events.js?v=20260702_v6"></script>
@@ -748,6 +813,29 @@
 <!-- Activity & Profile Detail Modals (moved outside swipe container for position:fixed to work) -->
 <!-- Activity Detail Modal -->
   <div id="event-reg-modal" class="detail-modal" style="display:none;"></div>
+
+  <!-- new post drawer -->
+  <div id="post-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding-top:calc(20px + env(safe-area-inset-top));overflow-y:auto">
+    <div style="background:var(--surface);width:calc(100% - 24px);max-width:520px;border-radius:20px;padding:18px;margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:600">Share a celebration</div>
+        <button id="post-close" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <input id="post-title" placeholder="Title (e.g. We got married! 💍)" maxlength="120" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
+      <textarea id="post-msg" placeholder="Tell everyone about it… (optional)" rows="3" maxlength="2000" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;resize:none"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <button id="post-photo-btn" style="padding:9px 14px;background:var(--surface2);border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-family:inherit;font-size:12.5px;cursor:pointer">📷 Add photos</button>
+        <input type="file" id="post-photo-file" accept="image/*" multiple style="display:none">
+        <div id="post-photo-previews" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
+      <div style="display:flex;justify-content:flex-end">
+        <button id="post-submit" title="Post" style="width:40px;height:40px;background:none;border:none;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="activity-detail-modal" class="detail-modal">
     <!-- Top Nav Bar -->
