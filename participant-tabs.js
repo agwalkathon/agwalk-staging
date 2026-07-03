@@ -100,8 +100,7 @@ function showTab(tab) {
     if (typeof loadEventsTab === 'function') loadEventsTab();
   }
   if (tab === 'celebrate') {
-    var cf = document.getElementById('celebrate-frame');
-    if (cf && !cf.src) cf.src = cf.getAttribute('data-src') + '&_t=' + Date.now();
+    if (typeof loadCelebrate === 'function') loadCelebrate();
   }
   if (tab === 'feed') {
     safeSetItem('ag_last_viewed_announcements', new Date().toISOString());
