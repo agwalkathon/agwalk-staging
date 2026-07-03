@@ -18,7 +18,7 @@ var TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
 // Tab Order for indicator rendering
 function updateNavIndicator() {
   var bnav = document.querySelector('.bottom-nav');
-  var indicator = document.getElementById('nav-indicator');
+  var indicator = bnav ? bnav.querySelector('.bnav-indicator') : null;
   var activeItem = bnav ? bnav.querySelector('.bnav-item.active') : null;
   if (!bnav || !indicator || !activeItem) return;
   var items = Array.from(bnav.querySelectorAll('.bnav-item')).filter(function(el){ return el.offsetParent !== null; });
@@ -2841,10 +2841,10 @@ document.addEventListener('click', function(e) {
 // Boot Main Application
 if (document.readyState === 'loading') {
   window.addEventListener('DOMContentLoaded', function() {
-    load().finally(function(){ hideSplash(); });
+    if (typeof bootAppUnified === 'function') bootAppUnified();
   });
 } else {
-  load().finally(function(){ hideSplash(); });
+  if (typeof bootAppUnified === 'function') bootAppUnified();
 }
 function loadProfileTimeframe() {
   var sel = document.getElementById('prof-timeframe-select');
@@ -3093,3 +3093,49 @@ function closeReactionsDetail() {
   
   setTimeout(checkObserverStatus, 1000);
 })();
+
+function setupAppLayout(isParticipant) {
+  var bnav = document.querySelector('.bottom-nav');
+  var track = document.getElementById('tab-track');
+  
+  if (isParticipant) {
+    TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
+    document.getElementById('bnav-dashboard').style.display = 'flex';
+    document.getElementById('bnav-leaderboard').style.display = 'flex';
+    document.getElementById('bnav-events').style.display = 'flex';
+    document.getElementById('bnav-celebrate').style.display = 'flex';
+    document.getElementById('bnav-you').style.display = 'flex';
+    
+    document.getElementById('tab-dashboard').style.display = 'block';
+    document.getElementById('tab-leaderboard').style.display = 'block';
+    document.getElementById('tab-events').style.display = 'block';
+    document.getElementById('tab-celebrate').style.display = 'block';
+    document.getElementById('tab-you').style.display = 'block';
+  } else {
+    TAB_ORDER = ['celebrate', 'events', 'you'];
+    document.getElementById('bnav-dashboard').style.display = 'none';
+    document.getElementById('bnav-leaderboard').style.display = 'none';
+    document.getElementById('bnav-events').style.display = 'flex';
+    document.getElementById('bnav-celebrate').style.display = 'flex';
+    document.getElementById('bnav-you').style.display = 'flex';
+    
+    document.getElementById('tab-dashboard').style.display = 'none';
+    document.getElementById('tab-leaderboard').style.display = 'none';
+    document.getElementById('tab-events').style.display = 'block';
+    document.getElementById('tab-celebrate').style.display = 'block';
+    document.getElementById('tab-you').style.display = 'block';
+  }
+  
+  if (track) {
+    track.style.width = (TAB_ORDER.length * 100) + '%';
+    TAB_ORDER.forEach(function(tab) {
+      var pane = document.getElementById('tab-' + tab);
+      if (pane) {
+        pane.style.width = (100 / TAB_ORDER.length) + '%';
+      }
+    });
+  }
+  
+  var defaultTab = isParticipant ? 'dashboard' : 'celebrate';
+  showTab(defaultTab);
+}
