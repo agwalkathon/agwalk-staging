@@ -64,13 +64,14 @@
     box.className = 'ring-box';
     var unit = unitOf(ring.metric);
     var fmt = function(v){ return (unit==='km') ? v.toFixed(1) : Math.round(v).toString(); };
+    var rot = (ring.shape === 'circle' || !ring.shape) ? ' transform="rotate(-90 50 50)"' : '';
     box.innerHTML =
       '<div class="ring-svg-wrap">' +
         '<svg viewBox="0 0 100 100">' +
-          '<g fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="8">' + shape + '</g>' +
+          '<g fill="none" stroke="' + ring.color + '" stroke-opacity="0.18" stroke-width="8">' + shape + '</g>' +
           '<g fill="none" stroke="' + ring.color + '" stroke-width="8" stroke-linecap="round" ' +
              'style="filter:drop-shadow(0 0 6px ' + ring.color + '66)">' +
-            shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '" transform="rotate(-90 50 50)"/>') +
+            shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '"' + rot + '/>') +
           '</g>' +
         '</svg>' +
         '<div class="ring-inner"><span class="ring-pct">' + Math.round(pct) + '%</span></div>' +

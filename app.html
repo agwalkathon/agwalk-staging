@@ -1332,10 +1332,31 @@ if (IS_EMBED) {
   });
 }
 
+/* ---------- embed silent login (participant -> employee token) ---------- */
+async function embedSilentLogin(){
+  if (!IS_EMBED || tokenValid(getToken())) return false;
+  try {
+    var wk = JSON.parse(localStorage.getItem('wk_user') || '{}'); // same-origin: shared with participant.html
+    if (!wk.athleteId) return false;
+    var r = await fetch(BACKEND + '/employee/exchange-participant', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ athlete_id: wk.athleteId })
+    });
+    var d2 = await r.json();
+    if (d2.success && d2.token) {
+      localStorage.setItem('ag_emp_token', d2.token);
+      localStorage.setItem('ag_emp', JSON.stringify(d2.employee || {}));
+      return true;
+    }
+  } catch(e){}
+  return false;
+}
+
 /* ---------- boot ---------- */
 var _origEnterApp = enterApp;
 enterApp = function(){ _origEnterApp(); loadCelebrate(); refreshBell(); setInterval(refreshBell, 90000); setTimeout(maybeShowPushPrompt, 1200); };
 if (tokenValid(getToken())) enterApp();
+else if (IS_EMBED) { embedSilentLogin().then(function(ok){ if (ok) enterApp(); }); }
 </script>
 </body>
 </html>
