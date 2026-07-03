@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e1115">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.json">
+<title>Arcgate — Employee App</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
+  --bg:#0e1115; --surface:#282e36; --surface2:#363c46;
+  --border:rgba(255,255,255,0.07);
+  --text:#FFFFFF; --muted:rgba(255,255,255,0.52); --label:rgba(255,255,255,0.48); --dim:rgba(255,255,255,0.20);
+  --green:#22C55E; --gold:#FFD000;
+  --radius:16px; --radius-sm:12px; --radius-xs:8px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --brand-soft:#F97D4E;
+}
+html{background:#0e1115}
+body{
+  font-family:var(--font);
+  background:linear-gradient(180deg,#1f262d 0%,#0e1115 100%);
+  background-attachment:fixed;background-size:100% 100dvh;
+  color:var(--text);min-height:100dvh;
+  -webkit-font-smoothing:antialiased;letter-spacing:-0.011em;
+}
+.hidden{display:none!important}
+/* ── Login ── */
+#login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.login-card{width:100%;max-width:380px}
+.login-logo{height:44px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.login-logo img{height:100%;width:auto}
+.login-logo .fallback{width:60px;height:60px;border-radius:18px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:28px}
+.login-title{font-size:21px;font-weight:800;text-align:center;letter-spacing:-0.02em}
+.login-sub{font-size:13.5px;color:var(--muted);text-align:center;margin:6px 0 26px}
+.login-field{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px}
+.login-field:focus{outline:none;border-color:var(--brand)}
+.login-btn{width:100%;padding:14px;background:var(--brand);border:none;border-radius:var(--radius-sm);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(232,98,42,.3)}
+.login-btn:disabled{opacity:.5}
+.login-err{color:#F87171;font-size:13px;min-height:18px;margin:8px 0;text-align:center}
+.login-hint{font-size:12px;color:var(--label);text-align:center;margin-top:14px}
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.otp-box{width:46px;height:54px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
+.otp-box:focus{outline:none;border-color:var(--brand)}
+.login-link{background:none;border:none;color:var(--brand-soft);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px}
+/* ── App header (glass, exact participant pattern) ── */
+#app-screen{padding-bottom:96px;min-height:100dvh}
+.header{position:sticky;top:0;z-index:200;background:rgba(31,38,45,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:max(14px,env(safe-area-inset-top)) 16px 14px}
+.hdr-inner{max-width:540px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hdr-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.hdr-logo-img{height:26px;width:auto}
+.hdr-center{display:flex;align-items:center;justify-content:center;flex:1.5;min-width:0;font-size:12px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap}
+.hdr-right{display:flex;align-items:center;flex:1;justify-content:flex-end;min-width:0}
+.app-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand-soft);overflow:hidden}
+.app-avatar img{width:100%;height:100%;object-fit:cover}
+/* ── Content ── */
+.tab-pane{padding:16px 16px 20px;max-width:540px;margin:0 auto}
+.placeholder{text-align:center;padding:70px 20px;color:var(--label)}
+.placeholder .big{font-size:46px;margin-bottom:12px}
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 8px 32px 0 rgba(0,0,0,0.3)}
+.card .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--label);margin-bottom:4px}
+.card .val{font-size:15px;font-weight:600}
+.logout-btn{width:100%;padding:13px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--radius-sm);color:#F87171;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
+.skel{height:80px;border-radius:var(--radius);background:linear-gradient(90deg,#282e36 25%,#323a44 50%,#282e36 75%);background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:14px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* ── Floating pill bottom nav (exact participant pattern) ── */
+.bottom-nav{
+  position:fixed;bottom:calc(2px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  width:92%;max-width:480px;
+  background:rgba(10,12,16,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.07);border-radius:28px;
+  display:flex;justify-content:space-around;padding:6px;z-index:9999;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;background:none;border:none;cursor:pointer;color:var(--muted);gap:4px;transition:color .3s;position:relative;flex:1;border-radius:22px;z-index:2;font-family:inherit}
+.bnav-label{font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.bnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275)}
+.bnav-item.active{color:var(--brand)}
+.bnav-item.active svg{transform:scale(1.12);filter:drop-shadow(0 2px 6px rgba(232,98,42,0.45))}
+.bnav-indicator{position:absolute;top:6px;bottom:6px;left:0;width:0;background:linear-gradient(135deg,rgba(232,98,42,0.14) 0%,rgba(252,97,0,0.05) 100%);border:1.5px solid rgba(232,98,42,0.2);border-radius:22px;z-index:1;transition:all .38s cubic-bezier(0.25,1,0.25,1.12);pointer-events:none}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><img src="logo-white.png" alt="Arcgate" onerror="this.parentNode.innerHTML='<div class=fallback>🏆</div>'"></div>
+    <div class="login-title">Arcgate Employee App</div>
+    <div class="login-sub" id="login-sub">Sign in with your company email</div>
+
+    <div id="step-email">
+      <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
+      <div class="login-err" id="err-email"></div>
+      <button class="login-btn" id="btn-send">Send Login Code</button>
+    </div>
+
+    <div id="step-otp" class="hidden">
+      <div class="otp-boxes" id="otp-boxes"></div>
+      <div class="login-err" id="err-otp"></div>
+      <button class="login-btn" id="btn-verify">Verify &amp; Sign In</button>
+      <div style="text-align:center"><button class="login-link" id="btn-resend">Resend code</button>
+      <button class="login-link" id="btn-back">Change email</button></div>
+    </div>
+    <div class="login-hint">A 6-digit code will be emailed to you. Sessions last 30 days.</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app-screen" class="hidden">
+  <header class="header">
+    <div class="hdr-inner">
+      <div class="hdr-left"><img src="logo-white.png" alt="Arcgate" class="hdr-logo-img" onerror="this.style.display='none'"></div>
+      <div class="hdr-center" id="header-title">Celebrate</div>
+      <div class="hdr-right"><div class="app-avatar" id="header-avatar">?</div></div>
+    </div>
+  </header>
+
+  <div class="tab-pane" id="pane-celebrate">
+    <button id="btn-new-post" style="width:100%;padding:13px;background:var(--surface2);border:1px dashed var(--border);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">✨ Share something to celebrate…</button>
+    <div id="celebrate-feed"><div class="skel"></div><div class="skel"></div></div>
+  </div>
+
+  <!-- new post drawer -->
+  <div id="post-drawer" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end">
+    <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:600">Share a celebration</div>
+        <button id="post-close" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <input id="post-title" placeholder="Title (e.g. We got married! 💍)" maxlength="120" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px">
+      <textarea id="post-msg" placeholder="Tell everyone about it… (optional)" rows="3" maxlength="2000" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;resize:none"></textarea>
+      <div id="post-err" style="color:#F87171;font-size:13px;min-height:16px;margin-bottom:6px"></div>
+      <button id="post-submit" style="width:100%;padding:13px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer">Post</button>
+    </div>
+  </div>
+
+  <div class="tab-pane hidden" id="pane-events">
+    <div id="app-events-list"><div class="skel"></div><div class="skel"></div></div>
+  </div>
+
+  <div class="tab-pane hidden" id="pane-profile">
+    <div id="profile-box"><div class="skel"></div></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bnav-indicator" id="bnav-indicator"></div>
+    <button class="bnav-item active" data-tab="celebrate">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.9 8.6 3 5 6.5 5c2 0 3.5 1 4.5 2.5v0H12v0C13 6 14.5 5 16.5 5 20 5 22.1 8.6 20.5 12 18 16.5 12 21 12 21z" transform="scale(0.9) translate(1.3,1)"/></svg>
+      <span class="bnav-label">Celebrate</span>
+    </button>
+    <button class="bnav-item" data-tab="events">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="bnav-label">Events</span>
+    </button>
+    <button class="bnav-item" data-tab="profile">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+      <span class="bnav-label">Profile</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+var BACKEND = 'https://agwalk-backend.onrender.com';
+var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON };
+
+/* ---------- session ---------- */
+function getToken(){ try { return localStorage.getItem('ag_emp_token'); } catch(e){ return null; } }
+function setToken(t){ try { localStorage.setItem('ag_emp_token', t); } catch(e){} }
+function getEmp(){ try { return JSON.parse(localStorage.getItem('ag_emp') || 'null'); } catch(e){ return null; } }
+function setEmp(e){ try { localStorage.setItem('ag_emp', JSON.stringify(e)); } catch(ex){} }
+function clearSession(){ try { localStorage.removeItem('ag_emp_token'); localStorage.removeItem('ag_emp'); } catch(e){} }
+
+function tokenValid(t){
+  if (!t) return false;
+  try {
+    var p = JSON.parse(atob(t.split('.')[1]));
+    return p.exp && p.exp * 1000 > Date.now();
+  } catch(e){ return false; }
+}
+
+/* ---------- login flow ---------- */
+var _loginEmail = '';
+function buildOtpBoxes(){
+  var box = document.getElementById('otp-boxes');
+  box.textContent = '';
+  for (var i = 0; i < 6; i++) {
+    var inp = document.createElement('input');
+    inp.className = 'otp-box';
+    inp.type = 'tel'; inp.maxLength = 1; inp.inputMode = 'numeric';
+    inp.setAttribute('data-i', i);
+    inp.addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g, '');
+      if (this.value && this.nextElementSibling) this.nextElementSibling.focus();
+    });
+    inp.addEventListener('keydown', function(ev){
+      if (ev.key === 'Backspace' && !this.value && this.previousElementSibling) this.previousElementSibling.focus();
+    });
+    inp.addEventListener('paste', function(ev){
+      var txt = (ev.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      if (txt.length >= 6) {
+        ev.preventDefault();
+        var boxes = document.querySelectorAll('.otp-box');
+        for (var j = 0; j < 6; j++) boxes[j].value = txt[j] || '';
+        boxes[5].focus();
+      }
+    });
+    box.appendChild(inp);
+  }
+}
+function otpValue(){
+  return Array.from(document.querySelectorAll('.otp-box')).map(function(b){ return b.value; }).join('');
+}
+
+async function sendCode(){
+  var email = document.getElementById('in-email').value.trim().toLowerCase();
+  var err = document.getElementById('err-email');
+  err.textContent = '';
+  if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Enter a valid email address'; return; }
+  var btn = document.getElementById('btn-send');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    var r = await fetch(BACKEND + '/employee/request-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Could not send code');
+    _loginEmail = email;
+    document.getElementById('step-email').classList.add('hidden');
+    document.getElementById('step-otp').classList.remove('hidden');
+    document.getElementById('login-sub').textContent = 'Enter the 6-digit code sent to ' + email;
+    buildOtpBoxes();
+    document.querySelector('.otp-box').focus();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = 'Send Login Code';
+}
+
+async function verifyCode(){
+  var err = document.getElementById('err-otp');
+  err.textContent = '';
+  var code = otpValue();
+  if (code.length !== 6) { err.textContent = 'Enter all 6 digits'; return; }
+  var btn = document.getElementById('btn-verify');
+  btn.disabled = true; btn.textContent = 'Verifying…';
+  try {
+    var r = await fetch(BACKEND + '/employee/verify-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _loginEmail, code: code })
+    });
+    var d = await r.json();
+    if (!r.ok || !d.success) throw new Error(d.error || 'Verification failed');
+    setToken(d.token); setEmp(d.employee);
+    enterApp();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = 'Verify & Sign In';
+}
+
+document.getElementById('btn-send').addEventListener('click', sendCode);
+document.getElementById('in-email').addEventListener('keydown', function(e){ if (e.key === 'Enter') sendCode(); });
+document.getElementById('btn-verify').addEventListener('click', verifyCode);
+document.getElementById('btn-resend').addEventListener('click', async function(){
+  var err = document.getElementById('err-otp'); err.textContent = '';
+  try {
+    var r = await fetch(BACKEND + '/employee/request-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _loginEmail })
+    });
+    var d = await r.json();
+    err.style.color = r.ok ? '#4ADE80' : '#F87171';
+    err.textContent = r.ok ? 'New code sent ✓' : (d.error || 'Failed');
+    setTimeout(function(){ err.style.color = '#F87171'; }, 3000);
+  } catch(e) { err.textContent = 'Failed to resend'; }
+});
+document.getElementById('btn-back').addEventListener('click', function(){
+  document.getElementById('step-otp').classList.add('hidden');
+  document.getElementById('step-email').classList.remove('hidden');
+  document.getElementById('login-sub').textContent = 'Sign in with your company email';
+});
+
+/* ---------- app shell ---------- */
+var TITLES = { celebrate: 'Celebrate', events: 'Events', profile: 'Profile' };
+var _loaded = {};
+function moveIndicator(){
+  var ind = document.getElementById('bnav-indicator');
+  var active = document.querySelector('.bnav-item.active');
+  if (!ind || !active) return;
+  ind.style.left = active.offsetLeft + 'px';
+  ind.style.width = active.offsetWidth + 'px';
+}
+window.addEventListener('resize', moveIndicator);
+function switchTab(tab){
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.add('hidden'); });
+  document.getElementById('pane-' + tab).classList.remove('hidden');
+  document.querySelectorAll('.bnav-item').forEach(function(n){
+    n.classList.toggle('active', n.getAttribute('data-tab') === tab);
+  });
+  moveIndicator();
+  document.getElementById('header-title').textContent = TITLES[tab];
+  if (tab === 'events' && !_loaded.events) { _loaded.events = true; loadAppEvents(); }
+  if (tab === 'profile' && !_loaded.profile) { _loaded.profile = true; loadProfile(); }
+}
+document.querySelectorAll('.bnav-item').forEach(function(n){
+  n.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+});
+
+function enterApp(){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+  requestAnimationFrame(moveIndicator);
+  var emp = getEmp() || {};
+  var av = document.getElementById('header-avatar');
+  av.textContent = '';
+  if (emp.photo_url) { var img = document.createElement('img'); img.src = emp.photo_url; av.appendChild(img); }
+  else av.textContent = (emp.full_name || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+}
+
+/* ---------- Events tab (employee view) ---------- */
+var _myEnrollments = [];
+async function loadAppEvents(){
+  var box = document.getElementById('app-events-list');
+  try {
+    var me = null;
+    try {
+      var mr = await fetch(BACKEND + '/employee/me', { headers: { Authorization: 'Bearer ' + getToken() } });
+      me = await mr.json();
+      _myEnrollments = (me.enrollments || []).map(function(x){ return x.event_id; });
+    } catch(e){}
+    var r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+    var evs = await r.json();
+    box.textContent = '';
+    if (!Array.isArray(evs) || !evs.length) {
+      box.innerHTML = '<div class="placeholder"><div class="big">📅</div>No events yet. Stay tuned!</div>';
+      return;
+    }
+    var groups = [['live','LIVE NOW'],['upcoming','UPCOMING'],['ended','PAST EVENTS'],['archived',null]];
+    groups.forEach(function(g){
+      var list = evs.filter(function(e){ return e.status === g[0]; });
+      if (!list.length || g[1] === null && !list.length) return;
+      if (g[1]) {
+        var h = document.createElement('div');
+        h.style.cssText = 'font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted);margin:16px 0 8px;';
+        h.textContent = g[1];
+        box.appendChild(h);
+      }
+      list.forEach(function(ev){
+        var enrolled = _myEnrollments.indexOf(ev.id) > -1;
+        var c = document.createElement('div');
+        c.className = 'card';
+        c.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
+        var nm = document.createElement('div');
+        nm.style.cssText = 'font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;';
+        nm.textContent = ev.name;
+        var pill = document.createElement('span');
+        pill.style.cssText = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;';
+        if (enrolled) { pill.style.background = 'rgba(232,98,42,.15)'; pill.style.color = '#F97D4E'; pill.textContent = '✓ Enrolled'; }
+        else if (ev.status === 'live') { pill.style.background = 'rgba(34,197,94,.15)'; pill.style.color = '#4ADE80'; pill.textContent = '● LIVE'; }
+        if (pill.textContent) nm.appendChild(pill);
+        var dt = document.createElement('div');
+        dt.style.cssText = 'font-size:12px;color:var(--muted);margin-top:4px;';
+        dt.textContent = (ev.start_date || '') + ' → ' + (ev.end_date || '');
+        c.appendChild(nm); c.appendChild(dt);
+        if (enrolled) {
+          var open = document.createElement('button');
+          open.style.cssText = 'margin-top:10px;width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;';
+          open.textContent = 'Open Event App →';
+          open.addEventListener('click', function(){ window.location.href = 'participant.html'; });
+          c.appendChild(open);
+        }
+        box.appendChild(c);
+      });
+    });
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load events.</div>';
+  }
+}
+
+/* ---------- Profile tab ---------- */
+async function loadProfile(){
+  var box = document.getElementById('profile-box');
+  try {
+    var r = await fetch(BACKEND + '/employee/me', { headers: { Authorization: 'Bearer ' + getToken() } });
+    if (r.status === 401) { clearSession(); location.reload(); return; }
+    var d = await r.json();
+    var e = d.employee || {};
+    setEmp(e);
+    box.textContent = '';
+    [['Name', e.full_name], ['Employee Code', e.emp_code], ['Email', e.email],
+     ['Department', e.department || '—'], ['Enrolled Events', String((d.enrollments || []).length)]].forEach(function(f){
+      var c = document.createElement('div'); c.className = 'card';
+      var l = document.createElement('div'); l.className = 'lbl'; l.textContent = f[0];
+      var v = document.createElement('div'); v.className = 'val'; v.textContent = f[1] || '—';
+      c.appendChild(l); c.appendChild(v); box.appendChild(c);
+    });
+    var lo = document.createElement('button');
+    lo.className = 'logout-btn'; lo.textContent = 'Sign Out';
+    lo.addEventListener('click', function(){ clearSession(); location.reload(); });
+    box.appendChild(lo);
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load profile.</div>';
+  }
+}
+
+/* ---------- Celebrate feed ---------- */
+var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎊','#8B5CF6'], custom: ['✨','#E8622A'] };
+var EMOJIS = ['🎉','❤️','👏'];
+
+async function loadCelebrate(){
+  var box = document.getElementById('celebrate-feed');
+  try {
+    var r = await fetch(BACKEND + '/celebrate/feed', { headers: { Authorization: 'Bearer ' + getToken() } });
+    if (r.status === 401) { clearSession(); location.reload(); return; }
+    var d = await r.json();
+    box.textContent = '';
+    if (!d.items || !d.items.length) {
+      box.innerHTML = '<div class="placeholder"><div class="big">🎉</div>No celebrations yet.<br>Be the first to share one!</div>';
+      return;
+    }
+    d.items.forEach(function(c){ box.appendChild(buildCelebCard(c)); });
+  } catch(e) {
+    box.innerHTML = '<div class="placeholder">Could not load the feed. Pull to retry.</div>';
+  }
+}
+
+function buildCelebCard(c){
+  var meta = TYPE_META[c.type] || TYPE_META.custom;
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.style.borderLeft = '4px solid ' + meta[1];
+
+  var head = document.createElement('div');
+  head.style.cssText = 'display:flex;align-items:center;gap:11px;';
+  var av = document.createElement('div');
+  av.style.cssText = 'width:42px;height:42px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0;';
+  if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; im.style.cssText='width:100%;height:100%;object-fit:cover'; av.appendChild(im); }
+  else av.textContent = meta[0];
+  var ht = document.createElement('div');
+  var t1 = document.createElement('div'); t1.style.cssText = 'font-size:14.5px;font-weight:600;line-height:1.35;'; t1.textContent = c.title;
+  var t2 = document.createElement('div'); t2.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:2px;';
+  t2.textContent = (c.employee && c.employee.department ? c.employee.department + ' · ' : '') + c.celebrate_date;
+  ht.appendChild(t1); ht.appendChild(t2);
+  head.appendChild(av); head.appendChild(ht);
+  card.appendChild(head);
+
+  if (c.message) {
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;';
+    msg.textContent = c.message;
+    card.appendChild(msg);
+  }
+
+  var bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:12px;';
+  EMOJIS.forEach(function(em){
+    var b = document.createElement('button');
+    var count = (c.reactions && c.reactions[em]) || 0;
+    var mine = (c.my_reactions || []).indexOf(em) > -1;
+    b.style.cssText = 'padding:6px 12px;border-radius:20px;border:1px solid ' + (mine ? 'var(--brand)' : 'var(--border)') + ';background:' + (mine ? 'rgba(232,98,42,.12)' : 'transparent') + ';color:#fff;font-family:inherit;font-size:13px;cursor:pointer;';
+    b.textContent = em + (count ? ' ' + count : '');
+    b.addEventListener('click', async function(){
+      try {
+        var rr = await fetch(BACKEND + '/celebrate/react', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: c.id, emoji: em }) });
+        var dd = await rr.json();
+        if (dd.success) {
+          c.reactions = c.reactions || {};
+          c.my_reactions = c.my_reactions || [];
+          if (dd.reacted) { c.reactions[em] = (c.reactions[em]||0)+1; c.my_reactions.push(em); }
+          else { c.reactions[em] = Math.max(0,(c.reactions[em]||1)-1); c.my_reactions = c.my_reactions.filter(function(x){return x!==em;}); }
+          var nc = (c.reactions[em]||0);
+          b.textContent = em + (nc ? ' ' + nc : '');
+          var m2 = c.my_reactions.indexOf(em) > -1;
+          b.style.borderColor = m2 ? 'var(--brand)' : 'var(--border)';
+          b.style.background = m2 ? 'rgba(232,98,42,.12)' : 'transparent';
+        }
+      } catch(e){}
+    });
+    bar.appendChild(b);
+  });
+  var wb = document.createElement('button');
+  wb.style.cssText = 'margin-left:auto;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;cursor:pointer;';
+  wb.textContent = '💬 ' + (c.wish_count || 0) + ' wishes';
+  c._wishBtn = wb;
+  bar.appendChild(wb);
+  card.appendChild(bar);
+
+  // ----- inline wishes section (expandable) -----
+  var wsec = document.createElement('div');
+  wsec.style.cssText = 'display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
+  var wlist = document.createElement('div');
+  wlist.style.cssText = 'max-height:260px;overflow-y:auto;';
+  var wrow = document.createElement('div');
+  wrow.style.cssText = 'display:flex;gap:8px;margin-top:10px;';
+  var winp = document.createElement('input');
+  winp.placeholder = 'Write a wish…'; winp.maxLength = 500;
+  winp.style.cssText = 'flex:1;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:11px;color:#fff;font-family:inherit;font-size:13.5px;min-width:0;';
+  var wsend = document.createElement('button');
+  wsend.textContent = 'Send';
+  wsend.style.cssText = 'padding:10px 16px;background:var(--brand);border:none;border-radius:11px;color:#fff;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer;';
+  wrow.appendChild(winp); wrow.appendChild(wsend);
+  wsec.appendChild(wlist); wsec.appendChild(wrow);
+  card.appendChild(wsec);
+
+  function renderWishRow(w){
+    var row = document.createElement('div');
+    row.style.cssText = 'margin-bottom:10px;';
+    var nm = document.createElement('span'); nm.style.cssText = 'font-size:12.5px;font-weight:600;color:var(--brand-soft);margin-right:6px;';
+    nm.textContent = (w.employee && w.employee.full_name) || w.emp_code || 'You';
+    var mg = document.createElement('span'); mg.style.cssText = 'font-size:13px;color:var(--muted);line-height:1.4;';
+    mg.textContent = w.message;
+    row.appendChild(nm); row.appendChild(mg);
+    return row;
+  }
+  async function loadWishesInline(){
+    wlist.innerHTML = '<div class="skel" style="height:34px;margin-bottom:8px"></div>';
+    try {
+      var r = await fetch(BACKEND + '/celebrate/wishes?celebration_id=' + c.id, { headers: { Authorization: 'Bearer ' + getToken() } });
+      var d2 = await r.json();
+      wlist.textContent = '';
+      if (!d2.wishes || !d2.wishes.length) {
+        wlist.innerHTML = '<div style="color:var(--label);font-size:12.5px;padding:4px 0 2px">No wishes yet — be the first! 🎈</div>';
+        return;
+      }
+      d2.wishes.forEach(function(w){ wlist.appendChild(renderWishRow(w)); });
+      wlist.scrollTop = wlist.scrollHeight;
+    } catch(e){ wlist.innerHTML = '<div style="color:var(--label);font-size:12.5px">Could not load wishes.</div>'; }
+  }
+  function toggleWishes(){
+    var open = wsec.style.display !== 'none';
+    wsec.style.display = open ? 'none' : 'block';
+    if (!open) { loadWishesInline(); setTimeout(function(){ winp.focus(); }, 100); }
+  }
+  wb.addEventListener('click', toggleWishes);
+
+  wsend.addEventListener('click', async function(){
+    var msg = winp.value.trim();
+    if (!msg) return;
+    wsend.disabled = true;
+    try {
+      var r = await fetch(BACKEND + '/celebrate/wish', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ celebration_id: c.id, message: msg }) });
+      var d2 = await r.json();
+      if (d2.success) {
+        winp.value = '';
+        if (d2.status === 'pending') {
+          var n = document.createElement('div'); n.style.cssText='color:#F59E0B;font-size:12px;padding:4px 0'; n.textContent='Pending admin approval ✓'; wlist.appendChild(n);
+        } else {
+          var emp = getEmp() || {};
+          var placeholder = wlist.querySelector('div');
+          if (placeholder && placeholder.textContent.indexOf('No wishes yet') > -1) wlist.textContent = '';
+          wlist.appendChild(renderWishRow({ message: msg, employee: { full_name: emp.full_name } }));
+          wlist.scrollTop = wlist.scrollHeight;
+          c.wish_count = (c.wish_count || 0) + 1;
+          wb.textContent = '💬 ' + c.wish_count + ' wishes';
+        }
+      }
+    } catch(e){}
+    wsend.disabled = false;
+  });
+  winp.addEventListener('keydown', function(e){ if (e.key === 'Enter') wsend.click(); });
+
+  return card;
+}
+
+document.getElementById('btn-new-post').addEventListener('click', function(){ document.getElementById('post-drawer').classList.remove('hidden'); });
+document.getElementById('post-close').addEventListener('click', function(){ document.getElementById('post-drawer').classList.add('hidden'); });
+document.getElementById('post-drawer').addEventListener('click', function(e){ if (e.target === this) this.classList.add('hidden'); });
+document.getElementById('post-submit').addEventListener('click', async function(){
+  var title = document.getElementById('post-title').value.trim();
+  var msg = document.getElementById('post-msg').value.trim();
+  var err = document.getElementById('post-err');
+  err.textContent = '';
+  if (!title) { err.textContent = 'Please give it a title'; return; }
+  this.disabled = true;
+  try {
+    var r = await fetch(BACKEND + '/celebrate/post', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+getToken() }, body: JSON.stringify({ title: title, message: msg }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Failed');
+    document.getElementById('post-drawer').classList.add('hidden');
+    document.getElementById('post-title').value = ''; document.getElementById('post-msg').value = '';
+    if (d.status === 'pending') alert('Submitted! Your post will appear after admin approval. 🎉');
+    else loadCelebrate();
+  } catch(e) { err.textContent = e.message; }
+  this.disabled = false;
+});
+
+/* ---------- boot ---------- */
+var _origEnterApp = enterApp;
+enterApp = function(){ _origEnterApp(); loadCelebrate(); };
+if (tokenValid(getToken())) enterApp();
+</script>
+</body>
+</html>
