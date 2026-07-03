@@ -573,13 +573,13 @@ async function loadBranding() {
     var d = await r.json();
     if (d && d.success && d.branding) {
       var b = d.branding;
-      if (b.login_title) {
-        var tEl = document.getElementById('br-login-title');
-        if (tEl) tEl.textContent = b.login_title;
-      }
       if (b.tagline) {
+        var tEl = document.getElementById('br-login-title');
+        if (tEl) tEl.textContent = b.tagline;
+      }
+      if (b.login_title) {
         var sEl = document.getElementById('br-login-sub');
-        if (sEl) sEl.textContent = b.tagline;
+        if (sEl) sEl.textContent = b.login_title;
       }
       
       var logoSrc = b.logo_url || 'logo-white.png';
