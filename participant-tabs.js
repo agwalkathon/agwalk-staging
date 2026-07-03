@@ -3111,7 +3111,7 @@ function setupAppLayout(isParticipant) {
     document.getElementById('tab-celebrate').style.display = 'block';
     document.getElementById('tab-you').style.display = 'block';
   } else {
-    TAB_ORDER = ['celebrate', 'events', 'you'];
+    TAB_ORDER = ['events', 'celebrate', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'none';
     document.getElementById('bnav-leaderboard').style.display = 'none';
     document.getElementById('bnav-events').style.display = 'flex';
