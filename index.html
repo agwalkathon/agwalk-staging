@@ -159,6 +159,23 @@ body{
 @media (max-width: 480px) {
   .bottom-nav { width: 94%; padding: 5px; }
 }
+.ev-section-title{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px}
+.ev-card-p{background:var(--surface);border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 8px 32px 0 rgba(0,0,0,0.3)}
+.ev-card-body{padding:16px}
+.ev-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ev-card-name{font-size:17px;font-weight:600;color:#fff}
+.ev-pill{font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.ev-pill-live{background:rgba(34,197,94,.15);color:#4ADE80}
+.ev-pill-enrolled{background:rgba(232,98,42,.15);color:#F97D4E}
+.ev-card-dates{font-size:12.5px;color:var(--muted);margin-top:5px}
+.ev-card-desc{font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.45}
+.ev-card-stats{font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
+.ev-card-actions{display:flex;gap:10px;margin-top:12px}
+.ev-btn{flex:1;padding:11px;border:none;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer}
+.ev-btn-primary{background:#E8622A}
+.ev-spectator-note{font-size:11.5px;color:var(--brand-soft);margin-top:10px;font-weight:500;}
+.ev-banner{width:100%;height:140px;object-fit:cover;display:block;}
+.ev-empty{text-align:center;padding:70px 20px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -518,6 +535,18 @@ function enterApp(){
   });
 }
 
+/* ---------- Events Helpers ---------- */
+function evFmtDate(d) {
+  if (!d) return '';
+  var p = d.split('-');
+  var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(p[1],10)-1];
+  return parseInt(p[2],10) + ' ' + mo + ' ' + p[0];
+}
+function evDaysUntil(d) {
+  var t = new Date(); t.setHours(0,0,0,0);
+  return Math.ceil((new Date(d + 'T00:00:00') - t) / 86400000);
+}
+
 /* ---------- Events tab (employee view) ---------- */
 var _myEnrollments = [];
 async function loadAppEvents(){
@@ -533,75 +562,174 @@ async function loadAppEvents(){
     var evs = await r.json();
     box.textContent = '';
     if (!Array.isArray(evs) || !evs.length) {
-      box.innerHTML = '<div class="placeholder"><div class="big">📅</div>No events yet. Stay tuned!</div>';
+      box.innerHTML = '<div class="ev-empty"><div class="big">📅</div>No events yet. Stay tuned!</div>';
       return;
     }
+
+    // Fetch stats for live + ended events (top 5 only) to match participant view details
+    var statEvents = evs.filter(function(e){ return e.status === 'live' || e.status === 'ended'; }).slice(0, 5);
+    await Promise.all(statEvents.map(async function(ev){
+      try {
+        var s = await fetch(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + ev.id +
+          '&is_deleted=is.false&is_flagged=is.false&select=total_km:distance_meters.sum(),acts:id.count()', { headers: HDR });
+        var d = await s.json();
+        if (d && d[0]) ev._stats = { km: (d[0].total_km || 0) / 1000, acts: d[0].acts || 0 };
+        var c = await fetch(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + ev.id + '&select=id&limit=1', {
+          headers: Object.assign({}, HDR, { Prefer: 'count=exact' })
+        });
+        var cr = c.headers.get('content-range');
+        if (cr && cr.indexOf('/') > -1) ev._participants = parseInt(cr.split('/')[1]) || 0;
+      } catch (e) {}
+    }));
+
     var groups = [['live','LIVE NOW'],['upcoming','UPCOMING'],['ended','PAST EVENTS'],['archived',null]];
     groups.forEach(function(g){
       var list = evs.filter(function(e){ return e.status === g[0]; });
       if (!list.length || g[1] === null && !list.length) return;
       if (g[1]) {
         var h = document.createElement('div');
-        h.style.cssText = 'font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted);margin:16px 0 8px;';
+        h.className = 'ev-section-title';
         h.textContent = g[1];
         box.appendChild(h);
       }
       list.forEach(function(ev){
         var enrolled = _myEnrollments.indexOf(ev.id) > -1;
         var rc = ev.rules_config || {};
-        var hasLongDesc = ev.description && ev.description.length > 0;
-        var c = document.createElement('div');
-        c.className = 'card';
-        c.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
-        var nm = document.createElement('div');
-        nm.style.cssText = 'font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;';
-        nm.textContent = ev.name;
-        var pill = document.createElement('span');
-        pill.style.cssText = 'font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;';
-        var btnRow = document.createElement('div');
-        btnRow.style.cssText = 'display:flex;gap:8px;margin-top:12px;';
-        var accent2 = ev.accent_color || '#E8622A';
-        function rowBtn(txt, primary){
-          var b = document.createElement('button');
-          b.textContent = txt;
-          b.style.cssText = 'flex:1;padding:10px 6px;border-radius:10px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;' +
-            (primary ? 'border:none;color:#fff;background:' + accent2 + ';box-shadow:0 4px 14px ' + accent2 + '55;'
-                     : 'border:1px solid var(--border);background:transparent;color:' + accent2 + ';');
-          return b;
-        }
-        if (hasLongDesc) {
-          var db2 = rowBtn('Read Details', false);
-          db2.style.color = 'var(--muted)';
-          db2.addEventListener('click', function(){ openEventDetails(ev); });
-          btnRow.appendChild(db2);
+        
+        var card = document.createElement('div');
+        card.className = 'ev-card-p';
+        card.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
+
+        if (ev.banner_url) {
+          var img = document.createElement('img');
+          img.className = 'ev-banner';
+          img.src = ev.banner_url;
+          img.alt = '';
+          img.loading = 'lazy';
+          card.appendChild(img);
         }
 
-        // Event registration button
+        var body = document.createElement('div');
+        body.className = 'ev-card-body';
+
+        var top = document.createElement('div');
+        top.className = 'ev-card-top';
+        var name = document.createElement('div');
+        name.className = 'ev-card-name';
+        name.textContent = ev.name;
+        top.appendChild(name);
+        
+        if (enrolled) {
+          var en = document.createElement('span'); 
+          en.className = 'ev-pill ev-pill-enrolled'; 
+          en.textContent = '✓ Enrolled'; 
+          top.appendChild(en);
+        } else if (g[0] === 'live') {
+          var lv = document.createElement('span'); 
+          lv.className = 'ev-pill ev-pill-live'; 
+          lv.textContent = '● LIVE'; 
+          top.appendChild(lv);
+        }
+        body.appendChild(top);
+
+        var dates = document.createElement('div');
+        dates.className = 'ev-card-dates';
+        dates.textContent = evFmtDate(ev.start_date) + ' → ' + evFmtDate(ev.end_date);
+        if (g[0] === 'upcoming') {
+          var du = evDaysUntil(ev.start_date);
+          if (du > 0) dates.textContent += '  ·  Starts in ' + du + ' day' + (du === 1 ? '' : 's');
+        }
+        body.appendChild(dates);
+
+        if (ev.description) {
+          var desc = document.createElement('div');
+          desc.className = 'ev-card-desc';
+          desc.textContent = ev.description;
+          body.appendChild(desc);
+        }
+
+        if (ev._stats) {
+          var st = document.createElement('div');
+          st.className = 'ev-card-stats';
+          var bits = [];
+          if (ev._participants) bits.push(ev._participants + ' participants');
+          bits.push(Math.round(ev._stats.km).toLocaleString('en-IN') + ' km total');
+          bits.push(ev._stats.acts.toLocaleString('en-IN') + ' activities');
+          st.textContent = bits.join('  ·  ');
+          body.appendChild(st);
+        }
+
+        var actions = document.createElement('div');
+        actions.className = 'ev-card-actions';
+
         var today0 = new Date().toISOString().split('T')[0];
         var regOpenNow = ev.registration_open_date && ev.registration_close_date &&
                          today0 >= ev.registration_open_date && today0 <= ev.registration_close_date;
-        if (!enrolled && regOpenNow) {
-          var hasDraft = false;
-          try {
-            hasDraft = !!localStorage.getItem('ag_reg_draft_' + ev.id);
-          } catch(e){}
-          var regBtn = rowBtn(hasDraft ? '▶ Resume Registration' : 'Register Now', true);
-          regBtn.addEventListener('click', function(){ openAppRegistration(ev); });
-          btnRow.appendChild(regBtn);
+
+        if (g[0] === 'live' || g[0] === 'ended') {
+          var lb = document.createElement('button');
+          lb.className = 'ev-btn';
+          lb.textContent = g[0] === 'ended' ? '🏆 Final Results' : '🏆 Leaderboard';
+          lb.addEventListener('click', function(){ openSpectatorBoard(ev); });
+          actions.appendChild(lb);
+          
+          if (g[0] === 'live' && !enrolled && regOpenNow) {
+            var jrb = document.createElement('button');
+            jrb.className = 'ev-btn ev-btn-primary';
+            jrb.style.background = ev.accent_color || '';
+            var hasDraft = false;
+            try {
+              hasDraft = !!localStorage.getItem('ag_reg_draft_' + ev.id);
+            } catch(e){}
+            jrb.textContent = hasDraft ? '▶ Resume Registration' : 'Register Now';
+            jrb.addEventListener('click', function(){ openAppRegistration(ev); });
+            actions.appendChild(jrb);
+          } else if (g[0] === 'live' && !enrolled) {
+            var sp = document.createElement('div');
+            sp.className = 'ev-spectator-note';
+            sp.textContent = "You're watching — join the next event to compete!";
+            body.appendChild(sp);
+          }
         }
 
-        if (enrolled) {
-          var open = rowBtn('Open Event →', true);
+        if (g[0] === 'upcoming') {
+          if (enrolled) {
+            var ok = document.createElement('div');
+            ok.className = 'ev-spectator-note';
+            ok.textContent = "You're registered. Get ready! 💪";
+            body.appendChild(ok);
+          } else if (regOpenNow) {
+            var rb = document.createElement('button');
+            rb.className = 'ev-btn ev-btn-primary';
+            rb.style.background = ev.accent_color || '';
+            var hasDraft = false;
+            try {
+              hasDraft = !!localStorage.getItem('ag_reg_draft_' + ev.id);
+            } catch(e){}
+            rb.textContent = hasDraft ? '▶ Resume Registration' : 'Register Now';
+            rb.addEventListener('click', function(){ openAppRegistration(ev); });
+            actions.appendChild(rb);
+          } else if (ev.registration_open_date) {
+            var no = document.createElement('div');
+            no.className = 'ev-spectator-note';
+            no.textContent = 'Registration opens ' + evFmtDate(ev.registration_open_date);
+            body.appendChild(no);
+          }
+        }
+
+        // Add "Open Event →" button for enrolled participants of live/upcoming events
+        if (enrolled && (g[0] === 'live' || g[0] === 'upcoming')) {
+          var open = document.createElement('button');
+          open.className = 'ev-btn ev-btn-primary';
+          open.style.background = ev.accent_color || '';
+          open.textContent = 'Open Event →';
           open.addEventListener('click', function(){ window.location.href = 'participant.html?login=1'; });
-          btnRow.appendChild(open);
+          actions.appendChild(open);
         }
-        if ((ev.status === 'live' || ev.status === 'ended') && rc.tracking_mode !== 'none' && rc.tracking_mode !== 'manual') {
-          var lbBtn = rowBtn('🏆 Leaderboard', btnRow.children.length === 0);
-          lbBtn.addEventListener('click', function(){ openSpectatorBoard(ev); });
-          btnRow.appendChild(lbBtn);
-        }
-        if (btnRow.children.length) c.appendChild(btnRow);
-        box.appendChild(c);
+
+        if (actions.children.length) body.appendChild(actions);
+        card.appendChild(body);
+        box.appendChild(card);
       });
     });
   } catch(e) {
