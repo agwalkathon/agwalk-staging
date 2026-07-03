@@ -398,6 +398,13 @@ function openEventRegistration(ev) {
     inp.id = 'ereg-' + f.k;
     inp.value = draft[f.k] !== undefined ? draft[f.k] : (pre[f.k] || '');
     inp.style.cssText = 'width:100%;padding:11px 12px;background:var(--surface2,#1E2230);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;';
+    if (f.k === 'full_name' || f.k === 'emp_code' || f.k === 'email') {
+      if (pre[f.k]) {
+        inp.disabled = true;
+        inp.style.opacity = '0.7';
+        inp.style.cursor = 'not-allowed';
+      }
+    }
     inp.addEventListener('input', function(){ saveRegDraft(ev.id); });
     inp.addEventListener('change', function(){ saveRegDraft(ev.id); });
     fw.appendChild(inp);
@@ -463,17 +470,15 @@ async function submitEventRegistration(ev) {
   btn.disabled = true; btn.textContent = 'Submitting…';
   try {
     var payload = Object.assign({}, d, { event_name: ev.slug, event_id: ev.id, status: 'pending' });
-    var r = await fetch(SUPABASE_URL + '/rest/v1/registration_requests', {
+    var backendUrl = (typeof BACKEND !== 'undefined' ? BACKEND : 'https://agwalk-backend.onrender.com');
+    var r = await fetch(backendUrl + '/register-request', {
       method: 'POST',
-      headers: Object.assign({}, HDR, { 'Content-Type':'application/json', Prefer:'return=minimal' }),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    if (!r.ok && r.status !== 201) {
-      var body = await r.text();
-      if (body.indexOf('duplicate') > -1 || body.indexOf('unique') > -1 || r.status === 409) {
-        throw new Error('A request with this Employee Code already exists for review.');
-      }
-      throw new Error('Submission failed (' + r.status + '). Please try again.');
+    if (!r.ok) {
+      var errData = await r.json().catch(function(){return{};});
+      throw new Error(errData.error || ('Submission failed (' + r.status + '). Please try again.'));
     }
     safeSetItem(regDraftKey(ev.id), '');
     try { localStorage.removeItem(regDraftKey(ev.id)); } catch(e) {}
