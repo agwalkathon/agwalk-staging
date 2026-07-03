@@ -130,24 +130,10 @@ function employeeTokenValid() {
 function userGuard() {
   try {
     var s = JSON.parse(safeGetItem('wk_user') || '{}');
-    if (!s.loggedIn) {
-      // Post-rename routing: index.html is now the universal Employee App home.
-      // Only an explicit "Open Event App" tap (?login=1) sends someone straight to Strava connect;
-      // every other session-less visitor (known employee or total stranger) lands home first,
-      // where OTP login (checked against employees_master) decides who they really are.
-      var wantLogin = new URLSearchParams(window.location.search).get('login') === '1';
-      if (wantLogin) { window.location.href = 'connect-strava.html'; return null; }
-      window.location.href = 'index.html'; return null;
-    }
-    if (!s.athleteId || s.athleteId === 'null' || s.athleteId === 'undefined') {
-      if (!s.empCode && !s.email) {
-        window.location.href = 'index.html';
-        return null;
-      }
-    }
+    if (!s.loggedIn) return null;
+    if (!s.athleteId || s.athleteId === 'null' || s.athleteId === 'undefined') return null;
     return s;
   } catch(e) {
-    window.location.href = 'index.html';
     return null;
   }
 }
@@ -157,7 +143,7 @@ function logout() {
   safeRemoveItem('ag_emp');
   safeRemoveItem('ag_push_emp_synced');
   try { sessionStorage.removeItem('wk_admin'); } catch(e){}
-  window.location.href = 'index.html';
+  location.reload();
 }
 
 // ── Maintenance Mode Gate ────────────────────────────────────────────────
