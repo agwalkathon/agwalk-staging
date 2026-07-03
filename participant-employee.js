@@ -565,6 +565,8 @@ function initEmployeeModeListeners() {
 }
 
 async function loadBranding() {
+  var lEl = document.getElementById('login-logo-img');
+  var aEl = document.getElementById('app-logo');
   try {
     var r = await fetch(BACKEND + '/branding');
     var d = await r.json();
@@ -578,17 +580,28 @@ async function loadBranding() {
         var sEl = document.getElementById('br-login-sub');
         if (sEl) sEl.textContent = b.tagline;
       }
-      if (b.logo_url) {
-        var lEl = document.getElementById('login-logo-img');
-        if (lEl) lEl.src = b.logo_url;
-        var aEl = document.getElementById('app-logo');
-        if (aEl) aEl.src = b.logo_url;
+      
+      var logoSrc = b.logo_url || 'logo-white.png';
+      if (lEl) {
+        lEl.src = logoSrc;
+        lEl.style.opacity = '1';
       }
+      if (aEl) aEl.src = logoSrc;
+
       if (b.app_name) {
         document.title = b.app_name + ' — Dashboard';
+      }
+    } else {
+      if (lEl) {
+        lEl.src = 'logo-white.png';
+        lEl.style.opacity = '1';
       }
     }
   } catch (e) {
     console.warn('Failed to load branding:', e);
+    if (lEl) {
+      lEl.src = 'logo-white.png';
+      lEl.style.opacity = '1';
+    }
   }
 }
