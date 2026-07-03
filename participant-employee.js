@@ -136,19 +136,13 @@ function formatCelebDateTime(isoStr) {
   min = min < 10 ? '0' + min : min;
   return mo + ' ' + dt.getDate() + ', ' + dt.getFullYear() + ' at ' + hr + ':' + min + ' ' + ampm;
 }
-
 function getGlassmorphicAvatarStyle(name) {
   var colors = [
-    { r: 255, g: 107, b: 107 }, // Sunset Red
-    { r: 78, g: 101, b: 255 },  // Electric Blue
-    { r: 127, g: 0, b: 255 },   // Purple
-    { r: 17, g: 153, b: 142 },  // Emerald
-    { r: 245, g: 87, b: 108 },  // Rose
-    { r: 31, g: 209, b: 249 },  // Neon Cyan
-    { r: 240, g: 147, b: 251 }, // Peach Pink
-    { r: 246, g: 211, b: 101 }, // Yellow Gold
-    { r: 137, g: 247, b: 254 }, // Sky Blue
-    { r: 48, g: 207, b: 208 }   // Cosmic Teal
+    { r: 232, g: 98, b: 42, r2: 252, g2: 97, b2: 0 },    // Orange
+    { r: 79, g: 70, b: 229, r2: 124, g2: 58, b2: 237 },  // Indigo/Purple
+    { r: 13, g: 148, b: 136, r2: 20, g2: 184, b2: 166 }, // Teal
+    { r: 219, g: 39, b: 119, r2: 236, g2: 72, b2: 153 }, // Pink
+    { r: 37, g: 99, b: 235, r2: 96, g2: 165, b2: 250 }   // Blue
   ];
   var hash = 0;
   var str = name || '';
@@ -157,18 +151,39 @@ function getGlassmorphicAvatarStyle(name) {
   }
   var index = Math.abs(hash) % colors.length;
   var c = colors[index];
-  var bg = 'linear-gradient(135deg, rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.25) 0%, rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.05) 100%)';
-  var border = '1px solid rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.4)';
-  var shadow = '0 4px 12px rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.15), inset 0 1px 1px rgba(255,255,255,0.2)';
-  return 'background:' + bg + '; border:' + border + '; color:#ffffff; box-shadow:' + shadow + '; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); text-shadow:0 1px 2px rgba(0,0,0,0.3);';
+  var bg = 'linear-gradient(135deg, rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.35) 0%, rgba(' + c.r2 + ',' + c.g2 + ',' + c.b2 + ',0.15) 100%)';
+  var border = '1px solid rgba(255,255,255,0.18)';
+  var shadow = 'inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 15px rgba(0,0,0,0.25)';
+  return 'background:' + bg + '; border:' + border + '; color:#ffffff; box-shadow:' + shadow + '; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); text-shadow:0 1px 2px rgba(0,0,0,0.3); font-weight:800; text-transform:uppercase;';
 }
-
 var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎉','#8B5CF6'], custom: ['📣','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'] };
 var EMOJIS = ['👍','❤️','👏'];
 
 async function loadCelebrate(){
   var box = document.getElementById('celebrate-feed');
   if (!box) return;
+
+  var greetEl = document.getElementById('celebrate-greeting');
+  if (greetEl) {
+    var userName = '';
+    var emp = getEmp();
+    try {
+      var s = JSON.parse(safeGetItem('wk_user') || '{}');
+      if (s && s.loggedIn && s.name) {
+        userName = s.name;
+      }
+    } catch(e){}
+    if (!userName && emp) {
+      userName = emp.full_name;
+    }
+    var hr = new Date().getHours();
+    var greet = 'Hello';
+    if (hr < 12) greet = 'Good Morning';
+    else if (hr < 17) greet = 'Good Afternoon';
+    else greet = 'Good Evening';
+    greetEl.textContent = greet + (userName ? ', ' + userName.split(' ')[0] : '') + ' 👋';
+  }
+
   try {
     var r = await fetch(BACKEND + '/celebrate/feed', { headers: { Authorization: 'Bearer ' + getToken() } });
     if (r.status === 401) { clearSession(); location.reload(); return; }
@@ -233,8 +248,9 @@ function buildCelebCard(c){
   card.className = 'card';
   card.setAttribute('data-celeb-id', c.id);
   card.style.borderLeft = '4px solid ' + meta[1];
+  card.style.padding = '16px';
+  card.style.marginBottom = '16px';
   if (c.type === 'announcement') card.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.10) 0%, var(--surface) 45%)';
-
   var head = document.createElement('div');
   head.style.cssText = 'display:flex;align-items:center;gap:11px;';
   var av = document.createElement('div');
@@ -314,7 +330,7 @@ function buildCelebCard(c){
   wb.textContent = '💬 ' + (c.wish_count || 0);
 
   var wsec = document.createElement('div');
-  wsec.style.cssText = 'display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
+  wsec.style.cssText = 'display:block;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
   var wlist = document.createElement('div');
   wlist.style.cssText = 'max-height:260px;overflow-y:auto;';
   var drawWishes = function(){
@@ -350,12 +366,13 @@ function buildCelebCard(c){
       wlist.appendChild(wrow);
     });
   };
+  drawWishes();
+
   wb.addEventListener('click', function(){
     var isHidden = wsec.style.display === 'none';
     wsec.style.display = isHidden ? 'block' : 'none';
     if (isHidden) { drawWishes(); }
   });
-
   var wrow = document.createElement('div');
   wrow.style.cssText = 'display:flex;gap:8px;margin-top:10px;';
   var winp = document.createElement('input');
