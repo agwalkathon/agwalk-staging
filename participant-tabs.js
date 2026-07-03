@@ -3096,8 +3096,7 @@ function closeReactionsDetail() {
 function setupAppLayout(isParticipant) {
   var bnav = document.querySelector('.bottom-nav');
   var track = document.getElementById('tab-track');
-  
-  if (isParticipant) {
+    if (isParticipant) {
     TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'flex';
     document.getElementById('bnav-leaderboard').style.display = 'flex';
@@ -3105,11 +3104,11 @@ function setupAppLayout(isParticipant) {
     document.getElementById('bnav-celebrate').style.display = 'flex';
     document.getElementById('bnav-you').style.display = 'flex';
     
-    document.getElementById('tab-dashboard').style.display = 'block';
-    document.getElementById('tab-leaderboard').style.display = 'block';
-    document.getElementById('tab-events').style.display = 'block';
-    document.getElementById('tab-celebrate').style.display = 'block';
-    document.getElementById('tab-you').style.display = 'block';
+    document.getElementById('tab-dashboard').classList.remove('hidden-tab');
+    document.getElementById('tab-leaderboard').classList.remove('hidden-tab');
+    document.getElementById('tab-events').classList.remove('hidden-tab');
+    document.getElementById('tab-celebrate').classList.remove('hidden-tab');
+    document.getElementById('tab-you').classList.remove('hidden-tab');
   } else {
     TAB_ORDER = ['events', 'celebrate', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'none';
@@ -3118,13 +3117,12 @@ function setupAppLayout(isParticipant) {
     document.getElementById('bnav-celebrate').style.display = 'flex';
     document.getElementById('bnav-you').style.display = 'flex';
     
-    document.getElementById('tab-dashboard').style.display = 'none';
-    document.getElementById('tab-leaderboard').style.display = 'none';
-    document.getElementById('tab-events').style.display = 'block';
-    document.getElementById('tab-celebrate').style.display = 'block';
-    document.getElementById('tab-you').style.display = 'block';
+    document.getElementById('tab-dashboard').classList.add('hidden-tab');
+    document.getElementById('tab-leaderboard').classList.add('hidden-tab');
+    document.getElementById('tab-events').classList.remove('hidden-tab');
+    document.getElementById('tab-celebrate').classList.remove('hidden-tab');
+    document.getElementById('tab-you').classList.remove('hidden-tab');
   }
-  
   if (track) {
     track.style.width = (TAB_ORDER.length * 100) + '%';
     TAB_ORDER.forEach(function(tab) {
