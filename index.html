@@ -403,6 +403,29 @@ async function verifyCode(){
     var d = await r.json();
     if (!r.ok || !d.success) throw new Error(d.error || 'Verification failed');
     setToken(d.token); setEmp(d.employee);
+
+    // If they are enrolled as a participant, save participant session and redirect
+    try {
+      var regRes = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(_loginEmail) + '&select=*', { headers: HDR });
+      var regs = await regRes.json();
+      if (Array.isArray(regs) && regs.length > 0) {
+        var reg = regs[0];
+        localStorage.setItem('wk_user', JSON.stringify({
+          loggedIn: true,
+          role: reg.role || 'user',
+          athleteId: reg.strava_athlete_id,
+          name: reg.full_name || d.employee.full_name || 'Participant',
+          empCode: reg.emp_code || d.employee.emp_code || '',
+          email: _loginEmail,
+          expires: Date.now() + (30 * 24 * 60 * 60 * 1000)
+        }));
+        window.location.replace('participant.html');
+        return;
+      }
+    } catch(ex) {
+      console.warn('Participant check failed:', ex);
+    }
+
     enterApp();
   } catch(e) { err.textContent = e.message; }
   btn.disabled = false; btn.textContent = 'Verify & Sign In';
@@ -525,6 +548,8 @@ async function loadAppEvents(){
       }
       list.forEach(function(ev){
         var enrolled = _myEnrollments.indexOf(ev.id) > -1;
+        var rc = ev.rules_config || {};
+        var hasLongDesc = ev.description && ev.description.length > 0;
         var c = document.createElement('div');
         c.className = 'card';
         c.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
@@ -550,7 +575,21 @@ async function loadAppEvents(){
           db2.addEventListener('click', function(){ openEventDetails(ev); });
           btnRow.appendChild(db2);
         }
-        if (ev._regBtn) { btnRow.appendChild(ev._regBtn); ev._regBtn = null; }
+
+        // Event registration button
+        var today0 = new Date().toISOString().split('T')[0];
+        var regOpenNow = ev.registration_open_date && ev.registration_close_date &&
+                         today0 >= ev.registration_open_date && today0 <= ev.registration_close_date;
+        if (!enrolled && regOpenNow) {
+          var hasDraft = false;
+          try {
+            hasDraft = !!localStorage.getItem('ag_reg_draft_' + ev.id);
+          } catch(e){}
+          var regBtn = rowBtn(hasDraft ? '▶ Resume Registration' : 'Register Now', true);
+          regBtn.addEventListener('click', function(){ openAppRegistration(ev); });
+          btnRow.appendChild(regBtn);
+        }
+
         if (enrolled) {
           var open = rowBtn('Open Event →', true);
           open.addEventListener('click', function(){ window.location.href = 'participant.html?login=1'; });
@@ -566,7 +605,7 @@ async function loadAppEvents(){
       });
     });
   } catch(e) {
-    box.innerHTML = '<div class="placeholder">Could not load events.</div>';
+    box.innerHTML = '<div class="placeholder" style="font-size:12px;color:#fca5a5;text-align:left;white-space:pre-wrap;word-break:break-all;">Could not load events: ' + e.message + '\n' + e.stack + '</div>';
   }
 }
 
@@ -1371,8 +1410,19 @@ async function syncExistingPushToEmployee(){
   } catch(e){}
 }
 enterApp = function(){ _origEnterApp(); loadCelebrate(); refreshBell(); setInterval(refreshBell, 90000); setTimeout(maybeShowPushPrompt, 1200); setTimeout(syncExistingPushToEmployee, 2000); };
-if (tokenValid(getToken())) enterApp();
-else if (IS_EMBED) { embedSilentLogin().then(function(ok){ if (ok) enterApp(); }); }
+
+var s = null;
+try {
+  s = JSON.parse(localStorage.getItem('wk_user') || '{}');
+} catch(e){}
+
+if (s && s.loggedIn && s.athleteId) {
+  window.location.replace('participant.html');
+} else if (tokenValid(getToken())) {
+  enterApp();
+} else if (IS_EMBED) {
+  embedSilentLogin().then(function(ok){ if (ok) enterApp(); });
+}
 </script>
 </body>
 </html>
