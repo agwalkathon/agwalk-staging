@@ -157,7 +157,7 @@ function getGlassmorphicAvatarStyle(name) {
   return 'background:' + bg + '; border:' + border + '; color:#ffffff; box-shadow:' + shadow + '; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); text-shadow:0 1px 2px rgba(0,0,0,0.3); font-weight:800; text-transform:uppercase;';
 }
 var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎉','#8B5CF6'], custom: ['📣','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'] };
-var EMOJIS = ['👍','❤️','👏'];
+var EMOJIS = ['🎉','❤️','👏'];
 
 async function loadCelebrate(){
   var box = document.getElementById('celebrate-feed');
