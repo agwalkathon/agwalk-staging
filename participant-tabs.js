@@ -3096,7 +3096,8 @@ function closeReactionsDetail() {
 function setupAppLayout(isParticipant) {
   var bnav = document.querySelector('.bottom-nav');
   var track = document.getElementById('tab-track');
-    if (isParticipant) {
+  
+  if (isParticipant) {
     TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'flex';
     document.getElementById('bnav-leaderboard').style.display = 'flex';
@@ -3109,8 +3110,15 @@ function setupAppLayout(isParticipant) {
     document.getElementById('tab-events').classList.remove('hidden-tab');
     document.getElementById('tab-celebrate').classList.remove('hidden-tab');
     document.getElementById('tab-you').classList.remove('hidden-tab');
+
+    // Show participant-only layout controls
+    document.querySelectorAll('.part-only').forEach(function(el) {
+      el.style.display = '';
+    });
+    // Default to activities sub-tab under Profile
+    if (typeof switchYouTab === 'function') switchYouTab('activities');
   } else {
-    TAB_ORDER = ['events', 'celebrate', 'you'];
+    TAB_ORDER = ['celebrate', 'events', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'none';
     document.getElementById('bnav-leaderboard').style.display = 'none';
     document.getElementById('bnav-events').style.display = 'flex';
@@ -3122,13 +3130,35 @@ function setupAppLayout(isParticipant) {
     document.getElementById('tab-events').classList.remove('hidden-tab');
     document.getElementById('tab-celebrate').classList.remove('hidden-tab');
     document.getElementById('tab-you').classList.remove('hidden-tab');
+
+    // Hide all participant-only activities/challenges sub-tabs and event progress
+    document.querySelectorAll('.part-only').forEach(function(el) {
+      el.style.display = 'none';
+    });
+    // For non-participants, Profile (You) tab should only show the Info sub-panel
+    if (document.getElementById('you-panel-activities')) document.getElementById('you-panel-activities').style.display = 'none';
+    if (document.getElementById('you-panel-challenges')) document.getElementById('you-panel-challenges').style.display = 'none';
+    if (document.getElementById('you-panel-info')) document.getElementById('you-panel-info').style.display = 'block';
   }
+  
+  // Reorder content panes in the DOM to match the TAB_ORDER exactly
   if (track) {
     track.style.width = (TAB_ORDER.length * 100) + '%';
     TAB_ORDER.forEach(function(tab) {
       var pane = document.getElementById('tab-' + tab);
       if (pane) {
         pane.style.width = (100 / TAB_ORDER.length) + '%';
+        track.appendChild(pane);
+      }
+    });
+  }
+
+  // Reorder bottom navigation links in the DOM to match the TAB_ORDER exactly
+  if (bnav) {
+    TAB_ORDER.forEach(function(tab) {
+      var btn = document.getElementById('bnav-' + tab);
+      if (btn) {
+        bnav.appendChild(btn);
       }
     });
   }
