@@ -31,24 +31,35 @@ body{
   -webkit-font-smoothing:antialiased;letter-spacing:-0.011em;
 }
 .hidden{display:none!important}
-/* ── Login ── */
-#login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-.login-card{width:100%;max-width:380px}
-.login-logo{height:44px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
-.login-logo img{height:100%;width:auto}
-.login-logo .fallback{width:60px;height:60px;border-radius:18px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:28px}
-.login-title{font-size:21px;font-weight:800;text-align:center;letter-spacing:-0.02em}
-.login-sub{font-size:13.5px;color:var(--muted);text-align:center;margin:6px 0 26px}
-.login-field{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px}
-.login-field:focus{outline:none;border-color:var(--brand)}
-.login-btn{width:100%;padding:14px;background:var(--brand);border:none;border-radius:var(--radius-sm);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(232,98,42,.3)}
-.login-btn:disabled{opacity:.5}
-.login-err{color:#F87171;font-size:13px;min-height:18px;margin:8px 0;text-align:center}
-.login-hint{font-size:12px;color:var(--label);text-align:center;margin-top:14px}
-.otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
-.otp-box{width:46px;height:54px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
-.otp-box:focus{outline:none;border-color:var(--brand)}
-.login-link{background:none;border:none;color:var(--brand-soft);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px}
+/* ── Login (hero + glass card, matching connect-strava.html) ── */
+#login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(32px,env(safe-area-inset-top)) 24px max(32px,env(safe-area-inset-bottom));position:relative;overflow:hidden}
+#login-screen::before{content:'';position:fixed;top:-160px;left:50%;transform:translateX(-50%);width:520px;height:520px;background:radial-gradient(circle,rgba(232,98,42,0.13) 0%,transparent 65%);pointer-events:none}
+.login-card{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.login-logo{width:min(120px,40vw);margin:0 auto 20px}
+.login-logo img{width:100%;height:auto;object-fit:contain}
+.login-logo .fallback{width:72px;height:72px;border-radius:20px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto}
+.login-title{font-size:clamp(22px,6.5vw,28px);font-weight:900;text-align:center;line-height:1.2;letter-spacing:-0.3px;margin-bottom:10px}
+.login-sub{font-size:13.5px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.6;margin-bottom:30px;max-width:280px}
+.login-glass{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:24px 20px 20px}
+.login-field-label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px}
+.login-field{width:100%;padding:13px 15px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:11px;color:#fff;font-size:15px;font-weight:500;font-family:inherit;margin-bottom:0;outline:none;transition:border-color .15s}
+.login-field:focus{border-color:rgba(232,98,42,0.6)}
+.login-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;margin-top:16px;background:var(--brand);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 20px rgba(232,98,42,0.28);transition:transform .12s}
+.login-btn:active{transform:scale(0.97)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-err{color:#fca5a5;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.18);border-radius:11px;font-size:12px;line-height:1.6;text-align:center;padding:0;min-height:0;margin:0;overflow:hidden;max-height:0;transition:all .2s}
+.login-err:not(:empty){padding:12px 14px;margin-top:14px;max-height:100px}
+.login-hint{font-size:11px;color:rgba(255,255,255,0.16);text-align:center;margin-top:18px;line-height:1.8}
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:4px}
+.otp-box{width:46px;height:54px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:11px;color:#fff;font-size:22px;font-weight:700;text-align:center;font-family:inherit}
+.otp-box:focus{outline:none;border-color:rgba(232,98,42,0.6)}
+.login-field-hint{font-size:11px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:14px}
+.login-resend-row{margin-top:14px;text-align:center;font-size:12px;color:rgba(255,255,255,0.4)}
+.login-link{background:none;border:none;color:var(--brand);font-weight:600;font-size:12px;font-family:inherit;cursor:pointer;padding:0}
+.login-terms{font-size:11px;color:rgba(255,255,255,0.4);margin-top:20px;line-height:1.5;text-align:center}
+.login-terms a{color:var(--brand);text-decoration:none;font-weight:500}
+.login-footnote{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.16);text-align:center;line-height:2}
+.login-footnote span{color:rgba(255,255,255,0.1);margin:0 4px}
 /* ── App header (exact participant classes) ── */
 #app-screen{padding-bottom:96px;min-height:100dvh}
 .header{position:sticky;top:0;z-index:200;background:rgba(31,38,45,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:max(14px,env(safe-area-inset-top)) 16px 14px}
@@ -159,20 +170,33 @@ body{
     <div class="login-title" id="br-login-title">Arcgate Employee App</div>
     <div class="login-sub" id="br-login-sub">Sign in with your company email</div>
 
-    <div id="step-email">
-      <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
-      <div class="login-err" id="err-email"></div>
-      <button class="login-btn" id="btn-send">Send Login Code</button>
+    <div class="login-glass">
+      <div id="step-email">
+        <label class="login-field-label" for="in-email">Registered Email</label>
+        <input type="email" class="login-field" id="in-email" placeholder="you@arcgate.com" autocomplete="email">
+        <button class="login-btn" id="btn-send">Send Login Code</button>
+        <div class="login-err" id="err-email"></div>
+      </div>
+
+      <div id="step-otp" class="hidden">
+        <label class="login-field-label" style="text-align:center">Verification Code</label>
+        <div class="otp-boxes" id="otp-boxes"></div>
+        <div class="login-field-hint">A 6-digit code was emailed to you</div>
+        <button class="login-btn" id="btn-verify">Verify &amp; Sign In</button>
+        <div class="login-err" id="err-otp"></div>
+        <div class="login-resend-row">
+          <button class="login-link" id="btn-resend">Resend code</button>
+          &nbsp;·&nbsp;
+          <button class="login-link" id="btn-back">Change email</button>
+        </div>
+      </div>
+
+      <div class="login-terms">
+        By continuing, you are agreeing to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.
+      </div>
     </div>
 
-    <div id="step-otp" class="hidden">
-      <div class="otp-boxes" id="otp-boxes"></div>
-      <div class="login-err" id="err-otp"></div>
-      <button class="login-btn" id="btn-verify">Verify &amp; Sign In</button>
-      <div style="text-align:center"><button class="login-link" id="btn-resend">Resend code</button>
-      <button class="login-link" id="btn-back">Change email</button></div>
-    </div>
-    <div class="login-hint">A 6-digit code will be emailed to you. Sessions last 30 days.</div>
+    <p class="login-footnote">Sessions last 30 days <span>·</span> Read-only <span>·</span> Never posts to Strava</p>
   </div>
 </div>
 

@@ -254,7 +254,17 @@ input[type=checkbox].sw:checked::after{left:21px}
       <div class="fld"><label>App Name</label><input id="br-name" maxlength="40" placeholder="Arcgate"></div>
       <div class="fld"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
       <div class="fld"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
-      <div class="fld"><label>Logo URL</label><input id="br-logo" placeholder="https://…/arcgate-logo.png"></div>
+      <div class="fld"><label>Logo</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="br-logo" placeholder="https://… or upload →" style="flex:1">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-brlogo-up">Upload</button>
+          <input type="file" id="brlogo-file" accept="image/*" style="display:none">
+        </div>
+        <div style="margin-top:10px;background:#0F1117;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;min-height:60px">
+          <img id="br-logo-preview" style="max-height:60px;max-width:200px;object-fit:contain;display:none">
+          <span id="br-logo-empty" style="color:var(--text-muted);font-size:12px">No logo set — preview appears here</span>
+        </div>
+      </div>
     </div>
     <div class="row-end"><span class="saved-msg" id="saved-branding">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="branding">Save Branding</button></div>
   </div>
@@ -316,6 +326,7 @@ async function loadConfig(){
   document.getElementById('br-title').value=br.login_title||'';
   document.getElementById('br-tag').value=br.tagline||'';
   document.getElementById('br-logo').value=br.logo_url||'';
+  updateLogoPreview(br.logo_url||'');
   var crm=CFG.crm||{};
   document.getElementById('crm-url').value=crm.url||'';
   document.getElementById('crm-key').value=crm.api_key||'';
@@ -479,6 +490,24 @@ document.getElementById('btn-announce').addEventListener('click',async function(
   this.disabled=false;
   if(r.success){document.getElementById('an-title').value='';document.getElementById('an-msg').value='';flashSaved('saved-announce');}
   else err.textContent=r.error||'Failed';
+});
+
+function updateLogoPreview(url){
+  var img=document.getElementById('br-logo-preview'), empty=document.getElementById('br-logo-empty');
+  if(url){ img.src=url; img.style.display='block'; empty.style.display='none'; }
+  else { img.style.display='none'; empty.style.display='block'; }
+}
+document.getElementById('br-logo').addEventListener('input',function(){ updateLogoPreview(this.value.trim()); });
+document.getElementById('btn-brlogo-up').addEventListener('click',function(){ document.getElementById('brlogo-file').click(); });
+document.getElementById('brlogo-file').addEventListener('change',function(){
+  var f=this.files[0]; this.value=''; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=async function(){
+    var r=await api('/admin/upload-image',{method:'POST',body:JSON.stringify({data:rd.result})});
+    if(r.success){ document.getElementById('br-logo').value=r.url; updateLogoPreview(r.url); }
+    else alert(r.error||'Upload failed');
+  };
+  rd.readAsDataURL(f);
 });
 
 loadConfig();loadPending();loadEmployees();
