@@ -226,23 +226,26 @@ async function pollMaintenance(athleteId) {
 }
 function esc(v) { return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 function getAvatarStyle(name) {
-  var colors = [
-    { bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.2)', text: 'var(--blue)' },
-    { bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.2)', text: 'var(--green)' },
-    { bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.2)', text: '#c084fc' },
-    { bg: 'rgba(232,98,42,0.1)', border: 'rgba(232,98,42,0.2)', text: 'var(--brand)' },
-    { bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)', text: '#fbbf24' },
-    { bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.2)', text: '#2dd4bf' },
-    { bg: 'rgba(244,63,94,0.1)', border: 'rgba(244,63,94,0.2)', text: '#fb7185' }
+  var gradients = [
+    { bg: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)', border: 'rgba(255,107,107,0.2)', text: '#ffffff', shadow: 'rgba(255,107,107,0.3)' }, // Sunset
+    { bg: 'linear-gradient(135deg, #4E65FF 0%, #92EFFD 100%)', border: 'rgba(78,101,255,0.2)', text: '#ffffff', shadow: 'rgba(78,101,255,0.3)' }, // Electric Teal
+    { bg: 'linear-gradient(135deg, #7F00FF 0%, #E100FF 100%)', border: 'rgba(127,0,255,0.2)', text: '#ffffff', shadow: 'rgba(127,0,255,0.3)' }, // Purple Haze
+    { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', border: 'rgba(17,153,142,0.2)', text: '#ffffff', shadow: 'rgba(17,153,142,0.3)' }, // Emerald
+    { bg: 'linear-gradient(135deg, #F5576C 0%, #F093FB 100%)', border: 'rgba(245,87,108,0.2)', text: '#ffffff', shadow: 'rgba(245,87,108,0.3)' }, // Rose Pink
+    { bg: 'linear-gradient(135deg, #1fd1f9 0%, #b621fe 100%)', border: 'rgba(31,209,249,0.2)', text: '#ffffff', shadow: 'rgba(31,209,249,0.3)' }, // Neon Dream
+    { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', border: 'rgba(240,147,251,0.2)', text: '#ffffff', shadow: 'rgba(240,147,251,0.3)' }, // Peach Blue
+    { bg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', border: 'rgba(246,211,101,0.2)', text: '#ffffff', shadow: 'rgba(246,211,101,0.3)' }, // Peach Amber
+    { bg: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)', border: 'rgba(137,247,254,0.2)', text: '#ffffff', shadow: 'rgba(137,247,254,0.3)' }, // Ocean Breeze
+    { bg: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', border: 'rgba(48,207,208,0.2)', text: '#ffffff', shadow: 'rgba(48,207,208,0.3)' }  // Deep Cosmic
   ];
   var hash = 0;
   var str = name || '';
   for (var i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  var index = Math.abs(hash) % colors.length;
-  var c = colors[index];
-  return 'background:' + c.bg + '; border-color:' + c.border + '; color:' + c.text + '; box-shadow: 0 0 8px ' + c.bg + ';';
+  var index = Math.abs(hash) % gradients.length;
+  var g = gradients[index];
+  return 'background:' + g.bg + '; border:1.5px solid ' + g.border + '; color:' + g.text + '; box-shadow: 0 4px 12px ' + g.shadow + '; text-shadow: 0 1px 2px rgba(0,0,0,0.2);';
 }
 function norm(s){return String(s||'').trim().toLowerCase();}
 
