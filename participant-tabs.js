@@ -101,7 +101,7 @@ function showTab(tab) {
   }
   if (tab === 'celebrate') {
     var cf = document.getElementById('celebrate-frame');
-    if (cf && !cf.src) cf.src = cf.getAttribute('data-src');
+    if (cf && !cf.src) cf.src = cf.getAttribute('data-src') + '&_t=' + Date.now();
   }
   if (tab === 'feed') {
     safeSetItem('ag_last_viewed_announcements', new Date().toISOString());
@@ -2543,7 +2543,11 @@ function clearPWACache(btn) {
   };
 
   if ('serviceWorker' in navigator) {
-    caches.keys().then(function(names) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      return Promise.all(regs.map(function(r) { return r.unregister(); }));
+    }).then(function() {
+      return caches.keys();
+    }).then(function(names) {
       return Promise.all(names.map(function(name) { return caches.delete(name); }));
     }).then(function() {
       setTimeout(reloadPage, 800);
