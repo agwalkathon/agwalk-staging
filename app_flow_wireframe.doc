@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arcgate Walkathon 2026 — Application Flow & Wireframe Blueprint</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333333;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      font-size: 26px;
+      color: #E8622A;
+      border-bottom: 2px solid #E8622A;
+      padding-bottom: 8px;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 20px;
+      color: #111827;
+      margin-top: 30px;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 6px;
+    }
+    h3 {
+      font-size: 16px;
+      color: #4B5563;
+      margin-top: 20px;
+    }
+    p, li {
+      font-size: 14px;
+      color: #4B5563;
+    }
+    ul, ol {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #D1D5DB;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #F3F4F6;
+      color: #111827;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #F9FAFB;
+    }
+    .note-box {
+      background-color: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      padding: 12px 16px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note-box p {
+      margin: 0;
+      color: #1E40AF;
+      font-weight: 500;
+    }
+    .footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 11px;
+      color: #9CA3AF;
+      border-top: 1px solid #E5E7EB;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Arcgate Walkathon 2026 — Application Flow &amp; Wireframe</h1>
+  <p>This document details the user journey, wireframe mappings, click transitions, and navigation rules from <strong>Login to Logout</strong>. It covers both the 5-Tab Participant view and the 3-Tab Employee view, as well as the active/deleted status of files in the project repository.</p>
+
+  <h2>1. Comprehensive Navigation Flow &amp; Transitions</h2>
+  <p>Below is the detailed page-by-page mapping showing exactly which action triggers a change, the target screen, and the method to navigate back.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Source Screen / Tab</th>
+        <th>User Action (Click / Tap)</th>
+        <th>Target Destination Screen</th>
+        <th>How to Navigate Back / Exit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Login Screen (Email Step)</strong></td>
+        <td>Click "Send Login Code" button</td>
+        <td>Transitions to OTP verification step on the same card</td>
+        <td>Click "Change email" link (returns to email textbox)</td>
+      </tr>
+      <tr>
+        <td><strong>Login Screen (OTP Step)</strong></td>
+        <td>Click "Verify &amp; Sign In" button</td>
+        <td>Main Dashboard (writes token to localStorage)</td>
+        <td>Requires signing out (clears token, returns to Login)</td>
+      </tr>
+      <tr>
+        <td><strong>Main App (Any Tab)</strong></td>
+        <td>Click Bottom Nav Tab icons</td>
+        <td>Switches view to the clicked tab (slide transition)</td>
+        <td>Click another Bottom Nav Tab icon</td>
+      </tr>
+      <tr>
+        <td><strong>Dashboard / Profile Tab</strong></td>
+        <td>Click on an Activity Card item</td>
+        <td>Opens <strong>Activity Detail Modal</strong> overlay</td>
+        <td>Click the "Back" button at the top-left of the modal</td>
+      </tr>
+      <tr>
+        <td><strong>Leaderboard Tab</strong></td>
+        <td>Click on a participant row or podium avatar</td>
+        <td>Opens <strong>Profile Detail Modal</strong> overlay</td>
+        <td>Click the "Back" button at the top-left of the modal</td>
+      </tr>
+      <tr>
+        <td><strong>Celebrate Feed Tab</strong></td>
+        <td>Click "+ Share something to celebrate" button</td>
+        <td>Launches <strong>Post Drawer</strong> overlay</td>
+        <td>Click the "✕" close button at the top-right of the drawer</td>
+      </tr>
+      <tr>
+        <td><strong>Celebrate Feed Tab</strong></td>
+        <td>Click a post's reaction counter</td>
+        <td>Launches <strong>Reactions Detail Modal</strong></td>
+        <td>Click the "Back" button at the top-left of the modal</td>
+      </tr>
+      <tr>
+        <td><strong>Activity Detail Modal</strong></td>
+        <td>Click the Share icon at the top-right</td>
+        <td>Launches <strong>Share Activity Sheet</strong> bottom sheet</td>
+        <td>Click "Cancel" button or tap anywhere on the backdrop</td>
+      </tr>
+      <tr>
+        <td><strong>You / Profile Tab</strong></td>
+        <td>Click "Sign Out" button at the bottom</td>
+        <td>Login Screen (wipes session state)</td>
+        <td>Requires completing the email/OTP verification flow again</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Screen Configurations &amp; Layout Modes</h2>
+  <p>The layout adapts dynamically depending on the authenticated employee's role in the walkathon database.</p>
+
+  <h3>2.1 Participant Layout (5 bottom-nav tabs)</h3>
+  <ul>
+    <li><strong>Dashboard Tab</strong>: Rings progress, current stats, points tally, pace goals, personal bests.</li>
+    <li><strong>Leaderboard Tab</strong>: Live rankings by category (Shift/Team), weekly movement indicators.</li>
+    <li><strong>Events Tab</strong>: Event calendars, rules, registration drawer.</li>
+    <li><strong>Celebrate Tab</strong>: Post sharing and comments feed.</li>
+    <li><strong>You Tab</strong>: Multi-panel profiles, Strava connection sync, consistency heatmap calendar, and Sign Out.</li>
+  </ul>
+
+  <h3>2.2 Employee / Non-Participant Layout (3 bottom-nav tabs)</h3>
+  <ul>
+    <li><strong>Celebrate Tab</strong>: Default active view containing celebration feeds.</li>
+    <li><strong>Events Tab</strong>: Lists company active and historical walking events.</li>
+    <li><strong>You Tab</strong>: View basic profile details and the Sign Out button. (All Strava integration elements are hidden).</li>
+  </ul>
+
+  <div class="note-box">
+    <p>Note: The "#recovery-card-wrap" DOM element is hidden from the UI but remains in the HTML as a hook structure. Removing it short-circuits the calculations in "participant-api.js" that display recovery recommendation alerts in the top banner.</p>
+  </div>
+
+  <h2>3. Cleaned / Deleted Obsolete Pages</h2>
+  <p>To optimize repository weight and prevent build/deployment confusion, the following files were removed from staging:</p>
+  <ul>
+    <li><strong>app.html</strong>: Old markup tab template. Replaced by <code>participant.html</code>.</li>
+    <li><strong>leaderboard.html</strong>: Redundant redirect helper file.</li>
+    <li><strong>debug-test.html</strong>: Troubleshooting sandboxed script page.</li>
+    <li><strong>ag-config.html</strong>: Obsolete duplicate backup of <code>config.html</code>.</li>
+  </ul>
+
+  <div class="footer">
+    <p>&copy; 2026 Arcgate. All rights reserved. Document created for project reference.</p>
+  </div>
+
+</body>
+</html>
