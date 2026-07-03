@@ -97,7 +97,20 @@
 
     var host = document.getElementById('medal-rings');
     if (!host) return;
+    try { localStorage.setItem('ag_dyn_dash', '1'); } catch(e){}
     host.textContent = '';
+    host.style.opacity = '1';
+    if (ev.rules_config.logo_url) {
+      var blk = host.closest('.hero-rings-block') || host.parentNode;
+      var im = blk ? blk.querySelector('img') : null;
+      if (im) { im.src = ev.rules_config.logo_url; im.style.maxHeight = '34px'; }
+      else {
+        var li = document.createElement('img');
+        li.src = ev.rules_config.logo_url;
+        li.style.cssText = 'display:block;margin:0 auto 12px;max-height:34px;';
+        host.parentNode.insertBefore(li, host);
+      }
+    }
     dash.rings.slice(0,5).forEach(function(ring){
       var total = 0, todaySum = 0;
       acts.forEach(function(a){
@@ -139,7 +152,14 @@
     tries++;
     if (typeof SUPABASE_URL !== 'undefined' && typeof HDR !== 'undefined' && document.getElementById('medal-rings')) {
       clearInterval(t);
-      setTimeout(applyDynamicDashboard, 800);
+      // avoid classic-rings flash for users we know get a dynamic dashboard
+      try { if (localStorage.getItem('ag_dyn_dash') === '1') document.getElementById('medal-rings').style.opacity = '0'; } catch(e){}
+      setTimeout(function(){
+        applyDynamicDashboard().then(function(){
+          var h = document.getElementById('medal-rings');
+          if (h) h.style.opacity = '1';
+        });
+      }, 300);
     } else if (tries > 40) clearInterval(t);
   }, 250);
 })();
