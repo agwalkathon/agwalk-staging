@@ -265,6 +265,12 @@ input[type=checkbox].sw:checked::after{left:21px}
           <span id="br-logo-empty" style="color:var(--text-muted);font-size:12px">No logo set — preview appears here</span>
         </div>
       </div>
+      <div class="fld"><label>Accent Color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="br-accent" style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer">
+          <input type="text" id="br-accent-hex" placeholder="#E8622A" style="flex:1" maxlength="7">
+        </div>
+      </div>
     </div>
     <div class="row-end"><span class="saved-msg" id="saved-branding">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="branding">Save Branding</button></div>
   </div>
@@ -326,6 +332,8 @@ async function loadConfig(){
   document.getElementById('br-title').value=br.login_title||'';
   document.getElementById('br-tag').value=br.tagline||'';
   document.getElementById('br-logo').value=br.logo_url||'';
+  document.getElementById('br-accent-hex').value=br.accent_color||'#E8622A';
+  document.getElementById('br-accent').value=br.accent_color||'#E8622A';
   updateLogoPreview(br.logo_url||'');
   var crm=CFG.crm||{};
   document.getElementById('crm-url').value=crm.url||'';
@@ -349,7 +357,7 @@ document.querySelectorAll('[data-save]').forEach(function(btn){
     if(which==='media'){key='media';value={photos:document.getElementById('md-photos').checked,videos:document.getElementById('md-videos').checked,max_photo_mb:parseInt(document.getElementById('md-photo-mb').value)||5,max_video_mb:parseInt(document.getElementById('md-video-mb').value)||25,provider:document.getElementById('md-provider').value};}
     if(which==='channels'){key='channels';value={inapp:document.getElementById('nt-inapp').checked,push:document.getElementById('nt-push').checked,whatsapp:document.getElementById('nt-wa').checked};}
     if(which==='wa'){key='whatsapp';value={provider:document.getElementById('wa-provider').value,api_key:document.getElementById('wa-key').value,phone_id:document.getElementById('wa-phone').value,tpl_birthday:document.getElementById('wa-tpl-bday').value,tpl_approved:document.getElementById('wa-tpl-approve').value};}
-    if(which==='branding'){key='branding';value={app_name:document.getElementById('br-name').value.trim(),login_title:document.getElementById('br-title').value.trim(),tagline:document.getElementById('br-tag').value.trim(),logo_url:document.getElementById('br-logo').value.trim()};}
+    if(which==='branding'){key='branding';value={app_name:document.getElementById('br-name').value.trim(),login_title:document.getElementById('br-title').value.trim(),tagline:document.getElementById('br-tag').value.trim(),logo_url:document.getElementById('br-logo').value.trim(),accent_color:document.getElementById('br-accent-hex').value.trim()};}
     if(which==='crm'){key='crm';value={url:document.getElementById('crm-url').value,api_key:document.getElementById('crm-key').value,frequency:document.getElementById('crm-freq').value,enabled:document.getElementById('crm-enabled').checked};}
     var r=await api('/admin/celebrate/config',{method:'POST',body:JSON.stringify({config_key:key,config_value:value})});
     if(r.success)flashSaved('saved-'+which);else alert('Save failed: '+(r.error||''));
@@ -508,6 +516,16 @@ document.getElementById('brlogo-file').addEventListener('change',function(){
     else alert(r.error||'Upload failed');
   };
   rd.readAsDataURL(f);
+});
+
+document.getElementById('br-accent').addEventListener('input', function(){
+  document.getElementById('br-accent-hex').value = this.value.toUpperCase();
+});
+document.getElementById('br-accent-hex').addEventListener('input', function(){
+  var val = this.value.trim();
+  if (val.match(/^#[0-9A-F]{6}$/i)) {
+    document.getElementById('br-accent').value = val;
+  }
 });
 
 loadConfig();loadPending();loadEmployees();
