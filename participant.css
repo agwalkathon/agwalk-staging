@@ -2961,7 +2961,13 @@
 .login-footnote span{color:rgba(255,255,255,0.1);margin:0 4px}
 
 /* FOUC login overrides */
+#app-screen {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100%;
+}
 html:not(.app-logged-in) #app-screen { display: none !important; }
 html.app-logged-in #login-screen { display: none !important; }
-html.app-logged-in #app-screen { display: block !important; }
+html.app-logged-in #app-screen { display: flex !important; }
 
