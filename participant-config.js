@@ -151,7 +151,14 @@ function userGuard() {
     return null;
   }
 }
-function logout() { safeRemoveItem('wk_user'); try { sessionStorage.removeItem('wk_admin'); } catch(e){} window.location.href = 'index.html'; }
+function logout() {
+  safeRemoveItem('wk_user');
+  safeRemoveItem('ag_emp_token');
+  safeRemoveItem('ag_emp');
+  safeRemoveItem('ag_push_emp_synced');
+  try { sessionStorage.removeItem('wk_admin'); } catch(e){}
+  window.location.href = 'index.html';
+}
 
 // ── Maintenance Mode Gate ────────────────────────────────────────────────
 var _maintPollTimer = null;
