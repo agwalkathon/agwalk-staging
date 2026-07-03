@@ -567,6 +567,7 @@ function initEmployeeModeListeners() {
 async function loadBranding() {
   var lEl = document.getElementById('login-logo-img');
   var aEl = document.getElementById('app-logo');
+  var appNameEl = document.getElementById('br-app-name');
   try {
     var r = await fetch(BACKEND + '/branding');
     var d = await r.json();
@@ -590,11 +591,19 @@ async function loadBranding() {
 
       if (b.app_name) {
         document.title = b.app_name + ' — Dashboard';
+        if (appNameEl) {
+          appNameEl.textContent = b.app_name;
+          appNameEl.style.opacity = '1';
+        }
       }
     } else {
       if (lEl) {
         lEl.src = 'logo-white.png';
         lEl.style.opacity = '1';
+      }
+      if (appNameEl) {
+        appNameEl.textContent = 'Arcgate';
+        appNameEl.style.opacity = '1';
       }
     }
   } catch (e) {
@@ -602,6 +611,10 @@ async function loadBranding() {
     if (lEl) {
       lEl.src = 'logo-white.png';
       lEl.style.opacity = '1';
+    }
+    if (appNameEl) {
+      appNameEl.textContent = 'Arcgate';
+      appNameEl.style.opacity = '1';
     }
   }
 }
