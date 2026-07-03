@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  (function() {
+    try {
+      var t = localStorage.getItem('ag_emp_token');
+      if (t) {
+        var p = JSON.parse(atob(t.split('.')[1]));
+        if (p.exp && p.exp * 1000 > Date.now()) {
+          document.documentElement.classList.add('app-logged-in');
+        }
+      }
+    } catch(e) {}
+  })();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0e1115">
@@ -11,6 +24,18 @@
 <link rel="manifest" href="manifest.json">
 <title>Arcgate — Employee App</title>
 <style>
+html.app-logged-in #login-screen { display: none !important; }
+html.app-logged-in #app-screen { display: block !important; }
+
+/* ── Tab Transition Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-pane:not(.hidden) {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
@@ -158,6 +183,13 @@ body{
 }
 @media (max-width: 480px) {
   .bottom-nav { width: 94%; padding: 5px; }
+  .bottom-nav .bnav-label { display: none !important; }
+  .bottom-nav .bnav-item { padding: 12px 6px !important; }
+  .bottom-nav .bnav-indicator {
+    top: 5px;
+    bottom: 5px;
+    border-radius: 20px;
+  }
 }
 .ev-section-title{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px}
 .ev-card-p{background:var(--surface);border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 8px 32px 0 rgba(0,0,0,0.3)}
@@ -496,6 +528,19 @@ document.querySelectorAll('.bnav-item').forEach(function(n){
 });
 
 function initials(name){ return (name || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase(); }
+function formatCelebDateTime(isoStr) {
+  if (!isoStr) return '';
+  var dt = new Date(isoStr);
+  if (isNaN(dt.getTime())) return '';
+  var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
+  var hr = dt.getHours();
+  var ampm = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12;
+  hr = hr ? hr : 12;
+  var min = dt.getMinutes();
+  min = min < 10 ? '0' + min : min;
+  return mo + ' ' + dt.getDate() + ', ' + dt.getFullYear() + ' at ' + hr + ':' + min + ' ' + ampm;
+}
 function enterApp(){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
@@ -504,7 +549,10 @@ function enterApp(){
   var av = document.getElementById('header-avatar');
   av.textContent = '';
   if (emp.photo_url) { var img = document.createElement('img'); img.src = emp.photo_url; av.appendChild(img); }
-  else av.textContent = initials(emp.full_name);
+  else {
+    av.textContent = initials(emp.full_name);
+    av.setAttribute('style', getAvatarStyle(emp.full_name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;');
+  }
   var dt = new Date();
   var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -924,7 +972,7 @@ async function openSpectatorBoard(ev){
       var rk = document.createElement('div');
       rk.style.cssText = 'width:28px;text-align:center;font-size:14px;font-weight:800;color:' + (i<3?'var(--brand)':'var(--label)') + ';flex-shrink:0;';
       rk.textContent = i + 1;
-      var av = document.createElement('div'); av.className = 'grad-avatar'; av.style.cssText += 'width:38px;height:38px;font-size:13px;'; av.textContent = initials(row.full_name);
+      var av = document.createElement('div'); av.className = 'grad-avatar'; av.style.cssText += 'width:38px;height:38px;font-size:13px;' + getAvatarStyle(row.full_name); av.textContent = initials(row.full_name);
       var nm = document.createElement('div'); nm.style.cssText = 'flex:1;min-width:0;';
       var n1 = document.createElement('div'); n1.style.cssText = 'font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'; n1.textContent = row.full_name || '—';
       var n2 = document.createElement('div'); n2.style.cssText = 'font-size:11px;color:var(--label);'; n2.textContent = row.team || '';
@@ -939,6 +987,23 @@ async function openSpectatorBoard(ev){
 document.getElementById('spec-back').addEventListener('click', function(){ document.getElementById('spec-board').classList.add('hidden'); });
 
 /* ---------- Profile tab ---------- */
+function showProfileToast(msg) {
+  var t = document.getElementById('profile-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'profile-toast';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;font-size:12.5px;font-weight:600;padding:8px 16px;border-radius:20px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.25);border:1px solid var(--border);transition:opacity 0.2s, transform 0.2s;opacity:0;transform:translate(-50%, 10px);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translate(-50%, 0)';
+  setTimeout(function() {
+    t.style.opacity = '0';
+    t.style.transform = 'translate(-50%, 10px)';
+  }, 2000);
+}
+
 async function loadProfile(){
   var box = document.getElementById('profile-box');
   try {
@@ -948,26 +1013,27 @@ async function loadProfile(){
     var e = d.employee || {};
     setEmp(e);
     box.textContent = '';
+    
+    // 1. Name Card (Hero)
     var hero = document.createElement('div');
     hero.className = 'card';
     hero.style.cssText += 'display:flex;flex-direction:column;align-items:center;padding:26px 16px;';
     var ha = document.createElement('div');
     ha.className = 'grad-avatar';
-    ha.style.cssText += 'width:76px;height:76px;font-size:26px;margin-bottom:12px;';
-    if (e.photo_url) { var hi = document.createElement('img'); hi.src = e.photo_url; ha.appendChild(hi); }
-    else ha.textContent = initials(e.full_name);
+    if (e.photo_url) {
+      ha.style.cssText += 'width:76px;height:76px;margin-bottom:12px;';
+      var hi = document.createElement('img'); hi.src = e.photo_url; ha.appendChild(hi);
+    } else {
+      ha.textContent = initials(e.full_name);
+      ha.setAttribute('style', getAvatarStyle(e.full_name) + '; width:76px; height:76px; border-radius:50%; font-size:26px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:12px;');
+    }
     var hn = document.createElement('div'); hn.style.cssText = 'font-size:17px;font-weight:800;'; hn.textContent = e.full_name || '';
-    var hd = document.createElement('div'); hd.style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:3px;'; hd.textContent = (e.designation ? e.designation + ' · ' : '') + (e.department || '');
+    var hd = document.createElement('div'); hd.style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:5px;text-align:center;';
+    hd.innerHTML = (e.designation ? e.designation + '<br>' : '') + '<span style="color:var(--muted);font-weight:600;">' + (e.emp_code || '') + '</span> · ' + (e.department || '');
     hero.appendChild(ha); hero.appendChild(hn); hero.appendChild(hd);
     box.appendChild(hero);
-    [['Employee Code', e.emp_code], ['Email', e.email],
-     ['Department', e.department || '—'], ['Enrolled Events', String((d.enrollments || []).length)]].forEach(function(f){
-      var c = document.createElement('div'); c.className = 'card';
-      var l = document.createElement('div'); l.className = 'lbl'; l.textContent = f[0];
-      var v = document.createElement('div'); v.className = 'val'; v.textContent = f[1] || '—';
-      c.appendChild(l); c.appendChild(v); box.appendChild(c);
-    });
-    // push notifications card
+    
+    // 2. Push Notifications Card (Moved after Name Card)
     var pc = document.createElement('div'); pc.className = 'card';
     pc.style.cssText += 'display:flex;align-items:center;justify-content:space-between;gap:12px;';
     var pinfo = document.createElement('div');
@@ -980,6 +1046,7 @@ async function loadProfile(){
     pbtn.style.display = 'none';
     pc.appendChild(pinfo); pc.appendChild(pbtn);
     box.appendChild(pc);
+    
     pushStatus().then(function(st){
       if (st === 'on') { pv.textContent = 'Enabled — you\'ll get birthday & wish alerts 🎉'; }
       else if (st === 'unsupported') { pv.textContent = 'Not supported on this browser'; }
@@ -989,14 +1056,152 @@ async function loadProfile(){
     pbtn.addEventListener('click', async function(){
       pbtn.disabled = true; pbtn.textContent = '…';
       try { await enablePush(); pv.textContent = 'Enabled — you\'ll get birthday & wish alerts 🎉'; pbtn.style.display = 'none'; }
-      catch(e){ pv.textContent = e.message; pbtn.textContent = 'Enable'; }
+      catch(err){ pv.textContent = err.message; pbtn.textContent = 'Enable'; }
       pbtn.disabled = false;
     });
-
+    
+    // 3. Collapsible Profile Details Card
+    var detailsCard = document.createElement('div');
+    detailsCard.className = 'card';
+    detailsCard.style.cssText = 'padding:14px 16px;cursor:pointer;user-select:none;margin-bottom:14px;';
+    var detailsHdr = document.createElement('div');
+    detailsHdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;';
+    var detailsTitle = document.createElement('div');
+    detailsTitle.style.cssText = 'font-size:11px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:1px;';
+    detailsTitle.textContent = 'Profile Details';
+    var detailsChevron = document.createElement('span');
+    detailsChevron.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform 0.25s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    detailsHdr.appendChild(detailsTitle);
+    detailsHdr.appendChild(detailsChevron);
+    detailsCard.appendChild(detailsHdr);
+    
+    var detailsBody = document.createElement('div');
+    detailsBody.style.cssText = 'margin-top:14px;display:none;border-top:1px solid var(--border);padding-top:14px;';
+    
+    function createDetailRow(label, value, copyable) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+      if (label === 'Department') row.style.marginBottom = '0';
+      
+      var left = document.createElement('div');
+      var rl = document.createElement('div'); rl.className = 'lbl'; rl.textContent = label; rl.style.marginBottom = '2px';
+      var rv = document.createElement('div'); rv.className = 'val'; rv.style.fontSize = '14.5px'; rv.textContent = value || '—';
+      left.appendChild(rl); left.appendChild(rv);
+      row.appendChild(left);
+      
+      if (copyable && value) {
+        var copyBtn = document.createElement('button');
+        copyBtn.style.cssText = 'background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:all 0.15s;';
+        copyBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+        copyBtn.addEventListener('click', function(evt) {
+          evt.stopPropagation();
+          navigator.clipboard.writeText(value).then(function() {
+            var origColor = copyBtn.style.color;
+            copyBtn.style.color = 'var(--brand)';
+            showProfileToast('Copied to clipboard!');
+            setTimeout(function() { copyBtn.style.color = origColor; }, 1500);
+          });
+        });
+        row.appendChild(copyBtn);
+      }
+      return row;
+    }
+    
+    detailsBody.appendChild(createDetailRow('Employee Code', e.emp_code, true));
+    detailsBody.appendChild(createDetailRow('Email', e.email, true));
+    detailsBody.appendChild(createDetailRow('Department', e.department, false));
+    detailsCard.appendChild(detailsBody);
+    
+    detailsCard.addEventListener('click', function() {
+      var isCol = detailsBody.style.display === 'none';
+      detailsBody.style.display = isCol ? 'block' : 'none';
+      detailsChevron.querySelector('svg').style.transform = isCol ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+    box.appendChild(detailsCard);
+    
+    // 4. Enrollments resolving + Enrollment Cards
+    var currentEventsList = [];
+    var pastEventsList = [];
+    try {
+      var evRes = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=id,name,status,start_date,end_date', { headers: HDR });
+      var evs = await evRes.json().catch(function(){return [];});
+      if (Array.isArray(evs)) {
+        (d.enrollments || []).forEach(function(enrollment) {
+          var ev = evs.find(function(item) { return item.id === enrollment.event_id; });
+          if (ev) {
+            if (ev.status === 'live' || ev.status === 'upcoming') {
+              currentEventsList.push(ev);
+            } else {
+              pastEventsList.push(ev);
+            }
+          }
+        });
+      }
+    } catch (e2) {
+      console.warn('Failed to resolve event enrollments:', e2);
+    }
+    
+    // Current Event Enrollment Card
+    var curCard = document.createElement('div');
+    curCard.className = 'card';
+    var curLbl = document.createElement('div'); curLbl.className = 'lbl'; curLbl.textContent = 'Current Event Enrollment';
+    var curVal = document.createElement('div'); curVal.className = 'val';
+    if (currentEventsList.length) {
+      var ul = document.createElement('div');
+      ul.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:6px;';
+      currentEventsList.forEach(function(ev) {
+        var li = document.createElement('div');
+        li.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:13.5px;padding:4px 0;';
+        var ename = document.createElement('span'); ename.style.fontWeight = '600'; ename.textContent = ev.name;
+        var estatus = document.createElement('span');
+        estatus.className = ev.status === 'live' ? 'ev-pill ev-pill-live' : 'ev-pill ev-pill-enrolled';
+        estatus.textContent = ev.status === 'live' ? 'Live' : 'Upcoming';
+        li.appendChild(ename); li.appendChild(estatus);
+        ul.appendChild(li);
+      });
+      curVal.appendChild(ul);
+    } else {
+      curVal.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:4px;';
+      curVal.textContent = 'Not enrolled in any active events.';
+    }
+    curCard.appendChild(curLbl);
+    curCard.appendChild(curVal);
+    box.appendChild(curCard);
+    
+    // Past Event Enrollment Card
+    var pastCard = document.createElement('div');
+    pastCard.className = 'card';
+    var pastLbl = document.createElement('div'); pastLbl.className = 'lbl'; pastLbl.textContent = 'Past Event Enrollment';
+    var pastVal = document.createElement('div'); pastVal.className = 'val';
+    if (pastEventsList.length) {
+      var ul2 = document.createElement('div');
+      ul2.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:6px;';
+      pastEventsList.forEach(function(ev) {
+        var li = document.createElement('div');
+        li.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:13.5px;padding:4px 0;';
+        var ename = document.createElement('span'); ename.style.fontWeight = '600'; ename.textContent = ev.name;
+        var estatus = document.createElement('span');
+        estatus.className = 'ev-pill';
+        estatus.style.cssText = 'background:rgba(255,255,255,0.06);color:var(--muted);';
+        estatus.textContent = 'Completed';
+        li.appendChild(ename); li.appendChild(estatus);
+        ul2.appendChild(li);
+      });
+      pastVal.appendChild(ul2);
+    } else {
+      pastVal.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:4px;';
+      pastVal.textContent = 'No past event enrollments.';
+    }
+    pastCard.appendChild(pastLbl);
+    pastCard.appendChild(pastVal);
+    box.appendChild(pastCard);
+    
+    // 5. Sign Out Button
     var lo = document.createElement('button');
     lo.className = 'logout-btn'; lo.textContent = 'Sign Out';
     lo.addEventListener('click', function(){ clearSession(); location.reload(); });
     box.appendChild(lo);
+    
   } catch(e) {
     box.innerHTML = '<div class="placeholder">Could not load profile.</div>';
   }
@@ -1106,7 +1311,10 @@ async function loadCelebrate(){
         av.className = 'grad-avatar';
         av.style.cssText += 'width:54px;height:54px;font-size:17px;position:relative;';
         if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; av.appendChild(im); }
-        else av.textContent = initials(c.employee && c.employee.full_name);
+        else {
+          av.textContent = initials(c.employee && c.employee.full_name);
+          av.setAttribute('style', getAvatarStyle(c.employee && c.employee.full_name) + '; width:54px; height:54px; border-radius:50%; font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center; position:relative;');
+        }
         var badge = document.createElement('div');
         badge.style.cssText = 'position:absolute;bottom:-3px;right:-3px;font-size:15px;';
         badge.textContent = (TYPE_META[c.type]||['🎉'])[0];
@@ -1141,13 +1349,25 @@ function buildCelebCard(c){
   var head = document.createElement('div');
   head.style.cssText = 'display:flex;align-items:center;gap:11px;';
   var av = document.createElement('div');
-  av.style.cssText = 'width:42px;height:42px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0;';
+  av.className = 'grad-avatar';
+  av.style.cssText = 'width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0;';
   if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; im.style.cssText='width:100%;height:100%;object-fit:cover'; av.appendChild(im); }
-  else av.textContent = meta[0];
+  else {
+    var celebEmpName = (c.employee && c.employee.full_name) || (c.title && c.title.split("'")[0]) || 'Announce';
+    av.textContent = initials(celebEmpName);
+    av.setAttribute('style', getAvatarStyle(celebEmpName) + '; width:42px; height:42px; border-radius:50%; font-size:19px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;');
+  }
   var ht = document.createElement('div');
   var t1 = document.createElement('div'); t1.style.cssText = 'font-size:14.5px;font-weight:600;line-height:1.35;'; t1.textContent = c.title;
   var t2 = document.createElement('div'); t2.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:2px;';
-  t2.textContent = (c.employee && c.employee.department ? c.employee.department + ' · ' : '') + c.celebrate_date;
+  var timeString = formatCelebDateTime(c.created_at || c.celebrate_date);
+  var empName = c.employee ? c.employee.full_name : '';
+  var dept = c.employee && c.employee.department ? c.employee.department : '';
+  if (c.type === 'custom' || c.type === 'announcement') {
+    t2.textContent = 'By ' + (empName || 'Anonymous') + (dept ? ' (' + dept + ')' : '') + ' · ' + timeString;
+  } else {
+    t2.textContent = (empName ? 'Employee: ' + empName + (dept ? ' · ' : '') : '') + (dept ? 'Dept: ' + dept + ' · ' : '') + timeString;
+  }
   ht.appendChild(t1); ht.appendChild(t2);
   head.appendChild(av); head.appendChild(ht);
   card.appendChild(head);
