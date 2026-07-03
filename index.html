@@ -357,7 +357,7 @@ async function sendCode(){
     _loginEmail = email;
     document.getElementById('step-email').classList.add('hidden');
     document.getElementById('step-otp').classList.remove('hidden');
-    document.getElementById('login-sub').textContent = 'Enter the 6-digit code sent to ' + email;
+    document.getElementById('br-login-sub').textContent = 'Enter the 6-digit code sent to ' + email;
     buildOtpBoxes();
     document.querySelector('.otp-box').focus();
   } catch(e) { err.textContent = e.message; }
@@ -403,7 +403,7 @@ document.getElementById('btn-resend').addEventListener('click', async function()
 document.getElementById('btn-back').addEventListener('click', function(){
   document.getElementById('step-otp').classList.add('hidden');
   document.getElementById('step-email').classList.remove('hidden');
-  document.getElementById('login-sub').textContent = 'Sign in with your company email';
+  document.getElementById('br-login-sub').textContent = 'Sign in with your company email';
 });
 
 /* ---------- app shell ---------- */
