@@ -9,7 +9,7 @@
     diamond: '<path d="M50 6 L94 50 L50 94 L6 50 Z" pathLength="100"/>',
     hexagon: '<path d="M50 5 L89 27 L89 73 L50 95 L11 73 L11 27 Z" pathLength="100"/>',
     square:  '<rect x="9" y="9" width="82" height="82" rx="18" pathLength="100"/>',
-    shield:  '<path d="M50 5 L87 18 L87 52 C87 73 70 87 50 95 C30 87 13 73 13 52 L13 18 Z" pathLength="100"/>'
+    shield:  '<path d="M14 10 L86 10 L86 48 C86 71 68 86 50 94 C32 86 14 71 14 48 Z" pathLength="100"/>'
   };
   function todayIST(){
     return new Date(Date.now() + 5.5*3600*1000).toISOString().split('T')[0];
