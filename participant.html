@@ -33,6 +33,8 @@
       } catch(e){}
       if (isEmp || isPart) {
         document.documentElement.classList.add('app-logged-in');
+      } else {
+        document.write('<style>#splash-screen { display: none !important; }</style>');
       }
     })();
   </script>
