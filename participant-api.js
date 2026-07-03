@@ -1187,18 +1187,6 @@ async function loadNotifications() {
 }
 
 async function bootAppUnified() {
-  var token = getToken();
-  var emp = getEmp();
-  if (!tokenValid(token) || !emp) {
-    document.getElementById('app-screen').classList.add('hidden');
-    document.getElementById('login-screen').classList.remove('hidden');
-    if (typeof hideSplash === 'function') hideSplash();
-    return;
-  }
-
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app-screen').classList.remove('hidden');
-
   var isParticipant = false;
   var s = null;
   try {
@@ -1207,6 +1195,19 @@ async function bootAppUnified() {
       isParticipant = true;
     }
   } catch(e){}
+
+  var token = getToken();
+  var emp = getEmp();
+
+  if (!isParticipant && (!tokenValid(token) || !emp)) {
+    document.getElementById('app-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    if (typeof hideSplash === 'function') hideSplash();
+    return;
+  }
+
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
 
   if (!isParticipant) {
     try {
