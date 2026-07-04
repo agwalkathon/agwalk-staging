@@ -35,7 +35,7 @@
     return r.json();
   }
 
-  async function getActiveEventWithDash(){
+  async function getActiveEvent(){
     try {
       var s = JSON.parse(safeGetItem('wk_user') || '{}');
       if (!s.athleteId) return null;
@@ -43,13 +43,10 @@
       if (!Array.isArray(evs) || !evs.length) return null;
       var regs = await fetchJSON(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=event_id');
       var myEvIds = (Array.isArray(regs)?regs:[]).map(function(r){ return r.event_id; });
-      // prefer a LIVE enrolled event with dashboard config, then any enrolled with config
+      
       var pick = null;
       evs.forEach(function(ev){
         if (myEvIds.indexOf(ev.id) === -1) return;
-        var hasDash = ev.rules_config && ev.rules_config.dashboard &&
-                      Array.isArray(ev.rules_config.dashboard.rings) && ev.rules_config.dashboard.rings.length;
-        if (!hasDash) return;
         if (!pick) pick = ev;
         else if (ev.status === 'live' && pick.status !== 'live') pick = ev;
       });
@@ -82,9 +79,38 @@
   }
 
   async function applyDynamicDashboard(){
-    var ctx = await getActiveEventWithDash();
-    if (!ctx) return; // classic layout stays
-    var ev = ctx.ev, dash = ev.rules_config.dashboard;
+    var ctx = await getActiveEvent();
+    if (!ctx) return;
+    var ev = ctx.ev;
+    
+    // 1. Update the Event Logo if configured (from events.html Event Logo field)
+    var host = document.getElementById('medal-rings');
+    if (ev.rules_config && ev.rules_config.logo_url) {
+      var blk = host ? (host.closest('.hero-rings-block') || host.parentNode) : null;
+      var im = blk ? blk.querySelector('img') : null;
+      if (im) {
+        im.onerror = function() {
+          this.src = 'logo-white.png';
+        };
+        im.src = ev.rules_config.logo_url;
+        im.style.maxHeight = '34px';
+      } else if (host) {
+        var li = document.createElement('img');
+        li.onerror = function() {
+          this.src = 'logo-white.png';
+        };
+        li.src = ev.rules_config.logo_url;
+        li.style.cssText = 'display:block;margin:0 auto 12px;max-height:34px;';
+        host.parentNode.insertBefore(li, host);
+      }
+    }
+    
+    // 2. Render custom rings if configured. If not, keep the classic layout
+    var hasDash = ev.rules_config && ev.rules_config.dashboard &&
+                  Array.isArray(ev.rules_config.dashboard.rings) && ev.rules_config.dashboard.rings.length;
+    if (!hasDash) return;
+    
+    var dash = ev.rules_config.dashboard;
     var rows = null;
     try {
       rows = await fetchJSON(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + ctx.athleteId +
@@ -95,22 +121,11 @@
     var today = todayIST();
     var evDays = Math.max(1, Math.round((new Date(ev.end_date) - new Date(ev.start_date))/86400000) + 1);
 
-    var host = document.getElementById('medal-rings');
     if (!host) return;
     try { localStorage.setItem('ag_dyn_dash', '1'); } catch(e){}
     host.textContent = '';
     host.style.opacity = '1';
-    if (ev.rules_config.logo_url) {
-      var blk = host.closest('.hero-rings-block') || host.parentNode;
-      var im = blk ? blk.querySelector('img') : null;
-      if (im) { im.src = ev.rules_config.logo_url; im.style.maxHeight = '34px'; }
-      else {
-        var li = document.createElement('img');
-        li.src = ev.rules_config.logo_url;
-        li.style.cssText = 'display:block;margin:0 auto 12px;max-height:34px;';
-        host.parentNode.insertBefore(li, host);
-      }
-    }
+    
     dash.rings.slice(0,5).forEach(function(ring){
       var total = 0, todaySum = 0;
       acts.forEach(function(a){
@@ -122,11 +137,12 @@
       if (ring.goal_type === 'total') { value = total; goal = ring.goal; }
       else if (ring.goal_type === 'auto') { value = todaySum; goal = ring.goal / evDays; }
       else { value = todaySum; goal = ring.goal; }
-      if (ring.metric === 'points') { value = 0; goal = ring.goal; /* points ring: shown as total when engine data present */
+      if (ring.metric === 'points') { value = 0; goal = ring.goal;
         try { if (typeof calcFullPtsAdaptive === 'function') { var p = calcFullPtsAdaptive(acts, null, null); value = (ring.goal_type === 'daily') ? 0 : p.total; } } catch(e){}
       }
       host.appendChild(ringBox(ring, value, goal));
     });
+    
     // retitle the block to the event
     var blockTitle = document.querySelector('.hero-rings-block .rings-title, .hero-rings-block h3');
     if (blockTitle) blockTitle.textContent = ev.name + ' — Goals';
