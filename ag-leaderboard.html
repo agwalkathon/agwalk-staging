@@ -284,6 +284,8 @@ tr:hover td{background:#FAFAFA}
     </div>
 <div class="sb-section">Main</div>
 <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+<a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+<a href="celebrate-config.html" class="sb-item"><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
 <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
 <a href="ag-leaderboard.html" class="sb-item active"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
 <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
@@ -297,7 +299,7 @@ tr:hover td{background:#FAFAFA}
 <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
 <div class="sb-spacer"></div><div class="sb-divider"></div><button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button></aside>
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Leaderboard</h1><p>Team and individual rankings</p></div><div class="topbar-right"><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
+<header class="topbar"><div class="topbar-left"><h1>Leaderboard</h1><p>Team and individual rankings</p></div><div class="topbar-right"><select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
   <div class="content">
 <!-- Stats row at top -->
   <div class="stats-grid">
@@ -448,6 +450,85 @@ authGuard();
 var currentBoard = 'dayshift-male';
 var CONFIG = { medals: { bronze:{male:125,female:100}, silver:{male:200,female:150}, gold:{male:300,female:250} }, bonus: [{km:5,points:1},{km:8,points:2},{km:10,points:3},{km:15,points:4},{km:21,points:7}], basePer_km: 1 };
 var CHALLENGES = [];
+var EV_ID = null; // null = default event (Walkathon 2026, original date-window queries)
+var EV_RULES = null; // selected event's rules_config (null = legacy distance points)
+var EV_ALL = [];
+function evq(){ return EV_ID ? "&event_id=eq."+EV_ID : ""; }
+function scoringMode(){ return (EV_ID && EV_RULES && EV_RULES.scoring_mode) || 'single_metric'; }
+function scoringMetric(){ return (EV_ID && EV_RULES && EV_RULES.metric) || 'distance_km'; }
+function isLegacyScoring(){ return !EV_ID || (scoringMode()==='single_metric' && scoringMetric()==='distance_km'); }
+var METRIC_META = {
+  distance_km:     { label:'DISTANCE (KM)', short:'KM',    dec:2 },
+  elevation_m:     { label:'ELEVATION (M)', short:'M',     dec:0 },
+  moving_time_min: { label:'MOVING TIME (MIN)', short:'MIN', dec:0 },
+  steps:           { label:'STEPS', short:'STEPS', dec:0 },
+  activity_count:  { label:'ACTIVITIES', short:'ACTS', dec:0 }
+};
+function metricMeta(){ return METRIC_META[scoringMetric()] || METRIC_META.distance_km; }
+function actMetricValue(a, m){
+  if (m==='elevation_m')     return parseFloat(a.elevation_gain)||0;
+  if (m==='moving_time_min') return (parseFloat(a.moving_time_seconds)||0)/60;
+  if (m==='steps')           return parseFloat(a.steps)||0;
+  if (m==='activity_count')  return 1;
+  return (parseFloat(a.distance_meters)||0)/1000;
+}
+
+// Adaptive scoring: same return shape as calcPoints so all rendering keeps working
+function calcPointsAdaptive(acts, athleteId, gender, shift){
+  if (isLegacyScoring()) return calcPoints(acts, athleteId, gender, shift);
+  var mode=scoringMode(), metric=scoringMetric();
+  var comp=(EV_RULES&&EV_RULES.composite)||{};
+  var rate=parseFloat(EV_RULES&&EV_RULES.rate); if(isNaN(rate))rate=1;
+  var myActs=acts.filter(function(a){return a.strava_athlete_id==athleteId&&!a.is_flagged;});
+  var byDay={};
+  myActs.forEach(function(a){var day=getActDate(a);if(!day)return;(byDay[day]=byDay[day]||[]).push(a);});
+  var dayBreakdown={},totalPts=0,bonusTotal=0,distKm=0;
+  Object.keys(byDay).forEach(function(day){
+    var dayVal=0,dayBase=0,dayKm=0;
+    byDay[day].forEach(function(a){
+      dayKm+=(parseFloat(a.distance_meters)||0)/1000;
+      if(mode==='composite'){
+        Object.keys(comp).forEach(function(m){
+          var v=actMetricValue(a,m),cap=parseFloat(comp[m].cap)||0;
+          if(cap>0)v=Math.min(v,cap);
+          dayBase+=v*(parseFloat(comp[m].rate)||0);
+        });
+      } else {
+        dayVal+=actMetricValue(a,metric);
+      }
+    });
+    var base = mode==='raw' ? 0 : (mode==='composite' ? dayBase : dayVal*rate);
+    var bonus=0;
+    if(mode!=='raw'&&Array.isArray(CONFIG.bonus)){
+      var basis=(mode==='composite')?base:dayVal;
+      CONFIG.bonus.forEach(function(b){ if(basis>=b.km) bonus=Math.max(bonus,b.points); });
+    }
+    var dispVal=(mode==='composite')?dayKm:dayVal;
+    var dayTotal=(mode==='raw')?dayVal:(base+bonus);
+    totalPts+=dayTotal;bonusTotal+=bonus;distKm+=dayKm;
+    dayBreakdown[day]={km:dispVal,distPts:(mode==='raw'?dayVal:base),bonusPts:bonus,challenges:[],capped:false,inRangeKm:0};
+  });
+  return {totalPts:totalPts,distKm:distKm,bonusPts:bonusTotal,challengePts:0,byDay:byDay,
+          dayBreakdown:dayBreakdown,adaptive:{mode:mode,metric:metric}};
+}
+async function loadEventSelector(){
+  try{
+    var r=await fetch(SB_URL+"/rest/v1/events?status=neq.draft&select=id,name,status,rules_config&order=start_date.desc",{headers:HDR});
+    var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
+    EV_ALL=evs;
+    sel.innerHTML="";
+    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
+    sel.value="1";
+    sel.addEventListener("change",async function(){
+      EV_ID=(this.value==="1")?null:parseInt(this.value);
+      var _sel=EV_ALL.find(function(e){return String(e.id)===this.value}.bind(this));
+      EV_RULES=(_sel&&_sel.rules_config)||null;
+      
+      await loadAll();
+    });
+  }catch(e){console.warn("event selector failed",e);}
+}
+loadEventSelector();
 var SPECIAL_DAYS = []; // dates (YYYY-MM-DD) where 21 km cap is lifted
 var allData = {}; // cache {board: rows}
 
@@ -510,7 +591,7 @@ function applyFilters() {
         return a.strava_athlete_id == r.p.strava_athlete_id && a.sport_type === sport && !a.is_flagged;
       });
       if (filteredActs.length === 0) return null;
-      var pts = calcPoints(filteredActs, r.p.strava_athlete_id, r.p.gender, r.p.shift);
+      var pts = calcPointsAdaptive(filteredActs, r.p.strava_athlete_id, r.p.gender, r.p.shift);
       return { p: r.p, pts: pts };
     }).filter(function(r){ return r && r.pts.totalPts > 0; });
     rows.sort(function(a,b){ return b.pts.totalPts - a.pts.totalPts; });
@@ -526,7 +607,7 @@ function applyFilters() {
 
 async function loadConfig() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(), {headers:HDR});
     var rows = await r.json();
     rows.forEach(function(row) {
       if (row.config_key==='medals')       CONFIG.medals     = row.config_value;
@@ -540,7 +621,7 @@ async function loadConfig() {
 
 async function loadChallenges() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/challenges?is_active=is.true&select=*', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/challenges?is_active=is.true&select=*'+evq(), {headers:HDR});
     var raw = await r.json();
     CHALLENGES = Array.isArray(raw) ? raw : [];
     
@@ -559,22 +640,22 @@ async function loadChallenges() {
 
 async function loadSpecialDays() {
   try {
-    var r = await fetch(SB_URL+'/rest/v1/special_scoring_days?select=special_date', {headers:HDR});
+    var r = await fetch(SB_URL+'/rest/v1/special_scoring_days?select=special_date'+evq(), {headers:HDR});
     var rows = await r.json();
     SPECIAL_DAYS = Array.isArray(rows) ? rows.map(function(x){ return x.special_date; }) : [];
   } catch(e) { SPECIAL_DAYS = []; }
 }
 
 async function loadRegistration() {
-  var r = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team', {headers:HDR});
+  var r = await fetch(SB_URL+'/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team'+evq(), {headers:HDR});
   return await r.json();
 }
 
 async function loadActivities() {
   // Fetch ALL activities using Supabase pagination
   var baseUrl = SB_URL+'/rest/v1/activities?is_deleted=eq.false'
-    +'&activity_date=gte.2026-06-01T00:00:00'
-    +'&activity_date=lte.2026-07-01T15:00:00'
+    +(EV_ID ? ('&event_id=eq.'+EV_ID)
+            : '&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-07-01T15:00:00')
     +'&select=strava_athlete_id,distance_meters,sport_type,activity_date,avg_speed,elevation_gain,strava_activity_id,is_flagged,manual_bonus,activity_name,start_time,description,activity_date_time_ist'
     +'&order=id.asc';
   var allActs = [];
@@ -1231,7 +1312,7 @@ async function loadAll() {
     var filtered = filterReg(reg, board);
     var rows = [];
     filtered.forEach(function(p) {
-      var pts = calcPoints(acts, p.strava_athlete_id, p.gender);
+      var pts = calcPointsAdaptive(acts, p.strava_athlete_id, p.gender, p.shift);
       if (pts.totalPts === 0 && pts.distKm === 0) return;
       rows.push({ p: p, pts: pts });
     });
@@ -1361,7 +1442,7 @@ function toggleExpand(athleteId, gender, trEl) {
   if (athleteReg) { shift = athleteReg.shift; }
 
   // Call calcPoints to get exact daily points details
-  var ptsDetail = calcPoints(allActivities, athleteId, gender, shift);
+  var ptsDetail = calcPointsAdaptive(allActivities, athleteId, gender, shift);
   var byDay = ptsDetail.byDay;
   var dayBreakdown = ptsDetail.dayBreakdown;
 
@@ -1380,7 +1461,20 @@ function toggleExpand(athleteId, gender, trEl) {
 
   var g = (gender||'').toLowerCase();
   try {
-  var dayRows = days.map(function(day) {
+  var dayRows;
+  if (scoringMode()==='raw') {
+    var mm=metricMeta();
+    dayRows = days.map(function(day){
+      var db = dayBreakdown[day] || { km:0 };
+      return '<tr style="border-top:1px solid #eee">'
+        +'<td style="padding:8px 14px;font-size:12.5px">'+day+'</td>'
+        +'<td style="padding:8px 14px;font-size:12.5px;text-align:center">'+((byDay[day]||[]).length)+'</td>'
+        +'<td style="padding:8px 14px;font-size:12.5px;font-weight:600">'+(db.km||0).toFixed(mm.dec)+'</td>'
+        +'<td style="padding:8px 14px;font-size:13px;font-weight:700">+'+(db.km||0).toFixed(mm.dec)+'</td>'
+        +'</tr>';
+    }).join('');
+  } else {
+  dayRows = days.map(function(day) {
     var db = dayBreakdown[day] || { km: 0, distPts: 0, bonusPts: 0, challenges: [], capped: false, inRangeKm: 0 };
     var dayKm = db.km;
     var dp = db.distPts;
@@ -1450,19 +1544,20 @@ function toggleExpand(athleteId, gender, trEl) {
       +'</tr>'
       +'<tbody id="'+dayActsId+'" style="display:none">'+actSubRows+'</tbody>';
   }).join('');
+  }
 
   expRow.innerHTML = '<div style="overflow-x:auto;background:#fafafa;border-top:1px solid #eee">'
     +'<table style="width:100%;border-collapse:collapse;min-width:580px">'
     +'<thead><tr style="background:#f0f0f0">'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DATE</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:center;letter-spacing:0.5px"># ACTS</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DISTANCE (KM)</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">DIST PTS</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">'+((scoringMode()==='composite')?'DISTANCE (KM)':metricMeta().label)+'</th>'
+    +(scoringMode()==='raw'?'':'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">'+(isLegacyScoring()?'DIST PTS':(scoringMode()==='composite'?'BASE PTS':'METRIC PTS'))+'</th>'
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">BONUS PTS</th>'
-    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">CHALLENGE</th>'
+    +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">CHALLENGE</th>')
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">'
     +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +    '<span>TOTAL PTS</span>'
+    +    '<span>'+(scoringMode()==='raw'?('TOTAL '+metricMeta().short):'TOTAL PTS')+'</span>'
     +    '<button onclick="exportAthleteDailyCSV(\''+athleteId+'\')" style="background:#E8622A;color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;line-height:1.2">📥 Export</button>'
     +  '</div>'
     +'</th>'
@@ -1493,18 +1588,19 @@ function buildRow(row, i) {
     + '<div class="lb-main">'
     +   '<div class="lb-name-row">'
     +     '<a href="https://www.strava.com/athletes/'+athleteId+'" target="_blank" class="lb-name-link">'+p.full_name+'</a>'
-    +     '<span class="medal-pill '+medal.cls+'">'+medal.label+'</span>'
+    +     (scoringMode()==='raw' ? '' : '<span class="medal-pill '+medal.cls+'">'+medal.label+'</span>')
     +   '</div>'
     +   '<div class="lb-meta">'
     +     '<span>🏙️ '+(p.leaderboard_team||'—')+'</span>'
     +     '<span>📏 <strong>'+pts.distKm.toFixed(2)+' KM</strong></span>'
-    +     '<span>⚡ <strong>+'+pts.bonusPts+'</strong></span>'
-    +     (pts.challengePts > 0 ? '<span>🎯 <strong>+'+pts.challengePts+'</strong></span>' : '')
+    +     (scoringMode()==='raw' ? '' :
+          '<span>⚡ <strong>+'+pts.bonusPts+'</strong></span>'
+          + (pts.challengePts > 0 ? '<span>🎯 <strong>+'+pts.challengePts+'</strong></span>' : ''))
     +   '</div>'
     + '</div>'
     + '<div style="text-align:right">'
     +   '<div class="lb-pts">'+fmtIndian(pts.totalPts)+'</div>'
-    +   '<div class="lb-pts-label">Total PTS</div>'
+    +   '<div class="lb-pts-label">'+(scoringMode()==='raw'?('Total '+metricMeta().short):'Total PTS')+'</div>'
     + '</div>'
     + '</div>';
 }
@@ -1546,7 +1642,7 @@ function exportActivitiesCSV() {
     var athleteActs = actsByAthlete[p.strava_athlete_id] || [];
     if (!athleteActs.length) return;
     try {
-      var ptsResult = calcPoints(allActivities, p.strava_athlete_id, p.gender, p.shift);
+      var ptsResult = calcPointsAdaptive(allActivities, p.strava_athlete_id, p.gender, p.shift);
       Object.assign(globalActBreakdowns, ptsResult.actBreakdown || {});
     } catch(err) {
       console.error('Error calculating details for athlete ' + p.strava_athlete_id, err);
@@ -1641,7 +1737,7 @@ function exportAthleteDailyCSV(athleteId) {
   var shift = reg ? (reg.shift || 'Dayshift') : 'Dayshift';
   var gender = reg ? (reg.gender || 'Male') : 'Male';
 
-  var ptsDetail = calcPoints(allActivities, athleteId, gender, shift);
+  var ptsDetail = calcPointsAdaptive(allActivities, athleteId, gender, shift);
   var dayBreakdown = ptsDetail.dayBreakdown;
   var byDay = ptsDetail.byDay;
   var days = Object.keys(byDay).sort();
