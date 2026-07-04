@@ -384,7 +384,7 @@ async function verifyOTP(){
       email: email,
       expires: Date.now() + (8 * 60 * 60 * 1000)
     }));
-    window.location.replace('participant.html');
+    window.location.replace('app.html');
   } catch (e) {
     showErr('❌ Connection error. Please try again.');
   }
@@ -451,7 +451,7 @@ async function doLogin(){
       empCode:code,
       expires:Date.now()+(8*60*60*1000)
     }));
-    window.location.replace('participant.html');
+    window.location.replace('app.html');
   }catch(e){
     showErr('❌ Connection error. Please try again.');
   }
@@ -488,7 +488,7 @@ if(oauthCode){
         expires:Date.now()+(8*60*60*1000)
       }));
       if(d.role==='admin'){sessionStorage.setItem('wk_admin',JSON.stringify({loggedIn:true,role:'admin',expires:Date.now()+(8*60*60*1000)}));window.location.replace('admin.html');}
-      else{window.location.replace('participant.html');}
+      else{window.location.replace('app.html');}
     } else if(d.error==='not_registered'){showErr('⛔ <strong>Not registered.</strong><br>Your Strava account is not in the participant list.<br><a href="index.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');}
     else{showErr('❌ <strong>Login failed.</strong><br>Please try again.');}
   })
