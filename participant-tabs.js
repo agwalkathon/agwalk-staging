@@ -756,17 +756,35 @@ function getRows(mode){
 
 function precomputeLBScores() {
   LB_SCORES = {};
+  LB_OLD_SCORES = {};
   if (!LB_REG || !LB_REG.length) return;
+  
+  var cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  var cutoffStr = typeof getISTDate === 'function' ? getISTDate(cutoff.toISOString()) : cutoff.toISOString().split('T')[0];
+
   var actsByAthlete = {};
+  var oldActsByAthlete = {};
+  
   LB_ACTS.forEach(function(a) {
     var aid = String(a.strava_athlete_id);
     if (!actsByAthlete[aid]) actsByAthlete[aid] = [];
     actsByAthlete[aid].push(a);
+    
+    var actDate = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+    if (actDate <= cutoffStr) {
+      if (!oldActsByAthlete[aid]) oldActsByAthlete[aid] = [];
+      oldActsByAthlete[aid].push(a);
+    }
   });
+
   LB_REG.forEach(function(p) {
     var aid = String(p.strava_athlete_id);
     var pActs = actsByAthlete[aid] || [];
     LB_SCORES[aid] = calcFullPtsAdaptive(pActs, p.gender, p.shift);
+    
+    var oldActs = oldActsByAthlete[aid] || [];
+    LB_OLD_SCORES[aid] = calcFullPtsAdaptive(oldActs, p.gender, p.shift).total;
   });
 }
 
@@ -1072,17 +1090,6 @@ function lbRender() {
       try {
         var meId = s.athleteId;
         var curRank = allRows.findIndex(function(r) { return String(r.p.strava_athlete_id) === String(meId); }) + 1;
-        var cutoff = new Date();
-        cutoff.setDate(cutoff.getDate() - 7);
-        var cutoffStr = getISTDate(cutoff.toISOString());
-        var oldActs = LB_ACTS.filter(function(a) { return getActDate(a) <= cutoffStr; });
-        
-        var oldActsMap = {};
-        oldActs.forEach(function(a) {
-          var aid = String(a.strava_athlete_id);
-          if (!oldActsMap[aid]) oldActsMap[aid] = [];
-          oldActsMap[aid].push(a);
-        });
         
         var myGd = norm(LB_ME.gender), myShd = norm(LB_ME.shift), isNd = myShd.indexOf('night') > -1, isFd = myGd === 'female' || myGd === 'f';
         var oldRows = LB_REG.filter(function(q) {
@@ -1091,8 +1098,8 @@ function lbRender() {
           return LB_currentTab === 'team' ? pt === norm(LB_ME.leaderboard_team) : ps.indexOf('night') > -1 === isNd;
         }).map(function(q) {
           var aid = String(q.strava_athlete_id);
-          var acts = oldActsMap[aid] || [];
-          return { id: aid, pts: calcFullPtsAdaptive(acts, q.gender, q.shift).total };
+          var oldPts = LB_OLD_SCORES[aid] || 0;
+          return { id: aid, pts: oldPts };
         }).filter(function(r) { return r.pts > 0; }).sort(function(a, b) { return b.pts - a.pts; });
         
         var oldRank = oldRows.findIndex(function(r) { return r.id === String(meId); }) + 1;
@@ -1630,8 +1637,91 @@ function triggerConfettiBurst() {
   }
 }
 
+var _feedMapObserver = null;
+
+function instantiateFeedMap(el) {
+  var polylineStr = _feedPolylines[el.id];
+  if (!polylineStr) return;
+
+  try {
+    var coordinates = decodePolyline(polylineStr);
+    if (coordinates && coordinates.length > 0) {
+      var map = L.map(el.id, {
+        zoomControl: false,
+        dragging: false,
+        touchZoom: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        attributionControl: false
+      }).setView(coordinates[0], 14);
+
+      el._leafletMap = map;
+      window._feedMaps.push(map);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20,
+        className: 'app-map-tile'
+      }).addTo(map);
+
+      var poly = L.polyline(coordinates, {
+        color: '#E8622A', // Brand orange matching detail map
+        weight: 4,
+        opacity: 0.9,
+        lineJoin: 'round'
+      }).addTo(map);
+
+      L.circleMarker(coordinates[0], {
+        radius: 5,
+        color: '#ffffff',
+        weight: 1.5,
+        fillColor: '#22c55e', // Emerald Green for start
+        fillOpacity: 1
+      }).addTo(map);
+
+      L.circleMarker(coordinates[coordinates.length - 1], {
+        radius: 5,
+        color: '#ffffff',
+        weight: 1.5,
+        fillColor: '#ef4444', // Red for end
+        fillOpacity: 1
+      }).addTo(map);
+
+      map._refit = function() {
+        try {
+          map.fitBounds(poly.getBounds(), { padding: [12, 12] });
+        } catch(e) {}
+      };
+
+      map._refit();
+
+      setTimeout(function() {
+        try {
+          map.invalidateSize();
+          map._refit();
+        } catch(e) {}
+      }, 100);
+    }
+  } catch (err) {
+    console.warn('Failed lazy initializing map for ' + el.id + ':', err);
+  }
+}
+
 function initFeedMaps() {
   if (_currentTab !== 'feed') return;
+
+  if (!_feedMapObserver && 'IntersectionObserver' in window) {
+    _feedMapObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          _feedMapObserver.unobserve(el);
+          instantiateFeedMap(el);
+        }
+      });
+    }, { rootMargin: '100px 0px 100px 0px' });
+  }
 
   var elements = document.querySelectorAll('.feed-map-container');
   elements.forEach(function(el) {
@@ -1648,72 +1738,10 @@ function initFeedMaps() {
       return;
     }
 
-    var polylineStr = _feedPolylines[el.id];
-    if (!polylineStr) return;
-
-    try {
-      var coordinates = decodePolyline(polylineStr);
-      if (coordinates && coordinates.length > 0) {
-        var map = L.map(el.id, {
-          zoomControl: false,
-          dragging: false,
-          touchZoom: false,
-          scrollWheelZoom: false,
-          doubleClickZoom: false,
-          boxZoom: false,
-          keyboard: false,
-          attributionControl: false
-        }).setView(coordinates[0], 14);
-
-        el._leafletMap = map;
-        window._feedMaps.push(map);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          maxZoom: 20,
-          className: 'app-map-tile'
-        }).addTo(map);
-
-        var poly = L.polyline(coordinates, {
-          color: '#E8622A', // Brand orange matching detail map
-          weight: 4,
-          opacity: 0.9,
-          lineJoin: 'round'
-        }).addTo(map);
-
-        // Add start and end point circle markers
-        L.circleMarker(coordinates[0], {
-          radius: 5,
-          color: '#ffffff',
-          weight: 1.5,
-          fillColor: '#22c55e', // Emerald Green for start
-          fillOpacity: 1
-        }).addTo(map);
-
-        L.circleMarker(coordinates[coordinates.length - 1], {
-          radius: 5,
-          color: '#ffffff',
-          weight: 1.5,
-          fillColor: '#ef4444', // Red for end
-          fillOpacity: 1
-        }).addTo(map);
-
-        map._refit = function() {
-          try {
-            map.fitBounds(poly.getBounds(), { padding: [12, 12] });
-          } catch(e) {}
-        };
-
-        map._refit();
-
-        setTimeout(function() {
-          try {
-            map.invalidateSize();
-            map._refit();
-          } catch(e) {}
-        }, 100);
-      }
-    } catch (err) {
-      console.warn('Failed lazy initializing map for ' + el.id + ':', err);
+    if (_feedMapObserver) {
+      _feedMapObserver.observe(el);
+    } else {
+      instantiateFeedMap(el);
     }
   });
 }
