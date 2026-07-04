@@ -79,16 +79,15 @@ function cacheClear(athleteId) {
 safeRemoveItem('agwalk_ranking_acts');
 
 function getRegistrationFetchUrl(s) {
-  var athleteId = s.athleteId;
-  if (!athleteId || athleteId === 'null' || athleteId === 'undefined') {
-    if (s.empCode) {
-      return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(s.empCode) + '&select=*';
-    }
-    if (s.email) {
-      return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(s.email) + '&select=*';
-    }
+  var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
+  if (s.empCode) {
+    return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(s.empCode) + '&select=' + cols;
   }
-  return SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=*';
+  if (s.email) {
+    return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(s.email) + '&select=' + cols;
+  }
+  var aId = s.athleteId || (typeof s.athleteId !== 'undefined' ? s.athleteId : '');
+  return SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + aId + '&select=' + cols;
 }
 
 // Main Application Loader
@@ -1206,8 +1205,8 @@ async function bootAppUnified() {
 
   if (!isParticipant) {
     try {
-      var email = emp.email || '';
-      var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(email) + '&select=*', { headers: HDR });
+      var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
+      var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(email) + '&select=' + cols, { headers: HDR });
       var regs = await r.json();
       if (Array.isArray(regs) && regs.length > 0) {
         var reg = regs[0];
