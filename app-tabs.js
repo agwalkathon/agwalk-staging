@@ -3129,6 +3129,8 @@ function setupAppLayout(isParticipant) {
   var bnav = document.querySelector('.bottom-nav');
   var track = document.getElementById('tab-track');
   
+  document.body.classList.toggle('employee-mode', !isParticipant);
+  
   if (isParticipant) {
     TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'flex';
