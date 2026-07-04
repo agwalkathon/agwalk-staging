@@ -6,6 +6,7 @@ var _feedData    = [];
 var LB_REG       = [];
 var LB_ACTS      = [];
 var LB_SCORES    = {};
+var LB_OLD_SCORES = {};
 var _lbReady     = false;
 var LB_ME        = null;
 
