@@ -154,6 +154,13 @@
 
 <script src="app-config.js?v=20260704_v101" defer></script>
 <script src="app-employee.js?v=20260704_v101" defer></script>
+<script>
+  window.addEventListener('load', function() {
+    if (typeof loadBranding === 'function') {
+      loadBranding();
+    }
+  });
+</script>
 
 </body>
 </html>
