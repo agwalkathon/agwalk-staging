@@ -170,7 +170,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   <div class="card-body">
     <div class="bc-grid">
       <div class="bc-field"><label>Title</label><input type="text" id="bc-title" placeholder="e.g. Keep walking!"></div>
-      <div class="bc-field"><label>URL on click (optional)</label><input type="text" id="bc-url" placeholder="https://agwalkathon.github.io/agwalk-staging/index.html"></div>
+      <div class="bc-field"><label>URL on click (optional)</label><input type="text" id="bc-url" placeholder="https://agwalkathon.github.io/agwalk-staging/app.html"></div>
       <div class="bc-field" style="grid-column:1/-1"><label>Message body</label><textarea id="bc-body" rows="3" placeholder="You're doing great! Check the leaderboard for your latest rank."></textarea></div>
     </div>
     <div style="margin-top:14px;display:flex;align-items:center;gap:12px">
@@ -461,7 +461,7 @@ async function sendTest() {
   try {
     var r = await fetch(BU + '/push/broadcast', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ title:'Test Notification', body:'Push notifications are working!', url: 'https://agwalkathon.github.io/agwalk-staging/index.html' })
+      body: JSON.stringify({ title:'Test Notification', body:'Push notifications are working!', url: 'https://agwalkathon.github.io/agwalk-staging/app.html' })
     });
     var j = await r.json();
     if (j.success) {
