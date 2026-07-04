@@ -2961,3 +2961,72 @@ html:not(.app-logged-in) #app-screen { display: none !important; }
 html.app-logged-in #login-screen { display: none !important; }
 html.app-logged-in #app-screen { display: flex !important; }
 
+/* Employee Mode Background Styles */
+body.employee-mode {
+  background: radial-gradient(circle at 10% 20%, rgba(232, 98, 42, 0.09) 0%, rgba(0, 0, 0, 0) 40%),
+              radial-gradient(circle at 90% 80%, rgba(232, 98, 42, 0.07) 0%, rgba(0, 0, 0, 0) 50%),
+              #0E1012 !important;
+}
+
+body.employee-mode::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0),
+    radial-gradient(rgba(232, 98, 42, 0.12) 1.5px, transparent 0);
+  background-size: 40px 40px, 60px 60px;
+  background-position: 0 0, 20px 20px;
+  opacity: 0.25;
+  z-index: -1;
+}
+
+/* Redesigned Profile Name Card with Celebration Background */
+.tab-you-profile {
+  position: relative;
+  background: linear-gradient(135deg, rgba(40, 46, 54, 0.7) 0%, rgba(26, 29, 32, 0.8) 100%) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: var(--radius) !important;
+  padding: 24px 20px !important;
+  margin-bottom: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  overflow: hidden;
+}
+
+/* Subtle decorative celebration background dots (like confetti) */
+.tab-you-profile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(rgba(232, 98, 42, 0.18) 1.5px, transparent 0),
+    radial-gradient(rgba(244, 114, 182, 0.15) 1.5px, transparent 0);
+  background-size: 30px 30px, 45px 45px;
+  background-position: 0 0, 15px 15px;
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glass glow overlay for a premium look */
+.tab-you-profile::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(232, 98, 42, 0.09) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure contents display above background */
+.tab-you-profile > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
