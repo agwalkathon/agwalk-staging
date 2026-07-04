@@ -86,9 +86,14 @@ async function fetchEventsData() {
   await Promise.all(statEvents.map(async function(ev){
     try {
       var s = await fetch(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + ev.id +
-        '&is_deleted=is.false&is_flagged=is.false&select=total_km:distance_meters.sum(),acts:id.count()', { headers: HDR });
+        '&is_deleted=eq.false&is_flagged=eq.false&select=distance_meters', { headers: HDR });
       var d = await s.json();
-      if (d && d[0]) ev._stats = { km: (d[0].total_km || 0) / 1000, acts: d[0].acts || 0 };
+      if (Array.isArray(d)) {
+        ev._stats = {
+          km: d.reduce((sum, a) => sum + (a.distance_meters || 0), 0) / 1000,
+          acts: d.length
+        };
+      }
       var c = await fetch(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + ev.id + '&select=id&limit=1', {
         headers: Object.assign({}, HDR, { Prefer: 'count=exact' })
       });
@@ -307,10 +312,10 @@ async function fetchEventLbState(evId) {
   if (_lbEventCache[evId]) return _lbEventCache[evId];
   var slimActs = '&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist';
   var results = await Promise.all([
-    fetchAllParallel(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + evId + '&is_deleted=is.false&order=id.asc' + slimActs),
+    fetchAllParallel(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + evId + '&is_deleted=eq.false&order=id.asc' + slimActs),
     fetchAllParallel(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + evId + '&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team'),
     fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=eq.' + evId + '&select=config_key,config_value', { headers: HDR }).then(function(r){ return r.json(); }),
-    fetch(SUPABASE_URL + '/rest/v1/challenges?event_id=eq.' + evId + '&is_active=is.true&select=*', { headers: HDR }).then(function(r){ return r.json(); }),
+    fetch(SUPABASE_URL + '/rest/v1/challenges?event_id=eq.' + evId + '&is_active=eq.true&select=*', { headers: HDR }).then(function(r){ return r.json(); }),
     fetch(SUPABASE_URL + '/rest/v1/special_scoring_days?event_id=eq.' + evId + '&select=special_date', { headers: HDR }).then(function(r){ return r.json(); })
   ]);
   var bonus = null, basePer = 1;
