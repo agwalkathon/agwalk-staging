@@ -1899,13 +1899,9 @@ function renderFeed() {
       
       shownReactions.forEach(function(r, index) {
         var pName = (r.name && r.name !== 'Participant') ? r.name : (regMap[r.athlete_id] ? regMap[r.athlete_id].full_name : 'Participant');
-        var uInitials = (function(){
-          var parts = (pName || '').trim().split(/\s+/);
-          if(parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
-          return (parts[0] || '?')[0].toUpperCase();
-        })();
+        var uInitials = typeof get2Initials === 'function' ? get2Initials(pName) : pName.substring(0,2).toUpperCase();
         
-        var customStyle = getAvatarStyle(pName);
+        var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;';
         var style = `width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; border:1px solid; margin-left: ${index > 0 ? '-6px' : '0'}; z-index: ${10 - index}; transition: transform 0.2s; ${customStyle}`;
         avatarsHtml += `<div style="${style}">${uInitials}</div>`;
       });
@@ -2007,7 +2003,7 @@ function renderFeed() {
       html += `
         <div class="feed-card type-activity ${timeClass}" onclick="openActivityDetail('${act.activity_id || act.strava_activity_id}', event, true)">
           <div class="feed-card-header">
-            <div class="feed-card-avatar" style="${getAvatarStyle(athleteName)};">${initials}</div>
+            <div class="feed-card-avatar" style="${typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(athleteName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;'};">${typeof get2Initials === 'function' ? get2Initials(athleteName) : initials}</div>
             <div class="feed-card-meta">
               <div class="feed-card-athlete-name">
                 <a href="#" onclick="openProfileDetail('${targetAthleteId}', event); event.stopPropagation(); return false;" class="athlete-profile-link">${esc(athleteName)}</a>
@@ -2885,13 +2881,9 @@ function openReactionsDetail(announcementId) {
     var iconColor = r.type === 'heart' ? '#ef4444' : '#3b82f6';
     
     var pName = (r.name && r.name !== 'Participant') ? r.name : (regMap[r.athlete_id] ? regMap[r.athlete_id].full_name : 'Participant');
-    var initials = (function(){
-      var parts = (pName || '').trim().split(/\s+/);
-      if(parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
-      return (parts[0] || '?')[0].toUpperCase();
-    })();
+    var initials = typeof get2Initials === 'function' ? get2Initials(pName) : pName.substring(0,2).toUpperCase();
 
-    var customStyle = getAvatarStyle(pName);
+    var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;';
 
     return `
       <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 14px;">
