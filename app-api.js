@@ -1206,6 +1206,7 @@ async function bootAppUnified() {
 
   if (!isParticipant) {
     try {
+      var email = emp ? (emp.email || '') : '';
       var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
       var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=ilike.' + encodeURIComponent(email) + '&select=' + cols, { headers: HDR });
       var regs = await r.json();
