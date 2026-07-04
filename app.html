@@ -511,15 +511,15 @@
 <!-- You tab -->
 <div class="content" id="tab-you">
 <div class="max-w">
-  <!-- Sub-tabs: Challenges first -->
+  <!-- Sub-tabs: Profile first -->
   <div class="lb-tabs part-only" style="margin-bottom:14px;">
-    <button class="lb-tab active" id="you-tab-activities" onclick="switchYouTab('activities')">&#9889; Activities</button>
+    <button class="lb-tab active" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
     <button class="lb-tab" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
-    <button class="lb-tab" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
+    <button class="lb-tab" id="you-tab-activities" onclick="switchYouTab('activities')">&#9889; Activities</button>
   </div>
 
   <!-- Activities panel (moved from old Activities tab) -->
-  <div id="you-panel-activities" style="display:block;">
+  <div id="you-panel-activities" style="display:none;">
 <div class="max-w">
   <div class="flagged-info" id="flagged-banner">
     <strong>⚑ Flagged activities</strong> — Some activities were flagged for admin review. They're excluded from your score until reviewed.
@@ -533,7 +533,7 @@
 </div></div>
 
   <!-- Info panel -->
-  <div id="you-panel-info" style="display:none;">
+  <div id="you-panel-info" style="display:block;">
 
   <!-- Avatar / name card - Profile tab only -->
   <div class="tab-you-profile">
@@ -728,7 +728,7 @@
 </div>
 
   <!-- Challenges panel -->
-  <div id="you-panel-challenges" style="display:none;display:block; padding-top:4px;">
+  <div id="you-panel-challenges" style="display:none; padding-top:4px;">
     <div id="challenges-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
       <div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>Loading challenges...</p></div></div>
     </div>
