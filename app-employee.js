@@ -28,7 +28,12 @@ function clearSession(){
 function tokenValid(t){
   if (!t) return false;
   try {
-    var p = JSON.parse(atob(t.split('.')[1]));
+    var base64Url = t.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    var p = JSON.parse(jsonPayload);
     return p.exp && p.exp * 1000 > Date.now();
   } catch(e){ return false; }
 }
@@ -573,13 +578,13 @@ async function loadBranding() {
     var d = await r.json();
     if (d && d.success && d.branding) {
       var b = d.branding;
-      if (b.tagline) {
-        var tEl = document.getElementById('br-login-title');
-        if (tEl) tEl.textContent = b.tagline;
-      }
       if (b.login_title) {
+        var tEl = document.getElementById('br-login-title');
+        if (tEl) tEl.textContent = b.login_title;
+      }
+      if (b.tagline) {
         var sEl = document.getElementById('br-login-sub');
-        if (sEl) sEl.textContent = b.login_title;
+        if (sEl) sEl.textContent = b.tagline;
       }
       
       var logoSrc = b.logo_url || 'logo-white.png';
