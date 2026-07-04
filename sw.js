@@ -36,7 +36,7 @@ self.addEventListener('push', function(event) {
     icon:    '/agwalk-staging/logo-icon.png',
     badge:   '/agwalk-staging/logo-icon.png',
     vibrate: [200, 100, 200],
-    data:    { url: data.url || 'https://agwalkathon.github.io/agwalk-staging/app.html' },
+    data:    { url: data.url || 'https://agwalkathon.github.io/agwalk-staging/index.html' },
     actions: [{ action: 'open', title: 'View' }]
   };
   event.waitUntil(self.registration.showNotification(title, options));
@@ -44,6 +44,6 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  var url = (event.notification.data && event.notification.data.url) || 'https://agwalkathon.github.io/agwalk-staging/app.html';
+  var url = (event.notification.data && event.notification.data.url) || 'https://agwalkathon.github.io/agwalk-staging/index.html';
   event.waitUntil(clients.openWindow(url));
 });
