@@ -50,6 +50,16 @@
         if (!pick) pick = ev;
         else if (ev.status === 'live' && pick.status !== 'live') pick = ev;
       });
+      
+      // Fallback: If user is not registered for any live event, pick the first live event in the list for dashboard rendering
+      if (!pick) {
+        evs.forEach(function(ev){
+          if (ev.status === 'live') {
+            if (!pick) pick = ev;
+          }
+        });
+      }
+      
       return pick ? { ev: pick, athleteId: s.athleteId } : null;
     } catch(e){ return null; }
   }
