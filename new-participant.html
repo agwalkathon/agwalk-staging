@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#111827">
+  <title>Join Walkathon 2026 — Arcgate</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:#E8622A; --brand-dark:#c4511f;
+      --dark:#111827; --bg:#F4F5F7; --white:#fff;
+      --border:#E8EAED; --text:#1A1A1A; --muted:#6B7280;
+      --green:#16a34a; --green-bg:#f0fdf4;
+      --red:#dc2626; --red-bg:#fef2f2;
+      --radius:14px; --radius-sm:10px;
+      --shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Poppins',-apple-system,sans-serif;background:var(--bg);
+         color:var(--text);min-height:100dvh;display:flex;flex-direction:column;
+         -webkit-font-smoothing:antialiased;}
+
+    /* ── Header ── */
+    .header{background:var(--dark);padding:14px 20px;
+            padding-top:max(14px,env(safe-area-inset-top));
+            display:flex;align-items:center;justify-content:space-between;}
+    .header img{height:34px;object-fit:contain;}
+    .header a{font-size:13px;color:rgba(255,255,255,0.55);text-decoration:none;
+               font-weight:500;padding:6px 10px;border-radius:8px;}
+    .header a:hover{color:white;background:rgba(255,255,255,0.08);}
+
+    /* ── Hero strip ── */
+    .hero{background:var(--dark);padding:20px 20px 28px;border-bottom:3px solid var(--brand);}
+    .hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;
+                   text-transform:uppercase;color:var(--brand);margin-bottom:8px;}
+    .hero h1{font-size:22px;font-weight:800;color:white;line-height:1.25;margin-bottom:6px;}
+    .hero p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;max-width:360px;}
+
+    /* ── Main content ── */
+    .content{flex:1;max-width:560px;width:100%;margin:0 auto;padding:20px 16px 40px;}
+
+    /* ── Card ── */
+    .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);
+          padding:24px 20px;margin-bottom:16px;}
+    .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
+                 letter-spacing:0.6px;margin-bottom:16px;padding-bottom:10px;
+                 border-bottom:1px solid var(--border);}
+
+    /* ── Form fields ── */
+    .field{margin-bottom:16px;}
+    .field:last-child{margin-bottom:0;}
+    .field label{display:block;font-size:12px;font-weight:600;color:var(--text);
+                  margin-bottom:6px;}
+    .field label .req{color:var(--brand);margin-left:2px;}
+    .field input,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);
+                  border-radius:var(--radius-sm);font-size:14px;font-family:inherit;
+                  background:var(--white);color:var(--text);transition:border-color 0.15s;
+                  -webkit-appearance:none;appearance:none;}
+    .field input:focus,.field select:focus{outline:none;border-color:var(--brand);}
+    .field input::placeholder{color:#C4C8D0;}
+    .field .hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4;}
+    .field.error input,.field.error select{border-color:var(--red);}
+    .field .err-msg{font-size:11px;color:var(--red);margin-top:4px;display:none;}
+    .field.error .err-msg{display:block;}
+
+    /* Two-col grid on wider screens */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
+    @media(max-width:420px){.grid-2{grid-template-columns:1fr;}}
+
+    /* ── Submit button ── */
+    .btn-submit{width:100%;padding:16px;background:var(--brand);color:white;
+                border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;
+                font-family:inherit;cursor:pointer;display:flex;align-items:center;
+                justify-content:center;gap:10px;
+                box-shadow:0 4px 16px rgba(232,98,42,0.35);transition:background 0.15s;}
+    .btn-submit:hover{background:var(--brand-dark);}
+    .btn-submit:active{transform:scale(0.98);}
+    .btn-submit:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);
+              border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;
+              flex-shrink:0;}
+
+    /* ── Success state ── */
+    .success-card{background:var(--white);border-radius:var(--radius);
+                  box-shadow:var(--shadow);padding:36px 24px;text-align:center;
+                  display:none;}
+    .success-icon{font-size:48px;margin-bottom:14px;}
+    .success-card h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;}
+    .success-card p{font-size:14px;color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto 20px;}
+    .btn-back{display:inline-block;padding:12px 24px;background:var(--dark);color:white;
+               border-radius:var(--radius-sm);font-size:14px;font-weight:600;
+               text-decoration:none;}
+
+    /* ── Alert banner ── */
+    .alert{padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;
+            line-height:1.5;margin-bottom:16px;display:none;}
+    .alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;}
+    .alert.show{display:block;}
+
+    /* ── Footer note ── */
+    .foot-note{text-align:center;font-size:11px;color:var(--muted);margin-top:20px;
+               line-height:1.7;}
+    .foot-note a{color:var(--brand);text-decoration:none;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="logo-white.png" alt="Arcgate Walkathon 2026">
+  <a href="index.html">← Back to login</a>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Arcgate Walkathon 2026</div>
+  <h1>Join the Walkathon</h1>
+  <p>Fill in your details below. Once submitted, admin will review and approve your request — you'll then be able to sign in with Strava.</p>
+</div>
+
+<div class="content">
+
+  <div class="alert error" id="alert"></div>
+
+  <!-- Form -->
+  <div id="form-wrap">
+
+    <div class="card">
+      <div class="card-title">Personal Details</div>
+
+      <div class="field" id="f-name">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" id="full_name" placeholder="e.g. Priya Sharma" autocomplete="name">
+        <div class="err-msg">Please enter your full name</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field" id="f-emp">
+          <label>Employee Code <span class="req">*</span></label>
+          <input type="text" id="emp_code" placeholder="e.g. AG1234" autocomplete="off">
+          <div class="err-msg">Required</div>
+        </div>
+        <div class="field" id="f-gender">
+          <label>Gender <span class="req">*</span></label>
+          <select id="gender">
+            <option value="">— Select —</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          <div class="err-msg">Required</div>
+        </div>
+      </div>
+
+      <div class="field" id="f-email">
+        <label>Personal Email <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="you@gmail.com" autocomplete="email">
+        <div class="err-msg">Please enter a valid email</div>
+      </div>
+
+      <div class="field" id="f-whatsapp">
+        <label>WhatsApp Number <span class="req">*</span></label>
+        <input type="tel" id="whatsapp" placeholder="+91 98765 43210" autocomplete="tel">
+        <div class="hint">Used for walkathon updates only</div>
+        <div class="err-msg">Required</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Walkathon Details</div>
+
+      <div class="grid-2">
+        <div class="field" id="f-shift">
+          <label>Shift <span class="req">*</span></label>
+          <select id="shift">
+            <option value="">— Select —</option>
+            <option value="Dayshift">Dayshift</option>
+            <option value="Nightshift">Nightshift</option>
+          </select>
+          <div class="err-msg">Required</div>
+        </div>
+        <div class="field" id="f-tshirt">
+          <label>T-Shirt Size <span class="req">*</span></label>
+          <select id="tshirt_size">
+            <option value="">— Select —</option>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+          <div class="err-msg">Required</div>
+        </div>
+      </div>
+
+      <div class="field" id="f-team">
+        <label>Leaderboard Team <span class="req">*</span></label>
+        <select id="leaderboard_team">
+          <option value="">— Select your team —</option>
+          <option value="Team Seattle">Team Seattle</option>
+          <option value="Team San Francisco">Team San Francisco</option>
+          <option value="Team Los Angeles">Team Los Angeles</option>
+          <option value="Team Chicago">Team Chicago</option>
+          <option value="Team Austin">Team Austin</option>
+          <option value="Team New York">Team New York</option>
+        </select>
+        <div class="err-msg">Required</div>
+      </div>
+
+      <div class="field" id="f-team-lead">
+        <label>Project / Team Lead Name <span class="req">*</span></label>
+        <input type="text" id="team_lead" placeholder="Your manager's name" autocomplete="off">
+        <div class="err-msg">Required</div>
+      </div>
+
+      <div class="field" id="f-strava">
+        <label>Strava Profile Link <span class="req">*</span></label>
+        <input type="url" id="strava_url" placeholder="https://www.strava.com/athletes/1234567890" autocomplete="off">
+        <div class="hint">Find it at strava.com → Profile → copy the URL from your browser</div>
+        <div class="err-msg">Please enter your Strava profile URL</div>
+      </div>
+    </div>
+
+    <div class="alert error" id="alert-bottom"></div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+      Submit Registration Request
+    </button>
+
+    <p class="foot-note">
+      Already registered? <a href="index.html">Sign in with Strava</a><br>
+      Have questions? Contact <a href="mailto:pra@arcgate.com">pra@arcgate.com</a>
+    </p>
+
+  </div>
+
+  <!-- Success state -->
+  <div class="success-card" id="success-card">
+    <div class="success-icon">🎉</div>
+    <h2>Request Submitted!</h2>
+    <p>Your registration request has been sent. Admin will review and approve it shortly. Once approved, you can sign in with Strava on the home page.</p>
+    <a href="index.html" class="btn-back">Back to Home</a>
+  </div>
+
+</div>
+
+<script>
+var SB_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR    = { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json' };
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function setError(fieldId, show) {
+  var el = document.getElementById(fieldId);
+  if (show) el.classList.add('error'); else el.classList.remove('error');
+}
+
+function showAlert(msg) {
+  ['alert','alert-bottom'].forEach(function(id) {
+    var el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function hideAlert() {
+  ['alert','alert-bottom'].forEach(function(id) {
+    document.getElementById(id).classList.remove('show');
+  });
+}
+
+function validateEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+async function submitForm() {
+  hideAlert();
+
+  var full_name   = val('full_name');
+  var emp_code    = val('emp_code');
+  var gender      = val('gender');
+  var email       = val('email');
+  var whatsapp    = val('whatsapp');
+  var shift       = val('shift');
+  var tshirt_size = val('tshirt_size');
+  var team_lead         = val('team_lead');
+  var leaderboard_team  = val('leaderboard_team');
+  var strava_url  = val('strava_url');
+
+  // Validate
+  var ok = true;
+  setError('f-name',      !full_name);   if (!full_name)   ok = false;
+  setError('f-emp',       !emp_code);    if (!emp_code)    ok = false;
+  setError('f-gender',    !gender);      if (!gender)      ok = false;
+  setError('f-email',     !validateEmail(email)); if (!validateEmail(email)) ok = false;
+  setError('f-whatsapp',  !whatsapp);    if (!whatsapp)    ok = false;
+  setError('f-shift',     !shift);       if (!shift)       ok = false;
+  setError('f-tshirt',    !tshirt_size); if (!tshirt_size) ok = false;
+  setError('f-team',      !leaderboard_team); if (!leaderboard_team) ok = false;
+  setError('f-team-lead', !team_lead);   if (!team_lead)   ok = false;
+  var validStrava = strava_url.startsWith('https://www.strava.com/athletes/');
+  setError('f-strava', !validStrava); if (!validStrava) ok = false;
+
+  if (!ok) {
+    showAlert('Please fill in all required fields.');
+    return;
+  }
+
+  // Submit
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Submitting...';
+
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/registration_requests', {
+      method: 'POST',
+      headers: Object.assign({}, HDR, { Prefer: 'return=minimal' }),
+      body: JSON.stringify({
+        full_name:   full_name,
+        emp_code:    emp_code,
+        gender:      gender,
+        email:       email,
+        whatsapp:    whatsapp,
+        shift:       shift,
+        tshirt_size: tshirt_size,
+        leaderboard_team: leaderboard_team,
+        team_lead:   team_lead,
+        strava_url:  strava_url,
+        event_name:  'walkathon2026',
+        status:      'pending'
+      })
+    });
+
+    if (res.ok || res.status === 201) {
+      document.getElementById('form-wrap').style.display = 'none';
+      document.getElementById('success-card').style.display = 'block';
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    } else {
+      var body = await res.text();
+      // Check for duplicate emp_code
+      if (body.includes('duplicate') || body.includes('unique') || res.status === 409) {
+        showAlert('⚠️ A request with this Employee Code already exists. If you need help, contact pra@arcgate.com');
+      } else {
+        showAlert('❌ Submission failed (error ' + res.status + '). Please try again.');
+      }
+      btn.disabled = false;
+      btn.innerHTML = 'Submit Registration Request';
+    }
+  } catch (e) {
+    showAlert('❌ Connection error. Please check your internet and try again.');
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Registration Request';
+  }
+}
+</script>
+</body>
+</html>
