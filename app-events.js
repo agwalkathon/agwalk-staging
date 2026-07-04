@@ -43,6 +43,15 @@ async function fetchEventsData() {
     empCode = currentSession.empCode;
     email = currentSession.email;
   }
+  if (!empCode || !email) {
+    try {
+      var emp = JSON.parse(safeGetItem('ag_emp') || '{}');
+      if (emp) {
+        if (!empCode) empCode = emp.emp_code || null;
+        if (!email) email = emp.email || null;
+      }
+    } catch(e){}
+  }
 
   _myEventRegistrations = {}; // mapping of event_id -> status
   _myEventIds = [];
@@ -52,7 +61,7 @@ async function fetchEventsData() {
       var filterParts = [];
       if (athleteId && athleteId !== 'null' && athleteId !== 'undefined') filterParts.push('strava_athlete_id.eq.' + encodeURIComponent(athleteId));
       if (empCode && empCode !== 'null' && empCode !== 'undefined') filterParts.push('emp_code.eq.' + encodeURIComponent(empCode));
-      if (email && email !== 'null' && email !== 'undefined') filterParts.push('email.eq.' + encodeURIComponent(email));
+      if (email && email !== 'null' && email !== 'undefined') filterParts.push('email.ilike.' + encodeURIComponent(email));
 
       var url = SUPABASE_URL + '/rest/v1/registration?select=event_id,status';
       if (filterParts.length > 0) {
