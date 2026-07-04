@@ -18,13 +18,35 @@
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #login-screen {
-      display: none !important;
-      opacity: 0;
-      transition: opacity 0.35s ease;
+      display: flex !important;
     }
   </style>
   <script>
     (function(){
+      // 1. Synchronously inject cached branding style to prevent FOUC
+      try {
+        var cached = localStorage.getItem('ag_branding_cache');
+        if (cached) {
+          var b = JSON.parse(cached);
+          if (b.accent_color) {
+            var hexToRgba = function(hex, alpha) {
+              var c = hex.replace('#', '');
+              if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+              var rVal = parseInt(c.substring(0, 2), 16);
+              var gVal = parseInt(c.substring(2, 4), 16);
+              var bVal = parseInt(c.substring(4, 6), 16);
+              return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
+            };
+            document.write('<style id="sync-branding-style">' +
+              '.login-btn { background: ' + b.accent_color + ' !important; box-shadow: 0 4px 20px ' + hexToRgba(b.accent_color, 0.28) + ' !important; }' +
+              '.login-link, .login-terms a { color: ' + b.accent_color + ' !important; }' +
+              '#br-app-name { color: ' + b.accent_color + ' !important; }' +
+              'input.login-field:focus { border-color: ' + b.accent_color + ' !important; }' +
+            '</style>');
+          }
+        }
+      } catch(e){}
+
       function decodeJwt(token) {
         try {
           var base64Url = token.split('.')[1];
@@ -59,6 +81,8 @@
         var cb = "v=" + Date.now();
         var qs = window.location.search ? ("&" + window.location.search.substring(1)) : "";
         window.location.replace("app.html?" + cb + qs);
+      } else {
+        document.write('<style>#splash-screen { display: none !important; }</style>');
       }
     })();
   </script>
