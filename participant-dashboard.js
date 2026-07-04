@@ -83,25 +83,42 @@
     if (!ctx) return;
     var ev = ctx.ev;
     
-    // 1. Update the Event Logo if configured (from events.html Event Logo field)
+    // 1. Update the Event Logo or Event Display Name
     var host = document.getElementById('medal-rings');
+    var blk = host ? (host.closest('.hero-rings-block') || host.parentNode) : null;
+    if (blk) {
+      // remove any previous text logo to avoid duplicates on double render
+      var oldTxt = blk.querySelector('#app-logo-text');
+      if (oldTxt) oldTxt.remove();
+    }
+    var im = blk ? blk.querySelector('#app-logo') : null;
+
     if (ev.rules_config && ev.rules_config.logo_url) {
-      var blk = host ? (host.closest('.hero-rings-block') || host.parentNode) : null;
-      var im = blk ? blk.querySelector('img') : null;
       if (im) {
+        im.style.display = 'block';
         im.onerror = function() {
           this.src = 'logo-white.png';
         };
         im.src = ev.rules_config.logo_url;
         im.style.maxHeight = '34px';
-      } else if (host) {
-        var li = document.createElement('img');
-        li.onerror = function() {
-          this.src = 'logo-white.png';
-        };
-        li.src = ev.rules_config.logo_url;
-        li.style.cssText = 'display:block;margin:0 auto 12px;max-height:34px;';
-        host.parentNode.insertBefore(li, host);
+        im.style.height = 'auto';
+        im.style.width = 'auto';
+      }
+    } else if (ev.rules_config && ev.rules_config.display_name) {
+      if (im) im.style.display = 'none';
+      if (host) {
+        var txtEl = document.createElement('div');
+        txtEl.id = 'app-logo-text';
+        txtEl.textContent = ev.rules_config.display_name;
+        txtEl.style.cssText = "font-family:'Poppins', sans-serif; font-size:22px; font-weight:400; color:#ffffff; text-align:center; margin-bottom:14px; margin-top:2px; letter-spacing:0.5px; opacity:0.95;";
+        host.parentNode.insertBefore(txtEl, host);
+      }
+    } else {
+      if (im) {
+        im.style.display = 'block';
+        im.src = 'logo-white.png';
+        im.style.height = '26px';
+        im.style.width = 'auto';
       }
     }
     
