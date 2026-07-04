@@ -3145,6 +3145,9 @@ function setupAppLayout(isParticipant) {
     document.getElementById('tab-celebrate').classList.remove('hidden-tab');
     document.getElementById('tab-you').classList.remove('hidden-tab');
 
+    var backBtn = document.getElementById('lb-back-to-events-row');
+    if (backBtn) backBtn.style.display = 'none';
+
     // Show participant-only layout controls
     document.querySelectorAll('.part-only').forEach(function(el) {
       el.style.display = '';
@@ -3152,7 +3155,7 @@ function setupAppLayout(isParticipant) {
     // Default to activities sub-tab under Profile
     if (typeof switchYouTab === 'function') switchYouTab('activities');
   } else {
-    TAB_ORDER = ['celebrate', 'events', 'you'];
+    TAB_ORDER = ['celebrate', 'events', 'leaderboard', 'you'];
     document.getElementById('bnav-dashboard').style.display = 'none';
     document.getElementById('bnav-leaderboard').style.display = 'none';
     document.getElementById('bnav-events').style.display = 'flex';
@@ -3160,10 +3163,13 @@ function setupAppLayout(isParticipant) {
     document.getElementById('bnav-you').style.display = 'flex';
     
     document.getElementById('tab-dashboard').classList.add('hidden-tab');
-    document.getElementById('tab-leaderboard').classList.add('hidden-tab');
+    document.getElementById('tab-leaderboard').classList.remove('hidden-tab');
     document.getElementById('tab-events').classList.remove('hidden-tab');
     document.getElementById('tab-celebrate').classList.remove('hidden-tab');
     document.getElementById('tab-you').classList.remove('hidden-tab');
+
+    var backBtn = document.getElementById('lb-back-to-events-row');
+    if (backBtn) backBtn.style.display = 'block';
 
     // Hide all participant-only activities/challenges sub-tabs and event progress
     document.querySelectorAll('.part-only').forEach(function(el) {
