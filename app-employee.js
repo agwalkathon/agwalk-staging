@@ -583,105 +583,137 @@ async function loadBranding() {
   var lEl = document.getElementById('login-logo-img');
   var aEl = document.getElementById('app-logo');
   var appNameEl = document.getElementById('br-app-name');
+
+  // 1. Try to load and render cached branding instantly
+  try {
+    var cached = localStorage.getItem('ag_branding_cache');
+    if (cached) {
+      var b = JSON.parse(cached);
+      applyBrandingDOM(b, lEl, aEl, appNameEl);
+      revealLoginScreen();
+      if (typeof hideSplash === 'function') hideSplash();
+    }
+  } catch(e) {}
+
+  // 2. Fetch fresh branding from the network in background
   try {
     var r = await fetch(BACKEND + '/branding');
     var d = await r.json();
     if (d && d.success && d.branding) {
       var b = d.branding;
-      if (b.login_title) {
-        var tEl = document.getElementById('br-login-title');
-        if (tEl) tEl.textContent = b.login_title;
-      }
-      if (b.tagline) {
-        var sEl = document.getElementById('br-login-sub');
-        if (sEl) sEl.textContent = b.tagline;
-      }
-      
-      var logoSrc = b.logo_url || 'logo-white.png';
-      if (lEl) {
-        lEl.onerror = function() {
-          this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
-        };
-        lEl.src = logoSrc;
-        lEl.style.opacity = '1';
-      }
-      if (aEl) {
-        aEl.onerror = function() {
-          this.src = 'logo-white.png';
-        };
-        aEl.src = logoSrc;
-      }
-
-      if (b.app_name) {
-        document.title = b.app_name + ' — Dashboard';
-        if (appNameEl) {
-          appNameEl.textContent = b.app_name;
-          appNameEl.style.opacity = '1';
-        }
-      }
-
-      // Inject custom accent color style overrides if set
-      if (b.accent_color) {
-        var styleEl = document.createElement('style');
-        styleEl.id = 'dynamic-branding-style';
-        
-        // Helper to convert hex to rgba for shadow opacity
-        var hexToRgba = function(hex, alpha) {
-          var c = hex.replace('#', '');
-          if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
-          var rVal = parseInt(c.substring(0, 2), 16);
-          var gVal = parseInt(c.substring(2, 4), 16);
-          var bVal = parseInt(c.substring(4, 6), 16);
-          return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
-        };
-        
-        styleEl.textContent = `
-          .login-btn {
-            background: ${b.accent_color} !important;
-            box-shadow: 0 4px 20px ${hexToRgba(b.accent_color, 0.28)} !important;
-          }
-          .login-btn:hover {
-            opacity: 0.95;
-          }
-          .login-link, .login-terms a {
-            color: ${b.accent_color} !important;
-          }
-          #br-app-name {
-            color: ${b.accent_color} !important;
-          }
-          input.login-field:focus {
-            border-color: ${b.accent_color} !important;
-          }
-        `;
-        var oldStyle = document.getElementById('dynamic-branding-style');
-        if (oldStyle) oldStyle.remove();
-        document.head.appendChild(styleEl);
-      }
+      localStorage.setItem('ag_branding_cache', JSON.stringify(b));
+      applyBrandingDOM(b, lEl, aEl, appNameEl);
+      revealLoginScreen();
     } else {
-      if (lEl) {
-        lEl.onerror = function() {
-          this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
-        };
-        lEl.src = 'logo-white.png';
-        lEl.style.opacity = '1';
-      }
-      if (appNameEl) {
-        appNameEl.textContent = 'Arcgate';
-        appNameEl.style.opacity = '1';
-      }
+      applyDefaultBrandingDOM(lEl, appNameEl);
+      revealLoginScreen();
     }
   } catch (e) {
     console.warn('Failed to load branding:', e);
-    if (lEl) {
-      lEl.onerror = function() {
-        this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
-      };
-      lEl.src = 'logo-white.png';
-      lEl.style.opacity = '1';
+    applyDefaultBrandingDOM(lEl, appNameEl);
+    revealLoginScreen();
+  } finally {
+    if (typeof hideSplash === 'function') {
+      hideSplash();
     }
+  }
+}
+
+function revealLoginScreen() {
+  var loginEl = document.getElementById('login-screen');
+  if (loginEl) {
+    loginEl.style.setProperty('display', 'flex', 'important');
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        loginEl.style.opacity = '1';
+      });
+    });
+  }
+}
+
+function applyDefaultBrandingDOM(lEl, appNameEl) {
+  if (lEl) {
+    lEl.onerror = function() {
+      this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
+    };
+    lEl.src = 'logo-white.png';
+    lEl.style.opacity = '1';
+  }
+  if (appNameEl) {
+    appNameEl.textContent = 'Arcgate';
+    appNameEl.style.opacity = '1';
+  }
+}
+
+function applyBrandingDOM(b, lEl, aEl, appNameEl) {
+  if (b.login_title) {
+    var tEl = document.getElementById('br-login-title');
+    if (tEl) tEl.textContent = b.login_title;
+  }
+  if (b.tagline) {
+    var sEl = document.getElementById('br-login-sub');
+    if (sEl) sEl.textContent = b.tagline;
+  }
+  
+  var logoSrc = b.logo_url || 'logo-white.png';
+  if (lEl) {
+    lEl.onerror = function() {
+      this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
+    };
+    lEl.src = logoSrc;
+    lEl.style.opacity = '1';
+  }
+  if (aEl) {
+    aEl.onerror = function() {
+      this.src = 'logo-white.png';
+    };
+    aEl.src = logoSrc;
+  }
+
+  if (b.app_name) {
+    document.title = b.app_name + ' — Dashboard';
     if (appNameEl) {
-      appNameEl.textContent = 'Arcgate';
+      appNameEl.textContent = b.app_name;
       appNameEl.style.opacity = '1';
     }
   }
+
+  // Inject custom accent color style overrides if set
+  if (b.accent_color) {
+    var styleEl = document.getElementById('dynamic-branding-style');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-branding-style';
+      document.head.appendChild(styleEl);
+    }
+    
+    var hexToRgba = function(hex, alpha) {
+      var c = hex.replace('#', '');
+      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+      var rVal = parseInt(c.substring(0, 2), 16);
+      var gVal = parseInt(c.substring(2, 4), 16);
+      var bVal = parseInt(c.substring(4, 6), 16);
+      return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
+    };
+    
+    styleEl.textContent = `
+      .login-btn {
+        background: ${b.accent_color} !important;
+        box-shadow: 0 4px 20px ${hexToRgba(b.accent_color, 0.28)} !important;
+      }
+      .login-btn:hover {
+        opacity: 0.95;
+      }
+      .login-link, .login-terms a {
+        color: ${b.accent_color} !important;
+      }
+      #br-app-name {
+        color: ${b.accent_color} !important;
+      }
+      input.login-field:focus {
+        border-color: ${b.accent_color} !important;
+      }
+    `;
+  }
+}
 }
