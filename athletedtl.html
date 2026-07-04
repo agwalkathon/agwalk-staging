@@ -210,28 +210,23 @@
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon green"><i class="ti ti-circle-check"></i></div>
+            <div class="stat-icon purple"><i class="ti ti-notes"></i></div>
             <div class="stat-body">
-              <div class="stat-val" id="s-emp-active">—</div>
-              <div class="stat-lbl">Active Employees</div>
+              <div class="stat-val" id="s-emp-page">—</div>
+              <div class="stat-lbl">Current Page</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon red"><i class="ti ti-circle-x"></i></div>
+            <div class="stat-icon green"><i class="ti ti-list"></i></div>
             <div class="stat-body">
-              <div class="stat-val" id="s-emp-inactive">—</div>
-              <div class="stat-lbl">Inactive Employees</div>
+              <div class="stat-val" id="s-emp-size">50</div>
+              <div class="stat-lbl">Page Size Limit</div>
             </div>
           </div>
         </div>
 
         <div class="toolbar">
-          <input type="text" id="emp-search" placeholder="Search code, name, email or department..." oninput="filterEmployees()" style="width:280px">
-          <select id="emp-status-filter" onchange="filterEmployees()">
-            <option value="">All statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+          <input type="text" id="emp-search" placeholder="Search code, name, email..." oninput="filterEmployees()" style="width:280px">
           <span id="emp-count" class="count-badge" style="margin-left:auto;"></span>
         </div>
 
@@ -256,6 +251,13 @@
               </tbody>
             </table>
           </div>
+        </div>
+
+        <!-- Pagination controls -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+          <button class="btn btn-ghost btn-sm" id="emp-prev" onclick="changeEmpPage(-1)">← Previous</button>
+          <span id="emp-page-label" style="font-size:13px;color:var(--text-secondary);font-weight:600;">Page 1</span>
+          <button class="btn btn-ghost btn-sm" id="emp-next" onclick="changeEmpPage(1)">Next →</button>
         </div>
       </div>
 
@@ -424,12 +426,16 @@
     const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
     const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
-    
+    const REG_COLUMNS = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
+
     let allRows = [];
     let allEmployees = [];
     let allRequestRows = [];
     let currentTab = 'employees';
     var _BU = 'https://agwalk-backend.onrender.com';
+    let _empPage = 0;
+    let _empSearch = '';
+    let _searchTimeout = null;
 
     function authGuard(){
       var t = sessionStorage.getItem('wk_admin_token');
@@ -484,40 +490,59 @@
     async function loadEmployees() {
       const empBody = document.getElementById('employees-body');
       if (empBody) empBody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading...</td></tr>';
+      
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+
       try {
-        allEmployees = await getAll(SUPABASE_URL + '/rest/v1/employees_master?order=full_name.asc');
-        document.getElementById('s-emp-total').textContent = allEmployees.length;
-        document.getElementById('s-emp-active').textContent = allEmployees.filter(e => e.is_active).length;
-        document.getElementById('s-emp-inactive').textContent = allEmployees.filter(e => !e.is_active).length;
-        filterEmployees();
+        const url = `${_BU}/admin/employees?page=${_empPage}&search=${encodeURIComponent(_empSearch)}`;
+        const r = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        const d = await r.json();
+        if (!d.success) throw new Error(d.error || 'Failed to load employees');
+
+        allEmployees = d.employees || [];
+        document.getElementById('s-emp-total').textContent = d.total || 0;
+        document.getElementById('s-emp-page').textContent = _empPage + 1;
+        document.getElementById('emp-page-label').textContent = 'Page ' + (_empPage + 1) + ' of ' + Math.max(1, Math.ceil((d.total || 0) / 50));
+        
+        renderEmployeesTable();
       } catch(e) {
         if (empBody) empBody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
       }
     }
 
     function filterEmployees() {
-      const q = document.getElementById('emp-search').value.toLowerCase();
-      const st = document.getElementById('emp-status-filter').value;
-      const filtered = allEmployees.filter(e => {
-        const text = [e.emp_code, e.full_name, e.email, e.department].join(' ').toLowerCase();
-        const matchesSearch = !q || text.includes(q);
-        const matchesStatus = !st || (st === 'active' && e.is_active) || (st === 'inactive' && !e.is_active);
-        return matchesSearch && matchesStatus;
-      });
-      document.getElementById('emp-count').textContent = `${filtered.length} of ${allEmployees.length} employees`;
+      const q = document.getElementById('emp-search').value.trim();
+      clearTimeout(_searchTimeout);
+      _searchTimeout = setTimeout(() => {
+        _empSearch = q;
+        _empPage = 0;
+        loadEmployees();
+      }, 350);
+    }
+
+    function renderEmployeesTable() {
       const empBody = document.getElementById('employees-body');
       if (!empBody) return;
-      if (!filtered.length) {
+      if (!allEmployees.length) {
         empBody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No employees found</td></tr>';
         return;
       }
-      empBody.innerHTML = filtered.map((e, idx) => {
+      
+      document.getElementById('emp-count').textContent = `Showing ${allEmployees.length} records`;
+
+      empBody.innerHTML = allEmployees.map((e, idx) => {
         const statusPill = e.is_active 
           ? '<span class="badge conn">Active</span>'
           : '<span class="badge danger">Inactive</span>';
         const actionBtn = `<button class="btn btn-sm btn-ghost" onclick="toggleEmployeeActive('${e.emp_code}', ${e.is_active})">${e.is_active ? 'Deactivate' : 'Activate'}</button>`;
         return `<tr style="border-bottom:1px solid var(--border)">
-          <td>${idx + 1}</td>
+          <td>${(_empPage * 50) + idx + 1}</td>
           <td><strong>${esc(e.emp_code)}</strong></td>
           <td>${esc(e.full_name)}</td>
           <td>${esc(e.email)}</td>
@@ -528,6 +553,16 @@
           <td>${actionBtn}</td>
         </tr>`;
       }).join('');
+    }
+
+    function changeEmpPage(dir) {
+      if (dir === -1 && _empPage > 0) {
+        _empPage--;
+        loadEmployees();
+      } else if (dir === 1) {
+        _empPage++;
+        loadEmployees();
+      }
     }
 
     async function toggleEmployeeActive(empCode, currentStatus) {
@@ -644,7 +679,7 @@
     async function loadParticipants() {
       try {
         const [regs, acts] = await Promise.all([
-          getAll(SUPABASE_URL + '/rest/v1/registration?order=full_name.asc'),
+          getAll(SUPABASE_URL + '/rest/v1/registration?select=' + REG_COLUMNS + '&order=full_name.asc'),
           getAll(SUPABASE_URL + '/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false')
         ]);
         
@@ -815,8 +850,8 @@
         reqBody.innerHTML = '<tr class="loading-row"><td colspan="13">Loading...</td></tr>';
       }
       try {
-        // Query pending and rejected registration requests directly from consolidated registration table
-        allRequestRows = await getAll(SUPABASE_URL + '/rest/v1/registration?status=in.(pending,rejected)&order=created_at.desc');
+        // Query pending and rejected registration requests directly from consolidated registration table requesting only safe columns
+        allRequestRows = await getAll(SUPABASE_URL + '/rest/v1/registration?status=in.(pending,rejected)&select=' + REG_COLUMNS + '&order=created_at.desc');
         
         document.getElementById('s-req-total').textContent = allRequestRows.length;
         const pendingCount = allRequestRows.filter(x => (x.status || 'pending') === 'pending').length;
