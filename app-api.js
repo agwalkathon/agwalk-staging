@@ -85,7 +85,7 @@ function getRegistrationFetchUrl(s) {
     return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(queryObj.empCode) + '&select=' + cols;
   }
   if (queryObj.email) {
-    return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(queryObj.email) + '&select=' + cols;
+    return SUPABASE_URL + '/rest/v1/registration?email=ilike.' + encodeURIComponent(queryObj.email) + '&select=' + cols;
   }
   var aId = queryObj.athleteId || (typeof athleteId !== 'undefined' ? athleteId : '');
   return SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + aId + '&select=' + cols;
@@ -1207,7 +1207,7 @@ async function bootAppUnified() {
   if (!isParticipant) {
     try {
       var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
-      var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(email) + '&select=' + cols, { headers: HDR });
+      var r = await fetch(SUPABASE_URL + '/rest/v1/registration?email=ilike.' + encodeURIComponent(email) + '&select=' + cols, { headers: HDR });
       var regs = await r.json();
       if (Array.isArray(regs) && regs.length > 0) {
         var reg = regs[0];
