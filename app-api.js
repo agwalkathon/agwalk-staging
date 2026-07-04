@@ -80,13 +80,14 @@ safeRemoveItem('agwalk_ranking_acts');
 
 function getRegistrationFetchUrl(s) {
   var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
-  if (s.empCode) {
-    return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(s.empCode) + '&select=' + cols;
+  var queryObj = s || {};
+  if (queryObj.empCode) {
+    return SUPABASE_URL + '/rest/v1/registration?emp_code=eq.' + encodeURIComponent(queryObj.empCode) + '&select=' + cols;
   }
-  if (s.email) {
-    return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(s.email) + '&select=' + cols;
+  if (queryObj.email) {
+    return SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(queryObj.email) + '&select=' + cols;
   }
-  var aId = s.athleteId || (typeof s.athleteId !== 'undefined' ? s.athleteId : '');
+  var aId = queryObj.athleteId || (typeof athleteId !== 'undefined' ? athleteId : '');
   return SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + aId + '&select=' + cols;
 }
 
