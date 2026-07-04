@@ -337,12 +337,17 @@ async function fetchEventLbState(evId) {
 async function openEventLeaderboard(ev) {
   try {
     var suffix = (ev.status === 'ended' || ev.status === 'archived') ? ' — Final Results' : '';
-    if (ev.id === _lbCurrentEventId) {
+    
+    // Check if default leaderboard data is actually loaded in memory
+    var dataLoaded = (typeof LB_REG !== 'undefined' && LB_REG && LB_REG.length > 0);
+    
+    if (ev.id === _lbCurrentEventId && dataLoaded) {
       setLbTitle(_lbCurrentEventId === 1 ? '' : '🏆 ' + ev.name + suffix);
       showTab('leaderboard');
       return;
     }
-    if (ev.id === 1 && _lbDefaultState) {
+    
+    if (ev.id === 1 && _lbDefaultState && dataLoaded) {
       applyLbState(_lbDefaultState);
       _LB_EV_RULES = null;
       _lbCurrentEventId = 1;
@@ -351,13 +356,27 @@ async function openEventLeaderboard(ev) {
       lbBoot();
       return;
     }
-    saveDefaultLbState();
-    var st = await fetchEventLbState(ev.id);
+    
+    if (ev.id !== 1 && dataLoaded) {
+      saveDefaultLbState();
+    }
+    
+    var st;
+    if (ev.id === 1 && !_lbDefaultState) {
+      st = await fetchEventLbState(ev.id);
+      _lbDefaultState = st;
+    } else {
+      st = await fetchEventLbState(ev.id);
+    }
+    
     applyLbState(st);
     _LB_EV_RULES = ev.rules_config || null;
     _lbCurrentEventId = ev.id;
-    setLbTitle('🏆 ' + ev.name + suffix);
+    setLbTitle(ev.id === 1 ? '' : '🏆 ' + ev.name + suffix);
     showTab('leaderboard');
+    
+    // Force re-calculation and rendering
+    _lbReady = false;
     lbBoot();
   } catch (e) {
     console.warn('openEventLeaderboard failed:', e);
