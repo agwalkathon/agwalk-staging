@@ -306,6 +306,17 @@ function applyLbState(st) {
   CHALLENGES_LB = st.challenges; SPECIAL_DAYS_LB = st.specialDays;
   LB_SCORES = {};
   _lbReady = false;
+
+  // Resolve LB_ME for the selected event
+  var s = {};
+  try { s = JSON.parse(localStorage.getItem('wk_user') || '{}'); } catch(e){}
+  LB_ME = null;
+  if (s.athleteId && Array.isArray(LB_REG)) {
+    LB_ME = LB_REG.find(function(r){ return String(r.strava_athlete_id) === String(s.athleteId); }) || null;
+  }
+  if (!LB_ME && Array.isArray(LB_REG) && LB_REG.length > 0) {
+    LB_ME = LB_REG[0];
+  }
 }
 
 async function fetchEventLbState(evId) {
