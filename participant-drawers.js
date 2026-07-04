@@ -575,51 +575,41 @@ function openProfileDetail(athleteId, event) {
       modal.classList.add('open');
     }, 10);
 
-    Promise.all([
-      fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=*', { headers: HDR }).then(function(r){ return r.json(); }),
-      fetch(SUPABASE_URL + '/rest/v1/participants?strava_athlete_id=eq.' + athleteId + '&select=city,state,profile_photo', { headers: HDR }).then(function(r){ return r.json(); })
-    ]).then(function(results) {
-      var regRows = results[0];
-      var partRows = results[1];
-      var city = (partRows && partRows[0] && partRows[0].city) || '';
-      var state = (partRows && partRows[0] && partRows[0].state) || '';
-      var profilePhoto = (partRows && partRows[0] && partRows[0].profile_photo) || '';
-      
-      var locationParts = [];
-      if (city) locationParts.push(city);
-      if (state) locationParts.push(state);
-      locationParts.push('India');
-      var locationStr = locationParts.join(', ');
+    fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=*', { headers: HDR })
+      .then(function(r){ return r.json(); })
+      .then(function(regRows) {
+        if (regRows && regRows.length > 0) {
+          var p = regRows[0];
+          var profilePhoto = p.profile_photo || '';
+          var locationStr = 'India';
+          
+          document.getElementById('prof-name').innerHTML = `<a href="https://www.strava.com/athletes/${athleteId}" target="_blank" style="color: #fff; text-decoration: none; border-bottom: 1.5px dashed rgba(255,255,255,0.3); transition: color 0.2s ease, border-color 0.2s ease;">${esc(p.full_name || '—')} 🇮🇳</a>`;
 
-      if (regRows && regRows.length > 0) {
-        var p = regRows[0];
-        document.getElementById('prof-name').innerHTML = `<a href="https://www.strava.com/athletes/${athleteId}" target="_blank" style="color: #fff; text-decoration: none; border-bottom: 1.5px dashed rgba(255,255,255,0.3); transition: color 0.2s ease, border-color 0.2s ease;">${esc(p.full_name || '—')} 🇮🇳</a>`;
+          // Location
+          var locEl = document.getElementById('prof-location');
+          if (locEl) {
+            locEl.innerText = '📍 ' + locationStr;
+            locEl.style.display = 'block';
+          }
 
-        // Location
-        var locEl = document.getElementById('prof-location');
-        if (locEl) {
-          locEl.innerText = '📍 ' + locationStr;
-          locEl.style.display = 'block';
-        }
-
-        var pName = p.full_name || 'Participant';
-        var pInitials = (function(){var pts=(pName||'').trim().split(/\s+/);if(pts.length>=2)return(pts[0][0]+(pts[pts.length-1][0])).toUpperCase();return(pts[0]||'?')[0].toUpperCase();})();
-        var pStyle = getAvatarStyle(pName);
-        var avEl = document.getElementById('prof-avatar');
-        if (avEl) {
-          var hasPhoto = profilePhoto && profilePhoto !== 'null' && profilePhoto !== 'undefined' && !profilePhoto.includes('large.png') && !profilePhoto.includes('avatar/athlete');
-          if (hasPhoto) {
-            avEl.textContent = '';
-            avEl.setAttribute('style', `background: url('${profilePhoto}') no-repeat center center; background-size: cover; width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);`);
-          } else {
-            avEl.textContent = pInitials;
-            avEl.setAttribute('style', pStyle + '; width:90px; height:90px; border-radius:50%; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);');
+          var pName = p.full_name || 'Participant';
+          var pInitials = (function(){var pts=(pName||'').trim().split(/\s+/);if(pts.length>=2)return(pts[0][0]+(pts[pts.length-1][0])).toUpperCase();return(pts[0]||'?')[0].toUpperCase();})();
+          var pStyle = getAvatarStyle(pName);
+          var avEl = document.getElementById('prof-avatar');
+          if (avEl) {
+            var hasPhoto = profilePhoto && profilePhoto !== 'null' && profilePhoto !== 'undefined' && !profilePhoto.includes('large.png') && !profilePhoto.includes('avatar/athlete');
+            if (hasPhoto) {
+              avEl.textContent = '';
+              avEl.setAttribute('style', `background: url('${profilePhoto}') no-repeat center center; background-size: cover; width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);`);
+            } else {
+              avEl.textContent = pInitials;
+              avEl.setAttribute('style', pStyle + '; width:90px; height:90px; border-radius:50%; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);');
+            }
           }
         }
-      }
-    }).catch(function(err) {
-      console.warn('Profile details load error:', err);
-    });
+      }).catch(function(err) {
+        console.warn('Profile details load error:', err);
+      });
 
     var _profileAthleteId = athleteId;
     var _profileTimeframe = document.getElementById('prof-timeframe-select') ? (document.getElementById('prof-timeframe-select').value || 'month') : 'month';
