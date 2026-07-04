@@ -227,12 +227,12 @@ function get2Initials(name) {
 
 function getWhoopAvatarStyle(name) {
   var colors = [
-    { border: 'rgba(232, 98, 42, 0.85)', glow: 'rgba(232, 98, 42, 0.25)', glowText: 'rgba(232, 98, 42, 0.4)' },  // Orange
-    { border: 'rgba(59, 130, 246, 0.85)', glow: 'rgba(59, 130, 246, 0.25)', glowText: 'rgba(59, 130, 246, 0.4)' }, // Blue
-    { border: 'rgba(16, 185, 129, 0.85)', glow: 'rgba(16, 185, 129, 0.25)', glowText: 'rgba(16, 185, 129, 0.4)' }, // Green
-    { border: 'rgba(139, 92, 246, 0.85)', glow: 'rgba(139, 92, 246, 0.25)', glowText: 'rgba(139, 92, 246, 0.4)' }, // Violet
-    { border: 'rgba(239, 68, 68, 0.85)', glow: 'rgba(239, 68, 68, 0.25)', glowText: 'rgba(239, 68, 68, 0.4)' },   // Red
-    { border: 'rgba(255, 208, 0, 0.85)', glow: 'rgba(255, 208, 0, 0.25)', glowText: 'rgba(255, 208, 0, 0.4)' }    // Gold
+    { r: 232, g: 98, b: 42, border: 'rgba(232, 98, 42, 0.45)', glow: 'rgba(232, 98, 42, 0.15)' },   // Orange
+    { r: 59, g: 130, b: 246, border: 'rgba(59, 130, 246, 0.45)', glow: 'rgba(59, 130, 246, 0.15)' },  // Blue
+    { r: 16, g: 185, b: 129, border: 'rgba(16, 185, 129, 0.45)', glow: 'rgba(16, 185, 129, 0.15)' },  // Green
+    { r: 139, g: 92, b: 246, border: 'rgba(139, 92, 246, 0.45)', glow: 'rgba(139, 92, 246, 0.15)' },  // Violet
+    { r: 239, g: 68, b: 68, border: 'rgba(239, 68, 68, 0.45)', glow: 'rgba(239, 68, 68, 0.15)' },    // Red
+    { r: 255, g: 208, b: 0, border: 'rgba(255, 208, 0, 0.45)', glow: 'rgba(255, 208, 0, 0.15)' }     // Gold
   ];
   var hash = 0;
   var str = name || '';
@@ -241,12 +241,14 @@ function getWhoopAvatarStyle(name) {
   }
   var idx = Math.abs(hash) % colors.length;
   var c = colors[idx];
-  return 'background: rgba(20, 24, 30, 0.75); ' +
+  
+  // Light gradient glassmorphic style
+  return 'background: linear-gradient(135deg, rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.35) 0%, rgba(255, 255, 255, 0.12) 100%); ' +
          'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); ' +
-         'border: 2px solid ' + c.border + '; ' +
-         'box-shadow: 0 0 15px ' + c.glow + ', inset 0 0 8px rgba(255,255,255,0.06); ' +
+         'border: 1.5px solid ' + c.border + '; ' +
+         'box-shadow: 0 4px 18px ' + c.glow + ', inset 0 1px 1px rgba(255,255,255,0.25); ' +
          'color: #ffffff; font-weight: 800; font-family: var(--font); ' +
-         'text-shadow: 0 0 6px ' + c.glowText + '; text-transform: uppercase;';
+         'text-shadow: 0 1px 2px rgba(0,0,0,0.3); text-transform: uppercase;';
 }
 
 function norm(s){return String(s||'').trim().toLowerCase();}
