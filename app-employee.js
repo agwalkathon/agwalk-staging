@@ -716,4 +716,3 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     `;
   }
 }
-}
