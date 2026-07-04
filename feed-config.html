@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Feed Settings — Arcgate Walkathon 2026</title>
+  <style>
+    :root {
+      --brand: #E8622A;
+      --brand-light: #FFF0EA;
+      --brand-mid: #f97d4e;
+      --sidebar-bg: #0F1117;
+      --sidebar-w: 64px;
+      --sidebar-exp: 220px;
+      --page-bg: #F4F6FA;
+      --card-bg: #fff;
+      --text-primary: #0F1117;
+      --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
+      --border: rgba(0,0,0,.07);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --font: 'Poppins',-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--page-bg); color: var(--text-primary); min-height: 100vh; display: flex; }
+    
+    /* Sidebar styling */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); display: flex; flex-direction: column; align-items: center; padding: 16px 0 12px; z-index: 300; transition: width .24s cubic-bezier(.4,0,.2,1); overflow: hidden; }
+    .sidebar:hover { width: var(--sidebar-exp); }
+    .sb-logo { display: flex; align-items: center; width: 100%; padding: 4px 14px 20px; text-decoration: none; gap: 10px; flex-shrink: 0; }
+    .sb-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-logo-icon i { color: #fff; font-size: 20px; }
+    .sb-logo-text { font-size: 13px; font-weight: 600; color: #fff; opacity: 0; white-space: nowrap; transition: opacity .18s; line-height: 1.3; }
+    .sb-logo-text span { display: block; font-size: 10px; font-weight: 400; color: rgba(255,255,255,.45); }
+    .sidebar:hover .sb-logo-text { opacity: 1; }
+    .sb-section { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.22); padding: 0 14px 6px; width: 100%; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+    .sidebar:hover .sb-section { opacity: 1; }
+    .sb-item { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; text-decoration: none; gap: 10px; border-left: 3px solid transparent; transition: all .16s; }
+    .sb-item:hover { background: rgba(255,255,255,.06); border-left-color: rgba(232,98,42,.5); }
+    .sb-item.active { background: rgba(232,98,42,.12); border-left-color: var(--brand); }
+    .sb-item i { font-size: 19px; color: rgba(255,255,255,.38); flex-shrink: 0; width: 28px; text-align: center; transition: color .16s; }
+    .sb-item:hover i { color: rgba(255,255,255,.7); }
+    .sb-item.active i { color: var(--brand); }
+    .sb-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+    .sb-spacer { flex: 1; }
+    .sb-divider { width: calc(100% - 24px); height: 1px; background: rgba(255,255,255,.07); margin: 6px 12px; flex-shrink: 0; }
+    .sb-signout { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; gap: 10px; border: none; background: none; cursor: pointer; transition: all .16s; font-family: var(--font); }
+    .sb-signout:hover { background: rgba(255,80,80,.08); }
+    .sb-signout i { font-size: 19px; color: rgba(255,255,255,.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+    
+    /* Layout main container */
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+    .topbar-left h1 { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+    .topbar-left p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .topbar-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--page-bg); transition: all .15s; }
+    .topbar-back:hover { background: #EAECF0; color: var(--text-primary); }
+    .content { flex: 1; padding: 28px 32px; width: 100%; max-width: 900px; margin: 0 auto; }
+    
+    /* Panels */
+    .card { background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+    .card-head { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-head-left { display: flex; align-items: center; gap: 10px; }
+    .card-head h2 { font-size: 15px; font-weight: 700; }
+    .card-body { padding: 24px; }
+    
+    /* Form & UI Elements */
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-bottom: 8px; }
+    
+    /* Toggle switch style */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #FAFBFD; border: 1px solid #EDF0F5; border-radius: 10px; margin-bottom: 10px; transition: background 0.2s; }
+    .toggle-row:hover { background: #F5F7FA; }
+    .toggle-info { flex: 1; margin-right: 16px; }
+    .toggle-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .toggle-desc { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+    
+    /* Custom switch */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #D1D5DB; transition: .3s; border-radius: 24px; }
+    .slider::before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--brand); }
+    input:checked + .slider::before { transform: translateX(20px); }
+    
+    /* Numeric and select inputs */
+    .input-field { width: 100%; max-width: 320px; padding: 9px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13.5px; background: #fafafa; font-family: inherit; transition: border-color 0.2s; }
+    .input-field:focus { outline: none; border-color: var(--brand); background: #fff; }
+    
+    /* Checklist items */
+    .check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 6px; }
+    .check-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #FAFBFD; border: 1px solid #EDF0F5; border-radius: 8px; cursor: pointer; user-select: none; }
+    .check-item input { accent-color: var(--brand); width: 15px; height: 15px; }
+    .check-item span { font-size: 13px; font-weight: 500; }
+    
+    /* Save btn */
+    .btn { padding: 10px 24px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 600; font-family: var(--font); transition: all .15s; }
+    .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 10px rgba(232,98,42,0.2); }
+    .btn-primary:hover { background: #d4551f; }
+    .status-msg { margin-left: 12px; font-size: 13px; font-weight: 500; display: none; }
+    .status-msg.success { color: #059669; display: inline; }
+    .status-msg.error { color: #DC2626; display: inline; }
+    
+    .site-footer { width: 100%; background: var(--card-bg); border-top: 1px solid var(--border); padding: 16px 32px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-sizing: border-box; }
+    .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
+    .site-footer a:hover { text-decoration: underline; }
+    
+    @media(max-width: 768px) {
+      .sidebar { width: 56px; }
+      .main { margin-left: 56px; }
+      .topbar { padding: 0 16px; height: 54px; }
+      .content { padding: 16px; }
+      .site-footer { flex-direction: column; gap: 6px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+    <div class="sb-section">Main</div>
+    <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+    <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+    <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+    <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+<a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+    
+    <div class="sb-section" style="margin-top:10px;">Config</div>
+    <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+    <a href="feed-config.html" class="sb-item active"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
+    <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+    <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+    <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+    <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+    <div class="sb-spacer"></div>
+    <div class="sb-divider"></div>
+    <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Feed Settings</h1>
+        <p>Manage standard activities, milestones, and filters for the Social Feed</p>
+      </div>
+      <div class="topbar-right">
+        <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-left"><span>📢</span><h2>Feed Announcement Rules</h2></div>
+        </div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Standard Activities</div>
+              <div class="toggle-desc">Publish daily walks, runs, and rides completed by participants.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-activities">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Medal Milestones</div>
+              <div class="toggle-desc">Publish when a participant unlocks a Bronze, Silver, or Gold medal.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-medals">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Distance Clubs</div>
+              <div class="toggle-desc">Publish when a participant crosses a total distance marker (100km, 200km, 300km).</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-clubs">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Leaderboard #1 Spot</div>
+              <div class="toggle-desc">Publish when a participant takes the first rank on the Leaderboard.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-rank">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Allow Flagged Activities</div>
+              <div class="toggle-desc">Allow activities marked as flagged or invalid to be visible in the Feed. (Recommended: Off)</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-flagged">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-left"><span>🔍</span><h2>Feed Content Filters</h2></div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="filter-min-dist">Minimum Activity Distance (KM)</label>
+            <input type="number" step="0.1" min="0" class="input-field" id="filter-min-dist" placeholder="e.g. 1.0">
+            <p style="font-size:11.5px;color:var(--text-secondary);margin-top:6px;">Activities shorter than this distance will be automatically ignored in the Feed.</p>
+          </div>
+
+          <div class="form-group" style="margin-top:28px;">
+            <label class="form-label">Allowed Sport Types in Feed</label>
+            <div class="check-grid">
+              <label class="check-item">
+                <input type="checkbox" class="sport-check" value="Walk" checked>
+                <span>Walk 🚶‍♂️</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="sport-check" value="Run" checked>
+                <span>Run 🏃‍♂️</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="sport-check" value="Hike" checked>
+                <span>Hike 🥾</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="sport-check" value="Ride" checked>
+                <span>Ride 🚴‍♂️</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="card-head">
+          <div class="card-head-left"><span>⚙️</span><h2>Global Feed Customization</h2></div>
+        </div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Smart Pace Filtering</div>
+              <div class="toggle-desc">Automatically hide the pace field on Walk activity cards to keep the feed clean.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-smart-pace">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Display Calculated Steps</div>
+              <div class="toggle-desc">Show estimated steps for Walk, Run, and Hike activities on the feed.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-show-steps">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Display Elevation Gain</div>
+              <div class="toggle-desc">Show elevation stats on feed cards if the activity has elevation gain > 0.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-show-elevation">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Post-Specific Emoji Reactions</div>
+              <div class="toggle-desc">Enable customized sets of emojis (e.g. fire/crown/celebrate) tailored to activity/achievement type.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-post-emojis">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Priority Feed Sorting</div>
+              <div class="toggle-desc">Sort feed chronologically, using priority tie-breakers (Rank #1 > Medals > Clubs > Daily) for bulk syncs.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-priority-sorting">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Allow Private Profiles</div>
+              <div class="toggle-desc">Allow participants to set their profiles to Private and opt-out of the global social feed.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-allow-private">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+        <span id="status-msg" class="status-msg"></span>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <span>© 2026 Arcgate Walkathon</span>
+      <div>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    var SB = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+    var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+    var H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
+
+    function authGuard(){
+      var t = sessionStorage.getItem('wk_admin_token');
+      if(!t){ window.location.href = 'admin-login.html'; return; }
+      try {
+        var p = JSON.parse(atob(t.split('.')[1]));
+        if(p.exp && p.exp*1000 < Date.now()){
+          sessionStorage.removeItem('wk_admin_token');
+          window.location.href = 'admin-login.html';
+        }
+      } catch(e) {
+        sessionStorage.removeItem('wk_admin_token');
+        window.location.href = 'admin-login.html';
+      }
+    }
+    
+    function logout(){
+      sessionStorage.removeItem('wk_admin_token');
+      sessionStorage.removeItem('wk_admin');
+      window.location.href = 'admin-login.html';
+    }
+    
+    authGuard();
+
+    async function dbGet(table, query) {
+      var r = await fetch(SB + '/rest/v1/' + table + (query || ''), { headers: H });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.message || d.hint || JSON.stringify(d));
+      return d;
+    }
+
+    async function dbUpsert(table, data) {
+      var r = await fetch(SB + '/rest/v1/' + table, {
+        method: 'POST',
+        headers: Object.assign({}, H, { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+        body: JSON.stringify(data)
+      });
+      var d = await r.json();
+      if (!r.ok) throw new Error(d.message || d.hint || JSON.stringify(d));
+      return d;
+    }
+
+    var defaultConfig = {
+      rules: {
+        allow_standard_activities: true,
+        allow_medals: true,
+        allow_distance_clubs: true,
+        allow_rank_top1: true,
+        allow_flagged_activities: false,
+        smart_pace_filter: true,
+        show_steps: true,
+        show_elevation: true,
+        post_specific_reactions: true,
+        priority_feed_sorting: true,
+        allow_private_profiles: true
+      },
+      filters: {
+        minimum_activity_distance_km: 1.0,
+        allowed_sports: ["Walk", "Run", "Hike", "Ride"]
+      }
+    };
+
+    var currentConfigId = null;
+
+    async function loadSettings() {
+      try {
+        var rows = await dbGet('leaderboard_config', '?config_key=eq.feed_config');
+        var config = defaultConfig;
+        
+        if (rows.length > 0) {
+          currentConfigId = rows[0].id;
+          try {
+            config = JSON.parse(rows[0].config_value);
+          } catch(e) {
+            console.error("Failed to parse config_value JSON:", e);
+          }
+        }
+        
+        document.getElementById('rule-activities').checked = !!config.rules.allow_standard_activities;
+        document.getElementById('rule-medals').checked = !!config.rules.allow_medals;
+        document.getElementById('rule-clubs').checked = !!config.rules.allow_distance_clubs;
+        document.getElementById('rule-rank').checked = !!config.rules.allow_rank_top1;
+        document.getElementById('rule-flagged').checked = !!config.rules.allow_flagged_activities;
+        document.getElementById('rule-smart-pace').checked = config.rules.smart_pace_filter !== false;
+        document.getElementById('rule-show-steps').checked = config.rules.show_steps !== false;
+        document.getElementById('rule-show-elevation').checked = config.rules.show_elevation !== false;
+        document.getElementById('rule-post-emojis').checked = config.rules.post_specific_reactions !== false;
+        document.getElementById('rule-priority-sorting').checked = config.rules.priority_feed_sorting !== false;
+        document.getElementById('rule-allow-private').checked = config.rules.allow_private_profiles !== false;
+        document.getElementById('filter-min-dist').value = config.filters.minimum_activity_distance_km !== undefined ? config.filters.minimum_activity_distance_km : 1.0;
+        
+        var allowedSports = config.filters.allowed_sports || ["Walk", "Run", "Hike", "Ride"];
+        var sportChecks = document.querySelectorAll('.sport-check');
+        sportChecks.forEach(function(checkbox) {
+          checkbox.checked = allowedSports.indexOf(checkbox.value) > -1;
+        });
+        
+      } catch(err) {
+        showStatus('Error loading settings: ' + err.message, 'error');
+      }
+    }
+
+    async function saveSettings() {
+      var sportChecks = document.querySelectorAll('.sport-check');
+      var selectedSports = [];
+      sportChecks.forEach(function(checkbox) {
+        if (checkbox.checked) selectedSports.push(checkbox.value);
+      });
+
+      var newConfig = {
+        rules: {
+          allow_standard_activities: document.getElementById('rule-activities').checked,
+          allow_medals: document.getElementById('rule-medals').checked,
+          allow_distance_clubs: document.getElementById('rule-clubs').checked,
+          allow_rank_top1: document.getElementById('rule-rank').checked,
+          allow_flagged_activities: document.getElementById('rule-flagged').checked,
+          smart_pace_filter: document.getElementById('rule-smart-pace').checked,
+          show_steps: document.getElementById('rule-show-steps').checked,
+          show_elevation: document.getElementById('rule-show-elevation').checked,
+          post_specific_reactions: document.getElementById('rule-post-emojis').checked,
+          priority_feed_sorting: document.getElementById('rule-priority-sorting').checked,
+          allow_private_profiles: document.getElementById('rule-allow-private').checked
+        },
+        filters: {
+          minimum_activity_distance_km: parseFloat(document.getElementById('filter-min-dist').value || 0),
+          allowed_sports: selectedSports
+        }
+      };
+
+      var payload = {
+        config_key: 'feed_config',
+        config_value: JSON.stringify(newConfig)
+      };
+      
+      if (currentConfigId) {
+        payload.id = currentConfigId;
+      }
+
+      try {
+        await dbUpsert('leaderboard_config', payload);
+        showStatus('Settings saved successfully!', 'success');
+        loadSettings();
+      } catch(err) {
+        showStatus('Failed to save: ' + err.message, 'error');
+      }
+    }
+
+    function showStatus(msg, type) {
+      var el = document.getElementById('status-msg');
+      el.textContent = msg;
+      el.className = 'status-msg ' + type;
+      setTimeout(function() {
+        el.className = 'status-msg';
+      }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadSettings);
+  </script>
+</body>
+</html>
