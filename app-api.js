@@ -187,9 +187,9 @@ async function load(isBackgroundRefresh) {
       setTimeout(function(){
         Promise.all([
           fetch(getRegistrationFetchUrl(s),{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
-          fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc').then(function(d){cacheSet('acts_v3_'+athleteId,d);}),
+          fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc').then(function(d){cacheSet('acts_v3_'+athleteId,d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
-          fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
+          fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
           fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('medals',d);})
         ]).then(function(){
@@ -219,9 +219,9 @@ async function load(isBackgroundRefresh) {
       console.log('[Cache] Cache miss — fetching Phase 1 from Supabase...');
       var [regRes,myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
         fetch(getRegistrationFetchUrl(s),{headers:HDR}),
-        fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=is.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc'),
+        fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc'),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
-        fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=is.true&select=*',{headers:HDR}),
+        fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR})
       ]);
@@ -732,7 +732,7 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
                 fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
@@ -753,7 +753,7 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=is.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
             fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v3', allActsRaw);
