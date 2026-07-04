@@ -46,7 +46,9 @@
         isPart = u && u.loggedIn;
       } catch(e){}
       if (isEmp || isPart) {
-        window.location.replace("app.html" + window.location.search);
+        var cb = "v=" + Date.now();
+        var qs = window.location.search ? ("&" + window.location.search.substring(1)) : "";
+        window.location.replace("app.html?" + cb + qs);
       } else {
         document.write('<style>#splash-screen { display: none !important; }</style>');
       }
