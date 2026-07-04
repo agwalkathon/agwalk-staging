@@ -575,7 +575,8 @@ function openProfileDetail(athleteId, event) {
       modal.classList.add('open');
     }, 10);
 
-    fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=*', { headers: HDR })
+    var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
+    fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=' + cols, { headers: HDR })
       .then(function(r){ return r.json(); })
       .then(function(regRows) {
         if (regRows && regRows.length > 0) {
