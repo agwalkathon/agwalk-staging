@@ -98,12 +98,12 @@
     .toolbar input:focus, .toolbar select:focus { border-color: var(--brand); }
     .count-badge { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
     
-    /* Table styling */
+    /* Table styling with explicit widths and horizontal scroll support */
     .card { background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; }
     .table-wrap { overflow-x: auto; width: 100%; }
-    table { width: 100%; border-collapse: collapse; min-width: 1000px; text-align: left; }
-    th { padding: 12px 16px; border-bottom: 2px solid var(--border); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); background: #FAFBFD; }
-    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+    table { width: 100%; border-collapse: collapse; text-align: left; table-layout: auto; }
+    th { padding: 12px 16px; border-bottom: 2px solid var(--border); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); background: #FAFBFD; white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; white-space: nowrap; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #FAFBFD; }
     
@@ -235,15 +235,15 @@
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Employee Code</th>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Department</th>
-                  <th>DOB</th>
-                  <th>Joining Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th style="width: 60px;">#</th>
+                  <th style="width: 140px;">Employee Code</th>
+                  <th style="min-width: 180px;">Full Name</th>
+                  <th style="min-width: 220px;">Email</th>
+                  <th style="min-width: 150px;">Department</th>
+                  <th style="width: 110px;">DOB</th>
+                  <th style="width: 120px;">Joining Date</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 120px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="employees-body">
@@ -316,21 +316,19 @@
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Team</th>
-                  <th>Shift</th>
-                  <th>Gender</th>
-                  <th>Strava</th>
-                  <th>Activities</th>
-                  <th>Manual Sync</th>
-                  <th>Status</th>
-                  <th>Feed</th>
+                  <th style="width: 60px;">#</th>
+                  <th style="min-width: 180px;">Name</th>
+                  <th style="width: 100px;">Role</th>
+                  <th style="width: 90px;">Gender</th>
+                  <th style="width: 180px;">Strava</th>
+                  <th style="width: 110px;">Activities</th>
+                  <th style="width: 100px;">Manual Sync</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 120px;">Feed</th>
                 </tr>
               </thead>
               <tbody id="participants-body">
-                <tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+                <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -391,23 +389,21 @@
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Status</th>
-                  <th>Name</th>
-                  <th>Emp Code</th>
-                  <th>Gender</th>
-                  <th>Event</th>
-                  <th>Email</th>
-                  <th>WhatsApp</th>
-                  <th>Shift</th>
-                  <th>Team Lead</th>
-                  <th>T-shirt</th>
-                  <th>Submitted</th>
-                  <th>Action</th>
+                  <th style="width: 150px;">Action</th>
+                  <th style="width: 80px;">ID</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="min-width: 180px;">Name</th>
+                  <th style="width: 110px;">Emp Code</th>
+                  <th style="width: 80px;">Gender</th>
+                  <th style="min-width: 150px;">Event</th>
+                  <th style="min-width: 200px;">Email</th>
+                  <th style="width: 110px;">Shift</th>
+                  <th style="min-width: 150px;">Team Lead</th>
+                  <th style="min-width: 160px;">Submitted</th>
                 </tr>
               </thead>
               <tbody id="requests-body">
-                <tr class="loading-row"><td colspan="13">Loading...</td></tr>
+                <tr class="loading-row"><td colspan="11">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -599,8 +595,6 @@
               <div class="muted">${esc(p.email || '')}</div>
             </td>
             <td>${roleDrop(p)}</td>
-            <td>${esc(p.leaderboard_team || '—')}</td>
-            <td>${esc(p.shift || '—')}</td>
             <td>${esc(p.gender || '—')}</td>
             <td>
               <div style="display:flex;align-items:center;gap:6px;">
@@ -627,7 +621,7 @@
               </button>
             </td>
           </tr>`).join('')
-        : '<tr><td colspan="11" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
+        : '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
     }
 
     function filterTable() {
@@ -708,7 +702,7 @@
         filterTable();
       } catch(e) {
         document.getElementById('participants-body').innerHTML =
-          `<tr><td colspan="11" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+          `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
       }
     }
 
@@ -823,11 +817,10 @@
     function exportCSV() {
       const rows = window._exportParticipants || [];
       if (!rows.length) { alert('No data to export.'); return; }
-      const headers = ['Full Name','Employee Code','Gender','Email','WhatsApp','Shift','T-Shirt Size','Team','Team Lead','Strava ID','Activities','Distance (km)','Strava Connected'];
+      const headers = ['Full Name','Employee Code','Gender','Email','Shift','Team','Team Lead','Strava ID','Activities','Distance (km)','Strava Connected'];
       const data = rows.map(r => [
         r.full_name||'', r.emp_code||'', r.gender||'', r.email||'',
-        r.mobile||r.whatsapp||'', r.shift||'', r.tshirt_size||'', r.leaderboard_team||'',
-        r.project_lead||r.team_lead||'', r.strava_athlete_id||'',
+        r.shift||'', r.leaderboard_team||'', r.project_lead||r.team_lead||'', r.strava_athlete_id||'',
         r.cnt||0, r.dist ? (r.dist/1000).toFixed(2) : '0',
         r.connected ? 'Yes' : 'No'
       ].map(v => '"' + String(v).replace(/"/g,'""') + '"'));
@@ -847,7 +840,7 @@
     async function loadRequests() {
       const reqBody = document.getElementById('requests-body');
       if (reqBody) {
-        reqBody.innerHTML = '<tr class="loading-row"><td colspan="13">Loading...</td></tr>';
+        reqBody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading...</td></tr>';
       }
       try {
         // Query pending and rejected registration requests directly from consolidated registration table requesting only safe columns
@@ -874,7 +867,7 @@
       } catch (err) {
         console.error('Failed to load registration requests:', err);
         if (reqBody) {
-          reqBody.innerHTML = `<tr class="loading-row"><td colspan="13" style="color:#DC2626">Error loading requests: ${esc(err.message)}</td></tr>`;
+          reqBody.innerHTML = `<tr class="loading-row"><td colspan="11" style="color:#DC2626">Error loading requests: ${esc(err.message)}</td></tr>`;
         }
       }
     }
@@ -899,7 +892,7 @@
       if (!reqBody) return;
       
       if (!rows.length) {
-        reqBody.innerHTML = '<tr class="loading-row"><td colspan="13">No requests found</td></tr>';
+        reqBody.innerHTML = '<tr class="loading-row"><td colspan="11">No requests found</td></tr>';
         return;
       }
       
@@ -919,6 +912,7 @@
         }
         
         return `<tr>
+          <td style="padding-left:16px;"><div style="display:flex;gap:6px;">${actions}</div></td>
           <td>${r.id}</td>
           <td>${getStatusBadge(st)}</td>
           <td><strong>${esc(r.full_name)}</strong></td>
@@ -926,12 +920,9 @@
           <td>${esc(r.gender || '—')}</td>
           <td>${esc(r.event_name || '—')}</td>
           <td>${esc(r.email || '—')}</td>
-          <td>${esc(r.mobile || r.whatsapp || '—')}</td>
           <td>${esc(r.shift || '—')}</td>
           <td>${esc(r.project_lead || r.team_lead || '—')}</td>
-          <td>${esc(r.tshirt_size || '—')}</td>
           <td>${fmtReqDate(r.created_at)}</td>
-          <td><div style="display:flex;gap:6px;">${actions}</div></td>
         </tr>`;
       }).join('');
     }
