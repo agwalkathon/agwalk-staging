@@ -120,7 +120,9 @@ async function verifyCode(){
     // Redirect to app.html if logging in from the index/login gateway
     var path = window.location.pathname;
     if (path.includes("index.html") || path.endsWith("/") || path.endsWith("/agwalk-staging")) {
-      window.location.replace("app.html" + window.location.search);
+      var cb = "v=" + Date.now();
+      var qs = window.location.search ? ("&" + window.location.search.substring(1)) : "";
+      window.location.replace("app.html?" + cb + qs);
     } else if (window.bootAppUnified) {
       await window.bootAppUnified();
     } else {
