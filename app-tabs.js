@@ -1188,10 +1188,11 @@ function renderStanding() {
     var tLabelEl = document.getElementById('standing-team-label'); if (tLabelEl) tLabelEl.textContent=teamLabel;
     var tRankEl = document.getElementById('standing-team-rank'); if (tRankEl) tRankEl.innerHTML=teamRank?ordinal(teamRank):'—';
 
+    var teamLbEnabled = CONFIG_LB.team_leaderboard_enabled !== false;
     var isTop3Individual = shiftRank && shiftRank <= 3;
     var standingGrid = document.querySelector('.standing-grid');
     var teamCard = tRankEl ? tRankEl.closest('.standing-card') : null;
-    if(isTop3Individual){
+    if(isTop3Individual || !teamLbEnabled){
       if(teamCard) teamCard.style.display='none';
       if(standingGrid) standingGrid.style.gridTemplateColumns='1fr';
     } else {
@@ -1211,6 +1212,19 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
   if (!_notificationsLoaded) return;
   if (window._checkingMilestones) return;
   window._checkingMilestones = true;
+
+  var _alreadyAnnouncedMilestones = {};
+  try {
+    var annRes = await fetch(SUPABASE_URL + '/rest/v1/announcements?tagged_athlete_id=eq.' + athleteId + '&select=title', { headers: HDR });
+    var annData = await annRes.json();
+    if (Array.isArray(annData)) {
+      annData.forEach(function(ann) {
+        if (ann.title) {
+          _alreadyAnnouncedMilestones[ann.title] = true;
+        }
+      });
+    }
+  } catch(e) { console.warn('Failed to load athlete announcements:', e); }
 
   async function triggerAchievement(triggerKey, vars) {
     if (!athleteId) return;
@@ -1270,7 +1284,7 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     for (var i = 0; i < currentMedals.length; i++) {
       var mKey = currentMedals[i];
       var searchTitle = mKey === 'medal_bronze' ? 'Bronze Medal' : mKey === 'medal_silver' ? 'Silver Medal' : 'Gold Medal';
-      var alreadyNotifiedDb = _notificationsList.some(function(n) {
+      var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(searchTitle) || _notificationsList.some(function(n) {
         return n.title && n.title.indexOf(searchTitle) !== -1;
       });
       if (prevMedals.indexOf(mKey) === -1 && !alreadyNotifiedDb) {
@@ -1299,7 +1313,7 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     for (var i = 0; i < clubsToCheck.length; i++) {
       var club = clubsToCheck[i];
       if (totalKm >= club.thresh) {
-        var alreadyNotifiedDb = _notificationsList.some(function(n) {
+        var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(club.title) || _notificationsList.some(function(n) {
           return n.title && n.title.indexOf(club.title) !== -1;
         });
         if (prevClubs.indexOf(club.key) === -1 && !alreadyNotifiedDb) {
@@ -1317,7 +1331,7 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
         var qualifies = myActs.some(function(act) { return checkChallengeSingle(act, c); });
         if (qualifies) {
           completedChallenges.push(c.id);
-          var alreadyNotifiedDb = _notificationsList.some(function(n) {
+          var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(c.name) || _notificationsList.some(function(n) {
             return n.title && n.title.indexOf(c.name) !== -1;
           });
           if (prevChallenges.indexOf(c.id) === -1 && !alreadyNotifiedDb) {
@@ -2463,20 +2477,30 @@ function openNotificationItem(n) {
   // Close dropdown
   var dropdown = document.getElementById('notification-dropdown');
   if (dropdown) dropdown.style.display = 'none';
-  // Navigate to feed tab + highlight the post
-  if (n.url && n.url.startsWith('feed:')) {
-    var annId = n.url.split(':')[1];
-    showTab('feed');
-    setTimeout(function() {
-      var btn = document.querySelector('button[data-ann-id="' + annId + '"]');
-      var card = btn ? btn.closest('.feed-card') : null;
-      if (card) {
-        card.scrollIntoView({ behavior:'smooth', block:'center' });
-        card.style.transition = 'box-shadow 0.4s ease';
-        card.style.boxShadow = '0 0 0 2px var(--brand)';
-        setTimeout(function(){ card.style.boxShadow = ''; }, 2200);
+  
+  if (n.url) {
+    if (n.url.startsWith('feed:')) {
+      var annId = n.url.split(':')[1];
+      showTab('feed');
+      setTimeout(function() {
+        var btn = document.querySelector('button[data-ann-id="' + annId + '"]');
+        var card = btn ? btn.closest('.feed-card') : null;
+        if (card) {
+          card.scrollIntoView({ behavior:'smooth', block:'center' });
+          card.style.transition = 'box-shadow 0.4s ease';
+          card.style.boxShadow = '0 0 0 2px var(--brand)';
+          setTimeout(function(){ card.style.boxShadow = ''; }, 2200);
+        }
+      }, 320);
+    } else if (n.url.startsWith('activity:')) {
+      var actId = n.url.split(':')[1];
+      if (typeof openActivityDetail === 'function') {
+        openActivityDetail(actId, null, true);
       }
-    }, 320);
+    } else if (n.url.startsWith('tab:')) {
+      var targetTab = n.url.split(':')[1];
+      showTab(targetTab);
+    }
   }
 }
 
@@ -3131,19 +3155,42 @@ function setupAppLayout(isParticipant) {
   
   document.body.classList.toggle('employee-mode', !isParticipant);
   
+  var allTabs = ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'];
+  
   if (isParticipant) {
-    TAB_ORDER = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
-    document.getElementById('bnav-dashboard').style.display = 'flex';
-    document.getElementById('bnav-leaderboard').style.display = 'flex';
-    document.getElementById('bnav-events').style.display = 'flex';
-    document.getElementById('bnav-celebrate').style.display = 'flex';
-    document.getElementById('bnav-you').style.display = 'flex';
+    var rawOrder = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
+    var cfg = CONFIG_LB.tabs_config || {};
+    TAB_ORDER = [];
+    rawOrder.forEach(function(t) {
+      if (cfg[t] !== false) {
+        TAB_ORDER.push(t);
+      }
+    });
+    // Add feed if enabled
+    if (CONFIG_LB.announcements_enabled && cfg.feed !== false) {
+      TAB_ORDER.splice(TAB_ORDER.indexOf('you') >= 0 ? TAB_ORDER.indexOf('you') : TAB_ORDER.length, 0, 'feed');
+    }
+    if (TAB_ORDER.length === 0) {
+      TAB_ORDER = ['you'];
+    }
     
-    document.getElementById('tab-dashboard').classList.remove('hidden-tab');
-    document.getElementById('tab-leaderboard').classList.remove('hidden-tab');
-    document.getElementById('tab-events').classList.remove('hidden-tab');
-    document.getElementById('tab-celebrate').classList.remove('hidden-tab');
-    document.getElementById('tab-you').classList.remove('hidden-tab');
+    allTabs.forEach(function(t) {
+      var isVisible = TAB_ORDER.indexOf(t) !== -1;
+      var bnavBtn = document.getElementById('bnav-' + t);
+      var tabPane = document.getElementById('tab-' + t);
+      
+      if (bnavBtn) bnavBtn.style.display = isVisible ? 'flex' : 'none';
+      if (tabPane) {
+        if (isVisible) tabPane.classList.remove('hidden-tab');
+        else tabPane.classList.add('hidden-tab');
+      }
+    });
+
+    var teamLbEnabled = CONFIG_LB.team_leaderboard_enabled !== false;
+    var teamBtn = document.getElementById('lb-tab-team');
+    if (teamBtn) {
+      teamBtn.style.display = teamLbEnabled ? 'block' : 'none';
+    }
 
     var backBtn = document.getElementById('lb-back-to-events-row');
     if (backBtn) backBtn.style.display = 'none';
@@ -3156,17 +3203,18 @@ function setupAppLayout(isParticipant) {
     if (typeof switchYouTab === 'function') switchYouTab('activities');
   } else {
     TAB_ORDER = ['celebrate', 'events', 'leaderboard', 'you'];
-    document.getElementById('bnav-dashboard').style.display = 'none';
-    document.getElementById('bnav-leaderboard').style.display = 'none';
-    document.getElementById('bnav-events').style.display = 'flex';
-    document.getElementById('bnav-celebrate').style.display = 'flex';
-    document.getElementById('bnav-you').style.display = 'flex';
     
-    document.getElementById('tab-dashboard').classList.add('hidden-tab');
-    document.getElementById('tab-leaderboard').classList.remove('hidden-tab');
-    document.getElementById('tab-events').classList.remove('hidden-tab');
-    document.getElementById('tab-celebrate').classList.remove('hidden-tab');
-    document.getElementById('tab-you').classList.remove('hidden-tab');
+    allTabs.forEach(function(t) {
+      var isVisible = TAB_ORDER.indexOf(t) !== -1;
+      var bnavBtn = document.getElementById('bnav-' + t);
+      var tabPane = document.getElementById('tab-' + t);
+      
+      if (bnavBtn) bnavBtn.style.display = isVisible ? 'flex' : 'none';
+      if (tabPane) {
+        if (isVisible) tabPane.classList.remove('hidden-tab');
+        else tabPane.classList.add('hidden-tab');
+      }
+    });
 
     var backBtn = document.getElementById('lb-back-to-events-row');
     if (backBtn) backBtn.style.display = 'block';
@@ -3203,6 +3251,6 @@ function setupAppLayout(isParticipant) {
     });
   }
   
-  var defaultTab = isParticipant ? 'dashboard' : 'celebrate';
+  var defaultTab = TAB_ORDER[0] || 'you';
   showTab(defaultTab);
 }
