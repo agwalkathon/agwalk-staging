@@ -590,7 +590,12 @@ async function loadBranding() {
         lEl.src = logoSrc;
         lEl.style.opacity = '1';
       }
-      if (aEl) aEl.src = logoSrc;
+      if (aEl) {
+        aEl.onerror = function() {
+          this.src = 'logo-white.png';
+        };
+        aEl.src = logoSrc;
+      }
 
       if (b.app_name) {
         document.title = b.app_name + ' — Dashboard';
