@@ -141,7 +141,7 @@
     var rows = null;
     try {
       rows = await fetchJSON(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + ctx.athleteId +
-        '&event_id=eq.' + ev.id + '&is_deleted=is.false&is_flagged=is.false' +
+        '&event_id=eq.' + ev.id + '&is_deleted=eq.false&is_flagged=eq.false' +
         '&select=distance_meters,elevation_gain,moving_time_seconds,steps,activity_date,activity_date_time_ist');
     } catch(e){ return; }
     var acts = Array.isArray(rows) ? rows : [];
