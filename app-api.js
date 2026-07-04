@@ -57,6 +57,27 @@ async function fetchAllParallel(url) {
 
 // Caching Layer
 var CACHE_TTL = { personal: 5*60*1000, config: 10*60*1000, ranking: 5*60*1000, reg: 30*60*1000 };
+var EVENT_ROW = { id: 1, start_date: '2026-06-01', end_date: '2026-06-30' };
+
+function getEventUTCStart() {
+  var dStr = (EVENT_ROW && EVENT_ROW.start_date) || '2026-06-01';
+  return new Date(dStr + 'T00:00:00+05:30').toISOString().replace('.000Z', 'Z');
+}
+function getEventUTCEnd() {
+  var dStr = (EVENT_ROW && EVENT_ROW.end_date) || '2026-06-30';
+  var d = new Date(dStr + 'T23:59:59.999+05:30');
+  return d.toISOString().replace('.000Z', 'Z');
+}
+function getEventCutoffUTC() {
+  var dStr = (EVENT_ROW && EVENT_ROW.end_date) || '2026-06-30';
+  var d = new Date(dStr + 'T00:00:00+05:30');
+  d.setDate(d.getDate() + 1);
+  var y = d.getFullYear();
+  var m = String(d.getMonth() + 1).padStart(2, '0');
+  var day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day + 'T11:00:00Z';
+}
+
 function cacheSet(key, data) {
   safeSetItem('agwalk_' + key, JSON.stringify({ ts: Date.now(), data: data }));
 }
@@ -175,19 +196,33 @@ async function load(isBackgroundRefresh) {
   loadNotifications();
   try {
     // ── Phase 1: Load personal data with cache ────────────────────────────────
+    var _cachedEv    = cacheGet('event_row_'+athleteId, CACHE_TTL.reg);
     var _cachedReg   = cacheGet('reg_'+athleteId, CACHE_TTL.reg);
     var _cachedActs  = cacheGet('acts_v3_'+athleteId, CACHE_TTL.personal);
     var _cachedCfg   = cacheGet('config', CACHE_TTL.config);
     var _cachedCh    = cacheGet('challenges', CACHE_TTL.config);
     var _cachedSd    = cacheGet('special_days', CACHE_TTL.config);
     var _cachedMedal = cacheGet('medals', CACHE_TTL.config);
-    var _allFromCache = _cachedReg && _cachedActs && _cachedCfg && _cachedCh && _cachedSd && _cachedMedal;
+    var _allFromCache = _cachedEv && _cachedReg && _cachedActs && _cachedCfg && _cachedCh && _cachedSd && _cachedMedal;
+
+    if (_allFromCache) {
+      EVENT_ROW = _cachedEv;
+    }
 
     if (_allFromCache && !isBackgroundRefresh) {
       setTimeout(function(){
         Promise.all([
-          fetch(getRegistrationFetchUrl(s),{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('reg_'+athleteId,d);}),
-          fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc').then(function(d){cacheSet('acts_v3_'+athleteId,d);}),
+          fetch(getRegistrationFetchUrl(s),{headers:HDR}).then(function(r){return r.json();}).then(function(d){
+            cacheSet('reg_'+athleteId,d);
+            var reg = Array.isArray(d) && d.length ? d[0] : {};
+            var evId = reg.event_id || 1;
+            fetch(SUPABASE_URL + '/rest/v1/events?id=eq.' + evId, { headers: HDR }).then(function(r){return r.json();}).then(function(evData){
+              if (Array.isArray(evData) && evData.length > 0) {
+                cacheSet('event_row_' + athleteId, evData[0]);
+              }
+            });
+          }),
+          fetchAll(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=activity_date.desc').then(function(d){cacheSet('acts_v3_'+athleteId,d);}),
           fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
           fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
           fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
@@ -217,15 +252,35 @@ async function load(isBackgroundRefresh) {
       medalData    = _cachedMedal;
     } else {
       console.log('[Cache] Cache miss — fetching Phase 1 from Supabase...');
-      var [regRes,myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
-        fetch(getRegistrationFetchUrl(s),{headers:HDR}),
-        fetchAll(SUPABASE_URL+'/rest/v1/activities?strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=activity_date.desc'),
+      var regRes = await fetch(getRegistrationFetchUrl(s),{headers:HDR});
+      regJsonData = await regRes.json(); cacheSet('reg_'+athleteId, regJsonData);
+      var reg = Array.isArray(regJsonData) && regJsonData.length ? regJsonData[0] : {};
+      
+      // Resolve Event Row
+      var eventId = reg.event_id || 1;
+      try {
+        var evRes = await fetch(SUPABASE_URL + '/rest/v1/events?id=eq.' + eventId, { headers: HDR });
+        var evData = await evRes.json();
+        if (Array.isArray(evData) && evData.length > 0) {
+          EVENT_ROW = evData[0];
+        } else {
+          // Fallback to first live event
+          var liveRes = await fetch(SUPABASE_URL + '/rest/v1/events?status=eq.live&limit=1', { headers: HDR });
+          var liveData = await liveRes.json();
+          if (Array.isArray(liveData) && liveData.length > 0) {
+            EVENT_ROW = liveData[0];
+          }
+        }
+      } catch(e) { console.warn('Failed to resolve event row:', e); }
+      cacheSet('event_row_'+athleteId, EVENT_ROW);
+
+      var [myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
+        fetchAll(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=activity_date.desc'),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR})
       ]);
-      regJsonData = await regRes.json(); cacheSet('reg_'+athleteId, regJsonData);
       myActs      = myActsFetched;       cacheSet('acts_v3_'+athleteId, myActs);
       cfgRows     = await cfgRes.json(); cacheSet('config', cfgRows);
       chRows      = await chRes.json();  cacheSet('challenges', chRows);
@@ -241,12 +296,22 @@ async function load(isBackgroundRefresh) {
         if(row.config_key==='announcements_enabled') CONFIG_LB.announcements_enabled=(row.config_value===true||row.config_value==='true');
         if(row.config_key==='maintenance_mode') CONFIG_LB.maintenance_mode=(row.config_value===true||row.config_value==='true');
         if(row.config_key==='maintenance_message') CONFIG_LB.maintenance_message=(typeof row.config_value==='string'?row.config_value:'')||'';
+        if(row.config_key==='hide_strava_connect') CONFIG_LB.hide_strava_connect=(row.config_value===true||row.config_value==='true');
+        if(row.config_key==='team_leaderboard_enabled') CONFIG_LB.team_leaderboard_enabled=(row.config_value===true||row.config_value==='true');
+        if(row.config_key==='tabs_config') CONFIG_LB.tabs_config=row.config_value||{};
         if(row.config_key==='feed_config') {
           try {
             CONFIG_LB.feed_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
           } catch(e) { console.error("Failed to parse feed_config:", e); }
         }
       });
+    }
+
+    // Enforce Strava Connect Card visibility
+    var hideStrava = CONFIG_LB.hide_strava_connect === true;
+    var sContainer = document.getElementById('strava-connect-container');
+    if (sContainer) {
+      sContainer.style.display = hideStrava ? 'none' : 'block';
     }
 
     if (window.enforceForceInstallPWA) {
@@ -488,8 +553,8 @@ async function load(isBackgroundRefresh) {
 
     (function(){
       var validA=myActs.filter(function(a){return !a.is_flagged;});
-      var EVENT_START=new Date('2026-06-01T00:00:00+05:30');
-      var EVENT_END=new Date('2026-06-30T23:59:59+05:30');
+      var EVENT_START=new Date((EVENT_ROW && EVENT_ROW.start_date || '2026-06-01') + 'T00:00:00+05:30');
+      var EVENT_END=new Date((EVENT_ROW && EVENT_ROW.end_date || '2026-06-30') + 'T23:59:59+05:30');
       var nowD=new Date();
       var totalEventDays=Math.round((Math.min(nowD,EVENT_END)-EVENT_START)/86400000)+1;
       var activeDaysSet={};
@@ -551,13 +616,18 @@ async function load(isBackgroundRefresh) {
         });
         var todayStr=new Date().toISOString().split('T')[0];
         grid.innerHTML='';
-        for(var d=1;d<=30;d++){
-          var ds='2026-06-'+(d<10?'0':'')+d;
+        var eventDaysCount = Math.round((EVENT_END - EVENT_START) / 86400000);
+        for(var d=1;d<=eventDaysCount;d++){
+          var currentDayDate = new Date(EVENT_START.getTime() + (d - 1) * 24 * 60 * 60 * 1000);
+          var y = currentDayDate.getFullYear();
+          var m = String(currentDayDate.getMonth() + 1).padStart(2, '0');
+          var dayVal = String(currentDayDate.getDate()).padStart(2, '0');
+          var ds = y + '-' + m + '-' + dayVal;
           var cell=document.createElement('div');
           cell.className='hm-day';
           var km=dayKmMap[ds]||0;
           cell.title=ds+(km>0?' · '+km.toFixed(1)+' km':'');
-          cell.textContent=d;
+          cell.textContent=currentDayDate.getDate();
           if(ds>todayStr){cell.classList.add('future');}
           else if(km>=21){cell.classList.add('km-21');}
           else if(km>=15){cell.classList.add('km-15');}
@@ -810,8 +880,8 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
                   if (_touchInteracting) {
@@ -831,8 +901,8 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?is_deleted=eq.false&created_at=lt.2026-07-01T11:00:00Z&activity_date=gte.2026-05-31T18:30:00Z&activity_date=lte.2026-06-30T18:30:00Z&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v3', allActsRaw);
           allRegRaw  = fetched[1]; cacheSet('ranking_reg',  allRegRaw);
@@ -850,7 +920,7 @@ async function load(isBackgroundRefresh) {
 
     // Pace Goals Card
     var now=new Date();
-    var EVENT_END=new Date('2026-06-30T23:59:59+05:30');
+    var EVENT_END=new Date((EVENT_ROW && EVENT_ROW.end_date || '2026-06-30') + 'T23:59:59+05:30');
     var daysLeft=Math.max(0,Math.ceil((EVENT_END-now)/(1000*60*60*24)));
     var todayStr=getISTDate(now.toISOString());
     var todayKm=myActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return getActDate(a)===todayStr?s+(a.distance_meters||0)/1000:s;},0);
@@ -879,7 +949,7 @@ async function load(isBackgroundRefresh) {
       paceCard.innerHTML='';
 
       if(myPts>=goldThresh){
-        var daysElapsed=Math.max(1,(now-new Date('2026-06-01T00:00:00+05:30'))/86400000);
+        var daysElapsed=Math.max(1,(now-new Date((EVENT_ROW && EVENT_ROW.start_date || '2026-06-01') + 'T00:00:00+05:30'))/86400000);
         var avgKmDay=fullPts.km/daysElapsed;
         var goldActsMap={};
         allActs.forEach(function(a){if(!goldActsMap[a.strava_athlete_id])goldActsMap[a.strava_athlete_id]=[];goldActsMap[a.strava_athlete_id].push(a);});
@@ -926,7 +996,7 @@ async function load(isBackgroundRefresh) {
           );
         paceCard.appendChild(div);
       } else {
-        var daysElapsed2=Math.max(1,(now-new Date('2026-06-01T00:00:00+05:30'))/86400000);
+        var daysElapsed2=Math.max(1,(now-new Date((EVENT_ROW && EVENT_ROW.start_date || '2026-06-01') + 'T00:00:00+05:30'))/86400000);
         var avgKmDay2=fullPts.km/daysElapsed2;
         var projectedPts2=(myPts+(avgKmDay2*daysLeft)).toFixed(0);
         var icoCalPace='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
