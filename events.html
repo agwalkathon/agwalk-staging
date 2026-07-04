@@ -155,6 +155,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <input type="file" id="logo-file" accept="image/*" style="display:none">
       </div>
     </div>
+    <div class="fld"><label>Event Display Name (shown if no logo)</label>
+      <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
+    </div>
   </div>
   <div id="dashboard-config-block">
   <div class="subhead">Participant Dashboard</div>
@@ -429,6 +432,7 @@ function openEditor(ev){
   document.getElementById('f-desc').value=ev?(ev.description||''):'';
   document.getElementById('f-tracking').value=rc.tracking_mode||'strava';
   document.getElementById('f-logo-url').value=rc.logo_url||'';
+  document.getElementById('f-display-name').value=rc.display_name||'';
   loadDashboardCfg(rc);
   document.getElementById('f-fetch-start').value=rc.fetch_start||'';
   document.getElementById('f-fetch-end').value=rc.fetch_end||'';
@@ -461,6 +465,7 @@ function collect(){
   var mode=document.getElementById('f-smode').value;
   var rc={
     logo_url:document.getElementById('f-logo-url').value.trim()||null,
+    display_name:document.getElementById('f-display-name').value.trim()||null,
     dashboard:collectDashboardCfg(),
     tracking_mode:document.getElementById('f-tracking').value,
     fetch_start:document.getElementById('f-fetch-start').value||null,
