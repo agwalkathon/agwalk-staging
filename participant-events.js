@@ -30,20 +30,46 @@ async function fetchEventsData() {
   var evRes = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
   _eventsData = await evRes.json();
 
-  // which events am I enrolled in?
-  var athleteId = null;
+  // which events am I enrolled/registered in?
+  var athleteId = null, empCode = null, email = null;
   try {
     var u = JSON.parse(safeGetItem('wk_user') || '{}');
     athleteId = u.athleteId || null;
+    empCode = u.empCode || null;
+    email = u.email || null;
   } catch (e) {}
-  if (!athleteId && typeof currentSession !== 'undefined' && currentSession) athleteId = currentSession.athleteId;
+  if (!athleteId && typeof currentSession !== 'undefined' && currentSession) {
+    athleteId = currentSession.athleteId;
+    empCode = currentSession.empCode;
+    email = currentSession.email;
+  }
+
+  _myEventRegistrations = {}; // mapping of event_id -> status
   _myEventIds = [];
-  if (athleteId) {
+
+  if (athleteId || empCode || email) {
     try {
-      var rr = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=event_id', { headers: HDR });
+      var filterParts = [];
+      if (athleteId && athleteId !== 'null' && athleteId !== 'undefined') filterParts.push('strava_athlete_id.eq.' + encodeURIComponent(athleteId));
+      if (empCode && empCode !== 'null' && empCode !== 'undefined') filterParts.push('emp_code.eq.' + encodeURIComponent(empCode));
+      if (email && email !== 'null' && email !== 'undefined') filterParts.push('email.eq.' + encodeURIComponent(email));
+
+      var url = SUPABASE_URL + '/rest/v1/registration?select=event_id,status';
+      if (filterParts.length > 0) {
+        url += '&or=(' + filterParts.join(',') + ')';
+      }
+      
+      var rr = await fetch(url, { headers: HDR });
       var rows = await rr.json();
-      _myEventIds = (rows || []).map(function(x){ return x.event_id; }).filter(function(x){ return x != null; });
-    } catch (e) {}
+      (rows || []).forEach(function(x){
+        if (x.event_id != null) {
+          _myEventRegistrations[x.event_id] = x.status || 'approved';
+        }
+      });
+      _myEventIds = Object.keys(_myEventRegistrations).map(Number);
+    } catch (e) {
+      console.warn('Failed to load user event registrations:', e);
+    }
   }
 
   // light stats for live + ended events (top 5 only)
@@ -104,7 +130,11 @@ function renderEventsTab() {
 }
 
 function buildEventCard(ev, group) {
+  var registrationStatus = _myEventRegistrations ? _myEventRegistrations[ev.id] : null;
   var enrolled = _myEventIds.indexOf(ev.id) > -1;
+  var isApproved = enrolled && (registrationStatus === 'approved' || registrationStatus === 'active');
+  var isPending = enrolled && (registrationStatus === 'pending');
+
   var card = document.createElement('div');
   card.className = 'ev-card-p';
   card.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
@@ -127,8 +157,11 @@ function buildEventCard(ev, group) {
   name.className = 'ev-card-name';
   name.textContent = ev.name;
   top.appendChild(name);
-  if (enrolled) {
+  
+  if (isApproved) {
     var en = document.createElement('span'); en.className = 'ev-pill ev-pill-enrolled'; en.textContent = '✓ Enrolled'; top.appendChild(en);
+  } else if (isPending) {
+    var regPill = document.createElement('span'); regPill.className = 'ev-pill ev-pill-registered'; regPill.textContent = '⌛ Registered'; top.appendChild(regPill);
   } else if (group === 'live') {
     var lv = document.createElement('span'); lv.className = 'ev-pill ev-pill-live'; lv.textContent = '● LIVE'; top.appendChild(lv);
   }
@@ -173,12 +206,22 @@ function buildEventCard(ev, group) {
     lb.textContent = group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard';
     lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
     actions.appendChild(lb);
+    
     if (group === 'live' && !enrolled && regOpenNow) {
       var jrb = document.createElement('button');
       jrb.className = 'ev-btn ev-btn-primary';
       jrb.style.background = ev.accent_color || '';
       jrb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
       jrb.addEventListener('click', function(){ openEventRegistration(ev); });
+      actions.appendChild(jrb);
+    } else if (group === 'live' && isPending) {
+      var jrb = document.createElement('button');
+      jrb.className = 'ev-btn ev-btn-primary';
+      jrb.style.background = 'rgba(255, 255, 255, 0.08)';
+      jrb.style.color = 'rgba(255, 255, 255, 0.4)';
+      jrb.style.cursor = 'not-allowed';
+      jrb.disabled = true;
+      jrb.textContent = 'Registered (Pending)';
       actions.appendChild(jrb);
     } else if (group === 'live' && !enrolled) {
       var sp = document.createElement('div');
@@ -190,11 +233,20 @@ function buildEventCard(ev, group) {
 
   if (group === 'upcoming') {
     var regOpen = regOpenNow;
-    if (enrolled) {
+    if (isApproved) {
       var ok = document.createElement('div');
       ok.className = 'ev-spectator-note';
-      ok.textContent = "You're registered. Get ready! 💪";
+      ok.textContent = "You're enrolled. Get ready! 💪";
       body.appendChild(ok);
+    } else if (isPending) {
+      var rb = document.createElement('button');
+      rb.className = 'ev-btn ev-btn-primary';
+      rb.style.background = 'rgba(255, 255, 255, 0.08)';
+      rb.style.color = 'rgba(255, 255, 255, 0.4)';
+      rb.style.cursor = 'not-allowed';
+      rb.disabled = true;
+      rb.textContent = 'Registered (Pending)';
+      actions.appendChild(rb);
     } else if (regOpen) {
       var rb = document.createElement('button');
       rb.className = 'ev-btn ev-btn-primary';
