@@ -299,99 +299,49 @@ async function load(isBackgroundRefresh) {
     var stravaLink=document.getElementById('you-strava-link');
     if(stravaLink){var surl=reg.strava_profile_url||('https://www.strava.com/athletes/'+s.athleteId);stravaLink.href=surl;}
 
-    window.setStravaConnectedState = function() {
+    window.setStravaConnectedState = function(connectedAccountName) {
       var btn = document.getElementById('btn-strava-connect');
       var msg = document.getElementById('strava-connect-msg');
       if (!btn) return;
       btn.setAttribute('data-connected', 'true');
-      btn.style.background = 'rgba(16, 185, 129, 0.12)';
+      
+      // Directly show the red outlined Disconnect style when connected
+      btn.style.background = 'rgba(239, 68, 68, 0.12)';
       btn.style.backdropFilter = 'blur(16px)';
       btn.style.webkitBackdropFilter = 'blur(16px)';
-      btn.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-      btn.style.color = '#10b981';
-      btn.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.15)';
+      btn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      btn.style.color = '#ef4444';
+      btn.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.15)';
       btn.style.pointerEvents = 'auto';
       btn.style.cursor = 'pointer';
       btn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#10b981;">
-          <polyline points="20 6 9 17 4 12"></polyline>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#ef4444;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-        Strava Connected
+        Disconnect Strava
       `;
-      if (msg) msg.style.display = 'none';
+      
+      if (msg) {
+        var nameToShow = connectedAccountName || (reg && reg.full_name) || 'Connected';
+        msg.innerHTML = '<span style="font-weight:600; color:rgba(255,255,255,0.75);">Connected Account:</span> ' + nameToShow;
+        msg.style.display = 'block';
+        msg.style.background = 'rgba(255, 255, 255, 0.04)';
+        msg.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        msg.style.padding = '8px 16px';
+        msg.style.borderRadius = '8px';
+        msg.style.color = 'rgba(255, 255, 255, 0.6)';
+        msg.style.textAlign = 'center';
+      }
     };
 
-    // Bind event listeners for Disconnect/Connect hover & click interactions
+    // Bind event listeners for Disconnect/Connect click interactions
     (function initStravaDisconnectBtn() {
       var btn = document.getElementById('btn-strava-connect');
       if (!btn) return;
       
       btn.onclick = null;
       btn.removeAttribute('onclick');
-
-      btn.addEventListener('mouseenter', function() {
-        if (btn.getAttribute('data-connected') === 'true') {
-          btn.style.background = 'rgba(239, 68, 68, 0.12)';
-          btn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-          btn.style.color = '#ef4444';
-          btn.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.15)';
-          btn.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#ef4444;">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            Disconnect Strava
-          `;
-        }
-      });
-
-      btn.addEventListener('mouseleave', function() {
-        if (btn.getAttribute('data-connected') === 'true') {
-          btn.style.background = 'rgba(16, 185, 129, 0.12)';
-          btn.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-          btn.style.color = '#10b981';
-          btn.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.15)';
-          btn.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#10b981;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            Strava Connected
-          `;
-        }
-      });
-
-      btn.addEventListener('touchstart', function() {
-        if (btn.getAttribute('data-connected') === 'true') {
-          btn.style.background = 'rgba(239, 68, 68, 0.12)';
-          btn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-          btn.style.color = '#ef4444';
-          btn.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.15)';
-          btn.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#ef4444;">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            Disconnect Strava
-          `;
-        }
-      });
-
-      btn.addEventListener('touchend', function() {
-        if (btn.getAttribute('data-connected') === 'true') {
-          setTimeout(function() {
-            btn.style.background = 'rgba(16, 185, 129, 0.12)';
-            btn.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-            btn.style.color = '#10b981';
-            btn.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.15)';
-            btn.innerHTML = `
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#10b981;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Strava Connected
-            `;
-          }, 1000);
-        }
-      });
 
       btn.addEventListener('click', async function(e) {
         e.preventDefault();
@@ -429,6 +379,11 @@ async function load(isBackgroundRefresh) {
                 Connect with Strava
               `;
               window.isStravaConnected = false;
+              var msg = document.getElementById('strava-connect-msg');
+              if (msg) {
+                msg.style.display = 'none';
+                msg.innerHTML = '';
+              }
               if (typeof updateInAppNotificationBanner === 'function') updateInAppNotificationBanner();
               if (typeof renderNotifications === 'function') renderNotifications();
             } else {
@@ -455,7 +410,7 @@ async function load(isBackgroundRefresh) {
         });
         var d = await res.json();
         if (d.success && d.authorized) {
-          window.setStravaConnectedState();
+          window.setStravaConnectedState(d.name);
           window.isStravaConnected = true;
         } else {
           window.isStravaConnected = false;
@@ -493,7 +448,7 @@ async function load(isBackgroundRefresh) {
         var d = await res.json();
         
         if (d.success && d.authorized) {
-          window.setStravaConnectedState();
+          window.setStravaConnectedState(d.name);
         } else {
           var CLIENT_ID = '29159';
           var REDIRECT = window.location.origin + window.location.pathname;
