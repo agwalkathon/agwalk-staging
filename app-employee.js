@@ -590,8 +590,6 @@ async function loadBranding() {
     if (cached) {
       var b = JSON.parse(cached);
       applyBrandingDOM(b, lEl, aEl, appNameEl);
-      revealLoginScreen();
-      if (typeof hideSplash === 'function') hideSplash();
     }
   } catch(e) {}
 
@@ -603,31 +601,12 @@ async function loadBranding() {
       var b = d.branding;
       localStorage.setItem('ag_branding_cache', JSON.stringify(b));
       applyBrandingDOM(b, lEl, aEl, appNameEl);
-      revealLoginScreen();
     } else {
       applyDefaultBrandingDOM(lEl, appNameEl);
-      revealLoginScreen();
     }
   } catch (e) {
     console.warn('Failed to load branding:', e);
     applyDefaultBrandingDOM(lEl, appNameEl);
-    revealLoginScreen();
-  } finally {
-    if (typeof hideSplash === 'function') {
-      hideSplash();
-    }
-  }
-}
-
-function revealLoginScreen() {
-  var loginEl = document.getElementById('login-screen');
-  if (loginEl) {
-    loginEl.style.setProperty('display', 'flex', 'important');
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        loginEl.style.opacity = '1';
-      });
-    });
   }
 }
 
