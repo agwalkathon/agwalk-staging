@@ -117,8 +117,11 @@ async function verifyCode(){
     if (!r.ok || !d.success) throw new Error(d.error || 'Verification failed');
     setToken(d.token); setEmp(d.employee);
 
-    // Boot app dynamically
-    if (window.bootAppUnified) {
+    // Redirect to app.html if logging in from the index/login gateway
+    var path = window.location.pathname;
+    if (path.includes("index.html") || path.endsWith("/") || path.endsWith("/agwalk-staging")) {
+      window.location.replace("app.html" + window.location.search);
+    } else if (window.bootAppUnified) {
       await window.bootAppUnified();
     } else {
       location.reload();
