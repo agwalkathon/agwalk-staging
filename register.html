@@ -201,76 +201,114 @@
 <script>
 var STRAVA_CLIENT_ID = '29159';
 var BACKEND_URL = 'https://agwalk-backend.onrender.com';
+var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
+
 var EVENTS = {
   'walkathon2026':'Arcgate Walkathon 2026',
   'walkathon2027':'Arcgate Walkathon 2027',
   'cycling2026':'Arcgate Cycling 2026'
 };
-var params = new URLSearchParams(window.location.search);
-var authCode = params.get('code'), state = params.get('state'), evtParam = params.get('event');
-var eventCode = evtParam ? evtParam : state;
 
-if (!eventCode || !EVENTS[eventCode]) {
-  document.getElementById('invalid-view').style.display = 'flex';
-} else {
-  var validView = document.getElementById('valid-view');
-  validView.style.display = 'flex';
-  var eventName = EVENTS[eventCode];
-  document.getElementById('event-badge').textContent = eventName;
-  document.title = eventName + ' — Register';
-  var redirectURI = window.location.origin + window.location.pathname;
-  var authUrl = 'https://www.strava.com/oauth/authorize?client_id=' + STRAVA_CLIENT_ID +
-    '&redirect_uri=' + encodeURIComponent(redirectURI) + '&response_type=code&scope=read,activity:read&state=' + eventCode;
-  document.getElementById('strava-btn').href = authUrl;
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-  if (authCode && eventCode) {
-    document.getElementById('strava-btn').style.display = 'none';
-    document.getElementById('processing').style.display = 'flex';
-    fetch(BACKEND_URL + '/register', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ code: authCode, event_code: eventCode })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      document.getElementById('processing').style.display = 'none';
-      if (d.success || d.already_registered) {
-        // Store session so dashboard works immediately
-        if (d.athlete_id) {
-          localStorage.setItem('wk_user', JSON.stringify({
-            loggedIn: true, role: d.role || 'user',
-            athleteId: d.athlete_id, name: d.name,
-            profilePhoto: d.profile_photo || '',
-            expires: Date.now() + (8 * 60 * 60 * 1000)
-          }));
-        }
+async function getLiveEventCode() {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/events?status=eq.live&select=id,name,slug&limit=1', { headers: HDR });
+    const data = await r.json();
+    if (data && data[0]) {
+      const e = data[0];
+      const name = String(e.name).toLowerCase();
+      const slug = String(e.slug).toLowerCase();
+      
+      if (name.includes('cycling') || name.includes('cyclo') || slug.includes('cycling') || slug.includes('cyclo')) {
+        return 'cycling2026';
       }
+      if (name.includes('2027') || slug.includes('2027')) {
+        return 'walkathon2027';
+      }
+    }
+  } catch (err) {
+    console.error('Failed to get live event:', err);
+  }
+  return 'walkathon2026';
+}
 
-      if (d.success) {
-        document.getElementById('success-msg').innerHTML =
-          '✅ <strong>You\'re in!</strong><br>Welcome to ' + eventName + '. Your activities will appear on the leaderboard automatically.';
-        document.getElementById('success-msg').style.display = 'block';
-        document.getElementById('dashboard-btn').style.display = 'flex';
-      } else if (d.already_registered) {
-        document.getElementById('already-msg').innerHTML =
-          'ℹ️ <strong>Already connected!</strong><br>You\'re already registered for ' + eventName + '. Your activities are being tracked.';
-        document.getElementById('already-msg').style.display = 'block';
-        document.getElementById('dashboard-btn2').style.display = 'flex';
-      } else {
-        document.getElementById('error-msg').innerHTML =
-          '❌ <strong>Something went wrong.</strong><br>Please try again or contact prakash@arcgate.com';
+async function init() {
+  var params = new URLSearchParams(window.location.search);
+  var authCode = params.get('code'), state = params.get('state'), evtParam = params.get('event');
+  var eventCode = evtParam ? evtParam : state;
+
+  if (!eventCode) {
+    eventCode = await getLiveEventCode();
+  }
+
+  if (!eventCode || !EVENTS[eventCode]) {
+    document.getElementById('invalid-view').style.display = 'flex';
+  } else {
+    var validView = document.getElementById('valid-view');
+    validView.style.display = 'flex';
+    var eventName = EVENTS[eventCode];
+    document.getElementById('event-badge').textContent = eventName;
+    document.title = eventName + ' — Register';
+    var redirectURI = window.location.origin + window.location.pathname;
+    var authUrl = 'https://www.strava.com/oauth/authorize?client_id=' + STRAVA_CLIENT_ID +
+      '&redirect_uri=' + encodeURIComponent(redirectURI) + '&response_type=code&scope=read,activity:read&state=' + eventCode;
+    document.getElementById('strava-btn').href = authUrl;
+
+    if (authCode && eventCode) {
+      document.getElementById('strava-btn').style.display = 'none';
+      document.getElementById('processing').style.display = 'flex';
+      fetch(BACKEND_URL + '/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ code: authCode, event_code: eventCode })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        document.getElementById('processing').style.display = 'none';
+        if (d.success || d.already_registered) {
+          if (d.athlete_id) {
+            localStorage.setItem('wk_user', JSON.stringify({
+              loggedIn: true, role: d.role || 'user',
+              athleteId: d.athlete_id, name: d.name,
+              profilePhoto: d.profile_photo || '',
+              expires: Date.now() + (8 * 60 * 60 * 1000)
+            }));
+          }
+        }
+
+        if (d.success) {
+          document.getElementById('success-msg').innerHTML =
+            '✅ <strong>You\'re in!</strong><br>Welcome to ' + eventName + '. Your activities will appear on the leaderboard automatically.';
+          document.getElementById('success-msg').style.display = 'block';
+          document.getElementById('dashboard-btn').style.display = 'flex';
+        } else if (d.already_registered) {
+          document.getElementById('already-msg').innerHTML =
+            'ℹ️ <strong>Already connected!</strong><br>You\'re already registered for ' + eventName + '. Your activities are being tracked.';
+          document.getElementById('already-msg').style.display = 'block';
+          document.getElementById('dashboard-btn2').style.display = 'flex';
+        } else {
+          document.getElementById('error-msg').innerHTML =
+            '❌ <strong>Something went wrong.</strong><br>' + esc(d.error || 'Please try again or contact prakash@arcgate.com');
+          document.getElementById('error-msg').style.display = 'block';
+          document.getElementById('strava-btn').style.display = 'flex';
+        }
+      })
+      .catch(function(e) {
+        document.getElementById('processing').style.display = 'none';
+        document.getElementById('error-msg').innerHTML = '❌ <strong>Connection error.</strong><br>' + esc(e.message);
         document.getElementById('error-msg').style.display = 'block';
         document.getElementById('strava-btn').style.display = 'flex';
-      }
-    })
-    .catch(function() {
-      document.getElementById('processing').style.display = 'none';
-      document.getElementById('error-msg').innerHTML = '❌ <strong>Connection error.</strong><br>Please try again.';
-      document.getElementById('error-msg').style.display = 'block';
-      document.getElementById('strava-btn').style.display = 'flex';
-    });
+      });
+    }
   }
 }
+
+init();
 </script>
 </body>
 </html>
