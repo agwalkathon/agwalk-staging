@@ -1423,6 +1423,13 @@ function initializeFeedTab(enabled) {
     });
   }
   
+  if (track) {
+    var curIdx = TAB_ORDER.indexOf(_currentTab);
+    if (curIdx !== -1) {
+      track.style.transform = 'translateX(-' + (curIdx * (100 / TAB_ORDER.length)) + '%)';
+    }
+  }
+  
   setTimeout(updateNavIndicator, 50);
 }
 
@@ -3267,6 +3274,10 @@ function setupAppLayout(isParticipant) {
     });
   }
   
-  var defaultTab = TAB_ORDER[0] || 'you';
-  showTab(defaultTab);
+  var activeTab = _currentTab || TAB_ORDER[0] || 'you';
+  if (TAB_ORDER.indexOf(activeTab) === -1) {
+    activeTab = TAB_ORDER[0] || 'you';
+  }
+  _currentTab = null;
+  showTab(activeTab);
 }
