@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Arcgate Walkathon 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand:        #E8622A;
+      --brand-light:  #FFF0EA;
+      --brand-mid:    #f97d4e;
+      --sidebar-bg:   #0F1117;
+      --sidebar-w:    64px;
+      --sidebar-exp:  220px;
+      --page-bg:      #F4F6FA;
+      --card-bg:      #FFFFFF;
+      --text-primary: #0F1117;
+      --text-secondary:#6B7280;
+      --text-muted:   #9CA3AF;
+      --border:       rgba(0,0,0,0.07);
+      --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-lg:    0 12px 40px rgba(0,0,0,0.12);
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    20px;
+      --font:         'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0 12px;
+      z-index: 300;
+      transition: width 0.24s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
+    }
+    .sidebar:hover { width: var(--sidebar-exp); }
+
+    .sb-logo {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 4px 14px 20px;
+      text-decoration: none;
+      gap: 10px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sb-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sb-logo-icon img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .sb-logo-full {
+      opacity: 0;
+      transition: opacity 0.18s;
+      flex-shrink: 0;
+    }
+    .sb-logo-full img {
+      height: 22px;
+      width: auto;
+      display: block;
+    }
+    .sidebar:hover .sb-logo-full { opacity: 1; }
+
+    .sb-section {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+      padding: 0 14px 6px;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .sidebar:hover .sb-section { opacity: 1; }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 0 12px;
+      min-height: 42px;
+      text-decoration: none;
+      gap: 10px;
+      border-left: 3px solid transparent;
+      transition: all 0.16s;
+      position: relative;
+    }
+    .sb-item:hover { background: rgba(255,255,255,0.06); border-left-color: rgba(232,98,42,0.5); }
+    .sb-item.active { background: rgba(232,98,42,0.12); border-left-color: var(--brand); }
+
+    .sb-item i {
+      font-size: 19px;
+      color: rgba(255,255,255,0.38);
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+      transition: color 0.16s;
+    }
+    .sb-item:hover i { color: rgba(255,255,255,0.7); }
+    .sb-item.active i { color: var(--brand); }
+
+    .sb-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,0.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+
+    .sb-spacer { flex: 1; }
+
+    .sb-divider {
+      width: calc(100% - 24px);
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 6px 12px;
+      flex-shrink: 0;
+    }
+
+    .sb-signout {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 0 12px;
+      min-height: 42px;
+      gap: 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: all 0.16s;
+    }
+    .sb-signout:hover { background: rgba(255,80,80,0.08); }
+    .sb-signout i { font-size: 19px; color: rgba(255,255,255,0.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,0.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+
+    /* ─── Main Layout ─── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Top bar ─── */
+    .topbar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-left h1 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .topbar-left p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #realtime-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #F3F4F6;
+      color: var(--text-secondary);
+      font-family: var(--font);
+      border: none;
+      transition: all 0.3s;
+    }
+    #realtime-badge.live { background: #ECFDF5; color: #059669; }
+    #realtime-badge.live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block; animation: pulse 2s infinite; }
+    #realtime-badge.new-act { background: #FFF7ED; color: #EA580C; }
+    #realtime-badge.error { background: #FEF2F2; color: #DC2626; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ─── Content ─── */
+    .content {
+      flex: 1;
+      padding: 28px 32px;
+      width: 100%;
+    }
+
+    /* ─── Stats Grid ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .stat-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .stat-card-icon.orange { background: var(--brand-light); color: var(--brand); }
+    .stat-card-icon.green  { background: #ECFDF5; color: #059669; }
+    .stat-card-icon.blue   { background: #EFF6FF; color: #3B82F6; }
+    .stat-card-icon.red    { background: #FEF2F2; color: #DC2626; }
+    .stat-card-icon.purple { background: #F5F3FF; color: #7C3AED; }
+    .stat-card-icon.slate  { background: #F1F5F9; color: #475569; }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .stat-val.orange { color: var(--brand); }
+    .stat-val.green  { color: #059669; }
+    .stat-val.red    { color: #DC2626; }
+    .stat-val.blue   { color: #3B82F6; }
+    .stat-val.purple { color: #7C3AED; }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .stat-bottom { display: flex; flex-direction: column; }
+
+    /* ─── Nav Cards ─── */
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .nav-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-decoration: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: all 0.18s;
+      position: relative;
+    }
+    .nav-card:hover {
+      border-color: var(--brand);
+      box-shadow: 0 4px 20px rgba(232,98,42,0.12);
+      transform: translateY(-1px);
+    }
+    .nav-card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: background 0.18s;
+    }
+    .nav-card:hover .nav-card-icon { background: var(--brand); color: #fff; }
+    .nav-card-body { flex: 1; min-width: 0; }
+    .nav-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .nav-card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .nav-card-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 2px 6px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .badge-flag { background: #FEF2F2; color: #DC2626; }
+    .badge-ok   { background: #ECFDF5; color: #059669; }
+    .badge-info { background: #EFF6FF; color: #3B82F6; }
+    .badge-warning { background: #FFFBEB; color: #D97706; }
+
+
+    /* ─── Recent Activities Card ─── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header-left { display: flex; align-items: center; gap: 10px; }
+    .card-header-icon {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .card-header h2 { font-size: 15px; font-weight: 600; }
+    .card-header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--page-bg);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.15s;
+      font-family: var(--font);
+      cursor: pointer;
+    }
+    .btn-ghost:hover { background: #EAECF0; color: var(--text-primary); }
+
+    /* ─── Activity Feed ─── */
+    .activity-feed { padding: 8px 0; }
+
+    .act-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid #F9FAFB;
+      transition: background 0.15s;
+      cursor: default;
+    }
+    .act-row:last-child { border-bottom: none; }
+    .act-row:hover { background: #FAFAFA; }
+
+    .act-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .act-info { flex: 1; min-width: 0; }
+    .act-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .act-name:hover { color: var(--brand); }
+    .act-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .act-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .pill-walk   { background: #ECFDF5; color: #059669; }
+    .pill-run    { background: #EFF6FF; color: #3B82F6; }
+    .pill-ride   { background: #FFF7ED; color: #EA580C; }
+    .pill-hike   { background: #F5F3FF; color: #7C3AED; }
+    .pill-other  { background: #F1F5F9; color: #475569; }
+    .pill-flag   { background: #FEF2F2; color: #DC2626; }
+    .pill-clean  { background: #ECFDF5; color: #059669; }
+
+    .act-dist {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 64px;
+      text-align: right;
+    }
+    .act-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* empty / loading */
+    .feed-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .feed-state i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.3; }
+
+    /* ─── Footer ─── */
+    .site-footer {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding: 16px 32px;
+      font-size: 12px;
+      font-family: var(--font);
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { width: 56px; }
+      .main { margin-left: 56px; }
+      .content { padding: 12px; }
+      .topbar { padding: 0 12px; height: 50px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+      .stat-card { padding: 10px 12px; }
+      .stat-val { font-size: 18px; }
+      .nav-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .card-header { padding: 10px 14px; }
+      .card-header h2 { font-size: 13px; }
+      .act-row { padding: 10px 12px; }
+      .act-time { display: none; }
+      .site-footer { flex-direction: column; gap: 6px; text-align: center; }
+    }
+    @media (max-width: 420px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .nav-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Health Monitoring Panel Styles */
+    .health-status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+    .health-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .health-card:hover {
+      background: rgba(255,255,255,0.02) !important;
+      border-color: var(--brand) !important;
+      box-shadow: 0 4px 15px rgba(232,98,42,0.05);
+      transform: translateY(-1px);
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Health Logs Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0,0,0,0.1));
+      margin: 20px;
+      position: relative;
+    }
+    .modal h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .log-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 1px dashed var(--border);
+      padding: 8px 0;
+    }
+    .log-item:last-child {
+      border-bottom: none;
+    }
+    .log-status-ok {
+      color: #10B981;
+      font-weight: 600;
+      font-size: 11px;
+    }
+    .log-status-err {
+      color: #EF4444;
+      font-weight: 600;
+      font-size: 11px;
+    }
+    .modal.modal-wide {
+      max-width: 750px;
+    }
+    .log-console {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 14px;
+      border-radius: 8px;
+      overflow-y: auto;
+      max-height: 380px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+      border: 1px solid #333;
+      white-space: pre-wrap;
+      word-break: break-all;
+      text-align: left;
+    }
+    .troubleshoot-guide {
+      background: #FFF7ED;
+      border: 1px solid #FFEDD5;
+      color: #C2410C;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 14px;
+      text-align: left;
+    }
+    .troubleshoot-guide h4 {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .troubleshoot-guide ul {
+      margin-left: 18px;
+      margin-top: 6px;
+    }
+    .troubleshoot-guide li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+
+  <div class="sb-section">Main</div>
+  <a href="admin.html" class="sb-item active"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+  <a href="events.html" class="sb-item "><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+  <a href="celebrate-config.html" class="sb-item "><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
+  <a href="reports.html" class="sb-item "><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+
+  <div class="sb-section" style="margin-top:10px;">Config</div>
+  <a href="data-upload.html" class="sb-item "><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+  <a href="email-send.html" class="sb-item "><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+  <a href="audit-log.html" class="sb-item "><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+  <a href="push-notifications.html" class="sb-item "><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+
+  <div class="sb-spacer"></div>
+  <div class="sb-divider"></div>
+  <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard</h1>
+      <p id="topbar-date">Loading...</p>
+    </div>
+    <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
+      <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
+      <span id="realtime-badge">Connecting…</span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ── Stats ── -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon orange"><i class="ti ti-users"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val orange" id="s-participants">—</div>
+          <div class="stat-lbl">Participants</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon green"><i class="ti ti-run"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val green" id="s-activities">—</div>
+          <div class="stat-lbl">Total activities</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon blue"><i class="ti ti-map-pin"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val blue" id="s-km">—</div>
+          <div class="stat-lbl">Distance covered</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon purple"><i class="ti ti-brand-strava"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val purple" id="s-connected">—</div>
+          <div class="stat-lbl">Strava connected</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon orange"><i class="ti ti-calendar-check"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val orange" id="s-today">—</div>
+          <div class="stat-lbl">Today's activities</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon red"><i class="ti ti-flag"></i></div>
+        <div class="stat-bottom">
+          <div class="stat-val red" id="s-flagged">—</div>
+          <div class="stat-lbl">Flagged</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strava API Rate Limit Status Dashboard -->
+    <div class="card" id="rate-limit-dashboard" style="margin-bottom:20px;padding:20px;border-radius:12px;background:var(--card-bg);border:1px solid var(--border);flex:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <h3 style="margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--text-primary);">
+            <i class="ti ti-brand-strava" style="color:#fc5200;font-size:20px;"></i> Strava API Rate Limits & Status
+          </h3>
+          <span id="queue-status" class="badge" style="font-size:11px;padding:3px 8px;border-radius:12px;background:rgba(0,0,0,0.05);color:var(--text-secondary);">Queue Idle</span>
+        </div>
+        <button class="btn btn-sm" id="kill-switch-btn" onclick="toggleKillSwitch()" style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:none;cursor:pointer;transition:all 0.15s;"></button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin-bottom:16px;">
+        <!-- Read Quota 15m -->
+        <div style="background:rgba(0,0,0,0.015);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Read Rate Limit (15-Min)</div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-secondary);" id="limit-read-15m-desc">Last 15 Minutes: -- Remaining (Limit 300 Requests)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span id="pct-val-read-15m" style="font-size:12px;font-weight:700;color:var(--text-primary);min-width:38px;text-align:right;">0%</span>
+            <div style="flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;">
+              <div id="bar-read-15m" style="height:100%;width:0%;background:#3b82f6;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Read Quota 24h -->
+        <div style="background:rgba(0,0,0,0.015);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Read Rate Limit (Daily)</div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-secondary);" id="limit-read-24h-desc">Per Day: -- Remaining (Limit 3,000 requests)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span id="pct-val-read-24h" style="font-size:12px;font-weight:700;color:var(--text-primary);min-width:38px;text-align:right;">0%</span>
+            <div style="flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;">
+              <div id="bar-read-24h" style="height:100%;width:0%;background:#3b82f6;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Quota 15m -->
+        <div style="background:rgba(0,0,0,0.015);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Overall Rate Limit (15-Min)</div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-secondary);" id="limit-overall-15m-desc">Last 15 Minutes: -- Remaining (Limit 600 Requests)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span id="pct-val-overall-15m" style="font-size:12px;font-weight:700;color:var(--text-primary);min-width:38px;text-align:right;">0%</span>
+            <div style="flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;">
+              <div id="bar-overall-15m" style="height:100%;width:0%;background:#fc5200;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Quota 24h -->
+        <div style="background:rgba(0,0,0,0.015);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Overall Rate Limit (Daily)</div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-secondary);" id="limit-overall-24h-desc">Per Day: -- Remaining (Limit 6,000 requests)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span id="pct-val-overall-24h" style="font-size:12px;font-weight:700;color:var(--text-primary);min-width:38px;text-align:right;">0%</span>
+            <div style="flex:1;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;">
+              <div id="bar-overall-24h" style="height:100%;width:0%;background:#fc5200;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagnostic Status Indicator Panel -->
+      <div id="api-status-banner" style="border-radius:8px;padding:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transition:all 0.15s;background:rgba(0,0,0,0.015);border:1px solid var(--border);color:var(--text-muted);">
+        <span id="api-status-icon" style="font-size:16px;"></span>
+        <span id="api-status-text">Checking status...</span>
+      </div>
+    </div>
+
+    <!-- ── System Health & Monitoring ── -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-header-left">
+          <div class="card-header-icon"><i class="ti ti-server"></i></div>
+          <div>
+            <h2>System Health & Status</h2>
+            <div class="card-header-sub">Real-time status of backend services and databases</div>
+          </div>
+        </div>
+        <button class="btn btn-sm" id="btn-refresh-health" onclick="checkAllSystemsHealth()" style="font-size:12px;padding:6px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--brand);color:#fff;border:none;border-radius:6px;">
+          <i class="ti ti-refresh"></i> Refresh Status
+        </button>
+      </div>
+      
+      <div style="padding:20px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;">
+          
+          <!-- Render Backend Card -->
+          <div class="health-card" onclick="showServiceLogs('backend')" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-cpu" style="color:var(--brand);font-size:16px;"></i> Backend (Render)
+              </span>
+              <span id="health-backend-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-backend-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-backend-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-backend-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-backend-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-backend-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+              <!-- Wake Up Backend Button -->
+              <div id="backend-wakeup-container" style="margin-top:10px;display:none;">
+                <button id="btn-wakeup-backend" onclick="wakeUpBackend(event)" style="width:100%;font-size:11px;font-weight:600;padding:6px 8px;border-radius:6px;background:rgba(232,98,42,0.1);color:var(--brand);border:1px solid rgba(232,98,42,0.2);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);">
+                  <i class="ti ti-coffee"></i> Wake Up Backend
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supabase DB Card -->
+          <div class="health-card" onclick="showServiceLogs('supabase')" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-database" style="color:#059669;font-size:16px;"></i> Supabase DB
+              </span>
+              <span id="health-supabase-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-supabase-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-supabase-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-supabase-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-supabase-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-supabase-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub API Card -->
+          <div class="health-card" onclick="showServiceLogs('github')" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-brand-github" style="color:#7C3AED;font-size:16px;"></i> GitHub API
+              </span>
+              <span id="health-github-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Latency:</span>
+                <span id="health-github-latency" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-github-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-github-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-github-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Outage Reason:</span>
+                <span id="health-github-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Strava Gateway Card -->
+          <div class="health-card" onclick="showServiceLogs('strava')" style="border:1px solid var(--border);border-radius:10px;padding:15px;background:rgba(255,255,255,0.01);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                <i class="ti ti-brand-strava" style="color:#FC4C02;font-size:16px;"></i> Strava Sync
+              </span>
+              <span id="health-strava-badge" class="health-status-badge badge-info">Checking...</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Queue / Kill Switch:</span>
+                <span id="health-strava-queue" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Checked:</span>
+                <span id="health-strava-checked" style="font-weight:600;color:var(--text-primary);">-</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Last Outage:</span>
+                <span id="health-strava-down" style="font-weight:600;color:#DC2626;">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;flex-direction:column;margin-top:4px;border-top:1px dashed var(--border);padding-top:6px;display:none;" id="health-strava-reason-box">
+                <span style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-muted);">Diagnostic Logs:</span>
+                <span id="health-strava-reason" style="color:#DC2626;font-size:11px;word-break:break-all;">-</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Brevo Daily Usage Widget -->
+    <div class="card" id="brevo-usage-widget" style="display:none;margin-bottom:20px;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-header-left">
+          <div class="card-header-icon" style="color:var(--brand);"><i class="ti ti-chart-bar"></i></div>
+          <div>
+            <h2>Brevo Email Limit Status</h2>
+            <div class="card-header-sub">Monitor remaining daily/monthly email credits</div>
+          </div>
+        </div>
+        <span id="brevo-usage-plan" class="health-status-badge badge-info" style="font-size:11px;padding:4px 10px;border-radius:12px;font-weight:700;text-transform:uppercase;">Daily Limit</span>
+      </div>
+      <div class="card-body" style="padding:20px;">
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:32px;font-weight:900;color:var(--text-primary);line-height:1;" id="brevo-usage-remaining">0</div>
+            <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-top:6px;font-weight:600;" id="brevo-usage-remaining-label">Sent Today</div>
+          </div>
+          <div style="flex-grow:1;min-width:200px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;font-weight:600;color:var(--text-secondary);">
+              <span id="brevo-usage-percent">0% Used</span>
+              <span id="brevo-usage-subtitle" style="color:var(--text-muted);font-weight:400;">(300 remaining)</span>
+            </div>
+            <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;border:1px solid var(--border);">
+              <div id="brevo-usage-progress" style="height:100%;width:0%;background:var(--brand);border-radius:5px;transition:width 0.5s ease;"></div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:700;color:var(--text-primary);" id="brevo-usage-total">0 / 300</div>
+            <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-top:4px;font-weight:600;" id="brevo-usage-total-label">Daily Limit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div><!-- /content -->
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span>© 2026 Arcgate Walkathon</span>
+    <div>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+    </div>
+  </footer>
+</div><!-- /main -->
+
+<script>
+const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
+
+function toggleQuickAccess() {
+  var body = document.getElementById('quick-access-body');
+  var chev = document.getElementById('quick-access-chevron');
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.textContent = open ? '▼' : '▲';
+}
+
+const _BACKEND_URL = 'https://agwalk-backend.onrender.com';
+function authGuard() {
+  var token = sessionStorage.getItem('wk_admin_token');
+  if (!token) { window.location.href = 'admin-login.html'; return; }
+  // Check JWT expiry client-side (middle part of JWT is base64 payload)
+  try {
+    var payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      sessionStorage.removeItem('wk_admin_token');
+      window.location.href = 'admin-login.html';
+    }
+  } catch(e) {
+    sessionStorage.removeItem('wk_admin_token');
+    window.location.href = 'admin-login.html';
+  }
+}
+function logout() {
+  sessionStorage.removeItem('wk_admin_token');
+  sessionStorage.removeItem('wk_admin');
+  window.location.href = 'admin-login.html';
+}
+
+// ── Date in topbar ──
+(function() {
+  const d = new Date();
+  const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+  document.getElementById('topbar-date').textContent = d.toLocaleDateString('en-IN', opts);
+})();
+
+async function loadEmailStatus() {
+  try {
+    var r = await fetch(_BACKEND_URL + '/email/status');
+    var d = await r.json();
+    var widget = document.getElementById('brevo-usage-widget');
+    if (widget && d.success) {
+      if (d.provider === 'brevo' && d.configured) {
+        widget.style.display = 'block';
+        var remaining = d.remaining;
+        
+        if (d.isUnlimitedDaily) {
+          // Starter / Paid plan
+          document.getElementById('brevo-usage-plan').textContent = 'Starter Plan (Paid)';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(46,125,50,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#2e7d32';
+          
+          document.getElementById('brevo-usage-remaining').textContent = remaining.toLocaleString();
+          document.getElementById('brevo-usage-remaining-label').textContent = 'Monthly Credits Left';
+          document.getElementById('brevo-usage-total').textContent = 'Unlimited';
+          document.getElementById('brevo-usage-total-label').textContent = 'Daily Limit';
+          document.getElementById('brevo-usage-percent').textContent = 'Unlimited Daily Send';
+          document.getElementById('brevo-usage-subtitle').textContent = '';
+          document.getElementById('brevo-usage-progress').style.width = '100%';
+          document.getElementById('brevo-usage-progress').style.background = '#2e7d32';
+        } else {
+          // Free plan (Daily limit of 300)
+          var limit = d.limit || 300;
+          var used = Math.max(0, limit - remaining);
+          var progressPercent = Math.min(100, Math.max(0, (used / limit) * 100));
+          
+          document.getElementById('brevo-usage-plan').textContent = 'Daily Send Limit';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(232,98,42,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#E8622A';
+          
+          document.getElementById('brevo-usage-remaining').textContent = used;
+          document.getElementById('brevo-usage-remaining-label').textContent = 'Sent Today';
+          
+          document.getElementById('brevo-usage-total').textContent = used + ' / ' + limit;
+          document.getElementById('brevo-usage-total-label').textContent = 'Daily Limit';
+          
+          document.getElementById('brevo-usage-percent').textContent = progressPercent.toFixed(1) + '% Used';
+          document.getElementById('brevo-usage-subtitle').textContent = '(' + remaining + ' remaining today)';
+          document.getElementById('brevo-usage-progress').style.width = progressPercent + '%';
+          
+          if (remaining <= 20) {
+            document.getElementById('brevo-usage-progress').style.background = '#d32f2f'; // Red if running low
+          } else {
+            document.getElementById('brevo-usage-progress').style.background = '#E8622A';
+          }
+        }
+
+        if (d.error) {
+          document.getElementById('brevo-usage-remaining').textContent = '⚠️';
+          document.getElementById('brevo-usage-plan').textContent = 'Connection Error';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(211,47,47,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#d32f2f';
+        }
+      } else {
+        widget.style.display = 'none'; // Hide if SMTP or not configured
+      }
+    }
+  } catch(e) {
+    console.warn('loadEmailStatus:', e.message);
+  }
+}
+
+// ── Helpers ──
+function fmtDate(d) {
+  if (!d) return '';
+  try {
+    var dt = new Date(d);
+    if (isNaN(dt.getTime())) return '';
+    return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', timeZone: 'Asia/Kolkata' });
+  } catch (e) {
+    var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
+    return new Date(naive).toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+  }
+}
+function fmtTime(d, startTime) {
+  if (!d) return '';
+  if (startTime === null || startTime === undefined || startTime === '') return '';
+  try {
+    var dt = new Date(d);
+    if (isNaN(dt.getTime())) return '';
+    return dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true, timeZone: 'Asia/Kolkata' });
+  } catch (e) {
+    var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
+    return new Date(naive).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+  }
+}
+function fmtDist(m) {
+  if (!m) return '—';
+  return (m / 1000).toFixed(2) + ' km';
+}
+function fmtPS(ms, t) {
+  if (!ms) return '';
+  if (t === 'Ride' || t === 'VirtualRide') return (ms * 3.6).toFixed(1) + ' km/h';
+  const p = 1000 / ms, min = Math.floor(p / 60), sec = Math.round(p % 60);
+  return min + ':' + sec.toString().padStart(2, '0') + ' /km';
+}
+function pillClass(t) {
+  if (t === 'Walk') return 'pill-walk';
+  if (t === 'Run' || t === 'VirtualRun') return 'pill-run';
+  if (t === 'Ride' || t === 'VirtualRide') return 'pill-ride';
+  if (t === 'Hike') return 'pill-hike';
+  return 'pill-other';
+}
+function initials(name) {
+  if (!name) return '?';
+  const p = name.trim().split(' ');
+  return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase();
+}
+// Deterministic avatar color from name
+const AVATAR_COLORS = [
+  'linear-gradient(135deg,#E8622A,#f97d4e)',
+  'linear-gradient(135deg,#3B82F6,#60A5FA)',
+  'linear-gradient(135deg,#7C3AED,#A78BFA)',
+  'linear-gradient(135deg,#059669,#34D399)',
+  'linear-gradient(135deg,#DC2626,#F87171)',
+  'linear-gradient(135deg,#D97706,#FCD34D)',
+];
+function avatarGrad(name) {
+  let h = 0;
+  for (let i = 0; i < (name||'').length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xFFFF;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+authGuard();
+
+var EV_ID = 1;
+var EV_ALL = [];
+
+function evq() {
+  return "&event_id=eq." + EV_ID;
+}
+
+async function loadEventSelector() {
+  const sel = document.getElementById('ev-select');
+  if (!sel) return;
+  
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+    const evs = await r.json();
+    if (!Array.isArray(evs) || evs.length === 0) return;
+    EV_ALL = evs;
+    
+    sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+    
+    let savedId = localStorage.getItem('wk_admin_selected_event_id');
+    if (!savedId) {
+      const live = evs.find(e => e.status === 'live');
+      savedId = live ? live.id : evs[0].id;
+    }
+    
+    EV_ID = parseInt(savedId) || evs[0].id;
+    sel.value = EV_ID;
+    localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+    
+    sel.addEventListener('change', function() {
+      EV_ID = parseInt(this.value);
+      localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+      load();
+    });
+  } catch (err) {
+    console.error('Failed to load event selector:', err);
+  }
+}
+
+async function load() {
+  const today = new Date().toISOString().split('T')[0];
+
+  const [countR, distR, flagR, todayR, regR, connR] = await Promise.all([
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false' + evq(),
+      { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=distance_meters&is_deleted=eq.false&is_flagged=eq.false' + evq(),
+      { headers: HDR }),
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&is_flagged=eq.true' + evq(),
+      { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&activity_date=gte.' + today + 'T00:00:00&activity_date=lte.' + today + 'T23:59:59' + evq(),
+      { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name' + evq(), { headers: HDR }),
+    fetch(SUPABASE_URL + '/rest/v1/participants?select=strava_athlete_id', { headers: HDR })
+  ]);
+
+  const regs = await regR.json(), conn = await connR.json();
+
+  const totalCount = parseInt((countR.headers.get('content-range') || '').split('/')[1]) || 0;
+  const flagCount  = parseInt((flagR.headers.get('content-range') || '').split('/')[1]) || 0;
+  const todayCount = parseInt((todayR.headers.get('content-range') || '').split('/')[1]) || 0;
+
+  let totalKm = 0;
+  try {
+    const distData = await distR.json();
+    if (Array.isArray(distData)) {
+      totalKm = distData.reduce((sum, a) => sum + (a.distance_meters || 0), 0) / 1000;
+    }
+  } catch(e) {}
+
+  const nm = {};
+  if (Array.isArray(regs)) regs.forEach(r => nm[r.strava_athlete_id] = r.full_name);
+
+  // Filter connected participants by event registration
+  const registeredAthleteIds = new Set((regs || []).map(r => String(r.strava_athlete_id)));
+  const connectedRegistered = (conn || []).filter(c => registeredAthleteIds.has(String(c.strava_athlete_id)));
+
+  function fmtIN(n) {
+    n = Math.round(n);
+    if (n < 1000) return n.toString();
+    var s = n.toString(), last3 = s.slice(-3), rest = s.slice(0, -3);
+    var parts = [last3];
+    while (rest.length > 2) { parts.unshift(rest.slice(-2)); rest = rest.slice(0,-2); }
+    if (rest) parts.unshift(rest);
+    return parts.join(',');
+  }
+  function fmtKmIN(km) {
+    return fmtIN(km) + ' km';
+  }
+
+  document.getElementById('s-participants').textContent = fmtIN(Array.isArray(regs) ? regs.length : 0);
+  document.getElementById('s-activities').textContent   = fmtIN(totalCount);
+  document.getElementById('s-km').textContent           = fmtKmIN(totalKm);
+  document.getElementById('s-flagged').textContent      = fmtIN(flagCount);
+  document.getElementById('s-today').textContent        = fmtIN(todayCount);
+  document.getElementById('s-connected').textContent    = fmtIN(connectedRegistered.length);
+
+  // Flag badge on nav card (guarded)
+  const fb = document.getElementById('flag-badge');
+  if (fb) {
+    if (flagCount) {
+      fb.textContent = flagCount + ' flagged';
+      fb.className = 'nav-card-badge badge-flag';
+    } else {
+      fb.textContent = 'All clear';
+      fb.className = 'nav-card-badge badge-ok';
+    }
+  }
+  const flb = document.getElementById('flagged-badge');
+  if (flb) {
+    if (flagCount) {
+      flb.textContent = flagCount + ' flagged';
+      flb.className = 'nav-card-badge badge-flag';
+    } else {
+      flb.textContent = 'All clear';
+      flb.className = 'nav-card-badge badge-ok';
+    }
+  }
+  const pb = document.getElementById('part-badge');
+  if (pb) {
+    pb.textContent = connectedRegistered.length + ' connected';
+  }
+}
+
+loadEventSelector();
+load();
+checkAllSystemsHealth();
+setInterval(checkAllSystemsHealth, 60000);
+
+let currentKillSwitchState = false;
+
+async function updateRateLimitDashboard() {
+  const token = sessionStorage.getItem('wk_admin_token');
+  if (!token) return;
+  try {
+    const res = await fetch(_BACKEND_URL + '/admin/strava-status', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.success && d.limits) {
+      const lim = d.limits;
+      const status = d.status;
+      
+      // Update kill switch state
+      currentKillSwitchState = d.killSwitchActive;
+      const ksBtn = document.getElementById('kill-switch-btn');
+      if (ksBtn) {
+        if (currentKillSwitchState) {
+          ksBtn.textContent = '▶️ Resume Strava API Calls';
+          ksBtn.style.background = 'rgba(16, 185, 129, 0.1)';
+          ksBtn.style.color = '#10B981';
+          ksBtn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+        } else {
+          ksBtn.textContent = '🛑 Stop Strava API Calls';
+          ksBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+          ksBtn.style.color = '#EF4444';
+          ksBtn.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+        }
+      }
+
+      // Calculate Remaining
+      const remOverall15 = Math.max(0, lim.overallLimit15m - lim.overallUsage15m);
+      const remOverall24 = Math.max(0, lim.overallLimit24h - lim.overallUsage24h);
+      const remRead15 = Math.max(0, lim.readLimit15m - lim.readUsage15m);
+      const remRead24 = Math.max(0, lim.readLimit24h - lim.readUsage24h);
+
+      // Set Text
+      document.getElementById('limit-overall-15m-desc').textContent = `Last 15 Minutes: ${remOverall15} Remaining (Limit ${lim.overallLimit15m} Requests)`;
+      document.getElementById('limit-overall-24h-desc').textContent = `Per Day: ${remOverall24.toLocaleString()} Remaining (Limit ${lim.overallLimit24h.toLocaleString()} requests)`;
+      document.getElementById('limit-read-15m-desc').textContent = `Last 15 Minutes: ${remRead15} Remaining (Limit ${lim.readLimit15m} Requests)`;
+      document.getElementById('limit-read-24h-desc').textContent = `Per Day: ${remRead24.toLocaleString()} Remaining (Limit ${lim.readLimit24h || 3000} requests)`;
+
+      // Set Bars
+      const pctOverall15 = Math.min(100, (lim.overallUsage15m / lim.overallLimit15m) * 100);
+      const pctOverall24 = Math.min(100, (lim.overallUsage24h / lim.overallLimit24h) * 100);
+      const pctRead15 = Math.min(100, (lim.readUsage15m / lim.readLimit15m) * 100);
+      const pctRead24 = Math.min(100, (lim.readUsage24h / lim.readLimit24h) * 100);
+
+      document.getElementById('bar-overall-15m').style.width = `${pctOverall15}%`;
+      document.getElementById('bar-overall-24h').style.width = `${pctOverall24}%`;
+      document.getElementById('bar-read-15m').style.width = `${pctRead15}%`;
+      document.getElementById('bar-read-24h').style.width = `${pctRead24}%`;
+
+      document.getElementById('pct-val-overall-15m').textContent = `${Math.round(pctOverall15)}%`;
+      document.getElementById('pct-val-overall-24h').textContent = `${Math.round(pctOverall24)}%`;
+      document.getElementById('pct-val-read-15m').textContent = `${Math.round(pctRead15)}%`;
+      document.getElementById('pct-val-read-24h').textContent = `${Math.round(pctRead24)}%`;
+
+      // Queue Status
+      const qStatus = document.getElementById('queue-status');
+      if (qStatus) {
+        if (d.queueProcessing) {
+          qStatus.textContent = `Queue Active (Pending: ${d.queueSize})`;
+          qStatus.style.background = 'rgba(232, 98, 42, 0.15)';
+          qStatus.style.color = 'var(--brand)';
+        } else {
+          qStatus.textContent = 'Queue Idle';
+          qStatus.style.background = 'rgba(0,0,0,0.05)';
+          qStatus.style.color = 'var(--text-secondary)';
+        }
+      }
+
+      // API Diagnostic Status Indicator
+      const banner = document.getElementById('api-status-banner');
+      const icon = document.getElementById('api-status-icon');
+      const text = document.getElementById('api-status-text');
+
+      if (banner && icon && text) {
+        if (status.state === 'suspended') {
+          banner.style.background = 'rgba(245, 158, 11, 0.08)';
+          banner.style.border = '1px solid rgba(245, 158, 11, 0.15)';
+          banner.style.color = '#F59E0B';
+          icon.textContent = '⚠';
+          text.textContent = 'Strava API calls are suspended by Administrator';
+        } else if (status.state === 'error') {
+          banner.style.background = 'rgba(239, 68, 68, 0.08)';
+          banner.style.border = '1px solid rgba(239, 68, 68, 0.15)';
+          banner.style.color = '#EF4444';
+          icon.textContent = '❌';
+          
+          const dateStr = status.lastErrorTime ? new Date(status.lastErrorTime).toLocaleTimeString() : '';
+          text.textContent = `API Call Failed: ${status.lastError || 'Unknown error'} ${dateStr ? 'at ' + dateStr : ''}`;
+        } else {
+          banner.style.background = 'rgba(16, 185, 129, 0.08)';
+          banner.style.border = '1px solid rgba(16, 185, 129, 0.15)';
+          banner.style.color = '#10B981';
+          icon.textContent = '✓';
+          text.textContent = 'Strava API calls are working fine';
+        }
+      }
+    }
+  } catch(e) {
+    console.warn('Failed to update rate limit dashboard:', e);
+  }
+}
+
+async function toggleKillSwitch() {
+  const token = sessionStorage.getItem('wk_admin_token');
+  if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
+  
+  const newState = !currentKillSwitchState;
+  const actionText = newState ? 'stop all outbound Strava API calls?' : 'resume normal Strava API calls?';
+  if (!confirm(`Are you sure you want to ${actionText}`)) return;
+
+  try {
+    const res = await fetch(_BACKEND_URL + '/admin/toggle-kill-switch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ active: newState })
+    });
+    const d = await res.json();
+    if (d.success) {
+      alert(newState ? 'Strava API access has been STOPPED.' : 'Strava API access has been RESUMED.');
+      await updateRateLimitDashboard();
+    }
+  } catch(e) {
+    alert('Failed to toggle kill switch: ' + e.message);
+  }
+}
+
+updateRateLimitDashboard();
+setInterval(updateRateLimitDashboard, 15000);
+
+const healthHistory = {
+  backend: [],
+  supabase: [],
+  github: [],
+  strava: []
+};
+
+async function checkAllSystemsHealth() {
+  const refreshBtn = document.getElementById('btn-refresh-health');
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="ti ti-loader spin"></i> Checking...';
+  }
+
+  const nowStr = new Date().toLocaleString('en-IN');
+
+  function updateUI(service, ok, latency, reason, customStatus) {
+    const badge = document.getElementById(`health-${service}-badge`);
+    const checked = document.getElementById(`health-${service}-checked`);
+    const latencyEl = document.getElementById(`health-${service}-latency`);
+    const downEl = document.getElementById(`health-${service}-down`);
+    const reasonEl = document.getElementById(`health-${service}-reason`);
+    const reasonBox = document.getElementById(`health-${service}-reason-box`);
+
+    if (checked) checked.textContent = nowStr;
+
+    // Log history
+    if (!healthHistory[service]) healthHistory[service] = [];
+    healthHistory[service].push({
+      timestamp: new Date().toLocaleTimeString('en-IN'),
+      ok: ok,
+      latency: latency,
+      reason: reason
+    });
+    if (healthHistory[service].length > 20) {
+      healthHistory[service].shift();
+    }
+
+    // Toggle Backend wake-up button visibility
+    if (service === 'backend') {
+      const wakeupContainer = document.getElementById('backend-wakeup-container');
+      if (wakeupContainer) {
+        wakeupContainer.style.display = ok ? 'none' : 'block';
+      }
+    }
+
+    if (ok) {
+      if (badge) {
+        if (customStatus) {
+          badge.textContent = customStatus.text;
+          badge.className = 'health-status-badge ' + (customStatus.className || 'badge-ok');
+        } else {
+          badge.textContent = 'ONLINE';
+          badge.className = 'health-status-badge badge-ok';
+        }
+      }
+      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : '—';
+      
+      const lastDown = localStorage.getItem(`health_${service}_last_down`);
+      if (downEl) downEl.textContent = lastDown || 'None';
+      
+      if (customStatus && reason) {
+        if (reasonEl && reasonBox) {
+          reasonEl.textContent = reason;
+          reasonEl.style.color = '#D97706';
+          const labelSpan = reasonBox.querySelector('span');
+          if (labelSpan) labelSpan.textContent = 'Status Note:';
+          reasonBox.style.display = 'flex';
+        }
+      } else {
+        if (reasonEl) reasonEl.style.color = '#DC2626';
+        if (reasonBox) {
+          const labelSpan = reasonBox.querySelector('span');
+          if (labelSpan) labelSpan.textContent = 'Outage Reason:';
+          reasonBox.style.display = 'none';
+        }
+      }
+    } else {
+      if (badge) {
+        badge.textContent = 'OFFLINE';
+        badge.className = 'health-status-badge badge-flag';
+      }
+      if (latencyEl) latencyEl.textContent = '-';
+      
+      localStorage.setItem(`health_${service}_last_down`, nowStr);
+      localStorage.setItem(`health_${service}_down_reason`, reason || 'Unknown Error');
+      
+      if (downEl) downEl.textContent = nowStr;
+      if (reasonEl) {
+        reasonEl.textContent = reason || 'Unknown Error';
+        reasonEl.style.color = '#DC2626';
+      }
+      if (reasonBox) {
+        const labelSpan = reasonBox.querySelector('span');
+        if (labelSpan) labelSpan.textContent = 'Outage Reason:';
+        reasonBox.style.display = 'flex';
+      }
+    }
+  }
+
+  // 1. Check Render Backend
+  const startBackend = performance.now();
+  let backendOk = false, backendReason = '', latencyBackend = null;
+  try {
+    const res = await fetch(_BACKEND_URL + '/');
+    latencyBackend = Math.round(performance.now() - startBackend);
+    if (res.ok) {
+      backendOk = true;
+    } else {
+      backendReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    backendReason = err.message || 'Network Error';
+  }
+  updateUI('backend', backendOk, latencyBackend, backendReason);
+
+  // 2. Check Supabase DB
+  const startSupabase = performance.now();
+  let supabaseOk = false, supabaseReason = '', latencySupabase = null;
+  let supabaseCustomStatus = null;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/registration?limit=1', { headers: HDR });
+    latencySupabase = Math.round(performance.now() - startSupabase);
+    if (res.ok) {
+      supabaseOk = true;
+    } else {
+      supabaseReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    // Direct check failed, fallback to backend proxy check
+    try {
+      const fallbackRes = await fetch(_BACKEND_URL + '/health');
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.database === 'online') {
+          supabaseOk = true;
+          supabaseReason = 'CORS/Adblocker blocked direct fetch (bypassed via Server)';
+          supabaseCustomStatus = { text: 'ONLINE (VIA SERVER)', className: 'badge-warning' };
+        } else {
+          supabaseReason = fallbackData.error || 'Database reported offline by backend';
+        }
+      } else {
+        supabaseReason = `Direct check failed (${err.message}) and Backend fallback returned status ${fallbackRes.status}`;
+      }
+    } catch (fallbackErr) {
+      supabaseReason = `Direct check failed (${err.message}) and Backend fallback failed (${fallbackErr.message})`;
+    }
+  }
+  updateUI('supabase', supabaseOk, latencySupabase, supabaseReason, supabaseCustomStatus);
+
+  // 3. Check GitHub API (with server status fallback)
+  const startGithub = performance.now();
+  let githubOk = false, githubReason = '', latencyGithub = null;
+  try {
+    const res = await fetch('https://api.github.com/zen');
+    latencyGithub = Math.round(performance.now() - startGithub);
+    if (res.ok) {
+      githubOk = true;
+    } else {
+      githubReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    // Direct check failed, fallback to backend health proxy check
+    try {
+      const fallbackRes = await fetch(_BACKEND_URL + '/health');
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.github === 'online') {
+          githubOk = true;
+          githubReason = 'Direct check rate-limited (bypassed via Server)';
+        } else {
+          githubReason = `Direct: ${err.message}. Proxy: GitHub reported offline.`;
+        }
+      } else {
+        githubReason = `Direct: ${err.message}. Proxy status: ${fallbackRes.status}`;
+      }
+    } catch (fallbackErr) {
+      githubReason = `Direct: ${err.message}. Proxy check failed: ${fallbackErr.message}`;
+    }
+  }
+  updateUI('github', githubOk, latencyGithub, githubReason);
+
+  // 4. Check Strava API Status via Backend
+  let stravaOk = false, stravaReason = '', queueInfo = '—';
+  const token = sessionStorage.getItem('wk_admin_token');
+  if (!token) {
+    stravaReason = 'Admin token missing or not logged in';
+    updateUI('strava', false, null, stravaReason);
+  } else {
+    try {
+      const res = await fetch(_BACKEND_URL + '/admin/strava-status', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          stravaOk = true;
+          const killSwitch = data.killSwitchActive ? 'SUSPENDED' : 'ACTIVE';
+          queueInfo = `${data.queueSize} items / ${killSwitch}`;
+          const isWorking = data.status && data.status.state === 'working';
+          
+          const badge = document.getElementById('health-strava-badge');
+          if (badge) {
+            if (data.killSwitchActive) {
+              badge.textContent = 'SUSPENDED';
+              badge.className = 'health-status-badge badge-info';
+            } else if (isWorking) {
+              badge.textContent = 'ONLINE';
+              badge.className = 'health-status-badge badge-ok';
+            } else {
+              badge.textContent = 'ERROR';
+              badge.className = 'health-status-badge badge-flag';
+            }
+          }
+          
+          document.getElementById('health-strava-queue').textContent = queueInfo;
+          
+          const stravaChecked = document.getElementById('health-strava-checked');
+          if (stravaChecked) stravaChecked.textContent = nowStr;
+
+          const lastDown = localStorage.getItem('health_strava_last_down');
+          const downEl = document.getElementById('health-strava-down');
+          if (downEl) downEl.textContent = lastDown || 'None';
+
+          const reasonEl = document.getElementById('health-strava-reason');
+          const reasonBox = document.getElementById('health-strava-reason-box');
+          
+          if (data.status && data.status.lastError) {
+            if (reasonEl) reasonEl.textContent = `${data.status.lastError} (${new Date(data.status.lastErrorTime).toLocaleTimeString('en-IN')})`;
+            if (reasonBox) reasonBox.style.display = 'flex';
+          } else {
+            const lastReason = localStorage.getItem('health_strava_down_reason');
+            if (lastReason) {
+              if (reasonEl) reasonEl.textContent = lastReason;
+              if (reasonBox) reasonBox.style.display = 'flex';
+            } else if (reasonBox) {
+              reasonBox.style.display = 'none';
+            }
+          }
+          // Log Strava history
+          healthHistory.strava.push({
+            timestamp: new Date().toLocaleTimeString('en-IN'),
+            ok: !data.killSwitchActive && isWorking,
+            latency: null,
+            reason: (data.status && data.status.lastError) ? data.status.lastError : (data.killSwitchActive ? 'Suspended' : null)
+          });
+          if (healthHistory.strava.length > 20) healthHistory.strava.shift();
+        } else {
+          stravaReason = data.error || 'Failed to fetch status';
+          updateUI('strava', false, null, stravaReason);
+        }
+      } else {
+        stravaReason = `HTTP ${res.status}: ${res.statusText}`;
+        updateUI('strava', false, null, stravaReason);
+      }
+    } catch (err) {
+      stravaReason = err.message || 'Network Error';
+      updateUI('strava', false, null, stravaReason);
+    }
+  }
+
+  loadEmailStatus();
+
+  if (refreshBtn) {
+    refreshBtn.disabled = false;
+    refreshBtn.innerHTML = '<i class="ti ti-refresh"></i> Refresh Status';
+  }
+}
+
+let wakeupInterval = null;
+async function wakeUpBackend(e) {
+  if (e) e.stopPropagation();
+  const btn = document.getElementById('btn-wakeup-backend');
+  if (!btn || btn.disabled) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader spin"></i> Waking up... (approx. 50s)';
+
+  // Trigger wakeup request in the background
+  fetch(_BACKEND_URL + '/').catch(() => {});
+
+  if (wakeupInterval) clearInterval(wakeupInterval);
+  let attempts = 0;
+  wakeupInterval = setInterval(async () => {
+    attempts++;
+    try {
+      const res = await fetch(_BACKEND_URL + '/');
+      if (res.ok) {
+        clearInterval(wakeupInterval);
+        wakeupInterval = null;
+        btn.innerHTML = '<i class="ti ti-check"></i> Backend Awake!';
+        btn.style.background = 'rgba(16, 185, 129, 0.1)';
+        btn.style.color = '#10B981';
+        btn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+        
+        // Refresh status immediately
+        checkAllSystemsHealth();
+        
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-coffee"></i> Wake Up Backend';
+          btn.style.background = 'rgba(232,98,42,0.1)';
+          btn.style.color = 'var(--brand)';
+          btn.style.border = '1px solid rgba(232,98,42,0.2)';
+        }, 3000);
+        return;
+      }
+    } catch (err) {}
+
+    if (attempts >= 12) { // 60 seconds timeout
+      clearInterval(wakeupInterval);
+      wakeupInterval = null;
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-alert-triangle"></i> Timeout - Retry?';
+      btn.style.background = 'rgba(239, 68, 68, 0.1)';
+      btn.style.color = '#EF4444';
+      btn.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+    }
+  }, 5000);
+}
+
+function formatLogText(logLine) {
+  return logLine
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\[ERROR\]/g, '<span style="color:#F87171;font-weight:bold;">[ERROR]</span>')
+    .replace(/\[WARN\]/g, '<span style="color:#FBBF24;font-weight:bold;">[WARN]</span>')
+    .replace(/\[INFO\]/g, '<span style="color:#60A5FA;">[INFO]</span>')
+    .replace(/(\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\])/g, '<span style="color:#888;">$1</span>');
+}
+
+async function showServiceLogs(service) {
+  const serviceNames = {
+    backend: 'Backend (Render)',
+    supabase: 'Supabase DB',
+    github: 'GitHub API',
+    strava: 'Strava API Status'
+  };
+
+  const name = serviceNames[service] || service;
+  const titleSpan = document.getElementById('health-modal-service-name');
+  if (titleSpan) titleSpan.textContent = name;
+
+  const contentEl = document.getElementById('health-modal-content');
+  const modalEl = document.querySelector('#health-logs-modal .modal');
+  const refreshBtn = document.getElementById('modal-refresh-btn');
+
+  // Resize modal depending on whether it needs a wider view for console logs
+  if (modalEl) {
+    if (service === 'backend') {
+      modalEl.classList.add('modal-wide');
+    } else {
+      modalEl.classList.remove('modal-wide');
+    }
+  }
+
+  // Setup refresh button for backend
+  if (refreshBtn) {
+    if (service === 'backend') {
+      refreshBtn.style.display = 'inline-block';
+      refreshBtn.onclick = () => loadBackendLiveLogs();
+    } else {
+      refreshBtn.style.display = 'none';
+    }
+  }
+
+  const modal = document.getElementById('health-logs-modal');
+  if (modal) modal.classList.add('show');
+
+  // Populate content
+  if (service === 'backend') {
+    await loadBackendLiveLogs();
+  } else {
+    renderStandardHistoryLogs(service);
+  }
+}
+
+function renderStandardHistoryLogs(service) {
+  const contentEl = document.getElementById('health-modal-content');
+  if (!contentEl) return;
+
+  contentEl.innerHTML = '';
+  const logs = healthHistory[service] || [];
+  
+  if (logs.length === 0) {
+    contentEl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No ping logs recorded yet. Waiting for next health check...</div>';
+  } else {
+    const listContainer = document.createElement('div');
+    [...logs].reverse().forEach(log => {
+      const statusText = log.ok ? 'ONLINE' : 'OFFLINE';
+      const statusClass = log.ok ? 'log-status-ok' : 'log-status-err';
+      const latencyText = log.latency !== null ? `${log.latency}ms` : '—';
+      
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      item.innerHTML = `
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:500;margin-bottom:2px;">
+          <span style="color:var(--text-secondary);">${log.timestamp}</span>
+          <span class="${statusClass}">${statusText}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;gap:8px;">
+          <span>Latency: ${latencyText}</span>
+          ${log.reason ? `<span style="color:#EF4444;text-align:right;max-width:70%;word-break:break-all;">Error: ${log.reason}</span>` : ''}
+        </div>
+      `;
+      listContainer.appendChild(item);
+    });
+    contentEl.appendChild(listContainer);
+  }
+
+  // Append database troubleshooting tips for Supabase
+  if (service === 'supabase') {
+    const isCurrentlyOffline = logs.length > 0 && !logs[logs.length - 1].ok;
+    contentEl.appendChild(getTroubleshootingHTML('supabase', isCurrentlyOffline));
+  }
+}
+
+async function loadBackendLiveLogs() {
+  const contentEl = document.getElementById('health-modal-content');
+  if (!contentEl) return;
+
+  contentEl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:40px;"><i class="ti ti-loader spin" style="font-size:24px;display:block;margin-bottom:12px;"></i>Fetching live logs from Render backend...</div>';
+  
+  const token = sessionStorage.getItem('wk_admin_token');
+  if (!token) {
+    contentEl.innerHTML = '<div style="color:#EF4444;font-size:13px;text-align:center;padding:20px;">Unauthorized: Admin token missing. Please log in again.</div>';
+    return;
+  }
+
+  let logsFetched = false;
+  let errorReason = '';
+
+  try {
+    const res = await fetch(_BACKEND_URL + '/admin/live-logs', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.logs)) {
+        logsFetched = true;
+        if (data.logs.length === 0) {
+          contentEl.innerHTML = '<div class="log-console">Console initialized. Waiting for backend activities...</div>';
+        } else {
+          const consoleDiv = document.createElement('div');
+          consoleDiv.className = 'log-console';
+          consoleDiv.innerHTML = data.logs.map(line => formatLogText(line)).join('\n');
+          contentEl.innerHTML = '';
+          contentEl.appendChild(consoleDiv);
+          // Scroll console to bottom
+          setTimeout(() => { consoleDiv.scrollTop = consoleDiv.scrollHeight; }, 50);
+        }
+      } else {
+        errorReason = data.error || 'Invalid API response format';
+      }
+    } else {
+      errorReason = `HTTP ${res.status}: ${res.statusText}`;
+    }
+  } catch (err) {
+    errorReason = err.message || 'Connection Refused (Failed to fetch)';
+  }
+
+  if (!logsFetched) {
+    contentEl.innerHTML = `
+      <div style="color:#EF4444;font-size:13px;padding:12px;border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.05);border-radius:6px;margin-bottom:12px;text-align:left;">
+        <strong>Error Fetching Logs:</strong> ${errorReason}
+      </div>
+    `;
+    contentEl.appendChild(getTroubleshootingHTML('backend', true));
+  }
+}
+
+function getTroubleshootingHTML(service, isOffline) {
+  const guideDiv = document.createElement('div');
+  guideDiv.className = 'troubleshoot-guide';
+  
+  if (service === 'backend') {
+    guideDiv.innerHTML = `
+      <h4><i class="ti ti-alert-triangle"></i> Troubleshooting "Failed to fetch" (Backend Offline)</h4>
+      <p style="margin-bottom:6px;">If the backend shows offline or fails to load logs, it is usually caused by one of these reasons:</p>
+      <ul>
+        <li><strong>Cold Start (Sleep Mode)</strong>: The Render free tier spins down the server after 15 minutes of inactivity. Close this modal and click <strong>"Wake Up Backend"</strong> on the backend status card. It takes about 50 seconds to boot up.</li>
+        <li><strong>Local File CORS Blocker</strong>: If your browser URL starts with <code>file:///</code>, modern browsers block AJAX requests to external APIs due to security/CORS restrictions.
+          <br><em style="font-size:11px;color:#7c2d12;">👉 Fix: Run a local web server (e.g. VS Code Live Server or run <code>npx serve</code> in the folder) and open the page via <code>http://localhost</code>.</em>
+        </li>
+        <li><strong>Local Port CORS Mismatch</strong>: If you are using a local web server (e.g. <code>localhost:5500</code>), ensure the backend has the updated CORS configuration to allow local ports.</li>
+        <li><strong>Render Service Outage</strong>: Check if the backend is down by navigating directly to <a href="${_BACKEND_URL}/" target="_blank" style="color:var(--brand);font-weight:600;text-decoration:underline;">Backend Ping URL</a> in a new tab. If it loads "Walkathon backend running", the server is online.</li>
+      </ul>
+    `;
+  } else if (service === 'supabase') {
+    guideDiv.innerHTML = `
+      <h4><i class="ti ti-alert-triangle"></i> Troubleshooting DB Connection Errors</h4>
+      <p style="margin-bottom:6px;">If Supabase is showing "Failed to fetch", check the following items:</p>
+      <ul>
+        <li><strong>Local File CORS Restriction</strong>: Running the page directly from the file system (<code>file:///</code>) blocks headers required by the Supabase REST client in some browsers. Always serve via a local web server (<code>http://localhost</code>).</li>
+        <li><strong>Supabase Project Paused</strong>: Supabase free projects pause after 1 week of inactivity. Go to your Supabase Dashboard to resume the database.</li>
+        <li><strong>Invalid API Credentials</strong>: Verify that <code>SUPABASE_URL</code> and <code>SUPABASE_ANON</code> in your HTML file headers are set correctly.</li>
+        <li><strong>Adblocker/DNS Blocker</strong>: Some browser privacy extensions or company firewalls block database subdomains (e.g., <code>*.supabase.co</code>). Try disabling extensions or testing on a different network.</li>
+      </ul>
+    `;
+  }
+  return guideDiv;
+}
+
+function closeHealthLogsModal() {
+  const modal = document.getElementById('health-logs-modal');
+  if (modal) modal.classList.remove('show');
+}
+
+// ── Realtime ──
+(function startRealtime() {
+  const wsUrl = 'wss://jhdgkncpkrttvemvwukc.supabase.co/realtime/v1/websocket?vsn=1.0.0&apikey=' + SUPABASE_ANON;
+  let ws, ping, ref = 0;
+  const badge = document.getElementById('realtime-badge');
+
+  function nextRef() { return String(++ref); }
+
+  function setBadge(state, text) {
+    badge.className = state;
+    badge.textContent = text;
+  }
+
+  function connect() {
+    try {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = function() {
+        ws.send(JSON.stringify({
+          topic: 'realtime:activities-watch',
+          event: 'phx_join',
+          payload: {
+            config: {
+              broadcast: { self: false },
+              presence: { key: '' },
+              postgres_changes: [
+                { event: 'INSERT', schema: 'public', table: 'activities' },
+                { event: 'UPDATE', schema: 'public', table: 'activities' }
+              ]
+            },
+            access_token: SUPABASE_ANON
+          },
+          ref: nextRef()
+        }));
+
+        ping = setInterval(function() {
+          if (ws.readyState === 1) {
+            ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: nextRef() }));
+          }
+        }, 25000);
+      };
+
+      ws.onmessage = function(evt) {
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.event === 'phx_reply' && msg.payload && msg.payload.status === 'ok') {
+            setBadge('live', 'Live');
+          }
+          if (msg.event === 'postgres_changes' ||
+              (msg.payload && msg.payload.data && (msg.payload.data.type === 'INSERT' || msg.payload.data.type === 'UPDATE'))) {
+            setBadge('new-act', '⚡ New activity!');
+            setTimeout(function() { load(); setBadge('live', 'Live'); }, 1200);
+          }
+        } catch(e) {}
+      };
+
+      ws.onclose = function() {
+        clearInterval(ping);
+        setBadge('error', 'Reconnecting…');
+        setTimeout(connect, 5000);
+      };
+
+      ws.onerror = function() { ws.close(); };
+    } catch(e) {
+      setBadge('error', 'Error');
+    }
+  }
+
+  connect();
+})();
+
+// Close health modal if clicked outside
+document.getElementById('health-logs-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeHealthLogsModal();
+  }
+});
+</script>
+
+  <!-- Service Logs Modal -->
+  <div class="modal-overlay" id="health-logs-modal">
+    <div class="modal">
+      <button class="modal-close-btn" onclick="closeHealthLogsModal()">&times;</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-right:24px;flex-wrap:wrap;gap:8px;">
+        <h3 id="health-modal-title" style="margin:0;font-size:15px;font-weight:700;">
+          <i class="ti ti-history" style="color:var(--brand);margin-right:4px;"></i> <span id="health-modal-service-name">Service</span> Logs
+        </h3>
+        <button id="modal-refresh-btn" class="btn btn-sm" style="font-size:11px;padding:4px 8px;border-radius:4px;border:none;background:var(--brand);color:#fff;cursor:pointer;display:none;font-family:var(--font);font-weight:600;">
+          <i class="ti ti-refresh"></i> Refresh
+        </button>
+      </div>
+      <div id="health-modal-content" style="max-height: 440px; overflow-y: auto; margin-top: 8px;">
+        <!-- Log items dynamically loaded -->
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+
