@@ -312,6 +312,9 @@ async function load(isBackgroundRefresh) {
           } catch(e) { console.error("Failed to parse feed_config:", e); }
         }
       });
+      if (typeof setupAppLayout === 'function') {
+        setupAppLayout(true);
+      }
     }
 
     // Enforce Strava Connect Card visibility
