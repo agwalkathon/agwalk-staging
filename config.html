@@ -216,6 +216,79 @@ tr:hover td{background:#FAFAFA}
 <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span>🔑</span><div><div class="section-title">Participant Login Method</div><div class="section-sub-inline">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">▼</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">✅ Saved!</span></div></div>
 
 <div class="section">
+  <div class="section-header" onclick="toggleSection('layout')">
+    <div class="section-header-left">
+      <span>🎨</span>
+      <div>
+        <div class="section-title">App Layout & UI Features</div>
+        <div class="section-sub-inline">Configure tab visibilities and Connect Strava card visibility</div>
+      </div>
+    </div>
+    <span class="section-chevron" id="chev-layout">▼</span>
+  </div>
+  <div class="section-body" id="body-layout" style="padding: 24px;">
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
+      <!-- Toggle Strava Connect -->
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+        <div style="flex: 1; text-align: left;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Hide Strava Connect Card</strong>
+          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Hide the "Connect with Strava" card under the Profile tab for this event.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="layout-hide-strava">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Toggle Team Leaderboard Filter -->
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+        <div style="flex: 1; text-align: left;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Enable Team-Based Leaderboard Filter</strong>
+          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Show the "Team" sub-tab on the Leaderboard tab (filtered to participant's leaderboard_team).</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="layout-team-leaderboard">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Tab Visibilities -->
+      <div style="margin-top: 10px;">
+        <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Floating Nav Bar - Active Tabs</strong>
+        <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-dashboard" checked>
+            <span>Dashboard</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-leaderboard" checked>
+            <span>Leaderboard</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-events" checked>
+            <span>Events</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-celebrate" checked>
+            <span>Celebrate</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-feed" checked>
+            <span>Feed</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="tab-opt-you" checked>
+            <span>You (Profile)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveLayoutConfig()">Save layout settings</button>
+    <span class="saved-msg" id="layout-saved">✅ Saved!</span>
+  </div>
+</div>
+
+<div class="section">
   <div class="section-header" onclick="toggleSection('pwarules')">
     <div class="section-header-left">
       <span>🔔</span>
@@ -385,8 +458,32 @@ async function loadConfig(){
   ['gold-male','gold-female','silver-male','silver-female','bronze-male','bronze-female','base-per-km'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   var lm=document.getElementById('login-method-select'); if(lm) lm.value='';
   bonusData=[]; renderBonusRows();
-  var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}});if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
+  
+  // Reset layout fields to defaults
+  document.getElementById('layout-hide-strava').checked = false;
+  document.getElementById('layout-team-leaderboard').checked = true;
+  ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
+    var el = document.getElementById('tab-opt-' + t);
+    if (el) el.checked = true;
+  });
+
+  var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}
+    if(row.config_key==='hide_strava_connect'){
+      document.getElementById('layout-hide-strava').checked = !!row.config_value;
+    }
+    if(row.config_key==='team_leaderboard_enabled'){
+      document.getElementById('layout-team-leaderboard').checked = !!row.config_value;
+    }
+    if(row.config_key==='tabs_config'){
+      var cfg = row.config_value || {};
+      ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
+        var el = document.getElementById('tab-opt-' + t);
+        if (el) el.checked = cfg[t] !== false;
+      });
+    }
+  });if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await upsertConfig('login_method',val);showSaved('loginmethod-saved');}
+async function saveLayoutConfig(){try{var hideStrava=document.getElementById('layout-hide-strava').checked;var teamLb=document.getElementById('layout-team-leaderboard').checked;var tabsCfg={};['dashboard','leaderboard','events','celebrate','feed','you'].forEach(function(t){var el=document.getElementById('tab-opt-'+t);tabsCfg[t]=el?el.checked:true});await Promise.all([upsertConfig('hide_strava_connect',hideStrava),upsertConfig('team_leaderboard_enabled',teamLb),upsertConfig('tabs_config',tabsCfg)]);showSaved('layout-saved')}catch(e){alert('Failed to save layout settings: '+e.message)}}
 function clearMyCache(){var keysToRemove=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('agwalk_')===0){keysToRemove.push(k)}}keysToRemove.forEach(function(k){localStorage.removeItem(k)});showSaved('cache-saved');setTimeout(function(){window.location.reload()},1200)}
 async function saveMedals(){var val={gold:{male:+document.getElementById('gold-male').value,female:+document.getElementById('gold-female').value},silver:{male:+document.getElementById('silver-male').value,female:+document.getElementById('silver-female').value},bronze:{male:+document.getElementById('bronze-male').value,female:+document.getElementById('bronze-female').value}};await upsertConfig('medals',val);showSaved('medals-saved')}
 async function saveBonus(){var bonusArr=bonusData.map(function(b,i){return{km:b.km,points:+(document.getElementById('bp-'+i).value)||0}}),base=parseFloat(document.getElementById('base-per-km').value)||1;await Promise.all([upsertConfig('bonus_points',bonusArr),upsertConfig('base_points',{per_km:base})]);showSaved('bonus-saved')}
