@@ -231,7 +231,6 @@
         <p>Manage active/inactive company employee master records</p>
       </div>
       <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
-        <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
         <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
       </div>
     </header>
@@ -348,6 +347,7 @@
 
         <div class="toolbar">
           <input id="search" oninput="filterTable()" placeholder="Search name, email or team" style="width:240px">
+          <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
           <select id="status-filter" onchange="filterTable()">
             <option value="">All activity statuses</option>
             <option value="active">Has activities</option>
@@ -374,7 +374,8 @@
               <thead>
                 <tr>
                   <th style="width: 60px;">#</th>
-                  <th style="min-width: 240px;">Participant Details</th>
+                  <th style="min-width: 200px;">Participant Details</th>
+                  <th style="min-width: 150px;">Event</th>
                   <th style="width: 100px;">Role</th>
                   <th style="width: 90px;">Gender</th>
                   <th style="width: 220px;">Strava Status</th>
@@ -384,7 +385,7 @@
                 </tr>
               </thead>
               <tbody id="participants-body">
-                <tr><td colspan="8" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+                <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -694,7 +695,10 @@
                     : esc(p.full_name || '—')
                   )
               }
-              <div class="muted">${esc(p.email || '')}${p.event_name ? ` • <span style="color:var(--brand);font-weight:600;">${esc(p.event_name)}</span>` : ''}</div>
+              <div class="muted">${esc(p.email || '')}</div>
+            </td>
+            <td>
+              <span style="font-weight:600;color:var(--text-secondary);">${esc(p.event_name || '—')}</span>
             </td>
             <td>${roleDrop(p)}</td>
             <td>${esc(p.gender || '—')}</td>
@@ -741,7 +745,7 @@
               </div>
             </td>
           </tr>`).join('')
-        : '<tr><td colspan="8" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
+        : '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
     }
 
     function filterTable() {
@@ -821,6 +825,7 @@
         
         const am = {};
         acts.forEach(a => {
+          if (!a.strava_athlete_id || String(a.strava_athlete_id).trim() === '' || String(a.strava_athlete_id) === 'null') return;
           const key = a.strava_athlete_id + '_' + a.event_id;
           if (!am[key]) am[key] = { cnt: 0, dist: 0 };
           am[key].cnt++;
@@ -828,13 +833,15 @@
         });
         
         allRows = approvedRegs.map(r => {
-          const key = r.strava_athlete_id + '_' + r.event_id;
+          const hasAthleteId = r.strava_athlete_id && String(r.strava_athlete_id).trim() !== '' && String(r.strava_athlete_id) !== 'null';
+          const key = hasAthleteId ? r.strava_athlete_id + '_' + r.event_id : null;
+          const isConn = (r.strava_connected === true || r.strava_connected === 'true' || r.strava_connected === 1 || r.strava_connected === '1');
           return {
             ...r,
             role:      r.role || 'user',
-            connected: !!r.strava_connected,
-            cnt:       am[key]?.cnt  || 0,
-            dist:      am[key]?.dist || 0
+            connected: isConn,
+            cnt:       (hasAthleteId && am[key]) ? am[key].cnt  : 0,
+            dist:      (hasAthleteId && am[key]) ? am[key].dist : 0
           };
         });
         
@@ -845,7 +852,7 @@
         filterTable();
       } catch(e) {
         document.getElementById('participants-body').innerHTML =
-          `<tr><td colspan="8" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+          `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
       }
     }
 
