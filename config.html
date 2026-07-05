@@ -305,55 +305,160 @@ tr:hover td{background:#FAFAFA}
             <input type="checkbox" id="tab-opt-you" checked>
             <span>You (Profile)</span>
           </label>
+
+<style>
+.segmented-control { display: flex; background: #E4E7EC; padding: 4px; border-radius: 12px; margin-bottom: 24px; overflow-x: auto; gap: 4px; border: 1px solid rgba(0,0,0,0.05); }
+.sc-btn { flex: 1; min-width: 140px; border: none; background: transparent; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
+.sc-btn:hover { background: rgba(255,255,255,0.4); color: var(--text-primary); }
+.sc-btn.active { background: white !important; color: var(--brand) !important; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+</style>
+
+<div class="segmented-control">
+  <button class="sc-btn active" data-target="security" onclick="switchConfigTab('security')">🔑 Access & Security</button>
+  <button class="sc-btn" data-target="scoring" onclick="switchConfigTab('scoring')">🏅 Scoring & Medals</button>
+  <button class="sc-btn" data-target="challenges" onclick="switchConfigTab('challenges')">🎯 Challenges & Bonuses</button>
+  <button class="sc-btn" data-target="layout" onclick="switchConfigTab('layout')">🎨 Layout & Cache</button>
+</div>
+
+<!-- Tab 1: Access & Security -->
+<div class="config-tab-panel" id="tab-panel-security">
+  <div class="section"><div class="section-header" onclick="toggleSection('maintenance')"><div class="section-header-left"><span>🚧</span><div><div class="section-title">App Maintenance Mode</div><div class="section-sub-inline">Instantly block all participants from using the app</div></div></div><span class="section-chevron" id="chev-maintenance">▼</span></div><div class="section-body" id="body-maintenance"><div class="rule-box" style="border-color:#E8622A;background:#fff6f2"><strong>⚠️ Live impact:</strong><br>When enabled, every participant sees a full-screen "Under Maintenance" block within ~25 seconds — even if already logged in. Athlete IDs listed in the allow-list below stay in.</div><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:14px 0;gap:15px;max-width:600px"><div style="flex:1"><strong style="font-size:13.5px;display:block;margin-bottom:2px;color:var(--text-primary)">Maintenance Mode</strong><span style="font-size:11.5px;color:var(--text-secondary);line-height:1.4;display:block" id="maint-status-label">Loading current status...</span></div><label class="switch"><input type="checkbox" id="maint-enabled-toggle" onchange="updateMaintStatusLabel(this.checked)"><span class="slider"></span></label></div><div class="form-grid" style="max-width:700px;margin-top:16px"><div class="field" style="grid-column:1/-1"><label>Allowed athlete IDs (comma or newline separated — bypass the block for testing)</label><textarea id="maint-allowed-ids" rows="3" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="20507382"></textarea></div><div class="field" style="grid-column:1/-1"><label>Block screen message</label><input type="text" id="maint-message" placeholder="App is Under Maintenance"></div></div><button class="save-btn" onclick="saveMaintenance()">Save maintenance settings</button><span class="saved-msg" id="maint-saved">✅ Saved!</span><div id="maint-msg-err" class="msg err"></div></div></div>
+
+  <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span>🔑</span><div><div class="section-title">Participant Login Method</div><div class="section-sub-inline">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">▼</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">✅ Saved!</span></div></div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection('pwarules')">
+      <div class="section-header-left">
+        <span>🔔</span>
+        <div>
+          <div class="section-title">PWA & Push Restrictions</div>
+          <div class="section-sub-inline">Configure installation and notification access requirements for mobile participants</div>
         </div>
       </div>
+      <span class="section-chevron" id="chev-pwarules">▼</span>
     </div>
-    <button class="save-btn" onclick="saveLayoutConfig()">Save layout settings</button>
-    <span class="saved-msg" id="layout-saved">✅ Saved!</span>
+    <div class="section-body" id="body-pwarules" style="padding: 24px;">
+      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Push Notifications</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to enable push notifications before releasing the app dashboard.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="rule-force-push">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Add to Home Screen (PWA)</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to install the app on their Home Screen as a PWA to access the app.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="rule-force-pwa">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <button class="save-btn" onclick="savePWARestrictions()">Save restrictions</button>
+      <span class="saved-msg" id="pwa-saved">✅ Saved!</span>
+    </div>
   </div>
 </div>
 
-<div class="section">
-  <div class="section-header" onclick="toggleSection('pwarules')">
-    <div class="section-header-left">
-      <span>🔔</span>
-      <div>
-        <div class="section-title">PWA & Push Restrictions</div>
-        <div class="section-sub-inline">Configure installation and notification access requirements for mobile participants</div>
-      </div>
-    </div>
-    <span class="section-chevron" id="chev-pwarules">▼</span>
-  </div>
-  <div class="section-body" id="body-pwarules" style="padding: 24px;">
-    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
-        <div style="flex: 1; text-align: left;">
-          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Push Notifications</strong>
-          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to enable push notifications before releasing the app dashboard.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="rule-force-push">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; gap: 15px;">
-        <div style="flex: 1; text-align: left;">
-          <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Add to Home Screen (PWA)</strong>
-          <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to install the app on their Home Screen as a PWA to access the app.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="rule-force-pwa">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-    <button class="save-btn" onclick="savePWARestrictions()">Save restrictions</button>
-    <span class="saved-msg" id="pwa-saved">✅ Saved!</span>
-  </div>
+<!-- Tab 2: Scoring & Medals -->
+<div class="config-tab-panel" id="tab-panel-scoring" style="display: none;">
+  <div class="section"><div class="section-header" onclick="toggleSection('medals')"><div class="section-header-left"><span>🏅</span><div><div class="section-title">Medal Milestones</div><div class="section-sub-inline">Points required for Bronze, Silver, Gold — by gender</div></div></div><span class="section-chevron" id="chev-medals">▼</span></div><div class="section-body" id="body-medals"><div class="form-grid"><div class="field"><label>🥇 Gold — Male</label><input type="number" id="gold-male" value="300"></div><div class="field"><label>🥇 Gold — Female</label><input type="number" id="gold-female" value="250"></div><div class="field"><label>🥈 Silver — Male</label><input type="number" id="silver-male" value="200"></div><div class="field"><label>🥈 Silver — Female</label><input type="number" id="silver-female" value="150"></div><div class="field"><label>🥉 Bronze — Male</label><input type="number" id="bronze-male" value="125"></div><div class="field"><label>🥉 Bronze — Female</label><input type="number" id="bronze-female" value="100"></div></div><button class="save-btn" onclick="saveMedals()">Save medals</button><span class="saved-msg" id="medals-saved">✅ Saved!</span></div></div>
+
+  <div class="section"><div class="section-header" onclick="toggleSection('bonus')"><div class="section-header-left"><span>📊</span><div><div class="section-title">Points Configuration</div><div class="section-sub-inline">Base points per km + daily bonus milestones</div></div></div><span class="section-chevron" id="chev-bonus">▼</span></div><div class="section-body" id="body-bonus"><div class="form-grid" style="max-width:300px;margin-bottom:20px"><div class="field"><label>Base points per km</label><input type="number" id="base-per-km" value="1" step="0.1"></div></div><table class="bonus-table"><thead><tr><th>Daily distance milestone</th><th>Bonus points</th></tr></thead><tbody id="bonus-rows"></tbody></table><button class="save-btn" onclick="saveBonus()">Save points config</button><span class="saved-msg" id="bonus-saved">✅ Saved!</span></div></div>
+
+  <div class="section"><div class="section-header" onclick="toggleSection('dailycap')"><div class="section-header-left"><span>📅</span><div><div class="section-title">Daily Cap & Special Days</div><div class="section-sub-inline">21 km cap on normal days; selected dates count full distance</div></div></div><span class="section-chevron" id="chev-dailycap">▼</span></div><div class="section-body" id="body-dailycap"><div class="rule-box"><strong>Normal Days Rule:</strong><br>Daily walk/run cap is <strong>21 km</strong>. If a participant walks/runs more than 21 km on a normal day, recorded scoring distance will be capped at 21 km, worth 21 base points, and they will receive a flat <strong>+7 bonus points</strong>. Total = 28 points.</div><div class="rule-box"><strong>Special Days Rule Exception:</strong><br>On selected special dates, the 21 km limit is removed. Participants receive <strong>1 point per full kilometer</strong>, while bonus remains capped at <strong>+7 points</strong>. Example: 25 km = 25 base points + 7 bonus = 32 points.</div><div class="form-grid" style="align-items:end"><div class="field"><label>Special date</label><input type="date" id="special-date"></div><div class="field" style="grid-column:span 2"><label>Reason / Label</label><input type="text" id="special-label" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="addSpecialDate()">Add Special Date</button><button class="btn-add" style="margin-left:8px;background:#f0f0f0;color:#555" onclick="loadSpecialDates()">Refresh</button><span class="saved-msg" id="special-saved">✅ Saved!</span><div id="special-msg-ok" class="msg ok"></div><div id="special-msg-err" class="msg err"></div><div style="font-size:14px;font-weight:600;margin:20px 0 12px">Configured Special Dates</div><div id="special-dates-list">Loading...</div></div></div>
 </div>
 
+<!-- Tab 3: Challenges & Bonuses -->
+<div class="config-tab-panel" id="tab-panel-challenges" style="display: none;">
+  <div class="section"><div class="section-header" onclick="toggleSection('challenges')"><div class="section-header-left"><span>🎯</span><div><div class="section-title">Challenges</div><div class="section-sub-inline">Configure challenge bonus criteria and points</div></div></div><span class="section-chevron" id="chev-challenges">▼</span></div><div class="section-body" id="body-challenges"><div id="challenges-list">Loading...</div><button class="btn-add" onclick="addChallenge()">+ Add challenge</button><span class="saved-msg" id="ch-saved">✅ Saved!</span></div></div>
 
-<div class="section"><div class="section-header" onclick="toggleSection('cachemgmt')"><div class="section-header-left"><span>🧹</span><div><div class="section-title">Cache Management</div><div class="section-sub-inline">Clear browser local cache to see updates immediately</div></div></div><span class="section-chevron" id="chev-cachemgmt">▼</span></div><div class="section-body" id="body-cachemgmt"><div class="rule-box"><strong>Application Cache:</strong><br>The frontend caches leaderboard and configuration data to reduce database load. If you applied manual bonuses, added new challenges, or flagged activities, it may take up to 5 minutes to show up. Click below to clear your local cache and reload immediately.</div><button class="save-btn" onclick="clearMyCache()">🧹 Clear My Browser Cache</button><span class="saved-msg" id="cache-saved">✅ Cache Cleared!</span></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('manual')"><div class="section-header-left"><span>🎁</span><div><div class="section-title">Manual Bonus by Activity ID</div><div class="section-sub-inline">Apply bonus points to specific activities manually</div></div></div><span class="section-chevron" id="chev-manual">▼</span></div><div class="section-body" id="body-manual"><div class="form-grid" style="max-width:700px"><div class="field" style="grid-column:1/-1"><label>Activity IDs (one per line, or comma separated)</label><textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea></div><div class="field"><label>Apply bonus to</label><select id="manual-apply-to"><option value="each">Each activity individually</option><option value="day">All activities on same day</option></select></div><div class="field"><label>Bonus points</label><input type="number" id="manual-pts" value="3" min="1" max="50"></div><div class="field"><label>Date</label><input type="date" id="manual-date"></div><div class="field"><label>Challenge name</label><input type="text" id="manual-reason" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button><span class="saved-msg" id="manual-saved">✅ Applied!</span><div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div><div style="margin-top:20px"><div onclick="toggleManualList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:8px;user-select:none"><div style="font-size:14px;font-weight:600">Existing manual bonuses</div><span id="chev-manuallist" style="font-size:13px;color:#bbb;transition:transform .2s">▼</span></div><div id="body-manuallist" style="display:none;margin-top:8px"><div id="manual-list"></div></div></div></div></div>
+</div>
+
+<!-- Tab 4: Layout & Cache -->
+<div class="config-tab-panel" id="tab-panel-layout" style="display: none;">
+  <div class="section">
+    <div class="section-header" onclick="toggleSection('layout')">
+      <div class="section-header-left">
+        <span>🎨</span>
+        <div>
+          <div class="section-title">App Layout & UI Features</div>
+          <div class="section-sub-inline">Configure tab visibilities and Connect Strava card visibility</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-layout">▼</span>
+    </div>
+    <div class="section-body" id="body-layout" style="padding: 24px;">
+      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
+        <!-- Toggle Strava Connect -->
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Hide Strava Connect Card</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Hide the "Connect with Strava" card under the Profile tab for this event.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="layout-hide-strava">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Toggle Team Leaderboard Filter -->
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Enable Team-Based Leaderboard Filter</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Show the "Team" sub-tab on the Leaderboard tab (filtered to participant's leaderboard_team).</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="layout-team-leaderboard">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Tab Visibilities -->
+        <div style="margin-top: 10px;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Floating Nav Bar - Active Tabs</strong>
+          <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-dashboard" checked>
+              <span>Dashboard</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-leaderboard" checked>
+              <span>Leaderboard</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-events" checked>
+              <span>Events</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-celebrate" checked>
+              <span>Celebrate</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-feed" checked>
+              <span>Feed</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="tab-opt-you" checked>
+              <span>You (Profile)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveLayoutConfig()">Save layout settings</button>
+      <span class="saved-msg" id="layout-saved">✅ Saved!</span>
+    </div>
+  </div>
+
+  <div class="section"><div class="section-header" onclick="toggleSection('cachemgmt')"><div class="section-header-left"><span>🧹</span><div><div class="section-title">Cache Management</div><div class="section-sub-inline">Clear browser local cache to see updates immediately</div></div></div><span class="section-chevron" id="chev-cachemgmt">▼</span></div><div class="section-body" id="body-cachemgmt"><div class="rule-box"><strong>Application Cache:</strong><br>The frontend caches leaderboard and configuration data to reduce database load. If you applied manual bonuses, added new challenges, or flagged activities, it may take up to 5 minutes to show up. Click below to clear your local cache and reload immediately.</div><button class="save-btn" onclick="clearMyCache()">🧹 Clear My Browser Cache</button><span class="saved-msg" id="cache-saved">✅ Cache Cleared!</span></div></div>
+</div>
 
 </div>
 
@@ -389,6 +494,44 @@ var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON,'Content-Type':'application/json'};
 var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
+
+window.switchConfigTab = function(tabName) {
+  document.querySelectorAll('.sc-btn').forEach(btn => {
+    if (btn.getAttribute('data-target') === tabName) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  document.querySelectorAll('.config-tab-panel').forEach(panel => {
+    panel.style.display = 'none';
+  });
+  
+  const activePanel = document.getElementById('tab-panel-' + tabName);
+  if (activePanel) {
+    activePanel.style.display = 'block';
+    
+    activePanel.querySelectorAll('.section').forEach(sec => {
+      const body = sec.querySelector('.section-body');
+      const chev = sec.querySelector('.section-chevron');
+      if (body) {
+        body.classList.add('open');
+        body.style.display = 'block';
+      }
+      if (chev) {
+        chev.classList.add('open');
+        chev.style.transform = 'rotate(180deg)';
+      }
+    });
+  }
+}
+
+// Initialize active tab layout and expand sections on load
+setTimeout(function() {
+  switchConfigTab('security');
+}, 100);
+
 var BONUS_DEFAULT=[{km:5,pts:1},{km:8,pts:2},{km:10,pts:3},{km:15,pts:4},{km:21,pts:7}],bonusData=BONUS_DEFAULT.slice(),flagPreviewData=[];
 var atypeOptions = ['one-time', 'per-act', 'range-split', 'two-challenges-same-day'];
 var atypeLabels = {
