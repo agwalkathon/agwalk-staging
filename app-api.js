@@ -305,7 +305,13 @@ async function load(isBackgroundRefresh) {
         if(row.config_key==='maintenance_message') CONFIG_LB.maintenance_message=(typeof row.config_value==='string'?row.config_value:'')||'';
         if(row.config_key==='hide_strava_connect') CONFIG_LB.hide_strava_connect=(row.config_value===true||row.config_value==='true');
         if(row.config_key==='team_leaderboard_enabled') CONFIG_LB.team_leaderboard_enabled=(row.config_value===true||row.config_value==='true');
-        if(row.config_key==='tabs_config') CONFIG_LB.tabs_config=row.config_value||{};
+        if(row.config_key==='tabs_config') {
+          var val = row.config_value || {};
+          if (typeof val === 'string') {
+            try { val = JSON.parse(val); } catch(e) {}
+          }
+          CONFIG_LB.tabs_config = val;
+        }
         if(row.config_key==='feed_config') {
           try {
             CONFIG_LB.feed_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
