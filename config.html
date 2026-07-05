@@ -5,8 +5,23 @@
     (function(){
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          var unregisteredAny = false;
           for (var i = 0; i < registrations.length; i++) {
-            registrations[i].update();
+            registrations[i].unregister();
+            unregisteredAny = true;
+          }
+          if (unregisteredAny) {
+            if ('caches' in window) {
+              caches.keys().then(function(keys) {
+                keys.forEach(function(key) {
+                  caches.delete(key);
+                });
+              }).then(function() {
+                window.location.reload();
+              });
+            } else {
+              window.location.reload();
+            }
           }
         });
       }
