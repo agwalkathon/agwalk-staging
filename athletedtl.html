@@ -751,7 +751,7 @@
         if (!token) return;
         
         const [d, acts] = await Promise.all([
-          fetch(_BU + '/admin/participants?event_id=' + EV_ID, {
+          fetch(_BU + '/admin/participants?event_id=' + EV_ID + '&_t=' + Date.now(), {
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + token
@@ -928,7 +928,7 @@
         const token = sessionStorage.getItem('wk_admin_token');
         if (!token) return;
         
-        const r = await fetch(_BU + '/admin/participants?event_id=' + EV_ID + '&status=in.(pending,rejected)', {
+        const r = await fetch(_BU + '/admin/participants?event_id=' + EV_ID + '&status=in.(pending,rejected)&_t=' + Date.now(), {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
