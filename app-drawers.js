@@ -560,10 +560,8 @@ function openProfileDetail(athleteId, event) {
     document.getElementById('prof-total-steps').innerText = '—';
     document.getElementById('prof-total-activities').innerText = '—';
     document.getElementById('prof-total-hours').innerText = '—';
-    document.getElementById('prof-pb-longest').innerText = '—';
-    document.getElementById('prof-pb-pace').innerText = '—';
-    document.getElementById('prof-pb-duration').innerText = '—';
-    document.getElementById('prof-pb-streak').innerText = '—';
+    var profPbContainer = document.getElementById('prof-pb-container');
+    if (profPbContainer) profPbContainer.innerHTML = '';
     document.getElementById('prof-heatmap-grid').innerHTML = '';
     document.getElementById('prof-recent-activities').innerHTML = '<div style="font-size:13px; color:var(--muted); text-align:center; padding:20px;">Loading recent activities...</div>';
 
@@ -710,27 +708,118 @@ function openProfileDetail(athleteId, event) {
           if (d) dayKm[d] = (dayKm[d] || 0) + km;
         });
 
-        document.getElementById('prof-pb-longest').innerText = maxDist > 0 ? (maxDist / 1000).toFixed(2) + ' km' : '—';
-        document.getElementById('prof-pb-pace').innerText = maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—';
-        document.getElementById('prof-pb-duration').innerText = maxTime > 0 ? fmtDur(maxTime) : '—';
+        // --- Render Profile Personal Bests Dynamically ---
+        (function() {
+          var container = document.getElementById("prof-pb-container");
+          if (!container) return;
+          
+          var pbConfig = (EVENT_ROW && EVENT_ROW.rules_config && EVENT_ROW.rules_config.dashboard && EVENT_ROW.rules_config.dashboard.personal_bests) ? EVENT_ROW.rules_config.dashboard.personal_bests : {
+            longest_activity: true,
+            best_pace: true,
+            longest_session: true,
+            best_day: true
+          };
+          
+          // Find max elevation
+          var maxElevation = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.elevation_gain) || 0); }, 0);
+          
+          // Find max avg speed
+          var maxAvgSpeed = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.avg_speed) || 0); }, 0);
+          
+          // Find total elevation
+          var totalElevation = validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0);
+          
+          // Calculate streak
+          var activeDays = {};
+          validActs.forEach(function(a) {
+            var d = getActDate(a);
+            if (d) activeDays[d] = true;
+          });
+          var sortedActive = Object.keys(activeDays).sort();
+          var streakBest = 0, cur = 0, prevD = null;
+          sortedActive.forEach(function(d) {
+            if (prevD) {
+              var diff = Math.round((new Date(d + "T12:00:00") - new Date(prevD + "T12:00:00")) / 86400000);
+              cur = diff === 1 ? cur + 1 : 1;
+            } else cur = 1;
+            streakBest = Math.max(streakBest, cur);
+            prevD = d;
+          });
 
-        var streak = 0;
-        var activeDays = {};
-        validActs.forEach(function(a) {
-          var d = getActDate(a);
-          if (d) activeDays[d] = true;
-        });
-        var sortedActive = Object.keys(activeDays).sort();
-        var best = 0, cur = 0, prevD = null;
-        sortedActive.forEach(function(d) {
-          if (prevD) {
-            var diff = Math.round((new Date(d + 'T12:00:00') - new Date(prevD + 'T12:00:00')) / 86400000);
-            cur = diff === 1 ? cur + 1 : 1;
-          } else cur = 1;
-          best = Math.max(best, cur);
-          prevD = d;
-        });
-        document.getElementById('prof-pb-streak').innerText = best + ' days';
+          var statDefs = {
+            longest_activity: {
+              lbl: "Longest Activity",
+              sub: "single session max",
+              val: maxDist > 0 ? (maxDist / 1000).toFixed(2) + ' km' : '—'
+            },
+            best_pace: {
+              lbl: "Best Pace",
+              sub: "min/km - walk/run",
+              val: maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—'
+            },
+            longest_session: {
+              lbl: "Longest Duration",
+              sub: "moving duration",
+              val: maxTime > 0 ? fmtDur(maxTime) : '—'
+            },
+            best_day: {
+              lbl: "Best Day",
+              sub: "daily max",
+              val: (function() {
+                var maxDayKm = 0;
+                Object.keys(dayKm).forEach(function(d){ if (dayKm[d] > maxDayKm) maxDayKm = dayKm[d]; });
+                return maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—';
+              })()
+            },
+            max_elevation: {
+              lbl: "Max Elevation",
+              sub: "single session max",
+              val: maxElevation > 0 ? maxElevation.toFixed(0) + ' m' : '—'
+            },
+            max_speed: {
+              lbl: "Max Avg Speed",
+              sub: "single session max",
+              val: maxAvgSpeed > 0 ? (maxAvgSpeed * 3.6).toFixed(1) + ' km/h' : '—'
+            },
+            total_distance: {
+              lbl: "Total Distance",
+              sub: "overall distance",
+              val: maxDist > 0 ? (validActs.reduce(function(sum, a) { return sum + (a.distance_meters || 0); }, 0) / 1000).toFixed(1) + ' km' : '—'
+            },
+            total_elevation: {
+              lbl: "Total Elevation",
+              sub: "overall elevation",
+              val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—'
+            },
+            total_activities: {
+              lbl: "Total Activities",
+              sub: "synced sessions",
+              val: validActs.length + " acts"
+            }
+          };
+
+          var html = "";
+          var keys = ["longest_activity", "best_pace", "longest_session", "best_day", "max_elevation", "max_speed", "total_distance", "total_elevation", "total_activities"];
+          keys.forEach(function(key) {
+            if (pbConfig[key] !== false) {
+              var d = statDefs[key];
+              html += "<div class=\\"prof-pb-card\\">" +
+                "<span class=\\"lbl\\">" + d.lbl + "</span>" +
+                "<span class=\\"val\\">" + d.val + "</span>" +
+                "<span class=\\"sub\\">" + d.sub + "</span>" +
+              "</div>";
+            }
+          });
+          
+          // Always append streak
+          html += "<div class=\\"prof-pb-card\\">" +
+            "<span class=\\"lbl\\">Active Streak</span>" +
+            "<span class=\\"val\\">" + streakBest + " days</span>" +
+            "<span class=\\"sub\\">consecutive days</span>" +
+          "</div>";
+
+          container.innerHTML = html;
+        })();
 
         var grid = document.getElementById('prof-heatmap-grid');
         if (grid) {
