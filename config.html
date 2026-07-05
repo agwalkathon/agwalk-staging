@@ -729,6 +729,9 @@ async function loadConfig(){
     }
     if(row.config_key==='tabs_config'){
       var cfg = row.config_value || {};
+      if (typeof cfg === 'string') {
+        try { cfg = JSON.parse(cfg); } catch(e) {}
+      }
       ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
         var el = document.getElementById('tab-opt-' + t);
         if (el) el.checked = cfg[t] !== false;
