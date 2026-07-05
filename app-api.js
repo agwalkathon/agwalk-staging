@@ -740,9 +740,7 @@ async function load(isBackgroundRefresh) {
         var grid = document.getElementById('pb-grid-container');
         if (!grid) return;
         
-        var cfgRows = cacheGet('config') || [];
-        var pbConfigRow = cfgRows.find(function(r) { return r.config_key === 'personal_bests'; });
-        var pbConfig = pbConfigRow ? pbConfigRow.config_value : {
+        var pbConfig = (EVENT_ROW && EVENT_ROW.rules_config && EVENT_ROW.rules_config.dashboard && EVENT_ROW.rules_config.dashboard.personal_bests) ? EVENT_ROW.rules_config.dashboard.personal_bests : {
           longest_activity: true,
           best_pace: true,
           longest_session: true,
