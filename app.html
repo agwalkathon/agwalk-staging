@@ -348,62 +348,8 @@
   </div>
 
   <div class="sec">PERSONAL BESTS</div>
-  <div class="pb-grid">
-    <!-- Longest Activity -->
-    <div class="pb-card">
-      <div class="pb-card-left">
-        <div class="pb-card-header">
-          <div class="pb-card-icon" style="background: rgba(255, 174, 0, 0.12); color: #ffae00;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 4 4-8 4 8"/></svg>
-          </div>
-          <div class="pb-card-label">Longest Activity</div>
-        </div>
-        <div class="pb-card-sub">single session max</div>
-      </div>
-      <div class="pb-card-val" id="pb-longest" style="color: #ffae00;">—</div>
-    </div>
-
-    <!-- Best Pace -->
-    <div class="pb-card">
-      <div class="pb-card-left">
-        <div class="pb-card-header">
-          <div class="pb-card-icon" style="background: rgba(232, 98, 42, 0.12); color: var(--brand);">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div class="pb-card-label">Best Pace</div>
-        </div>
-        <div class="pb-card-sub">min/km &middot; walk/run</div>
-      </div>
-      <div class="pb-card-val" id="pb-pace" style="color: var(--brand);">—</div>
-    </div>
-
-    <!-- Longest Session -->
-    <div class="pb-card">
-      <div class="pb-card-left">
-        <div class="pb-card-header">
-          <div class="pb-card-icon" style="background: rgba(96, 165, 250, 0.12); color: var(--blue);">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          </div>
-          <div class="pb-card-label">Longest Session</div>
-        </div>
-        <div class="pb-card-sub">longest moving duration</div>
-      </div>
-      <div class="pb-card-val" id="pb-time" style="color: var(--blue);">—</div>
-    </div>
-
-    <!-- Best Day -->
-    <div class="pb-card">
-      <div class="pb-card-left">
-        <div class="pb-card-header">
-          <div class="pb-card-icon" style="background: rgba(34, 197, 94, 0.12); color: var(--green);">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <div class="pb-card-label">Best Day</div>
-        </div>
-        <div class="pb-card-sub">daily max &middot; <span id="pb-bestday-date">—</span></div>
-      </div>
-      <div class="pb-card-val" id="pb-bestday" style="color: var(--green);">—</div>
-    </div>
+  <div class="pb-grid" id="pb-grid-container">
+    <!-- Rendered dynamically via javascript configuration -->
   </div>
 
 </div>
@@ -1067,27 +1013,8 @@
       <!-- Personal Bests Grid (Moved before heatmap) -->
       <div style="margin-bottom:24px;">
         <div class="detail-metrics-title">Personal Bests</div>
-        <div class="prof-pb-row">
-          <div class="prof-pb-card">
-            <span class="lbl">Longest Activity</span>
-            <span class="val" id="prof-pb-longest">—</span>
-            <span class="sub">single session max</span>
-          </div>
-          <div class="prof-pb-card">
-            <span class="lbl">Best Pace</span>
-            <span class="val" id="prof-pb-pace">—</span>
-            <span class="sub">min/km · walk/run</span>
-          </div>
-          <div class="prof-pb-card">
-            <span class="lbl">Longest Duration</span>
-            <span class="val" id="prof-pb-duration">—</span>
-            <span class="sub">moving duration</span>
-          </div>
-          <div class="prof-pb-card">
-            <span class="lbl">Active Streak</span>
-            <span class="val" id="prof-pb-streak">—</span>
-            <span class="sub">consecutive days</span>
-          </div>
+        <div class="prof-pb-row" id="prof-pb-container">
+          <!-- Rendered dynamically via javascript configuration -->
         </div>
       </div>
 
