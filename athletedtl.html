@@ -319,11 +319,16 @@
         <div class="toolbar">
           <input id="search" oninput="filterTable()" placeholder="Search name, email or team" style="width:240px">
           <select id="status-filter" onchange="filterTable()">
-            <option value="">All statuses</option>
+            <option value="">All activity statuses</option>
             <option value="active">Has activities</option>
             <option value="inactive">No activities</option>
             <option value="connected">Strava connected</option>
             <option value="notconnected">Not connected</option>
+          </select>
+          <select id="reg-status-filter" onchange="filterTable()">
+            <option value="all">All Registrations</option>
+            <option value="active" selected>Active Only</option>
+            <option value="inactive">Inactive Only</option>
           </select>
           <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:5px 10px;height:38px;box-sizing:border-box;">
             <label for="sync-date" style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;white-space:nowrap;margin:0;">Sync Date:</label>
@@ -671,7 +676,7 @@
                         style="${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? 'background:#F3F4F6;color:#4B5563;border:1px solid #E5E7EB;' : ''}">
                     ${p.connected ? '✓ Connected' : ( (!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? 'Disconnected' : 'Not yet' )}
                   </span>
-                  ${p.connected ? `<a href="javascript:void(0)" onclick="revokeStrava('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Revoke</a>` : ''}
+                  ${p.connected ? `<a href="javascript:void(0)" onclick="revokeStrava('${p.id}','${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Revoke</a>` : ''}
                 </div>
                 ${p.connected && p.strava_connected_at ? `<div class="muted" style="margin-top:2px;">Connected: ${fmtReqDate(p.strava_connected_at)}</div>` : ''}
                 ${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? `<div class="muted" style="margin-top:2px;">Disconnected: ${fmtReqDate(p.strava_disconnected_at)}${p.strava_disconnected_by ? ' by ' + esc(p.strava_disconnected_by) : ''}</div>` : ''}
@@ -684,9 +689,21 @@
               </div>
             </td>
             <td>
-              ${p.connected ? `<a href="javascript:void(0)" id="sync-btn-${p.strava_athlete_id}" onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: var(--brand); text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232, 98, 42, 0.2); background: rgba(232, 98, 42, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(232,98,42,0.15)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='rgba(232,98,42,0.05)';this.style.borderColor='rgba(232, 98, 42, 0.2)'">Sync</a>` : '—'}
+              ${p.connected ? `<a href="javascript:void(0)" id="sync-btn-${p.strava_athlete_id}" onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: var(--brand); text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232, 98, 42, 0.2); background: rgba(232, 98, 42, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(232,98,42,0.15)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='rgba(232,98,42,0.05)';this.style.borderColor='rgba(232, 98, 42, 0.2)'">Sync</a>` : '-'}
             </td>
-            <td><span class="badge ${p.cnt > 0 ? 'ok' : 'warn'}">${p.cnt > 0 ? 'Active' : 'Pending'}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span class="badge ${p.status === 'inactive' ? 'warn' : 'ok'}" style="${p.status === 'inactive' ? 'background:#F3F4F6;color:#4B5563;border:1px solid #E5E7EB;' : ''}">
+                  ${p.status === 'inactive' ? 'Inactive' : 'Active'}
+                </span>
+                <a href="javascript:void(0)" onclick="toggleRegistrationActive('${p.id}', ${p.status === 'inactive' ? 'true' : 'false'})" 
+                   style="color:${p.status === 'inactive' ? '#10b981' : '#ef4444'}; text-decoration:none; font-size:11px; font-weight:600; padding:2px 6px; border-radius:4px; border:1px solid ${p.status === 'inactive' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; background:${p.status === 'inactive' ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)'}; transition:all 0.15s;"
+                   onmouseover="this.style.background='${p.status === 'inactive' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}'"
+                   onmouseout="this.style.background='${p.status === 'inactive' ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)'}'">
+                  ${p.status === 'inactive' ? 'Activate' : 'Deactivate'}
+                </a>
+              </div>
+            </td>">${p.cnt > 0 ? 'Active' : 'Pending'}</span></td>
             <td>
               <button onclick="toggleFeedMute('${p.id}', ${p.is_private === true || p.is_private === 'true'})" 
                       style="padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid ${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; background: ${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)'}; color: ${p.is_private === true || p.is_private === 'true' ? '#ef4444' : '#10b981'}; transition: all 0.15s;"
@@ -702,6 +719,7 @@
     function filterTable() {
       const q  = document.getElementById('search').value.toLowerCase();
       const st = document.getElementById('status-filter').value;
+      const regSt = document.getElementById('reg-status-filter').value;
       const rows = allRows.filter(r => {
         const mq = !q || [r.full_name, r.email, r.leaderboard_team].join(' ').toLowerCase().includes(q);
         const ms = !st ? true
@@ -709,7 +727,10 @@
           : st === 'inactive'    ? r.cnt === 0
           : st === 'connected'   ? r.connected
           : !r.connected;
-        return mq && ms;
+        const mreg = regSt === 'all' ? true
+          : regSt === 'active' ? (r.status !== 'inactive')
+          : (r.status === 'inactive');
+        return mq && ms && mreg;
       });
       window._exportParticipants = rows;
       document.getElementById('export-btn').style.display = rows.length ? 'inline-flex' : 'none';
@@ -763,8 +784,8 @@
         if (!d.success) throw new Error(d.error || 'Failed to load participants');
         const regs = d.participants || [];
         
-        // Filter only approved participants
-        const approvedRegs = regs.filter(r => r.status === 'approved' || r.status === 'active' || !r.status);
+        // Filter approved and inactive participants for grid display (inactive filtered via reg-status-filter UI dropdown)
+        const approvedRegs = regs.filter(r => r.status === 'approved' || r.status === 'active' || r.status === 'inactive' || !r.status);
         
         const am = {};
         acts.forEach(a => {
@@ -839,7 +860,7 @@
       }
     }
 
-    async function revokeStrava(athleteId, name) {
+    async function revokeStrava(id, athleteId, name) {
       if (!confirm(`Are you sure you want to revoke Strava authorization for ${name}? The app will no longer be able to fetch new activities.`)) return;
       const token = sessionStorage.getItem('wk_admin_token');
       if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
@@ -850,11 +871,33 @@
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
           },
-          body: JSON.stringify({ athlete_id: athleteId })
+          body: JSON.stringify({ id: id, athlete_id: athleteId })
         });
         const d = await res.json();
         if (!res.ok || !d.success) throw new Error(d.error || 'Failed to revoke Strava');
         alert(`Successfully disconnected Strava for ${name}.`);
+        await loadParticipants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function toggleRegistrationActive(id, activate) {
+      const verb = activate ? 'activate' : 'deactivate';
+      if (!confirm(`Are you sure you want to ${verb} this participant registration?`)) return;
+      try {
+        const token = sessionStorage.getItem('wk_admin_token');
+        const res = await fetch(_BU + '/admin/participants/toggle-active', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ id, is_active: activate })
+        });
+        const d = await res.json();
+        if (!res.ok || !d.success) throw new Error(d.error || 'Failed to toggle status');
+        alert(`Successfully ${activate ? 'activated' : 'deactivated'} participant.`);
         await loadParticipants();
       } catch (err) {
         alert('Error: ' + err.message);
