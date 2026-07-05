@@ -836,8 +836,16 @@
           const hasAthleteId = r.strava_athlete_id && String(r.strava_athlete_id).trim() !== '' && String(r.strava_athlete_id) !== 'null';
           const key = hasAthleteId ? r.strava_athlete_id + '_' + r.event_id : null;
           const isConn = (r.strava_connected === true || r.strava_connected === 'true' || r.strava_connected === 1 || r.strava_connected === '1');
+          
+          let eventName = r.event_name;
+          if (!eventName && r.event_id && typeof EV_ALL !== 'undefined') {
+            const ev = EV_ALL.find(e => e.id === r.event_id);
+            if (ev) eventName = ev.name;
+          }
+          
           return {
             ...r,
+            event_name: eventName || '—',
             role:      r.role || 'user',
             connected: isConn,
             cnt:       (hasAthleteId && am[key]) ? am[key].cnt  : 0,
