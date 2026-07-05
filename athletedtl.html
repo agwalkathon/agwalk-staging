@@ -179,7 +179,8 @@
         <h1>Participants</h1>
         <p>Manage active/inactive company employee master records</p>
       </div>
-      <div class="topbar-right">
+      <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
+        <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
         <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
       </div>
     </header>
@@ -429,6 +430,43 @@
     let allRequestRows = [];
     let currentTab = 'employees';
     var _BU = 'https://agwalk-backend.onrender.com';
+
+    var EV_ID = 1;
+    var EV_ALL = [];
+
+    async function loadEventSelector() {
+      const sel = document.getElementById('ev-select');
+      if (!sel) return;
+      try {
+        const r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+        const evs = await r.json();
+        if (!Array.isArray(evs) || evs.length === 0) return;
+        EV_ALL = evs;
+        sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+        
+        let savedId = localStorage.getItem('wk_admin_selected_event_id');
+        if (!savedId) {
+          const live = evs.find(e => e.status === 'live');
+          savedId = live ? live.id : evs[0].id;
+        }
+        EV_ID = parseInt(savedId) || evs[0].id;
+        sel.value = EV_ID;
+        localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+        
+        sel.addEventListener('change', function() {
+          EV_ID = parseInt(this.value);
+          localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+          if (currentTab === 'participants') {
+            loadParticipants();
+          } else if (currentTab === 'requests') {
+            loadRequests();
+          }
+          updateBadgeCount();
+        });
+      } catch (err) {
+        console.error('Failed to load event selector:', err);
+      }
+    }
     let _empPage = 0;
     let _empSearch = '';
     let _searchTimeout = null;
@@ -673,8 +711,8 @@
     async function loadParticipants() {
       try {
         const [regs, acts] = await Promise.all([
-          getAll(SUPABASE_URL + '/rest/v1/registration?select=' + REG_COLUMNS + '&order=full_name.asc'),
-          getAll(SUPABASE_URL + '/rest/v1/activities?select=strava_athlete_id,distance_meters&is_deleted=eq.false')
+          getAll(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&select=' + REG_COLUMNS + '&order=full_name.asc'),
+          getAll(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + EV_ID + '&select=strava_athlete_id,distance_meters&is_deleted=eq.false')
         ]);
         
         // Filter only approved participants
@@ -844,7 +882,7 @@
       }
       try {
         // Query pending and rejected registration requests directly from consolidated registration table requesting only safe columns
-        allRequestRows = await getAll(SUPABASE_URL + '/rest/v1/registration?status=in.(pending,rejected)&select=' + REG_COLUMNS + '&order=created_at.desc');
+        allRequestRows = await getAll(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&status=in.(pending,rejected)&select=' + REG_COLUMNS + '&order=created_at.desc');
         
         document.getElementById('s-req-total').textContent = allRequestRows.length;
         const pendingCount = allRequestRows.filter(x => (x.status || 'pending') === 'pending').length;
@@ -1013,12 +1051,13 @@
 
     // Initial page load
     authGuard();
+    loadEventSelector();
     switchTab('employees');
     
     // Periodically update the badge count for pending requests
     async function updateBadgeCount() {
       try {
-        const r = await fetch(SUPABASE_URL + '/rest/v1/registration?status=eq.pending&select=id', { headers: HDR });
+        const r = await fetch(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&status=eq.pending&select=id', { headers: HDR });
         const data = await r.json();
         const pendingCount = Array.isArray(data) ? data.length : 0;
         const badge = document.getElementById('badge-requests-count');
