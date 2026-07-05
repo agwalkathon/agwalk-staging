@@ -244,6 +244,11 @@
         <div class="err-msg">Please enter your Strava profile URL</div>
       </div>
     </div>
+    
+    <div class="card" id="custom-questions-card" style="display:none; margin-top:20px;">
+      <div class="card-title">Additional Information</div>
+      <div id="custom-questions-container"></div>
+    </div>
 
     <div class="alert error" id="alert-bottom"></div>
 
@@ -272,6 +277,10 @@
 var SB_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR    = { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json' };
+var BACKEND_URL = 'https://agwalk-backend.onrender.com';
+
+var activeEvent = null;
+var isAutofilled = false;
 
 function val(id) { return document.getElementById(id).value.trim(); }
 
@@ -297,6 +306,138 @@ function hideAlert() {
 
 function validateEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+async function loadEventDetails() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var code = params.get('event');
+    var url = SB_URL + '/rest/v1/events?status=eq.live&limit=1';
+    if (code) {
+      url = SB_URL + '/rest/v1/events?slug=eq.' + encodeURIComponent(code);
+    }
+    var res = await fetch(url, { headers: HDR });
+    var data = await res.json();
+    if (data && data[0]) {
+      activeEvent = data[0];
+      document.querySelectorAll('.hero-eyebrow').forEach(function(el) {
+        el.textContent = activeEvent.name;
+      });
+      renderCustomQuestions();
+    }
+  } catch (e) {
+    console.error('Failed to load event details:', e);
+  }
+}
+
+function renderCustomQuestions() {
+  if (!activeEvent || !activeEvent.rules_config || !activeEvent.rules_config.form_fields) return;
+  var fields = activeEvent.rules_config.form_fields;
+  var container = document.getElementById('custom-questions-container');
+  var card = document.getElementById('custom-questions-card');
+  container.innerHTML = '';
+  
+  var visibleCount = 0;
+  fields.forEach(function(f, idx) {
+    if (f.visible === false) return;
+    visibleCount++;
+    
+    var div = document.createElement('div');
+    div.className = 'field';
+    div.setAttribute('data-label', f.label);
+    
+    var lbl = document.createElement('label');
+    lbl.textContent = f.label;
+    div.appendChild(lbl);
+    
+    var inputEl;
+    if (f.type === 'dropdown') {
+      inputEl = document.createElement('select');
+      inputEl.className = 'custom-q-input';
+      var optPlaceholder = document.createElement('option');
+      optPlaceholder.value = '';
+      optPlaceholder.textContent = '— Select —';
+      inputEl.appendChild(optPlaceholder);
+      (f.options || []).forEach(function(o) {
+        var opt = document.createElement('option');
+        opt.value = o;
+        opt.textContent = o;
+        inputEl.appendChild(opt);
+      });
+    } else if (f.type === 'checkbox') {
+      inputEl = document.createElement('input');
+      inputEl.type = 'checkbox';
+      inputEl.className = 'custom-q-input';
+      inputEl.style.width = '20px';
+      inputEl.style.height = '20px';
+      inputEl.style.marginTop = '6px';
+    } else {
+      inputEl = document.createElement('input');
+      inputEl.type = 'text';
+      inputEl.className = 'custom-q-input';
+      inputEl.placeholder = 'Enter details...';
+    }
+    
+    if (f.editable === false) {
+      inputEl.disabled = true;
+    }
+    
+    div.appendChild(inputEl);
+    container.appendChild(div);
+  });
+  
+  if (visibleCount > 0) {
+    card.style.display = 'block';
+  }
+}
+
+async function checkEmployeeMaster() {
+  var code = document.getElementById('emp_code').value.trim().toUpperCase();
+  if (!code) return;
+  
+  var statusEl = document.getElementById('emp-autofill-status');
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.id = 'emp-autofill-status';
+    statusEl.style.cssText = 'font-size:11px; margin-top:5px; font-weight:600;';
+    document.getElementById('f-emp').appendChild(statusEl);
+  }
+  
+  statusEl.style.color = '#B45309';
+  statusEl.textContent = 'Checking Employee Master...';
+  
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/employees_master?emp_code=eq.' + encodeURIComponent(code) + '&is_active=is.true&select=*&limit=1', { headers: HDR });
+    var data = await res.json();
+    if (data && data[0]) {
+      var emp = data[0];
+      document.getElementById('full_name').value = emp.full_name || '';
+      document.getElementById('email').value = emp.email || '';
+      if (emp.gender) {
+        document.getElementById('gender').value = emp.gender.toLowerCase() === 'm' ? 'Male' : (emp.gender.toLowerCase() === 'f' ? 'Female' : emp.gender);
+      }
+      if (emp.mobile) {
+        document.getElementById('whatsapp').value = emp.mobile;
+      }
+      if (emp.shift) {
+        document.getElementById('shift').value = emp.shift;
+      }
+      if (emp.project_lead) {
+        document.getElementById('team_lead').value = emp.project_lead;
+      }
+      
+      statusEl.style.color = '#16A34A';
+      statusEl.innerHTML = '✓ Employee details loaded from master record';
+      isAutofilled = true;
+    } else {
+      statusEl.style.color = '#DC2626';
+      statusEl.textContent = '⚠ Code not found in Employee Master database. Please ensure you enter the correct code.';
+    }
+  } catch (e) {
+    console.error('Failed to verify employee code:', e);
+    statusEl.style.color = '#DC2626';
+    statusEl.textContent = 'Failed to connect to employee database';
+  }
 }
 
 async function submitForm() {
@@ -332,15 +473,28 @@ async function submitForm() {
     return;
   }
 
+  // Collect custom answers
+  var customAnswers = {};
+  document.querySelectorAll('#custom-questions-container .field').forEach(function(field) {
+    var label = field.getAttribute('data-label');
+    var input = field.querySelector('.custom-q-input');
+    if (input) {
+      customAnswers[label] = input.type === 'checkbox' ? input.checked : input.value;
+    }
+  });
+
   // Submit
   var btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Submitting...';
 
   try {
-    var res = await fetch(SB_URL + '/rest/v1/registration_requests', {
+    var eventName = activeEvent ? activeEvent.slug : 'walkathon2026';
+    var eventId = activeEvent ? activeEvent.id : 1;
+
+    var res = await fetch(BACKEND_URL + '/register-request', {
       method: 'POST',
-      headers: Object.assign({}, HDR, { Prefer: 'return=minimal' }),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         full_name:   full_name,
         emp_code:    emp_code,
@@ -352,18 +506,18 @@ async function submitForm() {
         leaderboard_team: leaderboard_team,
         team_lead:   team_lead,
         strava_url:  strava_url,
-        event_name:  'walkathon2026',
-        status:      'pending'
+        event_name:  eventName,
+        event_id:    eventId,
+        custom_answers: customAnswers
       })
     });
 
-    if (res.ok || res.status === 201) {
+    if (res.ok || res.status === 200 || res.status === 201) {
       document.getElementById('form-wrap').style.display = 'none';
       document.getElementById('success-card').style.display = 'block';
       window.scrollTo({top: 0, behavior: 'smooth'});
     } else {
       var body = await res.text();
-      // Check for duplicate emp_code
       if (body.includes('duplicate') || body.includes('unique') || res.status === 409) {
         showAlert('⚠️ A request with this Employee Code already exists. If you need help, contact pra@arcgate.com');
       } else {
@@ -378,6 +532,12 @@ async function submitForm() {
     btn.innerHTML = 'Submit Registration Request';
   }
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+  loadEventDetails();
+  document.getElementById('emp_code').addEventListener('blur', checkEmployeeMaster);
+  document.getElementById('emp_code').addEventListener('change', checkEmployeeMaster);
+});
 </script>
 </body>
 </html>
