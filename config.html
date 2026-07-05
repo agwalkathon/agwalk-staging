@@ -496,25 +496,30 @@ var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=session
 authGuard();
 
 window.switchConfigTab = function(tabName) {
-  document.querySelectorAll('.sc-btn').forEach(btn => {
+  var btns = document.querySelectorAll('.sc-btn');
+  for (var i = 0; i < btns.length; i++) {
+    var btn = btns[i];
     if (btn.getAttribute('data-target') === tabName) {
       btn.classList.add('active');
     } else {
       btn.classList.remove('active');
     }
-  });
+  }
   
-  document.querySelectorAll('.config-tab-panel').forEach(panel => {
-    panel.style.display = 'none';
-  });
+  var panels = document.querySelectorAll('.config-tab-panel');
+  for (var j = 0; j < panels.length; j++) {
+    panels[j].style.display = 'none';
+  }
   
-  const activePanel = document.getElementById('tab-panel-' + tabName);
+  var activePanel = document.getElementById('tab-panel-' + tabName);
   if (activePanel) {
     activePanel.style.display = 'block';
     
-    activePanel.querySelectorAll('.section').forEach(sec => {
-      const body = sec.querySelector('.section-body');
-      const chev = sec.querySelector('.section-chevron');
+    var sections = activePanel.querySelectorAll('.section');
+    for (var k = 0; k < sections.length; k++) {
+      var sec = sections[k];
+      var body = sec.querySelector('.section-body');
+      var chev = sec.querySelector('.section-chevron');
       if (body) {
         body.classList.add('open');
         body.style.display = 'block';
@@ -523,7 +528,7 @@ window.switchConfigTab = function(tabName) {
         chev.classList.add('open');
         chev.style.transform = 'rotate(180deg)';
       }
-    });
+    }
   }
 }
 
