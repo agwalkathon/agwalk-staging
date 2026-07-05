@@ -593,10 +593,19 @@ async function loadEventSelector(){
     var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
     EV_ALL=evs; sel.innerHTML="";
     evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
-    sel.value="1"; EV_ID=1;
+    let savedId = localStorage.getItem('wk_admin_selected_event_id');
+    if (!savedId) {
+      const live = evs.find(e => e.status === 'live');
+      savedId = live ? live.id : evs[0].id;
+    }
+    EV_ID = parseInt(savedId) || evs[0].id;
+    sel.value = EV_ID;
+    localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+    
     updateEventLabels();
     sel.addEventListener("change",async function(){
       EV_ID=parseInt(this.value)||1;
+      localStorage.setItem('wk_admin_selected_event_id', EV_ID);
       updateEventLabels();
       await loadConfig(); loadSpecialDates(); loadChallenges();
     });
@@ -789,7 +798,20 @@ async function clearManualBonus(activityId){if(!confirm('Clear manual bonus for 
 function updateMaintStatusLabel(on){document.getElementById('maint-status-label').textContent=on?'🔴 LIVE — all participants blocked (except allow-list)':'🟢 App is open to all participants'}
 async function loadMaintenance(){try{var r=await fetch(_BU+'/admin/maintenance',{headers:{Authorization:'Bearer '+sessionStorage.getItem('wk_admin_token')}});var d=await r.json();var s=(d&&d.settings)||{};document.getElementById('maint-enabled-toggle').checked=!!s.maintenance_enabled;document.getElementById('maint-allowed-ids').value=(s.allowed_athlete_ids||[]).join(', ');document.getElementById('maint-message').value=s.message||'App is Under Maintenance';updateMaintStatusLabel(!!s.maintenance_enabled)}catch(e){document.getElementById('maint-status-label').textContent='Could not load status: '+e.message}}
 async function saveMaintenance(){var enabled=document.getElementById('maint-enabled-toggle').checked,idsRaw=document.getElementById('maint-allowed-ids').value.trim(),ids=idsRaw?idsRaw.split(/[\n,\s]+/).map(function(s){return s.trim()}).filter(Boolean):[],msg=document.getElementById('maint-message').value.trim()||'App is Under Maintenance',errEl=document.getElementById('maint-msg-err');errEl.textContent='';try{var r=await fetch(_BU+'/admin/maintenance',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+sessionStorage.getItem('wk_admin_token')},body:JSON.stringify({maintenance_enabled:enabled,allowed_athlete_ids:ids,message:msg})});if(!r.ok){var e=await r.json().catch(function(){return{}});throw new Error(e.error||('Save failed '+r.status))}showSaved('maint-saved');updateMaintStatusLabel(enabled)}catch(e){errEl.textContent='❌ '+e.message}}
-loadEventSelector();loadConfig();loadSpecialDates();loadChallenges();loadManualBonuses();loadMaintenance();
+loadEventSelector().then(() => {
+  loadConfig();
+  loadSpecialDates();
+  loadChallenges();
+  loadManualBonuses();
+  loadMaintenance();
+}).catch(err => {
+  console.error('loadEventSelector error:', err);
+  loadConfig();
+  loadSpecialDates();
+  loadChallenges();
+  loadManualBonuses();
+  loadMaintenance();
+});
 
 </script>
 </body>
