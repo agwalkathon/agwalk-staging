@@ -143,98 +143,119 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 <header class="topbar"><div class="topbar-left"><h1>Events</h1><p>Create, configure and manage all fitness events</p></div><div class="topbar-right"><button class="btn btn-primary" id="btn-new"><i class="ti ti-plus"></i> New Event</button></div></header>
 <div class="content">
 
-<div class="panel" id="editor">
-  <h2 id="editor-title"><i class="ti ti-calendar-plus"></i> New Event</h2>
-  <div class="grid">
-    <div class="fld"><label>Event Name</label><input id="f-name" placeholder="Arcgate Cyclathon 2027"></div>
-    <div class="fld"><label>Slug (URL id)</label><input id="f-slug" placeholder="auto-generated"></div>
-    <div class="fld"><label>Event Type</label><select id="f-type"><option value="walkathon">Walkathon</option><option value="cyclathon">Cyclathon</option><option value="steps">Steps Challenge</option><option value="fitness">Fitness / Multi-sport</option><option value="other">Other</option></select></div>
-    <div class="fld"><label>Status</label><select id="f-status"><option value="draft">Draft (hidden)</option><option value="upcoming">Upcoming</option><option value="live">Live</option><option value="ended">Ended</option><option value="archived">Archived</option></select></div>
-    <div class="fld"><label>Start Date</label><input type="date" id="f-start"></div>
-    <div class="fld"><label>End Date</label><input type="date" id="f-end"></div>
-    <div class="fld"><label>Registration Opens</label><input type="date" id="f-ropen"></div>
-    <div class="fld"><label>Registration Closes</label><input type="date" id="f-rclose"></div>
-    <div class="fld"><label>Accent Color</label><input type="color" id="f-color" value="#E8622A" style="height:40px;padding:4px"></div>
-    <div class="fld"><label>Banner Image URL</label><input id="f-banner" placeholder="https://... (optional)"></div>
-    <div class="fld fld-full"><label>Description</label><textarea id="f-desc" rows="2" placeholder="Shown to employees on the Events tab"></textarea></div>
-  </div>
-
-  <div class="subhead">Activity Tracking</div>
-  <div class="grid" style="margin-bottom:14px">
-    <div class="fld"><label>Tracking Mode</label>
-      <select id="f-tracking">
-        <option value="strava" selected>Strava — auto-fetch activities via API</option>
-        <option value="manual">Manual — organizers enter results (cricket, quiz…)</option>
-        <option value="none">None — no leaderboard, participation only</option>
-      </select>
+<div class="panel" id="editor" style="padding: 24px; background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+  <h2 id="editor-title" style="margin-bottom: 20px; font-size: 18px; font-weight: 700; color: var(--text-primary); border-bottom: 2px solid var(--border); padding-bottom: 12px;"><i class="ti ti-calendar-plus"></i> New Event</h2>
+  
+  <!-- Group 1: General Information -->
+  <div class="edit-group" style="border-left: 4px solid #2563EB; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #2563EB; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-info-circle"></i> General Information</h3>
+    <div class="grid">
+      <div class="fld"><label>Event Name</label><input id="f-name" placeholder="Arcgate Cyclathon 2027"></div>
+      <div class="fld"><label>Slug (URL id)</label><input id="f-slug" placeholder="auto-generated"></div>
+      <div class="fld"><label>Event Type</label><select id="f-type"><option value="walkathon">Walkathon</option><option value="cyclathon">Cyclathon</option><option value="steps">Steps Challenge</option><option value="fitness">Fitness / Multi-sport</option><option value="other">Other</option></select></div>
+      <div class="fld"><label>Status</label><select id="f-status"><option value="draft">Draft (hidden)</option><option value="upcoming">Upcoming</option><option value="live">Live</option><option value="ended">Ended</option><option value="archived">Archived</option></select></div>
+      <div class="fld"><label>Start Date</label><input type="date" id="f-start"></div>
+      <div class="fld"><label>End Date</label><input type="date" id="f-end"></div>
+      <div class="fld"><label>Registration Opens</label><input type="date" id="f-ropen"></div>
+      <div class="fld"><label>Registration Closes</label><input type="date" id="f-rclose"></div>
+      <div class="fld"><label>Accent Color</label><input type="color" id="f-color" value="#E8622A" style="height:40px;padding:4px"></div>
+      <div class="fld"><label>Banner Image URL</label><input id="f-banner" placeholder="https://... (optional)"></div>
+      <div class="fld fld-full"><label>Description</label><textarea id="f-desc" rows="2" placeholder="Shown to employees on the Events tab"></textarea></div>
     </div>
-    <div class="fld" id="wrap-fetch-start"><label>Fetch Data From <span style="font-weight:400;text-transform:none">(blank = event start)</span></label><input type="date" id="f-fetch-start"></div>
-    <div class="fld" id="wrap-fetch-end"><label>Fetch Data Until <span style="font-weight:400;text-transform:none">(blank = event end)</span></label><input type="date" id="f-fetch-end"></div>
   </div>
 
-  <div class="grid" style="margin-bottom:14px">
-    <div class="fld"><label>Event Logo (shown above rings)</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
-        <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
-        <input type="file" id="logo-file" accept="image/*" style="display:none">
+  <!-- Group 2: API Call Setting & Activity Tracking -->
+  <div class="edit-group" style="border-left: 4px solid #10B981; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #10B981; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-api"></i> API Call & Activity Tracking</h3>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Tracking Mode</label>
+        <select id="f-tracking">
+          <option value="strava" selected>Strava — auto-fetch activities via API</option>
+          <option value="manual">Manual — organizers enter results (cricket, quiz…)</option>
+          <option value="none">None — no leaderboard, participation only</option>
+        </select>
+      </div>
+      <div class="fld" id="wrap-fetch-start"><label>Fetch Data From <span style="font-weight:400;text-transform:none">(blank = event start)</span></label><input type="date" id="f-fetch-start"></div>
+      <div class="fld" id="wrap-fetch-end"><label>Fetch Data Until <span style="font-weight:400;text-transform:none">(blank = event end)</span></label><input type="date" id="f-fetch-end"></div>
+    </div>
+    <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin: 16px 0 8px;" id="sports-chips-title">Counted Activity Types</div>
+    <div class="chips" id="sport-chips"></div>
+  </div>
+
+  <!-- Group 3: Participant Dashboard Config -->
+  <div id="dashboard-config-block" class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-dashboard"></i> Dashboard Tab</h3>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Event Logo (shown above rings)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
+          <input type="file" id="logo-file" accept="image/*" style="display:none">
+        </div>
+      </div>
+      <div class="fld"><label>Event Display Name (shown if no logo)</label>
+        <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
       </div>
     </div>
-    <div class="fld"><label>Event Display Name (shown if no logo)</label>
-      <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
+    
+    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Configure Rings (max 5)</div>
+    <div id="rings-box" style="margin-bottom:12px"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
+    
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
+      <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
+      <div class="fld"><label>Sections</label><div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
+        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
+        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
+        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
+      </div></div>
     </div>
   </div>
-  <div id="dashboard-config-block">
-  <div class="subhead">Participant Dashboard</div>
-  <div class="scope-note" style="margin-bottom:10px">Configure rings (max 5), stat tiles, sections and activity columns. Leave empty for the classic Walkathon layout.</div>
-  <div id="rings-box" style="margin-bottom:12px"></div>
-  <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
-  <div class="grid" style="margin-bottom:14px">
-    <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-    <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-    <div class="fld"><label>Sections</label><div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
-      <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
-      <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
-      <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
-    </div></div>
-  </div>
 
-  </div>
-  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
-  <div class="subhead" id="scoring-head">Scoring</div>
-  <div class="grid" style="margin-bottom:14px" id="scoring-grid">
-    <div class="fld"><label>Scoring Mode</label>
-      <select id="f-smode">
-        <option value="raw">Raw Metric — rank by total directly, no points</option>
-        <option value="single_metric" selected>Single Metric → Points (walkathon style)</option>
-        <option value="composite">Composite — points from multiple metrics</option>
-      </select>
+  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
+
+  <!-- Group 4: Scoring Method -->
+  <div class="edit-group" id="scoring-section-block" style="border-left: 4px solid #EF4444; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #EF4444; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;" id="scoring-head"><i class="ti ti-calculator"></i> Scoring Method</h3>
+    <div class="grid" style="margin-bottom:14px" id="scoring-grid">
+      <div class="fld"><label>Scoring Mode</label>
+        <select id="f-smode">
+          <option value="raw">Raw Metric — rank by total directly, no points</option>
+          <option value="single_metric" selected>Single Metric → Points (walkathon style)</option>
+          <option value="composite">Composite — points from multiple metrics</option>
+        </select>
+      </div>
+      <div class="fld" id="wrap-metric"><label>Primary Metric</label>
+        <select id="f-metric"><option value="distance_km">Distance (km)</option><option value="steps">Steps</option><option value="moving_time_min">Moving Time (min)</option><option value="elevation_m">Elevation Gain (m)</option><option value="activity_count">Activity Count</option></select>
+      </div>
+      <div class="fld" id="wrap-rate"><label>Points per unit</label><input type="number" id="f-rate" value="1" step="0.1"></div>
     </div>
-    <div class="fld" id="wrap-metric"><label>Primary Metric</label>
-      <select id="f-metric"><option value="distance_km">Distance (km)</option><option value="steps">Steps</option><option value="moving_time_min">Moving Time (min)</option><option value="elevation_m">Elevation Gain (m)</option><option value="activity_count">Activity Count</option></select>
+    <div id="composite-box" style="display:none">
+      <div class="metric-head"><span></span><span>Metric</span><span>Pts / unit</span><span>Cap / activity</span></div>
+      <div class="metric-row"><input type="checkbox" class="cm-on" data-m="distance_km" checked><span class="mname">Distance (per km)</span><input type="number" class="cm-rate" data-m="distance_km" value="10"><input type="number" class="cm-cap" data-m="distance_km" value="0" title="0 = no cap"></div>
+      <div class="metric-row"><input type="checkbox" class="cm-on" data-m="elevation_m"><span class="mname">Elevation (per 10 m)</span><input type="number" class="cm-rate" data-m="elevation_m" value="1"><input type="number" class="cm-cap" data-m="elevation_m" value="0"></div>
+      <div class="metric-row"><input type="checkbox" class="cm-on" data-m="moving_time_min"><span class="mname">Moving time (per 15 min)</span><input type="number" class="cm-rate" data-m="moving_time_min" value="1"><input type="number" class="cm-cap" data-m="moving_time_min" value="0"></div>
+      <div class="metric-row"><input type="checkbox" class="cm-on" data-m="steps"><span class="mname">Steps (per 1000)</span><input type="number" class="cm-rate" data-m="steps" value="1"><input type="number" class="cm-cap" data-m="steps" value="0"></div>
+      <div class="fld" style="margin-top:10px;max-width:340px"><label>Bracket bonuses apply on</label><select id="f-bonusbase"><option value="composite_total">Composite total points</option><option value="primary_metric">Primary metric (distance)</option></select></div>
     </div>
-    <div class="fld" id="wrap-rate"><label>Points per unit</label><input type="number" id="f-rate" value="1" step="0.1"></div>
-  </div>
-  <div id="composite-box" style="display:none">
-    <div class="metric-head"><span></span><span>Metric</span><span>Pts / unit</span><span>Cap / activity</span></div>
-    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="distance_km" checked><span class="mname">Distance (per km)</span><input type="number" class="cm-rate" data-m="distance_km" value="10"><input type="number" class="cm-cap" data-m="distance_km" value="0" title="0 = no cap"></div>
-    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="elevation_m"><span class="mname">Elevation (per 10 m)</span><input type="number" class="cm-rate" data-m="elevation_m" value="1"><input type="number" class="cm-cap" data-m="elevation_m" value="0"></div>
-    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="moving_time_min"><span class="mname">Moving time (per 15 min)</span><input type="number" class="cm-rate" data-m="moving_time_min" value="1"><input type="number" class="cm-cap" data-m="moving_time_min" value="0"></div>
-    <div class="metric-row"><input type="checkbox" class="cm-on" data-m="steps"><span class="mname">Steps (per 1000)</span><input type="number" class="cm-rate" data-m="steps" value="1"><input type="number" class="cm-cap" data-m="steps" value="0"></div>
-    <div class="fld" style="margin-top:10px;max-width:340px"><label>Bracket bonuses apply on</label><select id="f-bonusbase"><option value="composite_total">Composite total points</option><option value="primary_metric">Primary metric (distance)</option></select></div>
   </div>
 
-  <div class="subhead">Counted Activity Types</div>
-  <div class="chips" id="sport-chips"></div>
+  <!-- Group 5: Registration Questions -->
+  <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-help-circle"></i> Registration Questions</h3>
+    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Configure custom extra questions for the registration form (core employee fields are always included).</p>
+    <div id="ff-list"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-addff" style="margin-top: 8px;"><i class="ti ti-plus"></i> Add Question</button>
+  </div>
 
-  <div class="subhead">Registration — Extra Questions <span style="font-weight:400;text-transform:none;letter-spacing:0">(core fields are always included)</span></div>
-  <div id="ff-list"></div>
-  <button class="btn btn-ghost btn-sm" id="btn-addff"><i class="ti ti-plus"></i> Add question</button>
+  <!-- Group 6: Post-Event Actions -->
+  <div class="edit-group" style="border-left: 4px solid #6B7280; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #6B7280; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-settings"></i> Post-Event Settings</h3>
+    <div class="toggle-row"><input type="checkbox" id="f-feedopen"><label for="f-feedopen" style="cursor:pointer">Keep feed open for reactions & comments after event ends</label></div>
+  </div>
 
-  <div class="subhead">After Event Ends</div>
-  <div class="toggle-row"><input type="checkbox" id="f-feedopen"><label for="f-feedopen" style="cursor:pointer">Keep feed open for reactions & comments after event ends</label></div>
-
-  <div class="row-end">
+  <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
     <span class="saved-msg" id="ed-saved">✅ Saved</span>
     <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
@@ -428,14 +449,32 @@ document.getElementById('sport-chips').addEventListener('click',function(e){
 function addFFRow(f){
   f=f||{};
   var row=document.createElement('div');row.className='ff-row';
+  row.style.cssText='display:grid;grid-template-columns:1fr 100px 1.2fr 80px 80px 34px;gap:8px;margin-bottom:8px;align-items:center;';
+  
   var lab=document.createElement('input');lab.placeholder='Question label';lab.className='ff-label';lab.value=f.label||'';
+  lab.style.cssText='padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12.5px;width:100%;';
+  
   var typ=document.createElement('select');typ.className='ff-type';
+  typ.style.cssText='padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12.5px;width:100%;';
   [['text','Text'],['dropdown','Dropdown'],['checkbox','Checkbox']].forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];typ.appendChild(op);});
   typ.value=f.type||'text';
+  
   var opt=document.createElement('input');opt.placeholder='Options, comma separated (dropdown)';opt.className='ff-opts';opt.value=(f.options||[]).join(', ');
-  var del=document.createElement('button');del.className='ff-del';del.textContent='✕';
+  opt.style.cssText='padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12.5px;width:100%;';
+  
+  var visLabel=document.createElement('label');visLabel.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;cursor:pointer;margin:0;user-select:none;color:var(--text-secondary);';
+  var vis=document.createElement('input');vis.type='checkbox';vis.className='ff-visible';vis.checked=f.visible!==false;
+  visLabel.appendChild(vis);visLabel.appendChild(document.createTextNode(' Show'));
+  
+  var edLabel=document.createElement('label');edLabel.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;cursor:pointer;margin:0;user-select:none;color:var(--text-secondary);';
+  var ed=document.createElement('input');ed.type='checkbox';ed.className='ff-editable';ed.checked=f.editable!==false;
+  edLabel.appendChild(ed);edLabel.appendChild(document.createTextNode(' Editable'));
+  
+  var del=document.createElement('button');del.type='button';del.className='ff-del';del.textContent='✕';
+  del.style.cssText='height:34px;border:none;background:#FEF2F2;color:#DC2626;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:all 0.15s;';
   del.addEventListener('click',function(){row.remove();});
-  row.appendChild(lab);row.appendChild(typ);row.appendChild(opt);row.appendChild(del);
+  
+  row.appendChild(lab);row.appendChild(typ);row.appendChild(opt);row.appendChild(visLabel);row.appendChild(edLabel);row.appendChild(del);
   document.getElementById('ff-list').appendChild(row);
 }
 document.getElementById('btn-addff').addEventListener('click',function(){addFFRow();});
@@ -502,7 +541,9 @@ function collect(){
     form_fields:Array.from(document.querySelectorAll('#ff-list .ff-row')).map(function(r){
       return {label:r.querySelector('.ff-label').value.trim(),
               type:r.querySelector('.ff-type').value,
-              options:r.querySelector('.ff-opts').value.split(',').map(function(s){return s.trim()}).filter(Boolean)};
+              options:r.querySelector('.ff-opts').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
+              visible:r.querySelector('.ff-visible').checked,
+              editable:r.querySelector('.ff-editable').checked};
     }).filter(function(f){return f.label})
   };
   if(mode==='single_metric')rc.rate=parseFloat(document.getElementById('f-rate').value)||1;
