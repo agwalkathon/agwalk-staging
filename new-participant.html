@@ -190,7 +190,15 @@
     </div>
 
     <div class="card">
-      <div class="card-title">Walkathon Details</div>
+      <div class="card-title">Event Details</div>
+
+      <div class="field" id="f-event">
+        <label>Select Event <span class="req">*</span></label>
+        <select id="event_select" onchange="onEventChange()">
+          <option value="">— Select Event —</option>
+        </select>
+        <div class="err-msg">Please select an event</div>
+      </div>
 
       <div class="grid-2">
         <div class="field" id="f-shift">
@@ -280,6 +288,7 @@ var HDR    = { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'a
 var BACKEND_URL = 'https://agwalk-backend.onrender.com';
 
 var activeEvent = null;
+var allEvents = [];
 var isAutofilled = false;
 
 function val(id) { return document.getElementById(id).value.trim(); }
@@ -312,21 +321,69 @@ async function loadEventDetails() {
   try {
     var params = new URLSearchParams(window.location.search);
     var code = params.get('event');
-    var url = SB_URL + '/rest/v1/events?status=eq.live&limit=1';
+    
+    // Fetch all events
+    var res = await fetch(SB_URL + '/rest/v1/events?select=id,name,slug,status', { headers: HDR });
+    allEvents = await res.json();
+    
+    // Populate the dropdown
+    var selectEl = document.getElementById('event_select');
+    selectEl.innerHTML = '<option value="">— Select Event —</option>';
+    allEvents.forEach(function(ev) {
+      // Only show live events in dropdown, unless it's pre-selected via query param
+      if (ev.status === 'live' || ev.slug === code) {
+        var opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = ev.name;
+        selectEl.appendChild(opt);
+      }
+    });
+    
     if (code) {
-      url = SB_URL + '/rest/v1/events?slug=eq.' + encodeURIComponent(code);
-    }
-    var res = await fetch(url, { headers: HDR });
-    var data = await res.json();
-    if (data && data[0]) {
-      activeEvent = data[0];
-      document.querySelectorAll('.hero-eyebrow').forEach(function(el) {
-        el.textContent = activeEvent.name;
-      });
-      renderCustomQuestions();
+      var found = allEvents.find(function(e) { return e.slug === code; });
+      if (found) {
+        activeEvent = found;
+        selectEl.value = activeEvent.id;
+        selectEl.disabled = true; // Disable if pre-filled via URL
+        
+        document.querySelectorAll('.hero-eyebrow').forEach(function(el) {
+          el.textContent = activeEvent.name;
+        });
+        renderCustomQuestions();
+      }
+    } else {
+      // If only one live event is available, pre-select it by default!
+      var liveEvents = allEvents.filter(function(e) { return e.status === 'live'; });
+      if (liveEvents.length === 1) {
+        activeEvent = liveEvents[0];
+        selectEl.value = activeEvent.id;
+        onEventChange();
+      }
     }
   } catch (e) {
     console.error('Failed to load event details:', e);
+  }
+}
+
+function onEventChange() {
+  var selectEl = document.getElementById('event_select');
+  var eventId = parseInt(selectEl.value, 10);
+  if (!eventId) {
+    activeEvent = null;
+    document.querySelectorAll('.hero-eyebrow').forEach(function(el) {
+      el.textContent = 'Arcgate Events';
+    });
+    document.getElementById('custom-questions-card').style.display = 'none';
+    return;
+  }
+  
+  var found = allEvents.find(function(e) { return e.id === eventId; });
+  if (found) {
+    activeEvent = found;
+    document.querySelectorAll('.hero-eyebrow').forEach(function(el) {
+      el.textContent = activeEvent.name;
+    });
+    renderCustomQuestions();
   }
 }
 
@@ -468,6 +525,9 @@ async function submitForm() {
   setError('f-team-lead', !team_lead);   if (!team_lead)   ok = false;
   var validStrava = strava_url.startsWith('https://www.strava.com/athletes/');
   setError('f-strava', !validStrava); if (!validStrava) ok = false;
+  
+  // Event selection validation
+  setError('f-event', !activeEvent); if (!activeEvent) ok = false;
 
   if (!ok) {
     showAlert('Please fill in all required fields.');
@@ -490,8 +550,8 @@ async function submitForm() {
   btn.innerHTML = '<div class="spinner"></div> Submitting...';
 
   try {
-    var eventName = activeEvent ? activeEvent.slug : 'walkathon2026';
-    var eventId = activeEvent ? activeEvent.id : 1;
+    var eventName = activeEvent ? activeEvent.name : '';
+    var eventId = activeEvent ? activeEvent.id : null;
 
     var res = await fetch(BACKEND_URL + '/register-request', {
       method: 'POST',
