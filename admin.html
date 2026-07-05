@@ -700,27 +700,20 @@
     </div>
 
   <div class="sb-section">Main</div>
-  <a href="admin.html"              class="sb-item active"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
-  <a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
-<a href="celebrate-config.html" class="sb-item"><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
-  <a href="activities.html"         class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
-  <a href="ag-leaderboard.html"     class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
-  <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
-  <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+  <a href="admin.html" class="sb-item active"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+  <a href="events.html" class="sb-item "><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+  <a href="celebrate-config.html" class="sb-item "><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
+  <a href="reports.html" class="sb-item "><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
 
   <div class="sb-section" style="margin-top:10px;">Config</div>
-  <a href="config.html"          class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
-    <a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
-  <a href="data-upload.html"        class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
-  <a href="email-send.html"         class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
-  <a href="audit-log.html"          class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
-<a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+  <a href="data-upload.html" class="sb-item "><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+  <a href="email-send.html" class="sb-item "><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+  <a href="audit-log.html" class="sb-item "><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+  <a href="push-notifications.html" class="sb-item "><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
 
   <div class="sb-spacer"></div>
   <div class="sb-divider"></div>
-  <button class="sb-signout" onclick="logout()">
-    <i class="ti ti-logout"></i><span class="sb-label">Sign out</span>
-  </button>
+  <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
 </aside>
 
 <!-- ── Main ── -->
@@ -732,7 +725,8 @@
       <h1>Dashboard</h1>
       <p id="topbar-date">Loading...</p>
     </div>
-    <div class="topbar-right">
+    <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
+      <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
       <span id="realtime-badge">Connecting…</span>
     </div>
   </header>
@@ -1215,19 +1209,58 @@ function avatarGrad(name) {
 
 authGuard();
 
+var EV_ID = 1;
+var EV_ALL = [];
+
+function evq() {
+  return "&event_id=eq." + EV_ID;
+}
+
+async function loadEventSelector() {
+  const sel = document.getElementById('ev-select');
+  if (!sel) return;
+  
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+    const evs = await r.json();
+    if (!Array.isArray(evs) || evs.length === 0) return;
+    EV_ALL = evs;
+    
+    sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+    
+    let savedId = localStorage.getItem('wk_admin_selected_event_id');
+    if (!savedId) {
+      const live = evs.find(e => e.status === 'live');
+      savedId = live ? live.id : evs[0].id;
+    }
+    
+    EV_ID = parseInt(savedId) || evs[0].id;
+    sel.value = EV_ID;
+    localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+    
+    sel.addEventListener('change', function() {
+      EV_ID = parseInt(this.value);
+      localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+      load();
+    });
+  } catch (err) {
+    console.error('Failed to load event selector:', err);
+  }
+}
+
 async function load() {
   const today = new Date().toISOString().split('T')[0];
 
   const [countR, distR, flagR, todayR, regR, connR] = await Promise.all([
-    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false',
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false' + evq(),
       { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(SUPABASE_URL + '/rest/v1/rpc/sum_distance',
-      { method: 'POST', headers: { ...HDR, 'Content-Type': 'application/json' }, body: '{}' }),
-    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&is_flagged=eq.true',
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=distance_meters&is_deleted=eq.false&is_flagged=eq.false' + evq(),
+      { headers: HDR }),
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&is_flagged=eq.true' + evq(),
       { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&activity_date=gte.' + today + 'T00:00:00&activity_date=lte.' + today + 'T23:59:59',
+    fetch(SUPABASE_URL + '/rest/v1/activities?select=id&is_deleted=eq.false&activity_date=gte.' + today + 'T00:00:00&activity_date=lte.' + today + 'T23:59:59' + evq(),
       { headers: { ...HDR, 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name', { headers: HDR }),
+    fetch(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name' + evq(), { headers: HDR }),
     fetch(SUPABASE_URL + '/rest/v1/participants?select=strava_athlete_id', { headers: HDR })
   ]);
 
@@ -1238,10 +1271,19 @@ async function load() {
   const todayCount = parseInt((todayR.headers.get('content-range') || '').split('/')[1]) || 0;
 
   let totalKm = 0;
-  try { const d = await distR.json(); totalKm = (Number(d) || 0) / 1000; } catch(e) {}
+  try {
+    const distData = await distR.json();
+    if (Array.isArray(distData)) {
+      totalKm = distData.reduce((sum, a) => sum + (a.distance_meters || 0), 0) / 1000;
+    }
+  } catch(e) {}
 
   const nm = {};
   if (Array.isArray(regs)) regs.forEach(r => nm[r.strava_athlete_id] = r.full_name);
+
+  // Filter connected participants by event registration
+  const registeredAthleteIds = new Set((regs || []).map(r => String(r.strava_athlete_id)));
+  const connectedRegistered = (conn || []).filter(c => registeredAthleteIds.has(String(c.strava_athlete_id)));
 
   function fmtIN(n) {
     n = Math.round(n);
@@ -1261,7 +1303,7 @@ async function load() {
   document.getElementById('s-km').textContent           = fmtKmIN(totalKm);
   document.getElementById('s-flagged').textContent      = fmtIN(flagCount);
   document.getElementById('s-today').textContent        = fmtIN(todayCount);
-  document.getElementById('s-connected').textContent    = fmtIN(Array.isArray(conn) ? conn.length : 0);
+  document.getElementById('s-connected').textContent    = fmtIN(connectedRegistered.length);
 
   // Flag badge on nav card (guarded)
   const fb = document.getElementById('flag-badge');
@@ -1286,12 +1328,11 @@ async function load() {
   }
   const pb = document.getElementById('part-badge');
   if (pb) {
-    pb.textContent = (Array.isArray(conn) ? conn.length : 0) + ' connected';
+    pb.textContent = connectedRegistered.length + ' connected';
   }
-
-
 }
 
+loadEventSelector();
 load();
 checkAllSystemsHealth();
 setInterval(checkAllSystemsHealth, 60000);
