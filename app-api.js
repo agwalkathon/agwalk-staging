@@ -144,6 +144,7 @@ async function load(isBackgroundRefresh) {
       });
       var d = await res.json();
       if (d.success) {
+        cacheClear(d.athlete_id);
         safeSetItem('wk_user', JSON.stringify({
           loggedIn: true,
           role: d.role || 'user',
@@ -428,6 +429,7 @@ async function load(isBackgroundRefresh) {
             });
             var data = await res.json();
             if (data.success) {
+              cacheClear(athleteId);
               btn.setAttribute('data-connected', 'false');
               btn.style.pointerEvents = 'auto';
               btn.style.opacity = '1';
