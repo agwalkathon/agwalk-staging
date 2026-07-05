@@ -131,13 +131,18 @@ async function load(isBackgroundRefresh) {
     var sessionEmpCode = session.empCode || '';
     var sessionEmail = session.email || '';
 
+    var urlParams = new URLSearchParams(window.location.search);
+    var stateVal = urlParams.get('state');
+    var activeEventId = stateVal ? parseInt(stateVal, 10) : (session.eventId || (EVENT_ROW ? EVENT_ROW.id : 1));
+
     try {
       var res = await fetch(BACKEND + '/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           code: oauthCode, 
-          event_code: 'walkathon2026',
+          event_code: activeEventId === 2 ? 'cycling2026' : 'walkathon2026',
+          event_id: activeEventId,
           emp_code: sessionEmpCode,
           email: sessionEmail
         })
@@ -153,6 +158,7 @@ async function load(isBackgroundRefresh) {
           profilePhoto: d.profile_photo || '',
           empCode: sessionEmpCode || d.emp_code || '',
           email: sessionEmail || d.email || '',
+          eventId: activeEventId,
           expires: Date.now() + (8 * 60 * 60 * 1000)
         }));
         if (splashText) {
@@ -425,7 +431,10 @@ async function load(isBackgroundRefresh) {
             var res = await fetch(BACKEND + '/participant/disconnect-strava', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ athlete_id: athleteId })
+              body: JSON.stringify({ 
+                athlete_id: athleteId,
+                event_id: EVENT_ROW ? EVENT_ROW.id : 1
+              })
             });
             var data = await res.json();
             if (data.success) {
@@ -473,7 +482,10 @@ async function load(isBackgroundRefresh) {
         var res = await fetch(BACKEND + '/check-authorized', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ athlete_id: athleteId })
+          body: JSON.stringify({ 
+            athlete_id: athleteId,
+            event_id: EVENT_ROW ? EVENT_ROW.id : 1
+          })
         });
         var d = await res.json();
         if (d.success && d.authorized) {
@@ -510,7 +522,10 @@ async function load(isBackgroundRefresh) {
         var res = await fetch(BACKEND + '/check-authorized', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ athlete_id: athleteId })
+          body: JSON.stringify({ 
+            athlete_id: athleteId,
+            event_id: EVENT_ROW ? EVENT_ROW.id : 1
+          })
         });
         var d = await res.json();
         
@@ -519,9 +534,10 @@ async function load(isBackgroundRefresh) {
         } else {
           var CLIENT_ID = '29159';
           var REDIRECT = window.location.origin + window.location.pathname;
+          var stateParam = EVENT_ROW ? EVENT_ROW.id : 1;
           window.location.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + 
             '&redirect_uri=' + encodeURIComponent(REDIRECT) + 
-            '&response_type=code&scope=read,activity:read&state=walkathon2026';
+            '&response_type=code&scope=read,activity:read&state=' + stateParam;
         }
       } catch (err) {
         console.warn('Connection check failed:', err);
