@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#E8622A">
+  <title>Strava Connection Broker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{
+      background:#0F1117;color:#fff;
+      min-height:100dvh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px;
+    }
+    body::before{
+      content:'';position:fixed;top:-160px;left:50%;transform:translateX(-50%);
+      width:520px;height:520px;
+      background:radial-gradient(circle,rgba(232,98,42,0.13) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .wrap{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+    .logo-box{
+      width:64px;height:64px;
+      background:rgba(232,98,42,0.1);
+      border:1px solid rgba(232,98,42,0.25);
+      border-radius:18px;
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:24px;
+      font-size:28px;
+      color:#E8622A;
+    }
+    .card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      padding:28px 24px;
+      width:100%;
+      text-align:center;
+      backdrop-filter:blur(20px);
+      box-shadow:0 8px 32px 0 rgba(0,0,0,0.37);
+    }
+    h1{font-size:20px;font-weight:700;margin-bottom:12px;letter-spacing:-0.2px;}
+    p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:24px;}
+    
+    .status-icon{
+      width:54px;height:54px;
+      border-radius:50%;
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:24px;
+      margin-bottom:16px;
+    }
+    .status-icon.loading{
+      background:rgba(255,255,255,0.05);
+      color:rgba(255,255,255,0.7);
+    }
+    .status-icon.success{
+      background:rgba(16,185,129,0.1);
+      color:#10B981;
+      border:1px solid rgba(16,185,129,0.2);
+    }
+    .status-icon.error{
+      background:rgba(239,68,68,0.1);
+      color:#EF4444;
+      border:1px solid rgba(239,68,68,0.2);
+    }
+    
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spinner{
+      width:22px;height:22px;
+      border:2px solid rgba(255,255,255,0.15);
+      border-top-color:#E8622A;
+      border-radius:50%;
+      animation:spin 0.8s linear infinite;
+    }
+    
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 24px;
+      background:#E8622A;color:#fff;
+      border:none;border-radius:12px;
+      font-size:14px;font-weight:600;
+      cursor:pointer;
+      text-decoration:none;
+      transition:transform 0.1s;
+      width:100%;
+    }
+    .btn:active{transform:scale(0.98);}
+    .btn-secondary{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.1);
+      color:#fff;
+      margin-top:10px;
+    }
+    
+    .meta-box{
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.05);
+      border-radius:12px;
+      padding:12px;
+      font-size:13px;
+      text-align:left;
+      margin-bottom:20px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .meta-item{
+      display:flex;
+      justify-content:space-between;
+    }
+    .meta-item span:first-child{color:rgba(255,255,255,0.4);}
+    .meta-item span:last-child{font-weight:600;color:#fff;}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo-box">
+    <i class="ti ti-brand-strava"></i>
+  </div>
+  
+  <div class="card" id="main-card">
+    <div id="state-loading">
+      <div style="display:flex;justify-content:center;margin-bottom:20px;">
+        <div class="spinner"></div>
+      </div>
+      <h1 id="loading-title">Connecting to Strava...</h1>
+      <p id="loading-desc">Please wait while we initialize the secure connection handshake.</p>
+    </div>
+
+    <div id="state-success" style="display:none">
+      <div class="status-icon success">
+        <i class="ti ti-circle-check"></i>
+      </div>
+      <h1 style="color:#10B981">Connected Successfully!</h1>
+      <p>Your Strava account has been successfully linked. We will now auto-sync your daily activities for the leaderboard.</p>
+      
+      <div class="meta-box">
+        <div class="meta-item">
+          <span>Employee Code</span>
+          <span id="s-emp-code">-</span>
+        </div>
+        <div class="meta-item">
+          <span>Linked Athlete</span>
+          <span id="s-athlete-name">-</span>
+        </div>
+      </div>
+      
+      <button class="btn" onclick="window.close()">Close Window</button>
+    </div>
+
+    <div id="state-error" style="display:none">
+      <div class="status-icon error">
+        <i class="ti ti-alert-triangle"></i>
+      </div>
+      <h1 style="color:#EF4444">Connection Failed</h1>
+      <p id="error-msg">An error occurred while linking your Strava account.</p>
+      <button class="btn" onclick="retryConnection()">Try Again</button>
+      <a href="index.html" class="btn btn-secondary">Go to Homepage</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  var CLIENT_ID = '29159';
+  var BACKEND = 'https://agwalk-backend.onrender.com';
+  var REDIRECT = window.location.origin + window.location.pathname;
+
+  function showState(state) {
+    document.getElementById('state-loading').style.display = state === 'loading' ? 'block' : 'none';
+    document.getElementById('state-success').style.display = state === 'success' ? 'block' : 'none';
+    document.getElementById('state-error').style.display = state === 'error' ? 'block' : 'none';
+  }
+
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = msg;
+    showState('error');
+  }
+
+  async function init() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var code = urlParams.get('code');
+    var empCode = urlParams.get('emp_code');
+    var eventId = urlParams.get('event_id');
+
+    // Scenario A: Initiating the authorization redirect
+    if (empCode && eventId) {
+      localStorage.setItem('wk_direct_emp_code', empCode);
+      localStorage.setItem('wk_direct_event_id', eventId);
+      
+      document.getElementById('loading-title').textContent = 'Redirecting to Strava...';
+      document.getElementById('loading-desc').textContent = 'Authorizing connection for Employee ' + empCode + '.';
+      
+      setTimeout(function() {
+        window.location.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + 
+          '&redirect_uri=' + encodeURIComponent(REDIRECT) + 
+          '&response_type=code&scope=read,activity:read&state=' + eventId;
+      }, 800);
+      return;
+    }
+
+    // Scenario B: Callback from Strava with authorization code
+    if (code) {
+      var savedEmp = localStorage.getItem('wk_direct_emp_code');
+      var savedEvent = localStorage.getItem('wk_direct_event_id');
+
+      if (!savedEmp || !savedEvent) {
+        showError('Missing registration context. Please click the custom link shared by your administrator again.');
+        return;
+      }
+
+      document.getElementById('loading-title').textContent = 'Linking account...';
+      document.getElementById('loading-desc').textContent = 'Registering your Strava token with employee roster record.';
+
+      try {
+        var activeEventId = parseInt(savedEvent, 10);
+        var res = await fetch(BACKEND + '/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: code,
+            event_code: activeEventId === 2 ? 'cycling2026' : 'walkathon2026',
+            event_id: activeEventId,
+            emp_code: savedEmp,
+            email: ''
+          })
+        });
+        
+        var d = await res.json();
+        if (d.success) {
+          document.getElementById('s-emp-code').textContent = savedEmp;
+          document.getElementById('s-athlete-name').textContent = d.name || 'Connected Athlete';
+          
+          // Clear query params to prevent reload submission
+          window.history.replaceState({}, '', window.location.pathname);
+          showState('success');
+        } else {
+          showError(d.error || 'Failed to complete connection. Ensure your registration is approved first.');
+        }
+      } catch (err) {
+        showError('Network connectivity issue. Please check your connection and try again.');
+      }
+      return;
+    }
+
+    // Scenario C: Opened empty
+    showError('Invalid request. The connection link must contain your Employee Code and Event ID parameters.');
+  }
+
+  function retryConnection() {
+    var savedEmp = localStorage.getItem('wk_direct_emp_code');
+    var savedEvent = localStorage.getItem('wk_direct_event_id');
+    if (savedEmp && savedEvent) {
+      window.location.href = window.location.pathname + '?emp_code=' + savedEmp + '&event_id=' + savedEvent;
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+
+  window.onload = init;
+</script>
+</body>
+</html>
