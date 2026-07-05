@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <script>
@@ -171,7 +171,27 @@ tr:hover td{background:#FAFAFA}
 .section{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}.section-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none}.section-header:hover{background:#fafafa}.section-header-left{display:flex;align-items:center;gap:12px}.section-header-left div{display:flex;flex-direction:column;gap:2px}.section-title{font-size:15px;font-weight:700;text-align:left;line-height:1.2}.section-sub-inline{font-size:11.5px;color:#888;text-align:left;line-height:1.3}.section-chevron{font-size:14px;color:#bbb;transition:transform .2s}.section-chevron.open{transform:rotate(180deg)}.section-body{display:none}.section-body.open{display:block}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:18px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;font-weight:600}.field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:14px;background:#fafafa}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#E8622A;background:white}.save-btn{padding:10px 24px;background:#E8622A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}.save-btn:hover{background:#d4561f}.saved-msg{display:none;color:#2e7d32;font-size:13px;margin-left:12px}.bonus-table{width:100%;border-collapse:collapse;margin-bottom:18px}.bonus-table th{background:#fafafa;padding:9px 14px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #f0f0f0}.bonus-table td{padding:9px 14px;border-bottom:1px solid #f8f8f8}.bonus-table input{width:80px;padding:6px 10px;border:1px solid #e8e8e8;border-radius:6px;font-size:13px;text-align:center}.btn-del{padding:6px 12px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-save-ch{padding:6px 14px;background:#E8622A;color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer}.btn-add{padding:10px 20px;background:#1A1A1A;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}.toggle-active{padding:5px 12px;border-radius:6px;border:none;font-size:12px;font-weight:500;cursor:pointer}.toggle-on{background:#e8f5e9;color:#2e7d32}.toggle-off{background:#f5f5f5;color:#999}.ch-compact{border:1px solid #e8e8e8;border-radius:10px;margin-bottom:10px;overflow:hidden}.ch-compact:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.rule-box{background:#fff7f2;border-left:4px solid #E8622A;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.65;color:#555}.date-pill{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fafafa;border:1px solid #eee;border-radius:10px;padding:10px 12px;margin-bottom:8px}.date-pill strong{font-size:14px}.date-pill span{font-size:12px;color:#888}.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:8px;font-size:13px}.ok{background:#e8f5e9;color:#2e7d32}.err{background:#ffebee;color:#c62828}@media(max-width:768px){.form-grid{grid-template-columns:1fr}}
 
   
-    /* Toggle switch styles */
+    
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ev-context-badge {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(232, 98, 42, 0.15);
+}
+/* Toggle switch styles */
     .switch {
       position: relative;
       display: inline-block;
@@ -260,14 +280,14 @@ tr:hover td{background:#FAFAFA}
 <div class="config-tab-panel" id="tab-panel-security">
   <div class="section"><div class="section-header" onclick="toggleSection('maintenance')"><div class="section-header-left"><span>&#128679;</span><div><div class="section-title">App Maintenance Mode</div><div class="section-sub-inline">Instantly block all participants from using the app</div></div></div><span class="section-chevron" id="chev-maintenance">&#9660;</span></div><div class="section-body" id="body-maintenance"><div class="rule-box" style="border-color:#E8622A;background:#fff6f2"><strong>&#9888; Live impact:</strong><br>When enabled, every participant sees a full-screen "Under Maintenance" block within ~25 seconds  &mdash;  even if already logged in. Athlete IDs listed in the allow-list below stay in.</div><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:14px 0;gap:15px;max-width:600px"><div style="flex:1"><strong style="font-size:13.5px;display:block;margin-bottom:2px;color:var(--text-primary)">Maintenance Mode</strong><span style="font-size:11.5px;color:var(--text-secondary);line-height:1.4;display:block" id="maint-status-label">Loading current status...</span></div><label class="switch"><input type="checkbox" id="maint-enabled-toggle" onchange="updateMaintStatusLabel(this.checked)"><span class="slider"></span></label></div><div class="form-grid" style="max-width:700px;margin-top:16px"><div class="field" style="grid-column:1/-1"><label>Allowed athlete IDs (comma or newline separated  &mdash;  bypass the block for testing)</label><textarea id="maint-allowed-ids" rows="3" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="20507382"></textarea></div><div class="field" style="grid-column:1/-1"><label>Block screen message</label><input type="text" id="maint-message" placeholder="App is Under Maintenance"></div></div><button class="save-btn" onclick="saveMaintenance()">Save maintenance settings</button><span class="saved-msg" id="maint-saved">&#9989; Saved!</span><div id="maint-msg-err" class="msg err"></div></div></div>
 
-  <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span>&#128273;</span><div><div class="section-title">Participant Login Method</div><div class="section-sub-inline">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">&#9660;</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">&#9989; Saved!</span></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span>&#128273;</span><div><div class="section-title">Participant Login Method <span class="ev-context-badge"></span></div><div class="section-sub-inline">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">&#9660;</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">&#9989; Saved!</span></div></div>
 
   <div class="section">
     <div class="section-header" onclick="toggleSection('pwarules')">
       <div class="section-header-left">
         <span>&#128276;</span>
         <div>
-          <div class="section-title">PWA & Push Restrictions</div>
+          <div class="section-title">PWA & Push Restrictions <span class="ev-context-badge"></span></div>
           <div class="section-sub-inline">Configure installation and notification access requirements for mobile participants</div>
         </div>
       </div>
@@ -304,18 +324,18 @@ tr:hover td{background:#FAFAFA}
 
 <!-- Tab 2: Scoring & Medals -->
 <div class="config-tab-panel" id="tab-panel-scoring" style="display: none;">
-  <div class="section"><div class="section-header" onclick="toggleSection('medals')"><div class="section-header-left"><span>&#127941;</span><div><div class="section-title">Medal Milestones</div><div class="section-sub-inline">Points required for Bronze, Silver, Gold  &mdash;  by gender</div></div></div><span class="section-chevron" id="chev-medals">&#9660;</span></div><div class="section-body" id="body-medals"><div class="form-grid"><div class="field"><label>&#129351; Gold  &mdash;  Male</label><input type="number" id="gold-male" value="300"></div><div class="field"><label>&#129351; Gold  &mdash;  Female</label><input type="number" id="gold-female" value="250"></div><div class="field"><label>&#129352; Silver  &mdash;  Male</label><input type="number" id="silver-male" value="200"></div><div class="field"><label>&#129352; Silver  &mdash;  Female</label><input type="number" id="silver-female" value="150"></div><div class="field"><label>&#129353; Bronze  &mdash;  Male</label><input type="number" id="bronze-male" value="125"></div><div class="field"><label>&#129353; Bronze  &mdash;  Female</label><input type="number" id="bronze-female" value="100"></div></div><button class="save-btn" onclick="saveMedals()">Save medals</button><span class="saved-msg" id="medals-saved">&#9989; Saved!</span></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('medals')"><div class="section-header-left"><span>&#127941;</span><div><div class="section-title">Medal Milestones <span class="ev-context-badge"></span></div><div class="section-sub-inline">Points required for Bronze, Silver, Gold  &mdash;  by gender</div></div></div><span class="section-chevron" id="chev-medals">&#9660;</span></div><div class="section-body" id="body-medals"><div class="form-grid"><div class="field"><label>&#129351; Gold  &mdash;  Male</label><input type="number" id="gold-male" value="300"></div><div class="field"><label>&#129351; Gold  &mdash;  Female</label><input type="number" id="gold-female" value="250"></div><div class="field"><label>&#129352; Silver  &mdash;  Male</label><input type="number" id="silver-male" value="200"></div><div class="field"><label>&#129352; Silver  &mdash;  Female</label><input type="number" id="silver-female" value="150"></div><div class="field"><label>&#129353; Bronze  &mdash;  Male</label><input type="number" id="bronze-male" value="125"></div><div class="field"><label>&#129353; Bronze  &mdash;  Female</label><input type="number" id="bronze-female" value="100"></div></div><button class="save-btn" onclick="saveMedals()">Save medals</button><span class="saved-msg" id="medals-saved">&#9989; Saved!</span></div></div>
 
-  <div class="section"><div class="section-header" onclick="toggleSection('bonus')"><div class="section-header-left"><span>&#128202;</span><div><div class="section-title">Points Configuration</div><div class="section-sub-inline">Base points per km + daily bonus milestones</div></div></div><span class="section-chevron" id="chev-bonus">&#9660;</span></div><div class="section-body" id="body-bonus"><div class="form-grid" style="max-width:300px;margin-bottom:20px"><div class="field"><label>Base points per km</label><input type="number" id="base-per-km" value="1" step="0.1"></div></div><table class="bonus-table"><thead><tr><th>Daily distance milestone</th><th>Bonus points</th></tr></thead><tbody id="bonus-rows"></tbody></table><button class="save-btn" onclick="saveBonus()">Save points config</button><span class="saved-msg" id="bonus-saved">&#9989; Saved!</span></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('bonus')"><div class="section-header-left"><span>&#128202;</span><div><div class="section-title">Points Configuration <span class="ev-context-badge"></span></div><div class="section-sub-inline">Base points per km + daily bonus milestones</div></div></div><span class="section-chevron" id="chev-bonus">&#9660;</span></div><div class="section-body" id="body-bonus"><div class="form-grid" style="max-width:300px;margin-bottom:20px"><div class="field"><label>Base points per km</label><input type="number" id="base-per-km" value="1" step="0.1"></div></div><table class="bonus-table"><thead><tr><th>Daily distance milestone</th><th>Bonus points</th></tr></thead><tbody id="bonus-rows"></tbody></table><button class="save-btn" onclick="saveBonus()">Save points config</button><span class="saved-msg" id="bonus-saved">&#9989; Saved!</span></div></div>
 
-  <div class="section"><div class="section-header" onclick="toggleSection('dailycap')"><div class="section-header-left"><span>&#128197;</span><div><div class="section-title">Daily Cap & Special Days</div><div class="section-sub-inline">21 km cap on normal days; selected dates count full distance</div></div></div><span class="section-chevron" id="chev-dailycap">&#9660;</span></div><div class="section-body" id="body-dailycap"><div class="rule-box"><strong>Normal Days Rule:</strong><br>Daily walk/run cap is <strong>21 km</strong>. If a participant walks/runs more than 21 km on a normal day, recorded scoring distance will be capped at 21 km, worth 21 base points, and they will receive a flat <strong>+7 bonus points</strong>. Total = 28 points.</div><div class="rule-box"><strong>Special Days Rule Exception:</strong><br>On selected special dates, the 21 km limit is removed. Participants receive <strong>1 point per full kilometer</strong>, while bonus remains capped at <strong>+7 points</strong>. Example: 25 km = 25 base points + 7 bonus = 32 points.</div><div class="form-grid" style="align-items:end"><div class="field"><label>Special date</label><input type="date" id="special-date"></div><div class="field" style="grid-column:span 2"><label>Reason / Label</label><input type="text" id="special-label" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="addSpecialDate()">Add Special Date</button><button class="btn-add" style="margin-left:8px;background:#f0f0f0;color:#555" onclick="loadSpecialDates()">Refresh</button><span class="saved-msg" id="special-saved">&#9989; Saved!</span><div id="special-msg-ok" class="msg ok"></div><div id="special-msg-err" class="msg err"></div><div style="font-size:14px;font-weight:600;margin:20px 0 12px">Configured Special Dates</div><div id="special-dates-list">Loading...</div></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('dailycap')"><div class="section-header-left"><span>&#128197;</span><div><div class="section-title">Daily Cap & Special Days <span class="ev-context-badge"></span></div><div class="section-sub-inline">21 km cap on normal days; selected dates count full distance</div></div></div><span class="section-chevron" id="chev-dailycap">&#9660;</span></div><div class="section-body" id="body-dailycap"><div class="rule-box"><strong>Normal Days Rule:</strong><br>Daily walk/run cap is <strong>21 km</strong>. If a participant walks/runs more than 21 km on a normal day, recorded scoring distance will be capped at 21 km, worth 21 base points, and they will receive a flat <strong>+7 bonus points</strong>. Total = 28 points.</div><div class="rule-box"><strong>Special Days Rule Exception:</strong><br>On selected special dates, the 21 km limit is removed. Participants receive <strong>1 point per full kilometer</strong>, while bonus remains capped at <strong>+7 points</strong>. Example: 25 km = 25 base points + 7 bonus = 32 points.</div><div class="form-grid" style="align-items:end"><div class="field"><label>Special date</label><input type="date" id="special-date"></div><div class="field" style="grid-column:span 2"><label>Reason / Label</label><input type="text" id="special-label" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="addSpecialDate()">Add Special Date</button><button class="btn-add" style="margin-left:8px;background:#f0f0f0;color:#555" onclick="loadSpecialDates()">Refresh</button><span class="saved-msg" id="special-saved">&#9989; Saved!</span><div id="special-msg-ok" class="msg ok"></div><div id="special-msg-err" class="msg err"></div><div style="font-size:14px;font-weight:600;margin:20px 0 12px">Configured Special Dates</div><div id="special-dates-list">Loading...</div></div></div>
 </div>
 
 <!-- Tab 3: Challenges & Bonuses -->
 <div class="config-tab-panel" id="tab-panel-challenges" style="display: none;">
-  <div class="section"><div class="section-header" onclick="toggleSection('challenges')"><div class="section-header-left"><span>&#127919;</span><div><div class="section-title">Challenges</div><div class="section-sub-inline">Configure challenge bonus criteria and points</div></div></div><span class="section-chevron" id="chev-challenges">&#9660;</span></div><div class="section-body" id="body-challenges"><div id="challenges-list">Loading...</div><button class="btn-add" onclick="addChallenge()">+ Add challenge</button><span class="saved-msg" id="ch-saved">&#9989; Saved!</span></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('challenges')"><div class="section-header-left"><span>&#127919;</span><div><div class="section-title">Challenges <span class="ev-context-badge"></span></div><div class="section-sub-inline">Configure challenge bonus criteria and points</div></div></div><span class="section-chevron" id="chev-challenges">&#9660;</span></div><div class="section-body" id="body-challenges"><div id="challenges-list">Loading...</div><button class="btn-add" onclick="addChallenge()">+ Add challenge</button><span class="saved-msg" id="ch-saved">&#9989; Saved!</span></div></div>
 
-  <div class="section"><div class="section-header" onclick="toggleSection('manual')"><div class="section-header-left"><span>&#127873;</span><div><div class="section-title">Manual Bonus by Activity ID</div><div class="section-sub-inline">Apply bonus points to specific activities manually</div></div></div><span class="section-chevron" id="chev-manual">&#9660;</span></div><div class="section-body" id="body-manual"><div class="form-grid" style="max-width:700px"><div class="field" style="grid-column:1/-1"><label>Activity IDs (one per line, or comma separated)</label><textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea></div><div class="field"><label>Apply bonus to</label><select id="manual-apply-to"><option value="each">Each activity individually</option><option value="day">All activities on same day</option></select></div><div class="field"><label>Bonus points</label><input type="number" id="manual-pts" value="3" min="1" max="50"></div><div class="field"><label>Date</label><input type="date" id="manual-date"></div><div class="field"><label>Challenge name</label><input type="text" id="manual-reason" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button><span class="saved-msg" id="manual-saved">&#9989; Applied!</span><div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div><div style="margin-top:20px"><div onclick="toggleManualList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:8px;user-select:none"><div style="font-size:14px;font-weight:600">Existing manual bonuses</div><span id="chev-manuallist" style="font-size:13px;color:#bbb;transition:transform .2s">&#9660;</span></div><div id="body-manuallist" style="display:none;margin-top:8px"><div id="manual-list"></div></div></div></div></div>
+  <div class="section"><div class="section-header" onclick="toggleSection('manual')"><div class="section-header-left"><span>&#127873;</span><div><div class="section-title">Manual Bonus by Activity ID <span class="ev-context-badge"></span></div><div class="section-sub-inline">Apply bonus points to specific activities manually</div></div></div><span class="section-chevron" id="chev-manual">&#9660;</span></div><div class="section-body" id="body-manual"><div class="form-grid" style="max-width:700px"><div class="field" style="grid-column:1/-1"><label>Activity IDs (one per line, or comma separated)</label><textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea></div><div class="field"><label>Apply bonus to</label><select id="manual-apply-to"><option value="each">Each activity individually</option><option value="day">All activities on same day</option></select></div><div class="field"><label>Bonus points</label><input type="number" id="manual-pts" value="3" min="1" max="50"></div><div class="field"><label>Date</label><input type="date" id="manual-date"></div><div class="field"><label>Challenge name</label><input type="text" id="manual-reason" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button><span class="saved-msg" id="manual-saved">&#9989; Applied!</span><div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div><div style="margin-top:20px"><div onclick="toggleManualList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:8px;user-select:none"><div style="font-size:14px;font-weight:600">Existing manual bonuses</div><span id="chev-manuallist" style="font-size:13px;color:#bbb;transition:transform .2s">&#9660;</span></div><div id="body-manuallist" style="display:none;margin-top:8px"><div id="manual-list"></div></div></div></div></div>
 </div>
 
 <!-- Tab 4: Layout & Cache -->
@@ -325,7 +345,7 @@ tr:hover td{background:#FAFAFA}
       <div class="section-header-left">
         <span>&#127912;</span>
         <div>
-          <div class="section-title">App Layout & UI Features</div>
+          <div class="section-title">App Layout & UI Features <span class="ev-context-badge"></span></div>
           <div class="section-sub-inline">Configure tab visibilities and Connect Strava card visibility</div>
         </div>
       </div>
@@ -484,7 +504,7 @@ function showSaved(id){var el=document.getElementById(id);if(el){el.style.displa
 function renderBonusRows(){document.getElementById('bonus-rows').innerHTML=bonusData.map(function(b,i){return '<tr><td>'+b.km+' km</td><td><input type="number" value="'+b.pts+'" id="bp-'+i+'" min="0"></td></tr>'}).join('')}
 async function loadPWARestrictions() {
   try {
-    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config' + evq(), { headers: HDR });
     var rows = await r.json();
     if (rows && rows.length > 0) {
       var config = JSON.parse(rows[0].config_value);
@@ -503,7 +523,7 @@ async function savePWARestrictions() {
   try {
     var forcePush = !!document.getElementById('rule-force-push').checked;
     var forcePwa = !!document.getElementById('rule-force-pwa').checked;
-    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config', { headers: HDR });
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?config_key=eq.feed_config' + evq(), { headers: HDR });
     var rows = await r.json();
     var config = { rules: {}, filters: {} };
     var rowId = null;
@@ -525,6 +545,7 @@ async function savePWARestrictions() {
       method = 'PATCH';
     } else {
       payload.config_key = 'feed_config';
+      payload.event_id = EV_ID;
     }
     var res = await fetch(url, {
       method: method,
@@ -542,6 +563,30 @@ async function savePWARestrictions() {
 }
 var EV_ID = 1; var EV_ALL = [];
 function evq(){ return "&event_id=eq."+EV_ID; }
+function updateEventLabels() {
+  var ev = EV_ALL.find(function(e){ return parseInt(e.id) === parseInt(EV_ID); }) || { name: 'Walkathon 2026' };
+  var evName = ev.name;
+  document.querySelectorAll('.ev-context-badge').forEach(function(el) {
+    el.textContent = 'Active: ' + evName;
+    el.style.display = 'inline-flex';
+  });
+  var btnMedals = document.querySelector('button[onclick="saveMedals()"]');
+  if (btnMedals) btnMedals.textContent = 'Save Medals for ' + evName;
+  var btnBonus = document.querySelector('button[onclick="saveBonus()"]');
+  if (btnBonus) btnBonus.textContent = 'Save Points Config for ' + evName;
+  var btnAddSpecial = document.querySelector('button[onclick="addSpecialDate()"]');
+  if (btnAddSpecial) btnAddSpecial.textContent = 'Add Special Date to ' + evName;
+  var btnAddChallenge = document.querySelector('button[onclick="addChallenge()"]');
+  if (btnAddChallenge) btnAddChallenge.textContent = '+ Add Challenge to ' + evName;
+  var btnManual = document.querySelector('button[onclick="saveManualBonus()"]');
+  if (btnManual) btnManual.textContent = 'Apply Manual Bonus to ' + evName;
+  var btnLayout = document.querySelector('button[onclick="saveLayoutConfig()"]');
+  if (btnLayout) btnLayout.textContent = 'Save Layout Settings for ' + evName;
+  var btnLogin = document.querySelector('button[onclick="saveLoginMethod()"]');
+  if (btnLogin) btnLogin.textContent = 'Save Login Method for ' + evName;
+  var btnPwa = document.querySelector('button[onclick="savePWARestrictions()"]');
+  if (btnPwa) btnPwa.textContent = 'Save Restrictions for ' + evName;
+}
 async function loadEventSelector(){
   try{
     var r=await fetch(SB_URL+"/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc",{headers:HDR});
@@ -549,8 +594,10 @@ async function loadEventSelector(){
     EV_ALL=evs; sel.innerHTML="";
     evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
     sel.value="1"; EV_ID=1;
+    updateEventLabels();
     sel.addEventListener("change",async function(){
       EV_ID=parseInt(this.value)||1;
+      updateEventLabels();
       await loadConfig(); loadSpecialDates(); loadChallenges();
     });
   }catch(e){console.warn("event selector failed",e);}
