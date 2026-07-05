@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <script>
@@ -1356,8 +1356,12 @@ async function load() {
   }
 }
 
-loadEventSelector();
-load();
+loadEventSelector().then(() => {
+  load();
+}).catch(err => {
+  console.error('loadEventSelector error:', err);
+  load();
+});
 checkAllSystemsHealth();
 setInterval(checkAllSystemsHealth, 60000);
 
