@@ -100,6 +100,27 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   color: white;
   border-color: var(--brand);
 }
+.sync-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16A34A;
+}
+.sync-dot.active {
+  animation: pulse-green 1.5s infinite;
+}
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(22, 163, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}
 .ev-actions{display:flex;gap:8px;flex-wrap:wrap}
 .badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
 .badge.draft{background:#EEF0F4;color:#6B7280}
@@ -318,6 +339,48 @@ function renderList(){
     var info=document.createElement('div');info.className='ev-info';
     var nm=document.createElement('div');nm.className='ev-name';nm.textContent=ev.name;
     var bd=document.createElement('span');bd.className='badge '+ev.status;bd.textContent=ev.status;nm.appendChild(bd);
+    
+    // API Sync Status Badge
+    var rc = ev.rules_config || {};
+    var trackingMode = rc.tracking_mode || 'strava';
+    if (trackingMode === 'strava') {
+      var fetchStart = rc.fetch_start || ev.start_date;
+      var fetchEnd = rc.fetch_end || ev.end_date;
+      
+      var d = new Date();
+      var istTime = new Date(d.getTime() + (330 * 60 * 1000));
+      var todayStr = istTime.getUTCFullYear() + '-' + 
+                     String(istTime.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+                     String(istTime.getUTCDate()).padStart(2, '0');
+      
+      var isApiOn = false;
+      if (fetchStart && fetchEnd) {
+        isApiOn = (todayStr >= fetchStart && todayStr <= fetchEnd);
+      }
+      
+      var syncBadge = document.createElement('span');
+      syncBadge.className = 'badge';
+      syncBadge.style.marginLeft = '10px';
+      syncBadge.style.fontSize = '11px';
+      syncBadge.style.fontWeight = '600';
+      syncBadge.style.display = 'inline-flex';
+      syncBadge.style.alignItems = 'center';
+      syncBadge.style.gap = '6px';
+      
+      if (isApiOn) {
+        syncBadge.innerHTML = '<span class="sync-dot active"></span> API Sync: Active';
+        syncBadge.style.background = '#EAFBF0';
+        syncBadge.style.color = '#16A34A';
+        syncBadge.style.border = '1px solid rgba(22, 163, 74, 0.15)';
+      } else {
+        var isPast = fetchEnd && (todayStr > fetchEnd);
+        syncBadge.innerHTML = isPast ? 'API Sync: Ended' : 'API Sync: Inactive';
+        syncBadge.style.background = '#F3F4F6';
+        syncBadge.style.color = '#9CA3AF';
+        syncBadge.style.border = '1px solid rgba(156, 163, 175, 0.15)';
+      }
+      nm.appendChild(syncBadge);
+    }
     
     var actBadge = document.createElement('span');
     actBadge.id = 'ev-act-badge-' + ev.id;
