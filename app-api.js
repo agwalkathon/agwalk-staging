@@ -230,10 +230,10 @@ async function load(isBackgroundRefresh) {
             });
           }),
           fetchAll(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=activity_date.desc').then(function(d){cacheSet('acts_v3_'+athleteId,d);}),
-          fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
-          fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
-          fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
-          fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('medals',d);})
+          fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?event_id=eq.'+EVENT_ROW.id+'&select=config_key,config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('config',d);}),
+          fetch(SUPABASE_URL+'/rest/v1/challenges?event_id=eq.'+EVENT_ROW.id+'&is_active=eq.true&select=*',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('challenges',d);}),
+          fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?event_id=eq.'+EVENT_ROW.id+'&select=special_date',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('special_days',d);}),
+          fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?event_id=eq.'+EVENT_ROW.id+'&config_key=eq.medals&select=config_value',{headers:HDR}).then(function(r){return r.json();}).then(function(d){cacheSet('medals',d);})
         ]).then(function(){
           function doReload() {
             if (_touchInteracting) {
@@ -283,10 +283,10 @@ async function load(isBackgroundRefresh) {
 
       var [myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
         fetchAll(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=activity_date.desc'),
-        fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?select=config_key,config_value',{headers:HDR}),
-        fetch(SUPABASE_URL+'/rest/v1/challenges?is_active=eq.true&select=*',{headers:HDR}),
-        fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?select=special_date',{headers:HDR}),
-        fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?config_key=eq.medals&select=config_value',{headers:HDR})
+        fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?event_id=eq.'+EVENT_ROW.id+'&select=config_key,config_value',{headers:HDR}),
+        fetch(SUPABASE_URL+'/rest/v1/challenges?event_id=eq.'+EVENT_ROW.id+'&is_active=eq.true&select=*',{headers:HDR}),
+        fetch(SUPABASE_URL+'/rest/v1/special_scoring_days?event_id=eq.'+EVENT_ROW.id+'&select=special_date',{headers:HDR}),
+        fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?event_id=eq.'+EVENT_ROW.id+'&config_key=eq.medals&select=config_value',{headers:HDR})
       ]);
       myActs      = myActsFetched;       cacheSet('acts_v3_'+athleteId, myActs);
       cfgRows     = await cfgRes.json(); cacheSet('config', cfgRows);
