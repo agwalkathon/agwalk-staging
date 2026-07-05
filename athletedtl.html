@@ -163,6 +163,83 @@
     .actions-dropdown-item.danger { color: #ef4444; }
     .actions-dropdown-item.danger:hover { background: #FEF2F2; color: #ef4444; }
     .actions-dropdown-item[disabled] { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    
+    /* Bulk Actions Bar styles */
+    .bulk-actions-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 12px 24px;
+      border-radius: 16px;
+      display: none;
+      align-items: center;
+      gap: 24px;
+      z-index: 1000;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideUp {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .bulk-info {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    #bulk-count {
+      color: var(--brand);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .bulk-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bulk-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+    .bulk-apply-btn {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .bulk-apply-btn:hover {
+      background: #d25320;
+    }
+    .bulk-cancel-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .bulk-cancel-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
     .actions-dropdown-item[disabled]:hover { background: transparent; color: var(--text-secondary); }
     
     /* Action Buttons */
@@ -373,6 +450,7 @@
             <table>
               <thead>
                 <tr>
+                  <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)"></th>
                   <th style="width: 60px;">#</th>
                   <th style="min-width: 200px;">Participant Details</th>
                   <th style="min-width: 150px;">Event</th>
@@ -385,7 +463,7 @@
                 </tr>
               </thead>
               <tbody id="participants-body">
-                <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+                <tr><td colspan="10" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -684,8 +762,23 @@
 
     /* ---------- TAB: Registration (Approved) ---------- */
     function renderRows(rows) {
+      if (document.getElementById('select-all-checkbox')) {
+        document.getElementById('select-all-checkbox').checked = false;
+      }
+      setTimeout(updateBulkBar, 0);
+
       document.getElementById('participants-body').innerHTML = rows.length
         ? rows.map((p, i) => `<tr>
+            <td style="text-align: center;">
+              <input type="checkbox" class="row-checkbox" 
+                     data-id="${p.id}" 
+                     data-athlete="${p.strava_athlete_id || ''}" 
+                     data-name="${esc(p.full_name || '')}" 
+                     data-is-private="${p.is_private === true || p.is_private === 'true'}" 
+                     data-status="${p.status || ''}" 
+                     data-connected="${p.connected ? 'true' : 'false'}" 
+                     onchange="updateBulkBar()">
+            </td>
             <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
             <td>
               ${p.strava_profile_url 
@@ -745,7 +838,7 @@
               </div>
             </td>
           </tr>`).join('')
-        : '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
+        : '<tr><td colspan="10" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
     }
 
     function filterTable() {
@@ -860,7 +953,7 @@
         filterTable();
       } catch(e) {
         document.getElementById('participants-body').innerHTML =
-          `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+          `<tr><td colspan="10" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
       }
     }
 
@@ -871,10 +964,12 @@
       if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
       
       const btn = document.getElementById(`sync-btn-${athleteId}`);
-      const originalText = btn.textContent;
-      btn.textContent = 'Syncing...';
-      btn.style.pointerEvents = 'none';
-      btn.style.opacity = '0.6';
+      const originalText = btn ? btn.textContent : 'Sync';
+      if (btn) {
+        btn.textContent = 'Syncing...';
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+      }
       
       try {
         const res = await fetch(_BU + '/admin/sync-activities', {
@@ -888,25 +983,31 @@
         const d = await res.json();
         if (!res.ok || !d.success) throw new Error(d.error || 'Failed to sync');
         
-        btn.textContent = 'Success ✅';
-        btn.style.color = '#10B981';
-        btn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
-        btn.style.background = 'rgba(16, 185, 129, 0.05)';
+        if (btn) {
+          btn.textContent = 'Success ✅';
+          btn.style.color = '#10B981';
+          btn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+          btn.style.background = 'rgba(16, 185, 129, 0.05)';
+        }
         alert(`Sync complete for ${name}!\nSaved: ${d.savedCount} activities\nSkipped (Duplicates): ${d.skippedCount} activities`);
         await loadParticipants();
       } catch(e) {
-        btn.textContent = 'Failed ❌';
-        btn.style.color = '#EF4444';
-        btn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-        btn.style.background = 'rgba(239, 68, 68, 0.05)';
+        if (btn) {
+          btn.textContent = 'Failed ❌';
+          btn.style.color = '#EF4444';
+          btn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+          btn.style.background = 'rgba(239, 68, 68, 0.05)';
+        }
         alert(`Sync failed for ${name}: ` + e.message);
         setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.pointerEvents = 'auto';
-          btn.style.opacity = '1';
-          btn.style.color = 'var(--brand)';
-          btn.style.borderColor = 'rgba(232, 98, 42, 0.2)';
-          btn.style.background = 'rgba(232, 98, 42, 0.05)';
+          if (btn) {
+            btn.textContent = originalText;
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
+            btn.style.color = 'var(--brand)';
+            btn.style.borderColor = 'rgba(232, 98, 42, 0.2)';
+            btn.style.background = 'rgba(232, 98, 42, 0.05)';
+          }
         }, 4000);
       }
     }
@@ -1242,6 +1343,186 @@
         dropdown.classList.add('show');
       }
     }
+
+    /* ---------- BULK ACTIONS HANDLERS ---------- */
+    window.toggleSelectAll = function(master) {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = master.checked;
+      });
+      window.updateBulkBar();
+    };
+
+    window.clearSelection = function() {
+      const master = document.getElementById('select-all-checkbox');
+      if (master) master.checked = false;
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = false;
+      });
+      window.updateBulkBar();
+    };
+
+    window.updateBulkBar = function() {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      const selected = Array.from(checkboxes).filter(cb => cb.checked);
+      const bar = document.getElementById('bulk-bar');
+      const count = document.getElementById('bulk-count');
+      
+      if (selected.length > 0) {
+        bar.style.display = 'flex';
+        count.textContent = selected.length;
+      } else {
+        bar.style.display = 'none';
+      }
+    };
+
+    window.applyBulkAction = async function() {
+      const action = document.getElementById('bulk-action-select').value;
+      if (!action) {
+        alert('Please select a bulk action.');
+        return;
+      }
+      
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      const selected = Array.from(checkboxes).filter(cb => cb.checked);
+      if (selected.length === 0) {
+        alert('No participants selected.');
+        return;
+      }
+      
+      const count = selected.length;
+      if (!confirm(`Are you sure you want to apply the bulk action to all ${count} selected participants?`)) {
+        return;
+      }
+      
+      const applyBtn = document.querySelector('.bulk-apply-btn');
+      const originalText = applyBtn.textContent;
+      applyBtn.textContent = 'Processing...';
+      applyBtn.disabled = true;
+      
+      try {
+        const token = sessionStorage.getItem('wk_admin_token');
+        if (!token) {
+          alert('Unauthorized. Please log in again.');
+          window.location.href = 'admin-login.html';
+          return;
+        }
+
+        const promises = selected.map(async (cb) => {
+          const regId = cb.getAttribute('data-id');
+          const athleteId = cb.getAttribute('data-athlete');
+          const isPrivate = cb.getAttribute('data-is-private') === 'true';
+          const connected = cb.getAttribute('data-connected') === 'true';
+          
+          if (action === 'sync') {
+            if (!connected || !athleteId) return;
+            const syncDate = document.getElementById('sync-date').value || '2026-06-22';
+            return fetch(_BU + '/admin/sync-activities', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({ athlete_id: athleteId, after_date: syncDate })
+            }).then(r => r.json()).catch(() => null);
+          }
+          
+          if (action === 'clear') {
+            if (!athleteId) return;
+            return fetch(_BU + '/clear-activities', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({ athlete_id: athleteId })
+            }).then(r => r.json()).catch(() => null);
+          }
+          
+          if (action === 'revoke') {
+            if (!athleteId) return;
+            return fetch(_BU + '/revoke-strava', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({ id: regId, athlete_id: athleteId })
+            }).then(r => r.json()).catch(() => null);
+          }
+          
+          if (action === 'include-feed') {
+            return fetch(SUPABASE_URL + '/rest/v1/registration?id=eq.' + encodeURIComponent(regId), {
+              method: 'PATCH',
+              headers: { ...HDR, Prefer: 'return=representation' },
+              body: JSON.stringify({ is_private: false })
+            }).catch(() => null);
+          }
+          
+          if (action === 'exclude-feed') {
+            return fetch(SUPABASE_URL + '/rest/v1/registration?id=eq.' + encodeURIComponent(regId), {
+              method: 'PATCH',
+              headers: { ...HDR, Prefer: 'return=representation' },
+              body: JSON.stringify({ is_private: true })
+            }).catch(() => null);
+          }
+          
+          if (action === 'activate') {
+            return fetch(_BU + '/admin/participants/toggle-active', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({ id: regId, is_active: true })
+            }).then(r => r.json()).catch(() => null);
+          }
+          
+          if (action === 'deactivate') {
+            return fetch(_BU + '/admin/participants/toggle-active', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({ id: regId, is_active: false })
+            }).then(r => r.json()).catch(() => null);
+          }
+        });
+        
+        await Promise.all(promises);
+        alert('Bulk action applied successfully!');
+        window.clearSelection();
+        await loadParticipants();
+      } catch (err) {
+        alert('Failed to apply bulk action: ' + err.message);
+      } finally {
+        applyBtn.textContent = originalText;
+        applyBtn.disabled = false;
+      }
+    };
   </script>
+
+  <!-- Bulk Actions Bar HTML -->
+  <div id="bulk-bar" class="bulk-actions-bar">
+    <div class="bulk-info">
+      <span id="bulk-count">0</span> participants selected
+    </div>
+    <div class="bulk-actions-group">
+      <select id="bulk-action-select" class="bulk-select">
+        <option value="">Choose bulk action...</option>
+        <option value="sync">🔄 Bulk Sync Activities</option>
+        <option value="clear">🗑️ Bulk Clear Activities</option>
+        <option value="revoke">🚫 Bulk Revoke Strava</option>
+        <option value="include-feed">🔊 Bulk Include in Feed</option>
+        <option value="exclude-feed">🔇 Bulk Exclude from Feed</option>
+        <option value="activate">✅ Bulk Activate Reg</option>
+        <option value="deactivate">❌ Bulk Deactivate Reg</option>
+      </select>
+      <button class="bulk-apply-btn" onclick="applyBulkAction()">Apply</button>
+      <button class="bulk-cancel-btn" onclick="clearSelection()">Cancel</button>
+    </div>
+  </div>
 </body>
 </html>
