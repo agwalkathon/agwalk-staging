@@ -56,7 +56,7 @@ async function fetchAllParallel(url) {
 }
 
 // Caching Layer
-var CACHE_TTL = { personal: 5*60*1000, config: 10*60*1000, ranking: 5*60*1000, reg: 30*60*1000 };
+var CACHE_TTL = { personal: 5*60*1000, config: 15*1000, ranking: 5*60*1000, reg: 30*60*1000 };
 var EVENT_ROW = { id: 1, start_date: '2026-06-01', end_date: '2026-06-30' };
 
 function getEventUTCStart() {
