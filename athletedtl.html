@@ -534,6 +534,7 @@
                   <th style="min-width: 200px;">Email</th>
                   <th style="width: 110px;">Shift</th>
                   <th style="min-width: 150px;">Team Lead</th>
+                  <th style="min-width: 130px;">Custom Qs</th>
                   <th style="min-width: 160px;">Submitted</th>
                 </tr>
               </thead>
@@ -1183,6 +1184,12 @@
           return `<span class="badge ${statusClass}" style="text-transform:uppercase;">${s}</span>`;
         }
         
+        let customVal = '—';
+        if (r.custom_answers && typeof r.custom_answers === 'object' && Object.keys(r.custom_answers).length > 0) {
+          const answersStr = Object.entries(r.custom_answers).map(([q, ans]) => `${q}: ${ans}`).join('\n');
+          customVal = `<span class="badge" style="cursor:pointer; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:3px 8px; border-radius:6px; font-weight:600;" title="${esc(answersStr)}">View (${Object.keys(r.custom_answers).length})</span>`;
+        }
+        
         return `<tr>
           <td style="padding-left:16px;"><div style="display:flex;gap:6px;">${actions}</div></td>
           <td>${r.id}</td>
@@ -1194,6 +1201,7 @@
           <td>${esc(r.email || '—')}</td>
           <td>${esc(r.shift || '—')}</td>
           <td>${esc(r.project_lead || r.team_lead || '—')}</td>
+          <td>${customVal}</td>
           <td>${fmtReqDate(r.created_at)}</td>
         </tr>`;
       }).join('');
