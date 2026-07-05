@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Email Send — Arcgate Walkathon 2026</title>
+  <style>
+:root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;align-items:center;padding:16px 0 12px;z-index:300;transition:width .24s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.sidebar:hover{width:var(--sidebar-exp)}
+.sb-logo{display:flex;align-items:center;width:100%;padding:4px 14px 20px;text-decoration:none;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.sb-logo-icon img{width:28px;height:28px;object-fit:contain}
+.sb-logo-full{opacity:0;transition:opacity .18s;flex-shrink:0}
+.sb-logo-full img{height:22px;width:auto;display:block}
+.sidebar:hover .sb-logo-full{opacity:1}
+.sb-logo-text{font-size:13px;font-weight:600;color:#fff;opacity:0;white-space:nowrap;transition:opacity .18s;line-height:1.3}
+.sb-logo-text span{display:block;font-size:10px;font-weight:400;color:rgba(255,255,255,.45)}
+.sidebar:hover .sb-logo-text{opacity:1}
+.sb-section{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:0 14px 6px;width:100%;opacity:0;transition:opacity .15s;white-space:nowrap}
+.sidebar:hover .sb-section{opacity:1}
+.sb-item{display:flex;align-items:center;width:100%;padding:0 12px;min-height:42px;text-decoration:none;gap:10px;border-left:3px solid transparent;transition:all .16s}
+.sb-item:hover{background:rgba(255,255,255,.06);border-left-color:rgba(232,98,42,.5)}
+.sb-item.active{background:rgba(232,98,42,.12);border-left-color:var(--brand)}
+.sb-item i{font-size:19px;color:rgba(255,255,255,.38);flex-shrink:0;width:28px;text-align:center;transition:color .16s}
+.sb-item:hover i{color:rgba(255,255,255,.7)}
+.sb-item.active i{color:var(--brand)}
+.sb-label{font-size:13px;font-weight:500;color:rgba(255,255,255,.5);white-space:nowrap;opacity:0;transition:opacity .15s}
+.sidebar:hover .sb-label{opacity:1}
+.sb-item:hover .sb-label{color:rgba(255,255,255,.9)}
+.sb-item.active .sb-label{color:#fff;font-weight:600}
+.sb-spacer{flex:1}
+.sb-divider{width:calc(100% - 24px);height:1px;background:rgba(255,255,255,.07);margin:6px 12px;flex-shrink:0}
+.sb-signout{display:flex;align-items:center;width:100%;padding:0 12px;min-height:42px;gap:10px;border:none;background:none;cursor:pointer;transition:all .16s;font-family:var(--font)}
+.sb-signout:hover{background:rgba(255,80,80,.08)}
+.sb-signout i{font-size:19px;color:rgba(255,255,255,.25);flex-shrink:0;width:28px;text-align:center}
+.sb-signout:hover i{color:#ff6b6b}
+.sb-signout .sb-label{color:rgba(255,255,255,.3)}
+.sb-signout:hover .sb-label{color:#ff6b6b}
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.topbar-left h1{font-size:17px;font-weight:600;color:var(--text-primary)}
+.topbar-left p{font-size:12px;color:var(--text-muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--page-bg);transition:all .15s}
+.topbar-back:hover{background:#EAECF0;color:var(--text-primary)}
+.content{flex:1;padding:28px 32px;width:100%}
+.card{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden}
+.card-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-header-left{display:flex;align-items:center;gap:10px}
+.card-header-icon{width:34px;height:34px;border-radius:9px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:17px}
+.card-header h2{font-size:15px;font-weight:600;color:var(--text-primary)}
+.card-header-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
+.btn{padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);transition:all .15s}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:#d4551f}
+.btn-ghost{background:var(--page-bg);color:var(--text-secondary);border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost:hover{background:#EAECF0;color:var(--text-primary)}
+.btn-danger{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
+.btn-danger:hover{background:#DC2626;color:#fff}
+.btn-success{background:#ECFDF5;color:#059669;border:1px solid #A7F3D0}
+.btn-success:hover{background:#059669;color:#fff}
+.stats-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.stat-card{background:var(--card-bg);border-radius:var(--radius-md);padding:18px 20px;flex:1;min-width:130px;box-shadow:var(--shadow-sm);border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.val{font-size:24px;font-weight:700;color:var(--brand);line-height:1}
+.lbl{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.stat-card.green .val{color:#059669}
+.stat-card.dark .val{color:var(--text-primary)}
+.stat-card.red .val{color:#DC2626}
+.stat-card.blue .val{color:#3B82F6}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th{background:#F9FAFB;padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid #F9FAFB;vertical-align:middle;color:var(--text-primary)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAFA}
+.loading-row td{text-align:center;padding:48px;color:var(--text-muted);font-size:14px}
+.badge,.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-walk,.pill-walk{background:#ECFDF5;color:#059669}
+.badge-run,.pill-run{background:#EFF6FF;color:#3B82F6}
+.badge-ride,.pill-ride{background:#FFF7ED;color:#EA580C}
+.badge-hike,.pill-hike{background:#F5F3FF;color:#7C3AED}
+.badge-valid,.badge-clean,.pill-clean{background:#ECFDF5;color:#059669}
+.badge-flag,.badge-invalid,.pill-flag{background:#FEF2F2;color:#DC2626}
+.badge-conn{background:#EFF6FF;color:#3B82F6}
+.badge-active,.badge-ok{background:#ECFDF5;color:#059669}
+.ath{color:var(--brand);text-decoration:none;font-weight:500}
+.ath:hover{text-decoration:underline}
+.act-link{color:var(--text-primary);text-decoration:none;font-weight:500}
+.act-link:hover{color:var(--brand)}
+.filter-bar{background:var(--card-bg);border-radius:var(--radius-md);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.filter-bar h3{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-primary)}
+.default-note{font-size:12px;color:var(--text-muted);margin-left:6px;font-weight:400}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.filter-group label{display:block;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
+.filter-group input,.filter-group select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--page-bg);font-family:var(--font);color:var(--text-primary)}
+.filter-group input:focus,.filter-group select:focus{outline:none;border-color:var(--brand);background:#fff}
+.filter-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.empty{text-align:center;padding:56px 24px;color:var(--text-muted);font-size:13px}
+.empty .icon{font-size:40px;margin-bottom:12px;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:var(--radius-lg);padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);margin:20px}
+.modal h3{font-size:18px;font-weight:600;margin-bottom:4px;color:var(--text-primary)}
+.modal .sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.modal label{display:block;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
+.modal select,.modal input[type=number],.modal input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;margin-bottom:14px;background:var(--page-bg);font-family:var(--font)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-actions button{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.btn-confirm{background:var(--brand);color:#fff}
+.btn-cancel{background:var(--page-bg);color:var(--text-secondary);border:1px solid var(--border)}
+.site-footer{width:100%;background:var(--card-bg);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;font-family:var(--font);color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box}
+.site-footer a{color:var(--brand);text-decoration:none;margin-left:14px}
+.site-footer a:hover{text-decoration:underline}
+.editable{cursor:pointer}
+.editable:hover{background:var(--brand-light)!important;border-radius:4px}
+.edit-input{width:80px;padding:4px 6px;border:1px solid var(--brand);border-radius:4px;font-size:12px;font-family:var(--font)}
+.edit-select{width:110px;padding:4px 6px;border:1px solid var(--brand);border-radius:4px;font-size:12px;font-family:var(--font)}
+.result-count{padding:10px 16px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border)}
+.scroll-top{overflow-x:auto;overflow-y:hidden;height:12px}
+.scroll-top-inner{height:1px}
+.dist-field{display:none}
+.dist-field.show{display:block}
+@media(max-width:768px){.sidebar{width:56px}.main{margin-left:56px;flex-direction:column}.topbar{padding:0 16px;height:54px;flex-shrink:0;}.content{padding:16px;flex:1;}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.val{font-size:18px}th,td{padding:8px 10px;font-size:12px}.filter-grid{grid-template-columns:1fr 1fr;gap:8px}.site-footer{flex-direction:column;gap:6px;text-align:center}}
+@media(max-width:480px){.filter-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
+}
+
+
+
+
+
+/* Tabs */
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:white;border-radius:12px;padding:5px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.tab-btn{flex:1;padding:10px 14px;border:none;background:transparent;border-radius:9px;font-size:13px;font-weight:500;color:#888;cursor:pointer;transition:all .15s;text-align:center}
+.tab-btn.active{background:#E8622A;color:white}
+.tab-btn:hover:not(.active){background:#f5f5f5;color:#1A1A1A}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* Cards */
+.card{background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px;overflow:hidden}
+.card-head{padding:16px 24px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.card-head-left{display:flex;align-items:center;gap:10px}
+.card-head h2{font-size:15px;font-weight:700}
+.card-head .badge-count{background:#E8622A;color:white;font-size:11px;padding:2px 7px;border-radius:10px}
+.card-body{padding:20px 24px}
+
+/* Form fields */
+.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.field input,.field select,.field textarea{padding:9px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;background:#fafafa;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#E8622A;background:white}
+.field textarea{resize:vertical;min-height:80px}
+.field.span2{grid-column:span 2}
+
+/* ── Email Send page-specific ── */
+
+
+
+/* Job cards */
+.job-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.job-info{flex:1}
+.job-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.job-meta{font-size:12px;color:#888;display:flex;gap:12px;flex-wrap:wrap}
+.job-meta span{display:flex;align-items:center;gap:4px}
+.job-actions{display:flex;gap:8px;flex-shrink:0}
+.pill{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:500}
+.pill-blue{background:#e3f2fd;color:#1565c0}
+.pill-green{background:#e8f5e9;color:#2e7d32}
+.pill-orange{background:#fff3e0;color:#e65100}
+.pill-grey{background:#f5f5f5;color:#666}
+
+/* Template cards */
+.tpl-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.tpl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tpl-name{font-size:14px;font-weight:600}
+.tpl-desc{font-size:12px;color:#888;margin-bottom:10px}
+.tpl-preview{background:white;border:1px solid #eee;border-radius:6px;padding:10px 14px;font-size:12px;color:#555;max-height:80px;overflow:hidden;line-height:1.5}
+
+/* Send log */
+.send-log{background:#1A1A1A;color:#a5d6a7;border-radius:8px;padding:14px 16px;font-size:12px;font-family:monospace;max-height:260px;overflow-y:auto;line-height:1.9;display:none}
+.send-log.show{display:block}
+.log-err{color:#ef9a9a}
+.log-warn{color:#fff9c4}
+.log-info{color:#80cbc4}
+
+/* Progress */
+.prog-wrap{display:none;margin-top:16px}
+.prog-wrap.show{display:block}
+.prog-bar-bg{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin:6px 0}
+.prog-bar-fill{height:100%;background:#E8622A;border-radius:3px;transition:width .3s;width:0}
+
+/* Recipient preview */
+.recip-table{width:100%;border-collapse:collapse;font-size:13px}
+.recip-table th{background:#fafafa;padding:8px 12px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #f0f0f0}
+.recip-table td{padding:8px 12px;border-bottom:1px solid #f8f8f8}
+
+/* Variable chips */
+.vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.var-chip{background:#e3f2fd;color:#1565c0;padding:3px 9px;border-radius:6px;font-size:11px;font-family:monospace;cursor:pointer}
+.var-chip:hover{background:#bbdefb}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+
+
+
+@media(max-width:768px){
+  
+  
+  .field-grid{grid-template-columns:1fr}
+  .job-card{flex-direction:column;align-items:flex-start}
+  .tabs{flex-direction:column}
+}</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+
+  <div class="sb-section">Main</div>
+  <a href="admin.html" class="sb-item "><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+  <a href="events.html" class="sb-item "><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+  <a href="celebrate-config.html" class="sb-item "><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
+  <a href="reports.html" class="sb-item "><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+
+  <div class="sb-section" style="margin-top:10px;">Config</div>
+  <a href="data-upload.html" class="sb-item "><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+  <a href="email-send.html" class="sb-item active"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+  <a href="audit-log.html" class="sb-item "><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+  <a href="push-notifications.html" class="sb-item "><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+
+  <div class="sb-spacer"></div>
+  <div class="sb-divider"></div>
+  <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+</aside>
+<div class="main">
+<header class="topbar"><div class="topbar-left"><h1>Email Send</h1><p>Send bulk or individual emails to participants</p></div><div class="topbar-right"><a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a></div></header>
+  <div class="content">
+<!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="smtp" onclick="switchTab('smtp')">⚙️ SMTP Config</button>
+    <button class="tab-btn" data-tab="jobs" onclick="switchTab('jobs')">📅 Email Jobs</button>
+    <button class="tab-btn" data-tab="templates" onclick="switchTab('templates')">📝 Templates</button>
+    <button class="tab-btn" data-tab="send" onclick="switchTab('send')">🚀 Send Now</button>
+  </div>
+
+  <!-- ── TAB 1: Email Config ── -->
+  <div class="tab-pane active" id="tab-smtp">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left"><span>⚙️</span><h2>Email Configuration</h2></div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:20px;">
+          <div class="field">
+            <label>Email Provider</label>
+            <select id="smtp-provider" onchange="toggleProviderFields()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:#1b1d20;color:#fff;">
+              <option value="brevo">Brevo API (HTTP)</option>
+              <option value="smtp">Gmail SMTP / Custom SMTP</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Brevo Config Fields -->
+        <div id="brevo-fields" style="display:block;margin-bottom:20px;">
+          <div class="field-grid">
+            <div class="field" style="grid-column:span 2">
+              <label>Brevo API Key</label>
+              <input type="password" id="smtp-brevo_key" placeholder="xkeysib-xxxxxxxxxxxxxxxxxxxxxxxx">
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom SMTP / Gmail Config Fields -->
+        <div id="smtp-fields" style="display:none;margin-bottom:20px;">
+          <div class="field-grid">
+            <div class="field"><label>SMTP Host</label><input type="text" id="smtp-host" placeholder="smtp.gmail.com"></div>
+            <div class="field"><label>SMTP Port</label><input type="number" id="smtp-port" placeholder="587"></div>
+            <div class="field"><label>SMTP Username / Email</label><input type="text" id="smtp-user" placeholder="your-email@gmail.com"></div>
+            <div class="field"><label>SMTP Password (or App Password)</label><input type="password" id="smtp-pass" placeholder="your-app-password"></div>
+          </div>
+        </div>
+
+        <!-- Common Sender Info -->
+        <div class="field-grid" style="margin-bottom:20px;">
+          <div class="field"><label>From Name</label><input type="text" id="smtp-from_name" placeholder="Arcgate Walkathon 2026"></div>
+          <div class="field"><label>From Email</label><input type="text" id="smtp-from_email" placeholder="walkathon@arcgate.com"></div>
+          <div class="field"><label>Reply-To Email</label><input type="text" id="smtp-reply" placeholder="walkathon@arcgate.com"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-primary" id="smtp-save-btn" onclick="saveSmtp()">💾 Save Settings</button>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="text" id="smtp-test-to" placeholder="Send test to: your@email.com" style="padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font,Poppins);width:240px">
+            <button class="btn btn-ghost" onclick="testSmtp()">🔌 Send Test Email</button>
+          </div>
+          <span id="smtp-status" style="font-size:13px;padding:8px 14px;border-radius:8px;display:none"></span>
+        </div>
+        <div style="margin-top:20px;padding:14px 16px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;line-height:1.9">
+          <strong>Setup steps:</strong><br>
+          1. <strong>Brevo API</strong>: Paste API key, set From Email (verified sender in Brevo).<br>
+          2. <strong>Gmail SMTP</strong>: Set host to <code>smtp.gmail.com</code>, port to <code>587</code>, user to your Gmail address, and pass to a generated <strong>Google App Password</strong> (requires 2-Step Verification enabled in Google Account).<br>
+          3. Save → Send Test Email to verify connection.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: Email Jobs ── -->
+  <div class="tab-pane" id="tab-jobs">
+    <!-- New Job Form -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left"><span>➕</span><h2>Create Email Job</h2></div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field"><label>Job Name</label><input type="text" id="job-name" placeholder="Weekly Leaderboard — June 2026"></div>
+          <div class="field"><label>Event (filter recipients)</label>
+            <select id="job-event">
+              <option value="">All Events (all participants)</option>
+            </select>
+          </div>
+          <div class="field"><label>Email Template</label>
+            <select id="job-tpl">
+              <option value="">— Select template —</option>
+            </select>
+          </div>
+          <div class="field"><label>Send Frequency</label>
+            <select id="job-freq">
+              <option value="manual">Manual only</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="weekly_monday">Every Monday</option>
+              <option value="weekly_friday">Every Friday</option>
+            </select>
+          </div>
+          <div class="field"><label>Send Time (HH:MM)</label><input type="time" id="job-time" value="08:00"></div>
+          <div class="field"><label>Status</label>
+            <select id="job-status">
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-primary" id="job-save-btn" onclick="saveJob()">💾 Save Job</button>
+          <button class="btn btn-ghost" onclick="previewRecipients()">👥 Preview Recipients</button>
+          <span id="job-saved" style="display:none;color:#2e7d32;font-size:13px">✅ Job saved!</span>
+        </div>
+
+        <!-- Recipients preview -->
+        <div id="recip-preview" style="display:none;margin-top:16px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="recip-count"></div>
+          <div style="max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid #f0f0f0">
+            <table class="recip-table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Event</th></tr></thead>
+            <tbody id="recip-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Jobs -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left"><span>📋</span><h2>Configured Jobs</h2><span class="badge-count" id="jobs-count">0</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadJobs()">🔄 Refresh</button>
+      </div>
+      <div class="card-body" id="jobs-list">
+        <div style="text-align:center;padding:32px;color:#bbb">Loading jobs...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB 3: Templates ── -->
+  <div class="tab-pane" id="tab-templates">
+    <!-- Preset Templates -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div class="card-head-left"><span>⚡</span><h2>Load a Preset Template</h2></div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select id="preset-sel" style="flex:1;min-width:240px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font,Poppins)">
+            <option value="">— Choose a preset —</option>
+            <option value="leaderboard_live">🏆 Leaderboard Live</option>
+            <option value="red_flag">🚩 Major Red Flag Activities</option>
+            <option value="disqualified">❌ Disqualified from Event</option>
+            <option value="top3">🥇 You are in Top 3</option>
+            <option value="registration_approved">✅ Registration Approved</option>
+          </select>
+          <button class="btn btn-primary" onclick="loadPreset()">⬇ Load into Editor</button>
+        </div>
+        <p style="font-size:12px;color:#aaa;margin-top:8px">Loads the preset into the editor below — edit as needed, then save.</p>
+      </div>
+    </div>
+
+    <!-- New Template -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left"><span>➕</span><h2>Add Template</h2></div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field"><label>Template Name</label><input type="text" id="tpl-name" placeholder="Weekly Leaderboard"></div>
+          <div class="field"><label>Email Subject</label><input type="text" id="tpl-subject" placeholder="Your Walkathon Week {{week_number}} Summary 🏃"></div>
+          <div class="field span2"><label>Description</label><input type="text" id="tpl-desc" placeholder="Weekly rank and distance summary sent every Monday"></div>
+        </div>
+        <div class="field" style="margin-bottom:16px">
+          <label>HTML Body <span style="font-size:11px;color:#aaa;font-weight:400;text-transform:none">— edit HTML on the left, live preview on the right</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;min-height:320px">
+            <div style="display:flex;flex-direction:column;border-right:1px solid #e8e8e8">
+              <div style="padding:6px 10px;background:#f8f8f8;border-bottom:1px solid #eee;font-size:11px;color:#888;font-weight:600">HTML EDITOR</div>
+              <textarea id="tpl-body" oninput="livePreview()" style="flex:1;min-height:300px;font-family:monospace;font-size:12px;border:none;outline:none;resize:none;padding:12px;background:#fafafa;line-height:1.6" placeholder="Paste or type HTML here — preview updates live →"></textarea>
+            </div>
+            <div style="display:flex;flex-direction:column">
+              <div style="padding:6px 10px;background:#f8f8f8;border-bottom:1px solid #eee;font-size:11px;color:#888;font-weight:600">LIVE PREVIEW</div>
+              <iframe id="tpl-live-preview" style="flex:1;min-height:300px;border:none;width:100%;background:white" srcdoc="<p style='color:#bbb;font-family:sans-serif;text-align:center;padding:40px 20px;font-size:13px'>Preview will appear here as you type HTML →</p>"></iframe>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;color:#888;margin-bottom:6px">Available variables — click to copy:</div>
+          <div class="vars">
+            <span class="var-chip" onclick="insertVar('{{participant_name}}')">{{participant_name}}</span>
+            <span class="var-chip" onclick="insertVar('{{rank}}')">{{rank}}</span>
+            <span class="var-chip" onclick="insertVar('{{total_km}}')">{{total_km}}</span>
+            <span class="var-chip" onclick="insertVar('{{total_points}}')">{{total_points}}</span>
+            <span class="var-chip" onclick="insertVar('{{medal}}')">{{medal}}</span>
+            <span class="var-chip" onclick="insertVar('{{event_name}}')">{{event_name}}</span>
+            <span class="var-chip" onclick="insertVar('{{week_number}}')">{{week_number}}</span>
+            <span class="var-chip" onclick="insertVar('{{leaderboard_url}}')">{{leaderboard_url}}</span>
+            <span class="var-chip" onclick="insertVar('{{team_name}}')">{{team_name}}</span>
+            <span class="var-chip" onclick="insertVar('{{activities_this_week}}')">{{activities_this_week}}</span>
+            <span class="var-chip" onclick="insertVar('{{activity_name}}')">{{activity_name}}</span>
+            <span class="var-chip" onclick="insertVar('{{activity_link}}')">{{activity_link}}</span>
+            <span class="var-chip" onclick="insertVar('{{flag_reason}}')">{{flag_reason}}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-primary" id="tpl-save-btn" onclick="saveTemplate()">💾 Save Template</button>
+          <button class="btn btn-ghost" onclick="previewCurrentTpl()">👁 Preview</button>
+          <span id="tpl-status" style="display:none"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template list -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left"><span>📝</span><h2>Email Templates</h2><span class="badge-count" id="tpls-count">0</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadTemplates()">🔄 Refresh</button>
+      </div>
+      <div class="card-body" id="tpls-list">
+        <div style="text-align:center;padding:32px;color:#bbb">Loading templates...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB 4: Send Now ── -->
+  <div class="tab-pane" id="tab-send">
+    <div class="card">
+      <div class="card-head"><div class="card-head-left"><span>🚀</span><h2>Send Email Now</h2></div></div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field"><label>Select Job</label>
+            <select id="send-job">
+              <option value="">— Select a job —</option>
+            </select>
+          </div>
+          <div class="field"><label>Or select Event manually</label>
+            <select id="send-event">
+              <option value="">All participants</option>
+            </select>
+          </div>
+          <div class="field"><label>Template</label>
+            <select id="send-tpl">
+              <option value="">— Select template —</option>
+            </select>
+          </div>
+          <div class="field"><label>Test mode (send to 1 address)</label>
+            <input type="text" id="send-test-email" placeholder="test@arcgate.com">
+          </div>
+        </div>
+        <p style="font-size:12px;color:#888;margin-bottom:16px">Leave test email blank to send to all matched participants. Fill test email to send only to that address first.</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="previewSend()">👥 Preview recipients</button>
+          <button class="btn btn-green" id="send-btn" onclick="startSend(false)">🚀 Send to All</button>
+          <button class="btn btn-primary" onclick="startSend(true)">🧪 Test Send (1 email)</button>
+        </div>
+
+        <!-- Recipients preview for send -->
+        <div id="send-recip-preview" style="display:none;margin-top:16px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="send-recip-count"></div>
+          <div style="max-height:180px;overflow-y:auto;border-radius:8px;border:1px solid #f0f0f0">
+            <table class="recip-table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Event</th></tr></thead>
+            <tbody id="send-recip-body"></tbody></table>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="prog-wrap" id="send-prog">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span id="send-prog-label">Sending...</span>
+            <span id="send-prog-pct">0%</span>
+          </div>
+          <div class="prog-bar-bg"><div class="prog-bar-fill" id="send-prog-fill"></div></div>
+        </div>
+        <div class="send-log" id="send-log"></div>
+      </div>
+    </div>
+
+    <!-- Send History -->
+    <div class="card">
+      <div class="card-head"><div class="card-head-left"><span>📜</span><h2>Send History</h2></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadHistory()">🔄 Refresh</button>
+      </div>
+      <div class="card-body" id="history-list">
+        <div style="text-align:center;padding:32px;color:#bbb">Loading history...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+</div><!-- /main -->
+<script>
+
+var SB = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
+
+var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+authGuard();
+
+// ── Supabase helpers ───────────────────────────────────
+async function dbGet(table, query) {
+  query = query || '';
+  var r = await fetch(SB + '/rest/v1/' + table + query, { headers: H });
+  var d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.hint || JSON.stringify(d));
+  return d;
+}
+async function dbInsert(table, data) {
+  var r = await fetch(SB + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: Object.assign({}, H, { 'Prefer': 'return=representation' }),
+    body: JSON.stringify(data)
+  });
+  var d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.hint || JSON.stringify(d));
+  return Array.isArray(d) ? d[0] : d;
+}
+async function dbUpdate(table, query, data) {
+  var r = await fetch(SB + '/rest/v1/' + table + query, {
+    method: 'PATCH',
+    headers: Object.assign({}, H, { 'Prefer': 'return=representation' }),
+    body: JSON.stringify(data)
+  });
+  var d = await r.json();
+  if (!r.ok) throw new Error(d.message || d.hint || JSON.stringify(d));
+  return d;
+}
+async function dbDelete(table, query) {
+  var r = await fetch(SB + '/rest/v1/' + table + query, { method: 'DELETE', headers: H });
+  if (!r.ok) { var d = await r.json(); throw new Error(d.message || JSON.stringify(d)); }
+}
+
+// ── UI helpers ─────────────────────────────────────────
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function setStatus(id, type, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'inline';
+  el.style.padding = '8px 14px';
+  el.style.borderRadius = '8px';
+  el.style.fontSize = '13px';
+  el.style.fontWeight = '500';
+  if (type === 'ok') { el.style.background = '#e8f5e9'; el.style.color = '#2e7d32'; }
+  if (type === 'err') { el.style.background = '#ffebee'; el.style.color = '#c62828'; }
+  if (type === 'wait') { el.style.background = '#fff8e1'; el.style.color = '#e65100'; }
+  el.textContent = msg;
+  if (type === 'ok') setTimeout(function() { el.style.display = 'none'; }, 4000);
+}
+function setBtnLoading(id, loading, originalText) {
+  var btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Saving...' : originalText;
+}
+
+// ── Tab switching ──────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-tab') === name);
+  });
+  document.querySelectorAll('.tab-pane').forEach(function(p) {
+    p.classList.toggle('active', p.id === 'tab-' + name);
+  });
+  if (name === 'smtp')      loadSmtp();
+  if (name === 'templates') loadTemplates();
+  if (name === 'jobs')      { loadTemplateSelect('job-tpl'); loadEventSelect('job-event'); loadJobs(); }
+  if (name === 'send')      { loadTemplateSelect('send-tpl'); loadEventSelect('send-event'); loadHistory(); }
+}
+
+// ── SMTP Config ────────────────────────────────────────
+function toggleProviderFields() {
+  var prov = document.getElementById('smtp-provider').value;
+  if (prov === 'smtp') {
+    document.getElementById('brevo-fields').style.display = 'none';
+    document.getElementById('smtp-fields').style.display = 'block';
+  } else {
+    document.getElementById('brevo-fields').style.display = 'block';
+    document.getElementById('smtp-fields').style.display = 'none';
+  }
+}
+
+async function loadEmailStatus() {
+  try {
+    var r = await fetch('https://agwalk-backend.onrender.com/email/status');
+    var d = await r.json();
+    var widget = document.getElementById('brevo-usage-widget');
+    if (widget && d.success) {
+      if (d.provider === 'brevo' && d.configured) {
+        widget.style.display = 'block';
+        var remaining = d.remaining;
+        
+        if (d.isUnlimitedDaily) {
+          // Starter / Paid plan
+          document.getElementById('brevo-usage-plan').textContent = 'Starter Plan (Paid)';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(46,125,50,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#2e7d32';
+          
+          document.getElementById('brevo-usage-remaining').textContent = remaining.toLocaleString();
+          document.getElementById('brevo-usage-total').textContent = 'Monthly Credits Left';
+          document.getElementById('brevo-usage-progress').style.width = '100%';
+          document.getElementById('brevo-usage-progress').style.background = '#2e7d32';
+        } else {
+          // Free plan (Daily limit of 300)
+          var limit = d.limit || 300;
+          var progressPercent = Math.min(100, Math.max(0, (remaining / limit) * 100));
+          
+          document.getElementById('brevo-usage-plan').textContent = 'Daily Send Limit';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(232,98,42,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#E8622A';
+          
+          document.getElementById('brevo-usage-remaining').textContent = remaining;
+          document.getElementById('brevo-usage-total').textContent = remaining + ' / ' + limit;
+          document.getElementById('brevo-usage-progress').style.width = progressPercent + '%';
+          
+          if (remaining <= 20) {
+            document.getElementById('brevo-usage-progress').style.background = '#d32f2f'; // Red if running low
+          } else {
+            document.getElementById('brevo-usage-progress').style.background = '#E8622A';
+          }
+        }
+
+        if (d.error) {
+          document.getElementById('brevo-usage-remaining').textContent = '⚠️';
+          document.getElementById('brevo-usage-plan').textContent = 'Connection Error';
+          document.getElementById('brevo-usage-plan').style.background = 'rgba(211,47,47,0.2)';
+          document.getElementById('brevo-usage-plan').style.color = '#d32f2f';
+        }
+      } else {
+        widget.style.display = 'none'; // Hide if SMTP or not configured
+      }
+    }
+  } catch(e) {
+    console.warn('loadEmailStatus:', e.message);
+  }
+}
+
+async function loadSmtp() {
+  try {
+    var r = await fetch('https://agwalk-backend.onrender.com/get-smtp');
+    var d = await r.json();
+    if (d.success && d.data && d.data.config) {
+      var s = d.data.config;
+      var fields = ['provider','brevo_key','host','port','user','pass','from_name','from_email','reply'];
+      fields.forEach(function(k) {
+        var el = document.getElementById('smtp-' + k);
+        if (el && s[k] != null) el.value = s[k];
+      });
+      toggleProviderFields();
+      loadEmailStatus();
+    }
+  } catch(e) {
+    console.warn('loadSmtp:', e.message);
+  }
+}
+
+async function saveSmtp() {
+  setBtnLoading('smtp-save-btn', true, '💾 Save Settings');
+  setStatus('smtp-status', 'wait', '⏳ Saving...');
+  var fields = ['provider','brevo_key','host','port','user','pass','from_name','from_email','reply'];
+  var cfg = {};
+  fields.forEach(function(k) {
+    var el = document.getElementById('smtp-' + k);
+    if (el) cfg[k] = el.value.trim();
+  });
+  try {
+    var r = await fetch('https://agwalk-backend.onrender.com/save-smtp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: cfg })
+    });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Save failed');
+    setStatus('smtp-status', 'ok', '✅ Settings saved!');
+    loadEmailStatus();
+  } catch(e) {
+    setStatus('smtp-status', 'err', '❌ Save failed: ' + e.message);
+    console.error('saveSmtp:', e);
+  }
+  setBtnLoading('smtp-save-btn', false, '💾 Save Settings');
+}
+
+async function testSmtp() {
+  var testTo = document.getElementById('smtp-test-to').value.trim();
+  if (!testTo) { alert('Enter a "Send test to" email address first.'); return; }
+  setStatus('smtp-status', 'wait', '⏳ Saving & sending test email to ' + testTo + '...');
+  await saveSmtp();
+  try {
+    var r = await fetch('https://agwalk-backend.onrender.com/test-email', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: testTo })
+    });
+    var txt = await r.text();
+    var d;
+    try { d = JSON.parse(txt); } catch(e) { throw new Error('Backend returned: ' + txt.slice(0,120)); }
+    setStatus('smtp-status', d.success ? 'ok' : 'err',
+      d.success ? '✅ Test email sent to ' + testTo + '! Check inbox.' : '❌ ' + (d.error || JSON.stringify(d)));
+  } catch(e) {
+    setStatus('smtp-status', 'err', '❌ ' + e.message);
+  }
+}
+
+// ── Templates ──────────────────────────────────────────
+function loadPreset() {
+  var key = document.getElementById('preset-sel').value;
+  if (!key) { alert('Select a preset first.'); return; }
+  var PRESETS = {
+    leaderboard_live: {
+      name: 'Leaderboard Live',
+      subject: '🏆 Arcgate Walkathon 2026 — Leaderboard Update',
+      desc: 'Leaderboard update with current rank, km, and points',
+      body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+  <div style="background:#E8622A;padding:28px 32px;text-align:center">
+    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">🏆 Leaderboard Update</h1>
+    <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026</p>
+  </div>
+  <div style="padding:28px 32px">
+    <p style="color:#333;font-size:15px">Hi <strong>{{participant_name}}</strong>,</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">Here's your latest leaderboard standing for the Arcgate Walkathon 2026!</p>
+    <div style="background:#fff8f5;border:2px solid #E8622A;border-radius:12px;padding:20px;margin:20px 0;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:#E8622A">{{rank}}</div>
+      <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px">Your Current Rank</div>
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap">
+        <div><div style="font-size:20px;font-weight:700;color:#333">{{total_km}} km</div><div style="font-size:11px;color:#888">Distance</div></div>
+        <div><div style="font-size:20px;font-weight:700;color:#333">{{total_points}} pts</div><div style="font-size:11px;color:#888">Points</div></div>
+        <div><div style="font-size:20px;font-weight:700;color:#333">{{medal}}</div><div style="font-size:11px;color:#888">Medal</div></div>
+      </div>
+    </div>
+    <p style="color:#555;font-size:14px">Team: <strong>{{team_name}}</strong></p>
+    <div style="text-align:center;margin:24px 0">
+      <a href="{{leaderboard_url}}" style="background:#E8622A;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View Full Leaderboard →</a>
+    </div>
+    <p style="color:#888;font-size:12px">Keep walking, keep earning points. Every step counts! 🚶‍♂️</p>
+  </div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+</div></body></html>`
+    },
+    red_flag: {
+      name: 'Red Flag Activities',
+      subject: '🚩 Action Required — Flagged Activity on Your Walkathon Profile',
+      desc: 'Inform participant about a flagged/suspicious activity',
+      body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+  <div style="background:#c62828;padding:28px 32px;text-align:center">
+    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">🚩 Activity Flagged for Review</h1>
+    <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026</p>
+  </div>
+  <div style="padding:28px 32px">
+    <p style="color:#333;font-size:15px">Hi <strong>{{participant_name}}</strong>,</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">Our system has flagged one of your recent activities for review. This means the activity will not count toward your score until resolved.</p>
+    <div style="background:#fff8f8;border:2px solid #c62828;border-radius:10px;padding:18px;margin:20px 0">
+      <div style="font-size:13px;color:#888;margin-bottom:4px">Activity</div>
+      <div style="font-size:16px;font-weight:700;color:#333"><a href="{{activity_link}}" style="color:#c62828;text-decoration:none">{{activity_name}}</a></div>
+      <div style="font-size:13px;color:#c62828;margin-top:8px;font-weight:600">Reason: {{flag_reason}}</div>
+    </div>
+    <p style="color:#555;font-size:14px;line-height:1.6">If you believe this is an error, please reach out to the walkathon admin team with your activity details. We'll review and update the status promptly.</p>
+    <p style="color:#888;font-size:12px;margin-top:24px">This is an automated alert. Please do not reply to this email — contact your admin directly.</p>
+  </div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+</div></body></html>`
+    },
+    disqualified: {
+      name: 'Disqualified from Event',
+      subject: '❌ Important — Disqualification Notice | Arcgate Walkathon 2026',
+      desc: 'Notify participant they have been disqualified from the event',
+      body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+  <div style="background:#424242;padding:28px 32px;text-align:center">
+    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">❌ Disqualification Notice</h1>
+    <p style="color:rgba(255,255,255,.75);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026</p>
+  </div>
+  <div style="padding:28px 32px">
+    <p style="color:#333;font-size:15px">Dear <strong>{{participant_name}}</strong>,</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">We regret to inform you that after a detailed review, your participation in the <strong>Arcgate Walkathon 2026</strong> has been disqualified.</p>
+    <div style="background:#fafafa;border-left:4px solid #424242;border-radius:0 8px 8px 0;padding:14px 18px;margin:20px 0">
+      <div style="font-size:12px;color:#888;margin-bottom:4px">Reason for disqualification</div>
+      <div style="font-size:14px;color:#333">{{flag_reason}}</div>
+    </div>
+    <p style="color:#555;font-size:14px;line-height:1.6">This decision was made in accordance with the walkathon's fair-play policy. If you have any questions or would like to appeal, please contact the admin team within 48 hours.</p>
+    <p style="color:#888;font-size:12px;margin-top:24px">We appreciate your participation and hope to see you in future events.</p>
+  </div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+</div></body></html>`
+    },
+    top3: {
+      name: 'You Are in Top 3',
+      subject: '🥇 Congratulations! You\'re in the Top 3 — Arcgate Walkathon 2026',
+      desc: 'Celebrate participant reaching top 3 on the leaderboard',
+      body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+  <div style="background:linear-gradient(135deg,#E8622A,#f5a623);padding:28px 32px;text-align:center">
+    <div style="font-size:48px;margin-bottom:8px">{{medal}}</div>
+    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">You're in the Top 3!</h1>
+    <p style="color:rgba(255,255,255,.9);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026</p>
+  </div>
+  <div style="padding:28px 32px;text-align:center">
+    <p style="color:#333;font-size:16px;font-weight:600">🎉 Amazing work, <strong>{{participant_name}}</strong>!</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">You've climbed to <strong>Rank {{rank}}</strong> on the leaderboard. You're among the top performers of Arcgate Walkathon 2026!</p>
+    <div style="background:#fff8f5;border:2px solid #E8622A;border-radius:12px;padding:20px;margin:20px 0">
+      <div style="font-size:36px;font-weight:800;color:#E8622A">#{{rank}}</div>
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:12px;flex-wrap:wrap">
+        <div><div style="font-size:18px;font-weight:700;color:#333">{{total_km}} km</div><div style="font-size:11px;color:#888">Distance</div></div>
+        <div><div style="font-size:18px;font-weight:700;color:#333">{{total_points}} pts</div><div style="font-size:11px;color:#888">Points</div></div>
+      </div>
+    </div>
+    <p style="color:#555;font-size:14px">Keep going — every step keeps you at the top! 🏆</p>
+    <div style="margin:24px 0">
+      <a href="{{leaderboard_url}}" style="background:#E8622A;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View Leaderboard →</a>
+    </div>
+  </div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+</div></body></html>`
+    },
+    registration_approved: {
+      name: 'Registration Approved',
+      subject: '✅ You\'re In! Registration Approved — Arcgate Walkathon 2026',
+      desc: 'Welcome email after registration approval with Strava connect instructions',
+      body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+  <div style="background:#E8622A;padding:28px 32px;text-align:center">
+    <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">✅ Registration Approved!</h1>
+    <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026 — June 2026</p>
+  </div>
+  <div style="padding:28px 32px">
+    <p style="color:#333;font-size:15px">Hi <strong>{{participant_name}}</strong>,</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">Great news — your registration for <strong>Arcgate Walkathon 2026</strong> has been approved! 🎉</p>
+    <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:10px;padding:18px;margin:20px 0">
+      <div style="font-size:14px;font-weight:700;color:#166534;margin-bottom:8px">Next Step: Connect Your Strava Account</div>
+      <p style="font-size:13px;color:#166534;margin:0;line-height:1.6">All your activities are tracked via Strava. Please connect your account to start earning points.</p>
+    </div>
+    <ol style="color:#555;font-size:14px;line-height:2;padding-left:20px">
+      <li>Visit the Walkathon portal</li>
+      <li>Click <strong>"Connect with Strava"</strong></li>
+      <li>Authorize the app — your walks, runs, and hikes will sync automatically</li>
+      <li>Track your points on the live leaderboard</li>
+    </ol>
+    <div style="text-align:center;margin:24px 0">
+      <a href="{{leaderboard_url}}" style="background:#E8622A;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open Walkathon Portal →</a>
+    </div>
+    <p style="color:#888;font-size:12px;line-height:1.6">The event runs throughout June 2026. Activities recorded on Strava from June 1 onward will count. Walk, run, hike, or ride — every km earns points!</p>
+  </div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+</div></body></html>`
+    }
+  };
+  var p = PRESETS[key];
+  if (!p) return;
+  document.getElementById('tpl-name').value    = p.name;
+  document.getElementById('tpl-subject').value = p.subject;
+  document.getElementById('tpl-desc').value    = p.desc;
+  document.getElementById('tpl-body').value    = p.body;
+  document.getElementById('preset-sel').value  = '';
+  document.getElementById('tpl-name').focus();
+  document.getElementById('tpl-status').style.display='none';
+  livePreview();
+  // Scroll to the editor
+  document.getElementById('tpl-name').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function loadTemplates() {
+  var list = document.getElementById('tpls-list');
+  list.innerHTML = '<div style="padding:20px;color:#aaa">Loading...</div>';
+  try {
+    var rows = await dbGet('email_templates', '?order=created_at.desc');
+    document.getElementById('tpls-count').textContent = rows.length;
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:#bbb">No templates yet. Add one above.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(t) {
+      return '<div class="tpl-card">'
+        + '<div class="tpl-head">'
+        + '<span class="tpl-name">' + esc(t.name) + '</span>'
+        + '<div style="display:flex;gap:8px">'
+        + '<button class="btn btn-ghost btn-sm" onclick="editTpl(' + t.id + ')">✏️ Edit</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="previewTpl(' + t.id + ')">👁 Preview</button>'
+        + '<button class="btn btn-sm" style="background:#ffebee;color:#c62828" onclick="deleteTpl(' + t.id + ')">🗑</button>'
+        + '</div></div>'
+        + '<div class="tpl-desc">' + esc(t.description || '') + '</div>'
+        + '<div style="font-size:12px;color:#666;margin-bottom:6px">Subject: <strong>' + esc(t.subject || '') + '</strong></div>'
+        + '<div class="tpl-preview">' + esc((t.body_html || '').substring(0, 200)) + '...</div>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:#c62828;padding:16px">❌ ' + e.message + '</div>';
+  }
+}
+
+async function saveTemplate() {
+  var name = document.getElementById('tpl-name').value.trim();
+  var subj = document.getElementById('tpl-subject').value.trim();
+  var body = document.getElementById('tpl-body').value.trim();
+  var desc = document.getElementById('tpl-desc').value.trim();
+  if (!name) { alert('Template name is required.'); return; }
+  if (!body) { alert('HTML body is required.'); return; }
+  setBtnLoading('tpl-save-btn', true, '💾 Save Template');
+  setStatus('tpl-status', 'wait', '⏳ Saving...');
+  try {
+    var editId = document.getElementById('tpl-save-btn').getAttribute('data-edit-id');
+    if (editId) {
+      await dbUpdate('email_templates', '?id=eq.' + editId, { name: name, subject: subj, body_html: body, description: desc });
+      document.getElementById('tpl-save-btn').removeAttribute('data-edit-id');
+    } else {
+      await dbInsert('email_templates', { name: name, subject: subj, body_html: body, description: desc });
+    }
+    setStatus('tpl-status', 'ok', '✅ Template saved!');
+    loadTemplates();
+  } catch(e) {
+    setStatus('tpl-status', 'err', '❌ Save failed: ' + e.message);
+    console.error('saveTemplate:', e);
+  }
+  setBtnLoading('tpl-save-btn', false, '💾 Save Template');
+}
+
+async function editTpl(id) {
+  try {
+    var rows = await dbGet('email_templates', '?id=eq.' + id);
+    if (!rows[0]) return;
+    var t = rows[0];
+    document.getElementById('tpl-name').value = t.name || '';
+    document.getElementById('tpl-subject').value = t.subject || '';
+    document.getElementById('tpl-body').value = t.body_html || '';
+    document.getElementById('tpl-desc').value = t.description || '';
+    document.getElementById('tpl-save-btn').setAttribute('data-edit-id', id);
+    document.getElementById('tpl-save-btn').textContent = '💾 Update Template';
+    switchTab('templates');
+    livePreview();
+    window.scrollTo(0, 0);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteTpl(id) {
+  if (!confirm('Delete this template?')) return;
+  try {
+    await dbDelete('email_templates', '?id=eq.' + id);
+    loadTemplates();
+  } catch(e) { alert('Delete failed: ' + e.message); }
+}
+
+async function previewTpl(id) {
+  try {
+    var rows = await dbGet('email_templates', '?id=eq.' + id);
+    if (!rows[0]) return;
+    document.getElementById('modal-tpl-name').textContent = rows[0].name;
+    document.getElementById('tpl-frame').srcdoc = rows[0].body_html || '<p>No content</p>';
+    document.getElementById('tpl-modal').style.display = 'flex';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function livePreview() {
+  var body = document.getElementById('tpl-body').value;
+  var frame = document.getElementById('tpl-live-preview');
+  if (frame) frame.srcdoc = body || '<p style="color:#bbb;font-family:sans-serif;text-align:center;padding:40px 20px;font-size:13px">Preview will appear here as you type HTML →</p>';
+}
+
+function previewCurrentTpl() {
+  var body = document.getElementById('tpl-body').value;
+  if (!body) { alert('Enter HTML body first.'); return; }
+  document.getElementById('modal-tpl-name').textContent = 'Preview';
+  document.getElementById('tpl-frame').srcdoc = body;
+  document.getElementById('tpl-modal').style.display = 'flex';
+}
+
+function closeTplModal() { document.getElementById('tpl-modal').style.display = 'none'; }
+
+function insertVar(v) {
+  var ta = document.getElementById('tpl-body');
+  var pos = ta.selectionStart;
+  ta.value = ta.value.slice(0, pos) + v + ta.value.slice(ta.selectionEnd);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = pos + v.length;
+}
+
+async function loadTemplateSelect(selectId) {
+  try {
+    var rows = await dbGet('email_templates', '?select=id,name&order=name');
+    var sel = document.getElementById(selectId);
+    if (!sel) return;
+    while (sel.options.length > 1) sel.remove(1);
+    rows.forEach(function(t) {
+      var o = document.createElement('option');
+      o.value = t.id; o.textContent = t.name;
+      sel.appendChild(o);
+    });
+  } catch(e) { console.warn('loadTemplateSelect:', e.message); }
+}
+
+// ── Events dropdown ────────────────────────────────────
+async function loadEventSelect(selectId) {
+  try {
+    var rows = await dbGet('registration', '?select=event_name&order=event_name');
+    var unique = [];
+    var seen = {};
+    rows.forEach(function(r) {
+      if (r.event_name && !seen[r.event_name]) { seen[r.event_name] = 1; unique.push(r.event_name); }
+    });
+    var sel = document.getElementById(selectId);
+    if (!sel) return;
+    while (sel.options.length > 1) sel.remove(1);
+    unique.forEach(function(ev) {
+      var o = document.createElement('option');
+      o.value = o.textContent = ev;
+      sel.appendChild(o);
+    });
+  } catch(e) { console.warn('loadEventSelect:', e.message); }
+}
+
+// ── Jobs ───────────────────────────────────────────────
+async function loadJobs() {
+  var list = document.getElementById('jobs-list');
+  list.innerHTML = '<div style="padding:20px;color:#aaa">Loading...</div>';
+  try {
+    var rows = await dbGet('email_jobs', '?order=created_at.desc');
+    var tpls = await dbGet('email_templates', '?select=id,name');
+    var tm = {};
+    tpls.forEach(function(t) { tm[t.id] = t.name; });
+    document.getElementById('jobs-count').textContent = rows.length;
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:#bbb">No jobs yet. Create one above.</div>';
+      return;
+    }
+    var freqMap = { manual: 'Manual', daily: 'Daily', weekly: 'Weekly', weekly_monday: 'Every Monday', weekly_friday: 'Every Friday' };
+    list.innerHTML = rows.map(function(j) {
+      var pill = j.status === 'active'
+        ? '<span class="pill pill-green">● Active</span>'
+        : '<span class="pill pill-grey">⏸ Paused</span>';
+      return '<div class="job-card">'
+        + '<div class="job-info">'
+        + '<div class="job-title">' + esc(j.name) + '</div>'
+        + '<div class="job-meta">'
+        + '<span>📅 ' + (freqMap[j.frequency] || j.frequency) + (j.send_time ? ' at ' + j.send_time : '') + '</span>'
+        + '<span>📝 ' + esc(tm[j.template_id] || 'No template') + '</span>'
+        + '<span>🎯 ' + esc(j.event_name || 'All participants') + '</span>'
+        + '</div></div>'
+        + '<div style="display:flex;align-items:center;gap:10px">'
+        + pill
+        + '<button class="btn btn-ghost btn-sm" onclick="toggleJob(' + j.id + ',\'' + j.status + '\')">'
+        + (j.status === 'active' ? '⏸ Pause' : '▶ Resume') + '</button>'
+        + '<button class="btn btn-sm" style="background:#ffebee;color:#c62828" onclick="deleteJob(' + j.id + ')">🗑</button>'
+        + '</div></div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:#c62828;padding:16px">❌ ' + e.message + '</div>';
+  }
+}
+
+async function saveJob() {
+  var name   = document.getElementById('job-name').value.trim();
+  var event  = document.getElementById('job-event').value;
+  var tplId  = document.getElementById('job-tpl').value;
+  var freq   = document.getElementById('job-freq').value;
+  var time   = document.getElementById('job-time').value;
+  var status = document.getElementById('job-status').value;
+  if (!name) { alert('Job name is required.'); return; }
+  if (!tplId) { alert('Please select a template. Go to Templates tab first.'); return; }
+  setBtnLoading('job-save-btn', true, '💾 Save Job');
+  setStatus('job-status', 'wait', '⏳ Saving...');
+  try {
+    await dbInsert('email_jobs', {
+      name: name, event_name: event || null,
+      template_id: parseInt(tplId),
+      frequency: freq, send_time: time, status: status
+    });
+    setStatus('job-status', 'ok', '✅ Job saved!');
+    loadJobs();
+  } catch(e) {
+    setStatus('job-status', 'err', '❌ Save failed: ' + e.message);
+    console.error('saveJob:', e);
+  }
+  setBtnLoading('job-save-btn', false, '💾 Save Job');
+}
+
+async function toggleJob(id, current) {
+  try {
+    await dbUpdate('email_jobs', '?id=eq.' + id, { status: current === 'active' ? 'paused' : 'active' });
+    loadJobs();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteJob(id) {
+  if (!confirm('Delete this job?')) return;
+  try {
+    await dbDelete('email_jobs', '?id=eq.' + id);
+    loadJobs();
+  } catch(e) { alert('Delete failed: ' + e.message); }
+}
+
+// ── Recipients helpers ─────────────────────────────────
+async function getRecipients(eventName) {
+  var q = '?select=strava_athlete_id,full_name,email,event_name,leaderboard_team';
+  if (eventName) q += '&event_name=eq.' + encodeURIComponent(eventName);
+  var rows = await dbGet('registration', q);
+  return rows.filter(function(r) { return r.email && r.email.indexOf('@') > 0; });
+}
+
+async function previewRecipients() {
+  var eventName = document.getElementById('job-event').value;
+  try {
+    var recips = await getRecipients(eventName);
+    document.getElementById('recip-count').textContent = recips.length + ' recipients' + (eventName ? ' for: ' + eventName : ' (all events)');
+    document.getElementById('recip-body').innerHTML = recips.slice(0, 30).map(function(r, i) {
+      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'—') + '</td><td>' + esc(r.email||'—') + '</td><td>' + esc(r.event_name||'—') + '</td></tr>';
+    }).join('') + (recips.length > 30 ? '<tr><td colspan="4" style="text-align:center;color:#888">…and ' + (recips.length-30) + ' more</td></tr>' : '');
+    document.getElementById('recip-preview').style.display = 'block';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Send Now ───────────────────────────────────────────
+async function previewSend() {
+  var eventName = document.getElementById('send-event').value;
+  try {
+    var recips = await getRecipients(eventName);
+    document.getElementById('send-recip-count').textContent = recips.length + ' recipients';
+    document.getElementById('send-recip-body').innerHTML = recips.slice(0, 20).map(function(r, i) {
+      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'—') + '</td><td>' + esc(r.email||'—') + '</td><td>' + esc(r.event_name||'—') + '</td></tr>';
+    }).join('');
+    document.getElementById('send-recip-preview').style.display = 'block';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function startSend(testOnly) {
+  var tplId     = document.getElementById('send-tpl').value;
+  var eventName = document.getElementById('send-event').value;
+  var testEmail = document.getElementById('send-test-email').value.trim();
+  if (!tplId) { alert('Please select a template.'); return; }
+  if (testOnly && !testEmail) { alert('Enter a test email address.'); return; }
+
+  var logEl = document.getElementById('send-log');
+  logEl.className = 'send-log show';
+  logEl.innerHTML = '';
+  document.getElementById('send-prog').className = 'prog-wrap show';
+
+  function log(msg, cls) {
+    logEl.innerHTML += '<div' + (cls ? ' class="' + cls + '"' : '') + '>' + msg + '</div>';
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  try {
+    var tpls = await dbGet('email_templates', '?id=eq.' + tplId);
+    if (!tpls[0]) { log('❌ Template not found', 'log-err'); return; }
+    log('📝 Template: ' + tpls[0].name);
+
+    var recips = testOnly ? [{ full_name: 'Test', email: testEmail, event_name: 'Test' }] : await getRecipients(eventName);
+    log('👥 Recipients: ' + recips.length);
+
+    if (!recips.length) { log('⚠️ No recipients with valid email addresses.', 'log-warn'); return; }
+
+    log('🚀 Sending via backend...');
+    var r = await fetch('https://agwalk-backend.onrender.com/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipients: recips, subject: tpls[0].subject, body_html: tpls[0].body_html, test_only: testOnly, test_email: testEmail })
+    });
+    var result = await r.json();
+    if (result.success) {
+      document.getElementById('send-prog-fill').style.width = '100%';
+      document.getElementById('send-prog-pct').textContent = '100%';
+      log('━━━━━━━━━━━━━━━━━━━━', 'log-info');
+      log('✅ Sent: ' + result.sent);
+      if (result.failed) log('❌ Failed: ' + result.failed, 'log-err');
+      log('━━━━━━━━━━━━━━━━━━━━', 'log-info');
+      await dbInsert('email_send_history', { template_id: parseInt(tplId), event_name: eventName || null, recipients_count: result.sent, failed_count: result.failed || 0, test_mode: testOnly, status: 'sent' });
+      loadHistory();
+    } else {
+      log('❌ Send failed: ' + (result.error || 'Unknown error'), 'log-err');
+    }
+  } catch(e) {
+    log('❌ Error: ' + e.message, 'log-err');
+  }
+}
+
+// ── Send History ───────────────────────────────────────
+async function loadHistory() {
+  var list = document.getElementById('history-list');
+  list.innerHTML = '<div style="padding:20px;color:#aaa">Loading...</div>';
+  try {
+    var rows = await dbGet('email_send_history', '?order=sent_at.desc&limit=20');
+    if (!rows.length) { list.innerHTML = '<div style="text-align:center;padding:32px;color:#bbb">No emails sent yet.</div>'; return; }
+    var tpls = await dbGet('email_templates', '?select=id,name');
+    var tm = {};
+    tpls.forEach(function(t) { tm[t.id] = t.name; });
+    tm[-1] = "🔑 OTP Login Code";
+    tm[-2] = "🔌 SMTP Test Email";
+    list.innerHTML = '<table class="recip-table"><thead><tr><th>Date</th><th>Template</th><th>Event</th><th>Sent</th><th>Failed</th><th>Mode</th></tr></thead><tbody>'
+      + rows.map(function(h) {
+        return '<tr>'
+          + '<td>' + new Date(h.sent_at || h.created_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td>'
+          + '<td>' + esc(tm[h.template_id] || '—') + '</td>'
+          + '<td>' + esc(h.event_name || 'All') + '</td>'
+          + '<td style="color:#2e7d32;font-weight:600">' + (h.recipients_count || 0) + '</td>'
+          + '<td style="color:' + (h.failed_count > 0 ? '#c62828' : '#888') + '">' + (h.failed_count || 0) + '</td>'
+          + '<td>' + (h.test_mode ? '<span class="pill pill-blue">Test</span>' : '<span class="pill pill-green">Live</span>') + '</td>'
+          + '</tr>';
+      }).join('')
+      + '</tbody></table>';
+  } catch(e) {
+    list.innerHTML = '<div style="color:#c62828;padding:16px">❌ ' + e.message + '</div>';
+  }
+}
+
+// ── Persist form fields via localStorage ──────────────
+var PERSIST_FIELDS = [
+  'smtp-from_name','smtp-from_email','smtp-reply','smtp-test-to',
+  'tpl-name','tpl-subject','tpl-desc',
+  'job-name','job-freq','job-time','job-status',
+  'send-test-email'
+];
+
+function saveFieldsToStorage() {
+  PERSIST_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) localStorage.setItem('wk_email_' + id, el.value);
+  });
+}
+
+function restoreFieldsFromStorage() {
+  PERSIST_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var saved = localStorage.getItem('wk_email_' + id);
+    if (saved !== null && saved !== '') el.value = saved;
+  });
+  // tpl-body is too large for per-keystroke, restore separately
+  var body = localStorage.getItem('wk_email_tpl-body');
+  if (body) { var el = document.getElementById('tpl-body'); if (el) el.value = body; }
+}
+
+function attachPersistListeners() {
+  PERSIST_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function() {
+      localStorage.setItem('wk_email_' + id, el.value);
+    });
+    el.addEventListener('change', function() {
+      localStorage.setItem('wk_email_' + id, el.value);
+    });
+  });
+  // tpl-body separately (debounced — don't save on every keypress)
+  var bodyEl = document.getElementById('tpl-body');
+  if (bodyEl) {
+    var bodyTimer;
+    bodyEl.addEventListener('input', function() {
+      clearTimeout(bodyTimer);
+      bodyTimer = setTimeout(function() {
+        localStorage.setItem('wk_email_tpl-body', bodyEl.value);
+      }, 800);
+    });
+  }
+}
+
+// Clear template form fields but keep localStorage (so they repopulate next visit)
+function clearTplForm() {
+  ['tpl-name','tpl-subject','tpl-body','tpl-desc'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+    localStorage.removeItem('wk_email_' + id);
+  });
+  var btn = document.getElementById('tpl-save-btn');
+  if (btn) { btn.removeAttribute('data-edit-id'); btn.textContent = '💾 Save Template'; }
+}
+
+// ── Init ───────────────────────────────────────────────
+restoreFieldsFromStorage();
+attachPersistListeners();
+loadSmtp();
+
+
+</script>
+</body>
+</html>
