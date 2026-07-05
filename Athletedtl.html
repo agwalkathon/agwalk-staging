@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Participants & Employees — Arcgate Walkathon 2026</title>
+  <style>
+    :root {
+      --brand: #E8622A;
+      --brand-light: #FFF0EA;
+      --brand-mid: #f97d4e;
+      --sidebar-bg: #0F1117;
+      --sidebar-w: 64px;
+      --sidebar-exp: 220px;
+      --page-bg: #F4F6FA;
+      --card-bg: #fff;
+      --text-primary: #0F1117;
+      --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
+      --border: rgba(0,0,0,.07);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --font: 'Poppins',-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--page-bg); color: var(--text-primary); min-height: 100vh; display: flex; }
+    
+    /* Sidebar styling */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); display: flex; flex-direction: column; align-items: center; padding: 16px 0 12px; z-index: 300; transition: width .24s cubic-bezier(.4,0,.2,1); overflow: hidden; }
+    .sidebar:hover { width: var(--sidebar-exp); }
+    .sb-logo { display: flex; align-items: center; width: 100%; padding: 4px 14px 20px; text-decoration: none; gap: 10px; flex-shrink: 0; }
+    .sb-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-logo-icon i { color: #fff; font-size: 20px; }
+    .sb-logo-text { font-size: 13px; font-weight: 600; color: #fff; opacity: 0; white-space: nowrap; transition: opacity .18s; line-height: 1.3; }
+    .sb-logo-text span { display: block; font-size: 10px; font-weight: 400; color: rgba(255,255,255,.45); }
+    .sidebar:hover .sb-logo-text { opacity: 1; }
+    .sb-section { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.22); padding: 0 14px 6px; width: 100%; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+    .sidebar:hover .sb-section { opacity: 1; }
+    .sb-item { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; text-decoration: none; gap: 10px; border-left: 3px solid transparent; transition: all .16s; }
+    .sb-item:hover { background: rgba(255,255,255,.06); border-left-color: rgba(232,98,42,.5); }
+    .sb-item.active { background: rgba(232,98,42,.12); border-left-color: var(--brand); }
+    .sb-item i { font-size: 19px; color: rgba(255,255,255,.38); flex-shrink: 0; width: 28px; text-align: center; transition: color .16s; }
+    .sb-item:hover i { color: rgba(255,255,255,.7); }
+    .sb-item.active i { color: var(--brand); }
+    .sb-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+    .sb-spacer { flex: 1; }
+    .sb-divider { width: calc(100% - 24px); height: 1px; background: rgba(255,255,255,.07); margin: 6px 12px; flex-shrink: 0; }
+    .sb-signout { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 42px; gap: 10px; border: none; background: none; cursor: pointer; transition: all .16s; font-family: var(--font); }
+    .sb-signout:hover { background: rgba(255,80,80,.08); }
+    .sb-signout i { font-size: 19px; color: rgba(255,255,255,.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+    
+    /* Layout main container */
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+    .topbar-left h1 { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+    .topbar-left p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .topbar-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--page-bg); transition: all .15s; }
+    .topbar-back:hover { background: #EAECF0; color: var(--text-primary); }
+    .content { flex: 1; padding: 28px 32px; width: 100%; max-width: 1200px; margin: 0 auto; }
+    
+    /* Tab Bar Styles */
+    .tab-bar { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; flex-shrink: 0; }
+    .tab-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: var(--font); transition: all 0.15s ease; display: flex; align-items: center; }
+    .tab-btn:hover { background: var(--brand-light); color: var(--brand); }
+    .tab-btn.active { background: var(--brand) !important; color: #fff !important; font-weight: 600; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .stat-icon.orange { background: #FFF0EA; color: var(--brand); }
+    .stat-icon.purple { background: #F5F3FF; color: #7C3AED; }
+    .stat-icon.green { background: #ECFDF5; color: #059669; }
+    .stat-icon.blue { background: #EFF6FF; color: #3B82F6; }
+    .stat-icon.red { background: #FEF2F2; color: #DC2626; }
+    .stat-body { display: flex; flex-direction: column; }
+    .stat-val { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .stat-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Toolbar / Filters */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .toolbar input, .toolbar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--card-bg); font-family: inherit; outline: none; }
+    .toolbar input:focus, .toolbar select:focus { border-color: var(--brand); }
+    .count-badge { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    
+    /* Table styling with explicit widths and horizontal scroll support */
+    .card { background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; }
+    .table-wrap { overflow-x: auto; width: 100%; }
+    table { width: 100%; border-collapse: collapse; text-align: left; table-layout: auto; }
+    th { padding: 12px 16px; border-bottom: 2px solid var(--border); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); background: #FAFBFD; white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFBFD; }
+    
+    /* Badge pills */
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 12px; font-size: 11.5px; font-weight: 600; }
+    .badge.conn { background: #ECFDF5; color: #059669; }
+    .badge.warn { background: #FFF7ED; color: #C2410C; }
+    .badge.ok { background: #EFF6FF; color: #1D4ED8; }
+    .badge-info { background: #EFF6FF; color: #1D4ED8; }
+    .badge-success { background: #ECFDF5; color: #059669; }
+    .badge-danger { background: #FEF2F2; color: #DC2626; }
+    
+    /* Action Buttons */
+    .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12.5px; font-weight: 500; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { background: #d4551f; }
+    .btn-ghost { background: var(--page-bg); color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: #EAECF0; }
+    .btn-success { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .btn-success:hover { background: #059669; color: #fff; }
+    .btn-danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; }
+    .btn-danger:hover { background: #DC2626; color: #fff; }
+    .btn-sm { padding: 4px 8px; font-size: 11.5px; }
+
+    .role-select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; background: transparent; font-family: inherit; }
+    .muted { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+    .ath { color: var(--brand); text-decoration: none; font-weight: 500; }
+    .ath:hover { text-decoration: underline; }
+    
+    .site-footer { width: 100%; background: var(--card-bg); border-top: 1px solid var(--border); padding: 16px 32px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    @media(max-width: 768px) {
+      .sidebar { width: 56px; }
+      .main { margin-left: 56px; }
+      .topbar { padding: 0 16px; height: 54px; }
+      .content { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+    <div class="sb-section">Main</div>
+    <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+    <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+    <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+    <a href="athletedtl.html" class="sb-item active"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+    <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+    
+    <div class="sb-section" style="margin-top:10px;">Config</div>
+    <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+    <a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
+    <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+    <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+    <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+    <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+    <div class="sb-spacer"></div>
+    <div class="sb-divider"></div>
+    <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Participants</h1>
+        <p>Manage active/inactive company employee master records</p>
+      </div>
+      <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
+        <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
+        <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-employees" onclick="switchTab('employees')">
+          <i class="ti ti-users-group" style="margin-right:6px;font-size:16px;"></i> Employees Master
+        </button>
+        <button class="tab-btn" id="tab-participants" onclick="switchTab('participants')">
+          <i class="ti ti-users" style="margin-right:6px;font-size:16px;"></i> Registration
+        </button>
+        <button class="tab-btn" id="tab-requests" onclick="switchTab('requests')">
+          <i class="ti ti-user-check" style="margin-right:6px;font-size:16px;"></i> New Requests
+          <span id="badge-requests-count" style="background:#FEF2F2;color:#DC2626;font-size:10px;padding:2px 6px;margin-left:6px;border-radius:10px;display:none;font-weight:600;">0</span>
+        </button>
+      </div>
+
+      <!-- 1. Employees Master Container -->
+      <div id="employees-container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="ti ti-users"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-emp-total">—</div>
+              <div class="stat-lbl">Total Master Records</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="ti ti-notes"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-emp-page">—</div>
+              <div class="stat-lbl">Current Page</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="ti ti-list"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-emp-size">50</div>
+              <div class="stat-lbl">Page Size Limit</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input type="text" id="emp-search" placeholder="Search code, name, email..." oninput="filterEmployees()" style="width:280px">
+          <span id="emp-count" class="count-badge" style="margin-left:auto;"></span>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 60px;">#</th>
+                  <th style="width: 140px;">Employee Code</th>
+                  <th style="min-width: 180px;">Full Name</th>
+                  <th style="min-width: 220px;">Email</th>
+                  <th style="min-width: 150px;">Department</th>
+                  <th style="width: 110px;">DOB</th>
+                  <th style="width: 120px;">Joining Date</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 120px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employees-body">
+                <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination controls -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+          <button class="btn btn-ghost btn-sm" id="emp-prev" onclick="changeEmpPage(-1)">← Previous</button>
+          <span id="emp-page-label" style="font-size:13px;color:var(--text-secondary);font-weight:600;">Page 1</span>
+          <button class="btn btn-ghost btn-sm" id="emp-next" onclick="changeEmpPage(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- 2. Registration Container -->
+      <div id="participants-container" style="display:none;">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="ti ti-users"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-total">—</div>
+              <div class="stat-lbl">Total registered</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="ti ti-brand-strava"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-connected">—</div>
+              <div class="stat-lbl">Strava connected</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="ti ti-run"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-active">—</div>
+              <div class="stat-lbl">Have activities</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="ti ti-map-pin"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-km">—</div>
+              <div class="stat-lbl">Total km</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input id="search" oninput="filterTable()" placeholder="Search name, email or team" style="width:240px">
+          <select id="status-filter" onchange="filterTable()">
+            <option value="">All statuses</option>
+            <option value="active">Has activities</option>
+            <option value="inactive">No activities</option>
+            <option value="connected">Strava connected</option>
+            <option value="notconnected">Not connected</option>
+          </select>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:5px 10px;height:38px;box-sizing:border-box;">
+            <label for="sync-date" style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;white-space:nowrap;margin:0;">Sync Date:</label>
+            <input type="date" id="sync-date" value="2026-06-22" style="background:transparent;border:none;color:var(--text);font-size:12px;padding:0;outline:none;cursor:pointer;font-family:inherit;">
+          </div>
+          <span id="count" class="count-badge"></span>
+          <button class="btn btn-ghost btn-sm" id="export-btn" onclick="exportCSV()" style="margin-left:auto;font-size:13px;display:none"><i class="ti ti-download"></i> Export CSV</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 60px;">#</th>
+                  <th style="min-width: 180px;">Name</th>
+                  <th style="width: 100px;">Role</th>
+                  <th style="width: 90px;">Gender</th>
+                  <th style="width: 180px;">Strava</th>
+                  <th style="width: 110px;">Activities</th>
+                  <th style="width: 100px;">Manual Sync</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 120px;">Feed</th>
+                </tr>
+              </thead>
+              <tbody id="participants-body">
+                <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. New Requests Container -->
+      <div id="requests-container" style="display:none;">
+        <div class="note" style="background:#FFF7ED;border:1px solid #FFEDD5;color:#C2410C;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:20px;line-height:1.5;">
+          Review and moderate pending registrations. Approving a request will change its status to <strong>Approved</strong> and authorize the employee to log in.
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="ti ti-history"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-req-total">—</div>
+              <div class="stat-lbl">Total requests</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="ti ti-loader"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-req-pending">—</div>
+              <div class="stat-lbl">Pending</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="ti ti-circle-check"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-req-approved">—</div>
+              <div class="stat-lbl">Approved</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><i class="ti ti-circle-x"></i></div>
+            <div class="stat-body">
+              <div class="stat-val" id="s-req-rejected">—</div>
+              <div class="stat-lbl">Rejected</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input type="text" id="req-search" placeholder="Search name, email, emp code..." oninput="filterRequests()" style="width:260px">
+          <select id="req-status-filter" onchange="filterRequests()">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadRequests()">Refresh</button>
+          <span style="margin-left:auto;font-size:13px;color:var(--text-secondary);" id="req-count"></span>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 150px;">Action</th>
+                  <th style="width: 80px;">ID</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="min-width: 180px;">Name</th>
+                  <th style="width: 110px;">Emp Code</th>
+                  <th style="width: 80px;">Gender</th>
+                  <th style="min-width: 150px;">Event</th>
+                  <th style="min-width: 200px;">Email</th>
+                  <th style="width: 110px;">Shift</th>
+                  <th style="min-width: 150px;">Team Lead</th>
+                  <th style="min-width: 160px;">Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="requests-body">
+                <tr class="loading-row"><td colspan="11">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <footer class="site-footer">
+      <span>© 2026 Arcgate Walkathon</span>
+      <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
+    </footer>
+  </div><!-- /main -->
+
+  <script>
+    const SUPABASE_URL  = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+    const HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
+    const REG_COLUMNS = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
+
+    let allRows = [];
+    let allEmployees = [];
+    let allRequestRows = [];
+    let currentTab = 'employees';
+    var _BU = 'https://agwalk-backend.onrender.com';
+
+    var EV_ID = 1;
+    var EV_ALL = [];
+
+    async function loadEventSelector() {
+      const sel = document.getElementById('ev-select');
+      if (!sel) return;
+      try {
+        const r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: HDR });
+        const evs = await r.json();
+        if (!Array.isArray(evs) || evs.length === 0) return;
+        EV_ALL = evs;
+        sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+        
+        let savedId = localStorage.getItem('wk_admin_selected_event_id');
+        if (!savedId) {
+          const live = evs.find(e => e.status === 'live');
+          savedId = live ? live.id : evs[0].id;
+        }
+        EV_ID = parseInt(savedId) || evs[0].id;
+        sel.value = EV_ID;
+        localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+        
+        sel.addEventListener('change', function() {
+          EV_ID = parseInt(this.value);
+          localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+          if (currentTab === 'participants') {
+            loadParticipants();
+          } else if (currentTab === 'requests') {
+            loadRequests();
+          }
+          updateBadgeCount();
+        });
+      } catch (err) {
+        console.error('Failed to load event selector:', err);
+      }
+    }
+    let _empPage = 0;
+    let _empSearch = '';
+    let _searchTimeout = null;
+
+    function authGuard(){
+      var t = sessionStorage.getItem('wk_admin_token');
+      if(!t){ window.location.href = 'admin-login.html'; return; }
+      try {
+        var p = JSON.parse(atob(t.split('.')[1]));
+        if(p.exp && p.exp*1000 < Date.now()){
+          sessionStorage.removeItem('wk_admin_token');
+          window.location.href = 'admin-login.html';
+        }
+      } catch(e){
+        sessionStorage.removeItem('wk_admin_token');
+        window.location.href = 'admin-login.html';
+      }
+    }
+
+    function logout(){
+      sessionStorage.removeItem('wk_admin_token');
+      sessionStorage.removeItem('wk_admin');
+      window.location.href = 'admin-login.html';
+    }
+
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function getAll(url) {
+      let all = [], from = 0;
+      while (true) {
+        const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'limit=1000&offset=' + from, { headers: HDR });
+        if (!r.ok) throw new Error(await r.text());
+        const p = await r.json();
+        if (!Array.isArray(p) || !p.length) break;
+        all = all.concat(p);
+        if (p.length < 1000) break;
+        from += 1000;
+      }
+      return all;
+    }
+
+    function roleDrop(p) {
+      const id = p.strava_athlete_id, role = p.role || 'user';
+      if (!id) return 'No Strava ID';
+      return `<select class="role-select" id="role-${id}" data-current="${role}" onchange="saveRole('${id}',this.value)">
+        <option value="user" ${role === 'user' ? 'selected' : ''}>User</option>
+        <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
+      </select>
+      <div class="muted" id="note-${id}"></div>`;
+    }
+
+    /* ---------- TAB: Employees Master ---------- */
+    async function loadEmployees() {
+      const empBody = document.getElementById('employees-body');
+      if (empBody) empBody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">Loading...</td></tr>';
+      
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+
+      try {
+        const url = `${_BU}/admin/employees?page=${_empPage}&search=${encodeURIComponent(_empSearch)}`;
+        const r = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        const d = await r.json();
+        if (!d.success) throw new Error(d.error || 'Failed to load employees');
+
+        allEmployees = d.employees || [];
+        document.getElementById('s-emp-total').textContent = d.total || 0;
+        document.getElementById('s-emp-page').textContent = _empPage + 1;
+        document.getElementById('emp-page-label').textContent = 'Page ' + (_empPage + 1) + ' of ' + Math.max(1, Math.ceil((d.total || 0) / 50));
+        
+        renderEmployeesTable();
+      } catch(e) {
+        if (empBody) empBody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+      }
+    }
+
+    function filterEmployees() {
+      const q = document.getElementById('emp-search').value.trim();
+      clearTimeout(_searchTimeout);
+      _searchTimeout = setTimeout(() => {
+        _empSearch = q;
+        _empPage = 0;
+        loadEmployees();
+      }, 350);
+    }
+
+    function renderEmployeesTable() {
+      const empBody = document.getElementById('employees-body');
+      if (!empBody) return;
+      if (!allEmployees.length) {
+        empBody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No employees found</td></tr>';
+        return;
+      }
+      
+      document.getElementById('emp-count').textContent = `Showing ${allEmployees.length} records`;
+
+      empBody.innerHTML = allEmployees.map((e, idx) => {
+        const statusPill = e.is_active 
+          ? '<span class="badge conn">Active</span>'
+          : '<span class="badge danger">Inactive</span>';
+        const actionBtn = `<button class="btn btn-sm btn-ghost" onclick="toggleEmployeeActive('${e.emp_code}', ${e.is_active})">${e.is_active ? 'Deactivate' : 'Activate'}</button>`;
+        return `<tr style="border-bottom:1px solid var(--border)">
+          <td>${(_empPage * 50) + idx + 1}</td>
+          <td><strong>${esc(e.emp_code)}</strong></td>
+          <td>${esc(e.full_name)}</td>
+          <td>${esc(e.email)}</td>
+          <td>${esc(e.department || '—')}</td>
+          <td>${esc(e.dob || '—')}</td>
+          <td>${esc(e.joining_date || '—')}</td>
+          <td>${statusPill}</td>
+          <td>${actionBtn}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function changeEmpPage(dir) {
+      if (dir === -1 && _empPage > 0) {
+        _empPage--;
+        loadEmployees();
+      } else if (dir === 1) {
+        _empPage++;
+        loadEmployees();
+      }
+    }
+
+    async function toggleEmployeeActive(empCode, currentStatus) {
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+      if (!confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} employee ${empCode}?`)) return;
+      try {
+        const res = await fetch(_BU + '/admin/employees/deactivate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ emp_code: empCode, is_active: !currentStatus })
+        });
+        const d = await res.json();
+        if (d.success) {
+          await loadEmployees();
+        } else {
+          alert('Error: ' + (d.error || 'Failed to update employee status'));
+        }
+      } catch(e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    /* ---------- TAB: Registration (Approved) ---------- */
+    function renderRows(rows) {
+      document.getElementById('participants-body').innerHTML = rows.length
+        ? rows.map((p, i) => `<tr>
+            <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
+            <td>
+              <a class="ath" target="_blank" href="https://www.strava.com/athletes/${p.strava_athlete_id}">${esc(p.full_name || '—')}</a>
+              <div class="muted">${esc(p.email || '')}</div>
+            </td>
+            <td>${roleDrop(p)}</td>
+            <td>${esc(p.gender || '—')}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span class="badge ${p.connected ? 'conn' : 'warn'}">${p.connected ? '✓ Connected' : 'Not yet'}</span>
+                ${p.connected ? `<a href="javascript:void(0)" onclick="revokeStrava('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Revoke</a>` : ''}
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-weight:600">${p.cnt || 0}</span>
+                ${p.cnt > 0 ? `<a href="javascript:void(0)" onclick="clearActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Clear</a>` : ''}
+              </div>
+            </td>
+            <td>
+              ${p.connected ? `<a href="javascript:void(0)" id="sync-btn-${p.strava_athlete_id}" onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: var(--brand); text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232, 98, 42, 0.2); background: rgba(232, 98, 42, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(232,98,42,0.15)';this.style.borderColor='var(--brand)'" onmouseout="this.style.background='rgba(232,98,42,0.05)';this.style.borderColor='rgba(232, 98, 42, 0.2)'">Sync</a>` : '—'}
+            </td>
+            <td><span class="badge ${p.cnt > 0 ? 'ok' : 'warn'}">${p.cnt > 0 ? 'Active' : 'Pending'}</span></td>
+            <td>
+              <button onclick="toggleFeedMute('${p.strava_athlete_id}', ${p.is_private === true || p.is_private === 'true'})" 
+                      style="padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid ${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; background: ${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)'}; color: ${p.is_private === true || p.is_private === 'true' ? '#ef4444' : '#10b981'}; transition: all 0.15s;"
+                      onmouseover="this.style.background='${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)'}'"
+                      onmouseout="this.style.background='${p.is_private === true || p.is_private === 'true' ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)'}'">
+                ${p.is_private === true || p.is_private === 'true' ? '🔇 Excluded' : '🔊 Included'}
+              </button>
+            </td>
+          </tr>`).join('')
+        : '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-muted)">No participants found</td></tr>';
+    }
+
+    function filterTable() {
+      const q  = document.getElementById('search').value.toLowerCase();
+      const st = document.getElementById('status-filter').value;
+      const rows = allRows.filter(r => {
+        const mq = !q || [r.full_name, r.email, r.leaderboard_team].join(' ').toLowerCase().includes(q);
+        const ms = !st ? true
+          : st === 'active'      ? r.cnt > 0
+          : st === 'inactive'    ? r.cnt === 0
+          : st === 'connected'   ? r.connected
+          : !r.connected;
+        return mq && ms;
+      });
+      window._exportParticipants = rows;
+      document.getElementById('export-btn').style.display = rows.length ? 'inline-flex' : 'none';
+      document.getElementById('count').textContent = rows.length + ' of ' + allRows.length + ' participants';
+      renderRows(rows);
+    }
+
+    async function saveRole(id, newRole) {
+      const sel  = document.getElementById('role-' + id);
+      const note = document.getElementById('note-' + id);
+      const old  = sel.dataset.current;
+      if (!confirm('Change role to ' + newRole + '?')) { sel.value = old; return; }
+      try {
+        note.textContent = 'Saving…';
+        const r = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: { ...HDR, Prefer: 'return=representation' },
+          body: JSON.stringify({ role: newRole })
+        });
+        const txt = await r.text();
+        if (!r.ok) throw new Error(txt);
+        const arr = JSON.parse(txt || '[]');
+        if (!arr.length) throw new Error('No row updated');
+        const row = allRows.find(x => String(x.strava_athlete_id) === String(id));
+        if (row) row.role = newRole;
+        sel.dataset.current = newRole;
+        note.textContent = 'Saved ✅';
+        setTimeout(() => { note.textContent = ''; }, 2500);
+      } catch(e) {
+        sel.value = old;
+        note.textContent = 'Not saved ❌';
+        alert('Role not saved: ' + e.message);
+      }
+    }
+
+    async function loadParticipants() {
+      try {
+        const [regs, acts] = await Promise.all([
+          getAll(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&select=' + REG_COLUMNS + '&order=full_name.asc'),
+          getAll(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + EV_ID + '&select=strava_athlete_id,distance_meters&is_deleted=eq.false')
+        ]);
+        
+        // Filter only approved participants
+        const approvedRegs = regs.filter(r => r.status === 'approved' || r.status === 'active' || !r.status);
+        
+        const am = {};
+        acts.forEach(a => {
+          if (!am[a.strava_athlete_id]) am[a.strava_athlete_id] = { cnt: 0, dist: 0 };
+          am[a.strava_athlete_id].cnt++;
+          am[a.strava_athlete_id].dist += a.distance_meters || 0;
+        });
+        
+        allRows = approvedRegs.map(r => ({
+          ...r,
+          role:      r.role || 'user',
+          connected: !!r.strava_athlete_id,
+          cnt:       am[r.strava_athlete_id]?.cnt  || 0,
+          dist:      am[r.strava_athlete_id]?.dist || 0
+        }));
+        
+        document.getElementById('s-total').textContent     = allRows.length;
+        document.getElementById('s-connected').textContent = allRows.filter(r => r.connected).length;
+        document.getElementById('s-active').textContent    = allRows.filter(r => r.cnt > 0).length;
+        document.getElementById('s-km').textContent        = (allRows.reduce((s, r) => s + r.dist, 0) / 1000).toFixed(1) + ' km';
+        filterTable();
+      } catch(e) {
+        document.getElementById('participants-body').innerHTML =
+          `<tr><td colspan="9" style="text-align:center;padding:48px;color:#DC2626">Error: ${esc(e.message)}</td></tr>`;
+      }
+    }
+
+    async function syncActivities(athleteId, name) {
+      const syncDate = document.getElementById('sync-date').value;
+      if (!syncDate) { alert('Please select a sync date.'); return; }
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
+      
+      const btn = document.getElementById(`sync-btn-${athleteId}`);
+      const originalText = btn.textContent;
+      btn.textContent = 'Syncing...';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.6';
+      
+      try {
+        const res = await fetch(_BU + '/admin/sync-activities', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ athlete_id: athleteId, after_date: syncDate })
+        });
+        const d = await res.json();
+        if (!res.ok || !d.success) throw new Error(d.error || 'Failed to sync');
+        
+        btn.textContent = 'Success ✅';
+        btn.style.color = '#10B981';
+        btn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+        btn.style.background = 'rgba(16, 185, 129, 0.05)';
+        alert(`Sync complete for ${name}!\nSaved: ${d.savedCount} activities\nSkipped (Duplicates): ${d.skippedCount} activities`);
+        await loadParticipants();
+      } catch(e) {
+        btn.textContent = 'Failed ❌';
+        btn.style.color = '#EF4444';
+        btn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+        btn.style.background = 'rgba(239, 68, 68, 0.05)';
+        alert(`Sync failed for ${name}: ` + e.message);
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1';
+          btn.style.color = 'var(--brand)';
+          btn.style.borderColor = 'rgba(232, 98, 42, 0.2)';
+          btn.style.background = 'rgba(232, 98, 42, 0.05)';
+        }, 4000);
+      }
+    }
+
+    async function revokeStrava(athleteId, name) {
+      if (!confirm(`Are you sure you want to revoke Strava authorization for ${name}? The app will no longer be able to fetch new activities.`)) return;
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
+      try {
+        const res = await fetch(_BU + '/revoke-strava', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ athlete_id: athleteId })
+        });
+        const d = await res.json();
+        if (!res.ok || !d.success) throw new Error(d.error || 'Failed to revoke Strava');
+        alert(`Successfully disconnected Strava for ${name}.`);
+        await loadParticipants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function clearActivities(athleteId, name) {
+      if (!confirm(`Are you sure you want to clear all activities for ${name}? This will permanently remove them from the database and leaderboard.`)) return;
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) { alert('Unauthorized. Please log in again.'); window.location.href = 'admin-login.html'; return; }
+      try {
+        const res = await fetch(_BU + '/clear-activities', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ athlete_id: athleteId })
+        });
+        const d = await res.json();
+        if (!res.ok || !d.success) throw new Error(d.error || 'Failed to clear activities');
+        alert(`Successfully cleared activities for ${name}.`);
+        await loadParticipants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function toggleFeedMute(athleteId, isPrivate) {
+      const action = isPrivate ? 'include' : 'exclude';
+      if (!confirm('Are you sure you want to ' + action + ' this participant in the global feed?')) return;
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + encodeURIComponent(athleteId), {
+          method: 'PATCH',
+          headers: { ...HDR, Prefer: 'return=representation' },
+          body: JSON.stringify({ is_private: !isPrivate })
+        });
+        const txt = await res.text();
+        if (!res.ok) throw new Error(txt);
+        await loadParticipants();
+      } catch(err) {
+        alert("Failed to toggle feed status: " + err.message);
+      }
+    }
+
+    function exportCSV() {
+      const rows = window._exportParticipants || [];
+      if (!rows.length) { alert('No data to export.'); return; }
+      const headers = ['Full Name','Employee Code','Gender','Email','Shift','Team','Team Lead','Strava ID','Activities','Distance (km)','Strava Connected'];
+      const data = rows.map(r => [
+        r.full_name||'', r.emp_code||'', r.gender||'', r.email||'',
+        r.shift||'', r.leaderboard_team||'', r.project_lead||r.team_lead||'', r.strava_athlete_id||'',
+        r.cnt||0, r.dist ? (r.dist/1000).toFixed(2) : '0',
+        r.connected ? 'Yes' : 'No'
+      ].map(v => '"' + String(v).replace(/"/g,'""') + '"'));
+      const csv = [headers.map(h => '"'+h+'"').join(','), ...data.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'participants_export_' + new Date().toISOString().slice(0,10) + '.csv';
+      a.click(); URL.revokeObjectURL(url);
+    }
+
+    /* ---------- TAB: New Requests (Pending/Rejected) ---------- */
+    function fmtReqDate(d) { 
+      return d ? new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'; 
+    }
+
+    async function loadRequests() {
+      const reqBody = document.getElementById('requests-body');
+      if (reqBody) {
+        reqBody.innerHTML = '<tr class="loading-row"><td colspan="11">Loading...</td></tr>';
+      }
+      try {
+        // Query pending and rejected registration requests directly from consolidated registration table requesting only safe columns
+        allRequestRows = await getAll(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&status=in.(pending,rejected)&select=' + REG_COLUMNS + '&order=created_at.desc');
+        
+        document.getElementById('s-req-total').textContent = allRequestRows.length;
+        const pendingCount = allRequestRows.filter(x => (x.status || 'pending') === 'pending').length;
+        document.getElementById('s-req-pending').textContent = pendingCount;
+        document.getElementById('s-req-approved').textContent = allRequestRows.filter(x => x.status === 'approved').length;
+        document.getElementById('s-req-rejected').textContent = allRequestRows.filter(x => x.status === 'rejected').length;
+        
+        // Update requests badge
+        const badge = document.getElementById('badge-requests-count');
+        if (badge) {
+          if (pendingCount > 0) {
+            badge.textContent = pendingCount;
+            badge.style.display = 'inline-flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+        
+        filterRequests();
+      } catch (err) {
+        console.error('Failed to load registration requests:', err);
+        if (reqBody) {
+          reqBody.innerHTML = `<tr class="loading-row"><td colspan="11" style="color:#DC2626">Error loading requests: ${esc(err.message)}</td></tr>`;
+        }
+      }
+    }
+
+    function filterRequests() {
+      const q = document.getElementById('req-search').value.toLowerCase();
+      const st = document.getElementById('req-status-filter').value;
+      const filtered = allRequestRows.filter(r => {
+        const text = [r.full_name, r.email, r.emp_code, r.mobile, r.project_lead].join(' ').toLowerCase();
+        return (!q || text.includes(q)) && (!st || (r.status || 'pending') === st);
+      });
+      
+      const countEl = document.getElementById('req-count');
+      if (countEl) {
+        countEl.textContent = `${filtered.length} of ${allRequestRows.length} requests`;
+      }
+      renderRequestRows(filtered);
+    }
+
+    function renderRequestRows(rows) {
+      const reqBody = document.getElementById('requests-body');
+      if (!reqBody) return;
+      
+      if (!rows.length) {
+        reqBody.innerHTML = '<tr class="loading-row"><td colspan="11">No requests found</td></tr>';
+        return;
+      }
+      
+      reqBody.innerHTML = rows.map(r => {
+        const st = (r.status || 'pending').toLowerCase();
+        const actions = st === 'pending'
+          ? `<button class="btn btn-sm btn-success" onclick="approveRequest(${r.id})">Approve</button>
+             <button class="btn btn-sm btn-danger" onclick="rejectRequest(${r.id})">Reject</button>`
+          : '<span style="color:var(--text-muted);font-size:12px">Reviewed</span>';
+          
+        function getStatusBadge(s) {
+          s = (s || 'pending').toLowerCase();
+          let statusClass = 'badge-info';
+          if (s === 'approved') statusClass = 'badge-success';
+          if (s === 'rejected') statusClass = 'badge-danger';
+          return `<span class="badge ${statusClass}" style="text-transform:uppercase;">${s}</span>`;
+        }
+        
+        return `<tr>
+          <td style="padding-left:16px;"><div style="display:flex;gap:6px;">${actions}</div></td>
+          <td>${r.id}</td>
+          <td>${getStatusBadge(st)}</td>
+          <td><strong>${esc(r.full_name)}</strong></td>
+          <td>${esc(r.emp_code || '—')}</td>
+          <td>${esc(r.gender || '—')}</td>
+          <td>${esc(r.event_name || '—')}</td>
+          <td>${esc(r.email || '—')}</td>
+          <td>${esc(r.shift || '—')}</td>
+          <td>${esc(r.project_lead || r.team_lead || '—')}</td>
+          <td>${fmtReqDate(r.created_at)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function approveRequest(id) {
+      const r = allRequestRows.find(x => x.id === id); if (!r) return;
+      if (!confirm(`Approve ${r.full_name}? They will be added to the participant list.`)) return;
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+      try {
+        const res = await fetch(_BU + '/approve-request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ id })
+        });
+        const d = await res.json();
+        if (d.success) { 
+          alert(`✅ Approved! ${r.full_name} can now sign in.`); 
+          await loadRequests();
+          if (currentTab === 'participants') await loadParticipants();
+        } else {
+          throw new Error(d.error || 'Unknown error');
+        }
+      } catch(e) { 
+        alert('❌ Error: ' + e.message); 
+      }
+    }
+
+    async function rejectRequest(id) {
+      const r = allRequestRows.find(x => x.id === id); if (!r) return;
+      if (!confirm(`Reject request from ${r.full_name}?`)) return;
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+      try {
+        const res = await fetch(_BU + '/reject-request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ id })
+        });
+        const d = await res.json();
+        if (d.success) { 
+          await loadRequests(); 
+        } else {
+          throw new Error(d.error || 'Unknown error');
+        }
+      } catch(e) { 
+        alert('❌ Error: ' + e.message); 
+      }
+    }
+
+    /* ---------- Tab Navigation ---------- */
+    function switchTab(t) {
+      currentTab = t;
+      const tabs = ['employees', 'participants', 'requests'];
+      tabs.forEach(tab => {
+        const btn = document.getElementById('tab-' + tab);
+        const container = document.getElementById(tab + '-container');
+        if (btn) {
+          if (tab === t) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+        if (container) {
+          if (tab === t) container.style.display = 'block';
+          else container.style.display = 'none';
+        }
+      });
+
+      const pEl = document.querySelector('.topbar-left p');
+      if (pEl) {
+        if (t === 'employees') {
+          pEl.textContent = 'Manage active/inactive company employee master records';
+          loadEmployees();
+        } else if (t === 'participants') {
+          pEl.textContent = 'Manage approved registered participants';
+          loadParticipants();
+        } else {
+          pEl.textContent = 'Review and approve new participant registrations';
+          loadRequests();
+        }
+      }
+    }
+
+    // Initial page load
+    authGuard();
+    loadEventSelector();
+    switchTab('employees');
+    
+    // Periodically update the badge count for pending requests
+    async function updateBadgeCount() {
+      try {
+        const r = await fetch(SUPABASE_URL + '/rest/v1/registration?event_id=eq.' + EV_ID + '&status=eq.pending&select=id', { headers: HDR });
+        const data = await r.json();
+        const pendingCount = Array.isArray(data) ? data.length : 0;
+        const badge = document.getElementById('badge-requests-count');
+        if (badge) {
+          if (pendingCount > 0) {
+            badge.textContent = pendingCount;
+            badge.style.display = 'inline-flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch(e){}
+    }
+    updateBadgeCount();
+    setInterval(updateBadgeCount, 30000);
+  </script>
+</body>
+</html>
