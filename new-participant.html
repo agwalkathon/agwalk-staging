@@ -407,17 +407,18 @@ async function checkEmployeeMaster() {
   statusEl.textContent = 'Checking Employee Master...';
   
   try {
-    var res = await fetch(SB_URL + '/rest/v1/employees_master?emp_code=eq.' + encodeURIComponent(code) + '&is_active=is.true&select=*&limit=1', { headers: HDR });
-    var data = await res.json();
-    if (data && data[0]) {
-      var emp = data[0];
+    var res = await fetch(BACKEND_URL + '/verify-employee?code=' + encodeURIComponent(code));
+    var d = await res.json();
+    if (d.success && d.employee) {
+      var emp = d.employee;
       document.getElementById('full_name').value = emp.full_name || '';
       document.getElementById('email').value = emp.email || '';
       if (emp.gender) {
         document.getElementById('gender').value = emp.gender.toLowerCase() === 'm' ? 'Male' : (emp.gender.toLowerCase() === 'f' ? 'Female' : emp.gender);
       }
-      if (emp.mobile) {
-        document.getElementById('whatsapp').value = emp.mobile;
+      var mob = emp.mobile || emp.whatsapp || '';
+      if (mob) {
+        document.getElementById('whatsapp').value = mob;
       }
       if (emp.shift) {
         document.getElementById('shift').value = emp.shift;
