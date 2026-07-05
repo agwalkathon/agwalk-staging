@@ -163,7 +163,8 @@
         <h1>Feed Settings</h1>
         <p>Manage standard activities, milestones, and filters for the Social Feed</p>
       </div>
-      <div class="topbar-right">
+      <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
+        <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
         <a href="admin.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Dashboard</a>
       </div>
     </header>
@@ -343,6 +344,39 @@
         <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
         <span id="status-msg" class="status-msg"></span>
       </div>
+
+      <div class="card" style="margin-top: 30px;">
+        <div class="card-head">
+          <div class="card-head-left"><span>📰</span><h2>Manage Social Feed Posts</h2></div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+            View recent social feed posts for this event and remove any unwanted posts.
+          </p>
+          <div id="posts-loading" style="text-align:center;padding:24px;color:var(--text-muted);">
+            <div style="width:20px;height:20px;border:2px solid #f0f0f0;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 8px;"></div>
+            Loading recent posts...
+          </div>
+          <div id="posts-container" style="display:none; max-height: 450px; overflow-y: auto;">
+            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+              <thead>
+                <tr style="border-bottom:2px solid #e5e7eb; color:var(--text-secondary); font-weight:600;">
+                  <th style="padding:10px;">Date (IST)</th>
+                  <th style="padding:10px;">User</th>
+                  <th style="padding:10px;">Post Content</th>
+                  <th style="padding:10px; text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="posts-table-body">
+                <!-- Posts dynamic rows -->
+              </tbody>
+            </table>
+            <div id="posts-empty" style="text-align:center;padding:24px;color:var(--text-muted);display:none;">
+              No posts found in the social feed for this event.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <footer class="site-footer">
@@ -358,6 +392,49 @@
     var SB = 'https://jhdgkncpkrttvemvwukc.supabase.co';
     var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
     var H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
+
+    var EV_ID = 1;
+    var EV_ALL = [];
+
+    function evq() {
+      return "&event_id=eq." + EV_ID;
+    }
+
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    async function loadEventSelector() {
+      var sel = document.getElementById('ev-select');
+      if (!sel) return;
+      try {
+        var r = await fetch(SB + '/rest/v1/events?status=neq.draft&select=*&order=start_date.desc', { headers: H });
+        var evs = await r.json();
+        if (!Array.isArray(evs) || evs.length === 0) return;
+        EV_ALL = evs;
+        sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+        
+        var savedId = localStorage.getItem('wk_admin_selected_event_id');
+        if (!savedId) {
+          var live = evs.find(e => e.status === 'live');
+          savedId = live ? live.id : evs[0].id;
+        }
+        EV_ID = parseInt(savedId) || evs[0].id;
+        sel.value = EV_ID;
+        localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+        
+        sel.addEventListener('change', function() {
+          EV_ID = parseInt(this.value);
+          localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+          loadSettings();
+          loadFeedPosts();
+        });
+      } catch (err) {
+        console.error('Failed to load event selector:', err);
+      }
+    }
 
     function authGuard(){
       var t = sessionStorage.getItem('wk_admin_token');
@@ -424,7 +501,7 @@
 
     async function loadSettings() {
       try {
-        var rows = await dbGet('leaderboard_config', '?config_key=eq.feed_config');
+        var rows = await dbGet('leaderboard_config', '?config_key=eq.feed_config&event_id=eq.' + EV_ID);
         var config = defaultConfig;
         
         if (rows.length > 0) {
@@ -489,15 +566,18 @@
 
       var payload = {
         config_key: 'feed_config',
-        config_value: JSON.stringify(newConfig)
+        event_id: EV_ID,
+        config_value: JSON.stringify(newConfig),
+        updated_at: new Date().toISOString()
       };
-      
-      if (currentConfigId) {
-        payload.id = currentConfigId;
-      }
 
       try {
-        await dbUpsert('leaderboard_config', payload);
+        var r = await fetch(SB + '/rest/v1/leaderboard_config?on_conflict=config_key,event_id', {
+          method: 'POST',
+          headers: Object.assign({}, H, { 'Prefer': 'resolution=merge-duplicates' }),
+          body: JSON.stringify(payload)
+        });
+        if (!r.ok) throw new Error(await r.text());
         showStatus('Settings saved successfully!', 'success');
         loadSettings();
       } catch(err) {
@@ -514,7 +594,120 @@
       }, 3000);
     }
 
-    window.addEventListener('DOMContentLoaded', loadSettings);
+    async function loadFeedPosts() {
+      var loading = document.getElementById('posts-loading');
+      var container = document.getElementById('posts-container');
+      var tbody = document.getElementById('posts-table-body');
+      var empty = document.getElementById('posts-empty');
+      
+      if (loading) loading.style.display = 'block';
+      if (container) container.style.display = 'none';
+      if (empty) empty.style.display = 'none';
+      if (tbody) tbody.innerHTML = '';
+      
+      try {
+        // 1. Fetch approved registrations for this event
+        var regs = await dbGet('registration', '?event_id=eq.' + EV_ID + '&select=strava_athlete_id,full_name');
+        var regMap = {};
+        regs.forEach(function(r) {
+          if (r.strava_athlete_id) {
+            regMap[String(r.strava_athlete_id)] = r.full_name;
+          }
+        });
+        
+        // 2. Fetch recent announcements
+        var announcements = await dbGet('announcements', '?order=created_at.desc&limit=100');
+        
+        // 3. Filter announcements by participants in this event
+        var filtered = announcements.filter(function(ann) {
+          if (ann.type === 'broadcast') return true;
+          var athId = String(ann.tagged_athlete_id);
+          return regMap.hasOwnProperty(athId);
+        });
+        
+        if (loading) loading.style.display = 'none';
+        
+        if (filtered.length === 0) {
+          if (empty) empty.style.display = 'block';
+          if (container) container.style.display = 'block';
+          return;
+        }
+        
+        tbody.innerHTML = filtered.map(function(ann) {
+          var dateStr = '—';
+          if (ann.created_at) {
+            try {
+              var d = new Date(ann.created_at);
+              var localTime = d.getTime() + (5.5 * 60 * 60 * 1000);
+              var istDate = new Date(localTime);
+              dateStr = istDate.getUTCFullYear() + '-' + 
+                        String(istDate.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+                        String(istDate.getUTCDate()).padStart(2, '0') + ' ' + 
+                        String(istDate.getUTCHours()).padStart(2, '0') + ':' + 
+                        String(istDate.getUTCMinutes()).padStart(2, '0');
+            } catch(e) {}
+          }
+          
+          var userName = '—';
+          if (ann.type === 'broadcast') {
+            userName = '<strong style="color:var(--brand);">Organizers (Broadcast)</strong>';
+          } else {
+            userName = regMap[String(ann.tagged_athlete_id)] || ('Athlete ID: ' + ann.tagged_athlete_id);
+          }
+          
+          var contentText = ann.title;
+          try {
+            var bodyObj = JSON.parse(ann.body);
+            if (bodyObj.activity_name) {
+              contentText += ': ' + bodyObj.activity_name;
+              if (bodyObj.distance_meters) {
+                contentText += ' (' + (bodyObj.distance_meters / 1000).toFixed(2) + ' km)';
+              }
+            } else if (bodyObj.text) {
+              contentText += ': ' + bodyObj.text;
+            }
+          } catch(e) {}
+          
+          return '<tr style="border-bottom:1px solid #eee;">' +
+                 '<td style="padding:10px; color:var(--text-muted); font-size:12px;">' + dateStr + '</td>' +
+                 '<td style="padding:10px; font-weight:600;">' + userName + '</td>' +
+                 '<td style="padding:10px; color:var(--text-primary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + esc(contentText) + '">' + esc(contentText) + '</td>' +
+                 '<td style="padding:10px; text-align:right;">' +
+                   '<button class="btn btn-sm btn-danger" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:4px 8px; font-size:11px; font-weight:600; border-radius:6px; cursor:pointer;" onclick="deleteFeedPost(\'' + ann.id + '\')">Remove</button>' +
+                 '</td>' +
+                 '</tr>';
+        }).join('');
+        
+        if (container) container.style.display = 'block';
+      } catch(err) {
+        console.error('Failed to load feed posts:', err);
+        if (loading) loading.style.display = 'none';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#ef4444;">Error loading posts: ' + err.message + '</td></tr>';
+        if (container) container.style.display = 'block';
+      }
+    }
+
+    async function deleteFeedPost(id) {
+      if (!confirm('Are you sure you want to permanently remove this post from the feed?')) return;
+      try {
+        var r = await fetch(SB + '/rest/v1/announcements?id=eq.' + id, {
+          method: 'DELETE',
+          headers: H
+        });
+        if (!r.ok) throw new Error(await r.text());
+        showStatus('Post removed successfully!', 'success');
+        loadFeedPosts();
+      } catch (err) {
+        alert('Failed to remove post: ' + err.message);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      loadEventSelector().then(function() {
+        loadSettings();
+        loadFeedPosts();
+      });
+    });
   </script>
 </body>
 </html>
