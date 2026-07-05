@@ -1445,8 +1445,12 @@
 
     // Initial page load
     authGuard();
-    loadEventSelector();
-    switchTab('participants');
+    loadEventSelector().then(() => {
+      switchTab('participants');
+    }).catch(err => {
+      console.error('loadEventSelector error:', err);
+      switchTab('participants');
+    });
     
     // Periodically update the badge count for pending requests
     async function updateBadgeCount() {
