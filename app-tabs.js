@@ -1375,13 +1375,17 @@ function initializeFeedTab(enabled) {
   var tabFeed = document.getElementById('tab-feed');
   var bnav = document.querySelector('.bottom-nav');
   
-  if (enabled) {
+  var cfg = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.tabs_config) ? CONFIG_LB.tabs_config : {};
+  var shouldShowFeed = enabled && (cfg.feed !== false);
+  
+  if (shouldShowFeed) {
     if (TAB_ORDER.indexOf('feed') === -1) {
-      TAB_ORDER.splice(4, 0, 'feed');
+      var youIdx = TAB_ORDER.indexOf('you');
+      var insertIdx = youIdx >= 0 ? youIdx : TAB_ORDER.length;
+      TAB_ORDER.splice(insertIdx, 0, 'feed');
     }
     if (bnavFeed) bnavFeed.style.display = '';
     if (tabFeed) tabFeed.classList.remove('hidden-tab');
-    if (bnav) bnav.classList.add('nav-five-tabs');
   } else {
     var idx = TAB_ORDER.indexOf('feed');
     if (idx !== -1) {
@@ -1389,7 +1393,14 @@ function initializeFeedTab(enabled) {
     }
     if (bnavFeed) bnavFeed.style.display = 'none';
     if (tabFeed) tabFeed.classList.add('hidden-tab');
-    if (bnav) bnav.classList.remove('nav-five-tabs');
+  }
+  
+  if (bnav) {
+    if (TAB_ORDER.length >= 5) {
+      bnav.classList.add('nav-five-tabs');
+    } else {
+      bnav.classList.remove('nav-five-tabs');
+    }
   }
   
   if (track) {
@@ -3227,6 +3238,11 @@ function setupAppLayout(isParticipant) {
     if (document.getElementById('you-panel-activities')) document.getElementById('you-panel-activities').style.display = 'none';
     if (document.getElementById('you-panel-challenges')) document.getElementById('you-panel-challenges').style.display = 'none';
     if (document.getElementById('you-panel-info')) document.getElementById('you-panel-info').style.display = 'block';
+  }
+  
+  if (bnav) {
+    if (TAB_ORDER.length >= 5) bnav.classList.add('nav-five-tabs');
+    else bnav.classList.remove('nav-five-tabs');
   }
   
   // Reorder content panes in the DOM to match the TAB_ORDER exactly
