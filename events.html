@@ -684,6 +684,21 @@ async function cloneEvent(ev){
   loadEvents();
 }
 
+function fmtIST(dt) {
+  if (!dt) return '-';
+  var parts = dt.split('T');
+  if (parts.length < 2) return dt;
+  var dParts = parts[0].split('-');
+  var tParts = parts[1].split(':');
+  if (dParts.length < 3 || tParts.length < 2) return dt;
+  var dateStr = dParts[2] + '/' + dParts[1] + '/' + dParts[0];
+  var hour = parseInt(tParts[0]);
+  var minute = tParts[1];
+  var ampm = hour >= 12 ? 'PM' : 'AM';
+  var displayHour = hour % 12;
+  if (displayHour === 0) displayHour = 12;
+  return dateStr + ' ' + displayHour + ':' + minute + ' ' + ampm;
+}
 function esc(str) {
   if (!str) return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -713,7 +728,7 @@ async function loadActivityStatsForEvents() {
 }
 async function loadActivityStatsForEvent(ev, regMap) {
   try {
-    var url = SB_URL + '/rest/v1/activities?event_id=eq.' + ev.id + '&is_deleted=eq.false&order=activity_date.desc,id.desc&select=strava_athlete_id,distance_meters,sport_type,activity_date&limit=5';
+    var url = SB_URL + '/rest/v1/activities?event_id=eq.' + ev.id + '&is_deleted=eq.false&order=activity_date_time_ist.desc,id.desc&select=strava_athlete_id,distance_meters,sport_type,activity_date_time_ist&limit=5';
     var res = await fetch(url, {
       headers: Object.assign({}, HDR, { 'Prefer': 'count=exact' })
     });
@@ -744,7 +759,7 @@ async function loadActivityStatsForEvent(ev, regMap) {
           var name = regMap[ev.id + '_' + a.strava_athlete_id] || ('Athlete #' + a.strava_athlete_id);
           var dist = (a.distance_meters / 1000).toFixed(2);
           var sport = a.sport_type || 'Activity';
-          var dateStr = fmtD(a.activity_date);
+          var dateStr = fmtIST(a.activity_date_time_ist);
           html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.03);font-size:13px;">' +
                     '<div>' +
                       '<strong style="color:var(--text-primary);">' + esc(name) + '</strong>' +
