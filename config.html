@@ -413,6 +413,91 @@ tr:hover td{background:#FAFAFA}
     </div>
   </div>
 
+  <div class="section">
+    <div class="section-header" onclick="toggleSection('pbconfig')">
+      <div class="section-header-left">
+        <span>🏆</span>
+        <div>
+          <div class="section-title">Personal Bests Settings <span class="ev-context-badge"></span></div>
+          <div class="section-sub-inline">Choose which personal stats to show in the participant view</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-pbconfig">&#9660;</span>
+    </div>
+    <div class="section-body" id="body-pbconfig" style="padding: 24px;">
+      <div style="margin-bottom: 20px;">
+        <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Select Stats to Display</strong>
+        <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-longest_activity" checked>
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Longest Activity</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Single session max distance</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-best_pace" checked>
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Best Pace</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Min/KM pace (walk/run)</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-longest_session" checked>
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Longest Session</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Longest moving duration</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-best_day" checked>
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Best Day</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Daily max distance</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-max_elevation">
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Max Elevation Gain</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Single session max (M)</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-max_speed">
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Max Avg Speed</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Single session max (KM/H)</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-total_distance">
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Total Distance</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Overall event distance</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-total_elevation">
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Total Elevation Gain</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Overall elevation gain</span>
+            </div>
+          </label>
+          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pb-opt-total_activities">
+            <div>
+              <span style="font-weight: 600; display: block; font-size: 13px;">Total Activities</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">Number of sync'd sessions</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      <button class="save-btn" onclick="savePersonalBestsConfig()">Save personal bests settings</button>
+      <span class="saved-msg" id="pbconfig-saved">&#9989; Saved!</span>
+    </div>
+  </div>
+
   <div class="section"><div class="section-header" onclick="toggleSection('cachemgmt')"><div class="section-header-left"><span>&#129529;</span><div><div class="section-title">Cache Management</div><div class="section-sub-inline">Clear browser local cache to see updates immediately</div></div></div><span class="section-chevron" id="chev-cachemgmt">&#9660;</span></div><div class="section-body" id="body-cachemgmt"><div class="rule-box"><strong>Application Cache:</strong><br>The frontend caches leaderboard and configuration data to reduce database load. If you applied manual bonuses, added new challenges, or flagged activities, it may take up to 5 minutes to show up. Click below to clear your local cache and reload immediately.</div><button class="save-btn" onclick="clearMyCache()">ðŸ§¹ Clear My Browser Cache</button><span class="saved-msg" id="cache-saved">&#9989; Cache Cleared!</span></div></div>
 </div>
 
@@ -629,6 +714,12 @@ async function loadConfig(){
     if (el) el.checked = true;
   });
 
+  // Reset personal bests fields to defaults
+  ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t) {
+    var el = document.getElementById('pb-opt-' + t);
+    if (el) el.checked = ['longest_activity', 'best_pace', 'longest_session', 'best_day'].indexOf(t) !== -1;
+  });
+
   var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}
     if(row.config_key==='hide_strava_connect'){
       document.getElementById('layout-hide-strava').checked = !!row.config_value;
@@ -643,8 +734,28 @@ async function loadConfig(){
         if (el) el.checked = cfg[t] !== false;
       });
     }
+    if(row.config_key==='personal_bests'){
+      var cfg = row.config_value || {};
+      ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t){
+        var el = document.getElementById('pb-opt-' + t);
+        if (el) el.checked = cfg[t] !== false;
+      });
+    }
   });if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await upsertConfig('login_method',val);showSaved('loginmethod-saved');}
+async function savePersonalBestsConfig() {
+  try {
+    var cfg = {};
+    ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t) {
+      var el = document.getElementById('pb-opt-' + t);
+      cfg[t] = el ? el.checked : false;
+    });
+    await upsertConfig('personal_bests', cfg);
+    showSaved('pbconfig-saved');
+  } catch (e) {
+    alert('Failed to save Personal Bests settings: ' + e.message);
+  }
+}
 async function saveLayoutConfig(){try{var hideStrava=document.getElementById('layout-hide-strava').checked;var teamLb=document.getElementById('layout-team-leaderboard').checked;var tabsCfg={};['dashboard','leaderboard','events','celebrate','feed','you'].forEach(function(t){var el=document.getElementById('tab-opt-'+t);tabsCfg[t]=el?el.checked:true});await Promise.all([upsertConfig('hide_strava_connect',hideStrava),upsertConfig('team_leaderboard_enabled',teamLb),upsertConfig('tabs_config',tabsCfg)]);showSaved('layout-saved')}catch(e){alert('Failed to save layout settings: '+e.message)}}
 function clearMyCache(){var keysToRemove=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('agwalk_')===0){keysToRemove.push(k)}}keysToRemove.forEach(function(k){localStorage.removeItem(k)});showSaved('cache-saved');setTimeout(function(){window.location.reload()},1200)}
 async function saveMedals(){var val={gold:{male:+document.getElementById('gold-male').value,female:+document.getElementById('gold-female').value},silver:{male:+document.getElementById('silver-male').value,female:+document.getElementById('silver-female').value},bronze:{male:+document.getElementById('bronze-male').value,female:+document.getElementById('bronze-female').value}};await upsertConfig('medals',val);showSaved('medals-saved')}
