@@ -94,9 +94,9 @@
     .topbar-back:hover { background: #EAECF0; color: var(--text-primary); }
     .content { flex: 1; padding: 28px 32px; width: 100%; max-width: 900px; margin: 0 auto; }
     
-    /* Panels */
     .card { background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
-    .card-head { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-head { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+    .card-head:hover { background: #FAFBFD; }
     .card-head-left { display: flex; align-items: center; gap: 10px; }
     .card-head h2 { font-size: 15px; font-weight: 700; }
     .card-body { padding: 24px; }
@@ -192,10 +192,11 @@
 
     <div class="content">
       <div class="card">
-        <div class="card-head">
+        <div class="card-head" onclick="toggleCard(this)">
           <div class="card-head-left"><span>📢</span><h2>Feed Announcement Rules</h2></div>
+          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
           <div class="toggle-row">
             <div class="toggle-info">
               <div class="toggle-title">Standard Activities</div>
@@ -254,10 +255,11 @@
       </div>
 
       <div class="card">
-        <div class="card-head">
+        <div class="card-head" onclick="toggleCard(this)">
           <div class="card-head-left"><span>🔍</span><h2>Feed Content Filters</h2></div>
+          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
           <div class="form-group">
             <label class="form-label" for="filter-min-dist">Minimum Activity Distance (KM)</label>
             <input type="number" step="0.1" min="0" class="input-field" id="filter-min-dist" placeholder="e.g. 1.0">
@@ -289,10 +291,11 @@
       </div>
 
       <div class="card" style="margin-top:24px;">
-        <div class="card-head">
+        <div class="card-head" onclick="toggleCard(this)">
           <div class="card-head-left"><span>⚙️</span><h2>Global Feed Customization</h2></div>
+          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
           <div class="toggle-row">
             <div class="toggle-info">
               <div class="toggle-title">Smart Pace Filtering</div>
@@ -367,10 +370,11 @@
       </div>
 
       <div class="card" style="margin-top: 30px;">
-        <div class="card-head">
+        <div class="card-head" onclick="toggleCard(this)">
           <div class="card-head-left"><span>📰</span><h2>Manage Social Feed Posts</h2></div>
+          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
             View recent social feed posts for this event and remove any unwanted posts.
           </p>
@@ -689,12 +693,21 @@
             }
           } catch(e) {}
           
+          var isHidden = !!ann.is_hidden;
+          var btnStyle = isHidden 
+            ? 'background:#ecfdf5; color:#10b981; border:1px solid #a7f3d0; padding:4px 8px; font-size:11px; font-weight:600; border-radius:6px; cursor:pointer;'
+            : 'background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:4px 8px; font-size:11px; font-weight:600; border-radius:6px; cursor:pointer;';
+          var btnText = isHidden ? 'Show on Feed' : 'Hide from Feed';
+          
           return '<tr style="border-bottom:1px solid #eee;">' +
                  '<td style="padding:10px; color:var(--text-muted); font-size:12px;">' + dateStr + '</td>' +
                  '<td style="padding:10px; font-weight:600;">' + userName + '</td>' +
-                 '<td style="padding:10px; color:var(--text-primary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + esc(contentText) + '">' + esc(contentText) + '</td>' +
+                 '<td style="padding:10px; color:var(--text-primary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + esc(contentText) + '">' +
+                   (isHidden ? '<span style="color:var(--text-muted); text-decoration: line-through; margin-right: 6px; font-weight: 700;">[HIDDEN]</span>' : '') +
+                   esc(contentText) + 
+                 '</td>' +
                  '<td style="padding:10px; text-align:right;">' +
-                   '<button class="btn btn-sm btn-danger" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:4px 8px; font-size:11px; font-weight:600; border-radius:6px; cursor:pointer;" onclick="deleteFeedPost(\'' + ann.id + '\')">Remove</button>' +
+                   '<button class="btn btn-sm" style="' + btnStyle + '" onclick="togglePostVisibility(\'' + ann.id + '\', ' + isHidden + ')">' + btnText + '</button>' +
                  '</td>' +
                  '</tr>';
         }).join('');
@@ -708,18 +721,32 @@
       }
     }
 
-    async function deleteFeedPost(id) {
-      if (!confirm('Are you sure you want to permanently remove this post from the feed?')) return;
+    window.toggleCard = function(header) {
+      const body = header.nextElementSibling;
+      const icon = header.querySelector('.toggle-icon');
+      if (body.style.display === 'none') {
+        body.style.display = 'block';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      } else {
+        body.style.display = 'none';
+        if (icon) icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    async function togglePostVisibility(id, currentIsHidden) {
+      var action = currentIsHidden ? 'show' : 'hide';
+      if (!confirm('Are you sure you want to ' + action + ' this post on the feed?')) return;
       try {
         var r = await fetch(SB + '/rest/v1/announcements?id=eq.' + id, {
-          method: 'DELETE',
-          headers: H
+          method: 'PATCH',
+          headers: Object.assign({}, H, { 'Prefer': 'return=representation' }),
+          body: JSON.stringify({ is_hidden: !currentIsHidden })
         });
         if (!r.ok) throw new Error(await r.text());
-        showStatus('Post removed successfully!', 'success');
+        showStatus('Post visibility updated successfully!', 'success');
         loadFeedPosts();
       } catch (err) {
-        alert('Failed to remove post: ' + err.message);
+        alert('Failed to update post visibility: ' + err.message);
       }
     }
 
