@@ -237,10 +237,10 @@
     <div class="content">
       <!-- Tab Bar -->
       <div class="tab-bar">
-        <button class="tab-btn active" id="tab-employees" onclick="switchTab('employees')">
+        <button class="tab-btn" id="tab-employees" onclick="switchTab('employees')">
           <i class="ti ti-users-group" style="margin-right:6px;font-size:16px;"></i> Employees Master
         </button>
-        <button class="tab-btn" id="tab-participants" onclick="switchTab('participants')">
+        <button class="tab-btn active" id="tab-participants" onclick="switchTab('participants')">
           <i class="ti ti-users" style="margin-right:6px;font-size:16px;"></i> Registration
         </button>
         <button class="tab-btn" id="tab-requests" onclick="switchTab('requests')">
@@ -250,7 +250,7 @@
       </div>
 
       <!-- 1. Employees Master Container -->
-      <div id="employees-container">
+      <div id="employees-container" style="display:none;">
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon orange"><i class="ti ti-users"></i></div>
@@ -312,7 +312,7 @@
       </div>
 
       <!-- 2. Registration Container -->
-      <div id="participants-container" style="display:none;">
+      <div id="participants-container">
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon orange"><i class="ti ti-users"></i></div>
@@ -1186,7 +1186,7 @@
     // Initial page load
     authGuard();
     loadEventSelector();
-    switchTab('employees');
+    switchTab('participants');
     
     // Periodically update the badge count for pending requests
     async function updateBadgeCount() {
