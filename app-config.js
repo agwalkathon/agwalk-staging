@@ -888,3 +888,4 @@ function calcFullPtsAdaptive(myActs, gender, shift){
     adaptive: { mode: mode, metric: metric }
   };
 }
+// Trigger rebuild: config features fix
