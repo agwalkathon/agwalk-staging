@@ -1440,3 +1440,4 @@ async function bootAppUnified() {
   }
 }
 window.bootAppUnified = bootAppUnified;
+// Trigger rebuild: fix config fetches and call setupAppLayout after loading config
