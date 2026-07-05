@@ -674,7 +674,7 @@
                   ${p.connected ? `<a href="javascript:void(0)" onclick="revokeStrava('${p.strava_athlete_id}','${esc(p.full_name)}')" style="color: #ef4444; text-decoration: none; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); transition: all 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.borderColor='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.05)';this.style.borderColor='rgba(239, 68, 68, 0.2)'">Revoke</a>` : ''}
                 </div>
                 ${p.connected && p.strava_connected_at ? `<div class="muted" style="margin-top:2px;">Connected: ${fmtReqDate(p.strava_connected_at)}</div>` : ''}
-                ${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? `<div class="muted" style="margin-top:2px;">Disconnected: ${fmtReqDate(p.strava_disconnected_at)}</div>` : ''}
+                ${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? `<div class="muted" style="margin-top:2px;">Disconnected: ${fmtReqDate(p.strava_disconnected_at)}${p.strava_disconnected_by ? ' by ' + esc(p.strava_disconnected_by) : ''}</div>` : ''}
               </div>
             </td>
             <td>
