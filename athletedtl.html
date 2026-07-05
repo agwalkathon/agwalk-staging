@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <script>
@@ -355,8 +355,12 @@
 
         <div class="toolbar">
           <input type="text" id="emp-search" placeholder="Search code, name, email..." oninput="filterEmployees()" style="width:280px">
-          <span id="emp-count" class="count-badge" style="margin-left:auto;"></span>
+          <span id="emp-count" class="count-badge"></span>
+          <button class="btn btn-ghost btn-sm" onclick="downloadEmpTemplate()" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-download"></i> CSV Template</button>
+          <button class="btn btn-primary btn-sm" onclick="triggerEmpUpload()" style="display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-upload"></i> Import CSV</button>
+          <input type="file" id="emp-csv-input" accept=".csv" style="display:none" onchange="handleEmpCSVUpload(event)">
         </div>
+
 
         <div class="card">
           <div class="table-wrap">
@@ -761,6 +765,151 @@
       }
     }
 
+    /* ---------- CSV & Direct Connection Link Functions ---------- */
+    function copyStravaDirectLink(empCode, eventId) {
+      if (!empCode || empCode === 'undefined') {
+        alert('This participant registration does not have a valid Employee Code.');
+        return;
+      }
+      var link = window.location.origin + window.location.pathname.replace('athletedtl.html', 'connect-strava-direct.html') + 
+                 '?emp_code=' + encodeURIComponent(empCode) + '&event_id=' + eventId;
+      navigator.clipboard.writeText(link).then(function() {
+        alert('🔗 Strava Direct Link copied to clipboard:\n' + link);
+      }).catch(function(err) {
+        alert('Failed to copy link: ' + err.message);
+      });
+    }
+
+    function downloadEmpTemplate() {
+      const headers = ['Employee Code', 'Full Name', 'Email', 'Gender', 'WhatsApp', 'Department', 'Designation', 'DOB', 'Joining Date'];
+      const sample = ['EMP-05-00123-PM', 'Prakash Mali', 'prakash@example.com', 'Male', '9876543210', 'Engineering', 'Developer', '1990-01-01', '2020-03-15'];
+      const csvContent = [headers.join(','), sample.join(',')].join('\n');
+      const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'employee_master_template.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function triggerEmpUpload() {
+      document.getElementById('emp-csv-input').click();
+    }
+
+    async function handleEmpCSVUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      event.target.value = '';
+      
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const text = e.target.result;
+        const rows = parseCSV(text);
+        
+        if (!rows.length) {
+          alert('No valid rows found in CSV. Headers must contain: employee code (or emp_code), full name, email.');
+          return;
+        }
+        
+        if (!confirm(`Found ${rows.length} valid employee master records in CSV. Proceed to upload/update?`)) {
+          return;
+        }
+        
+        const token = sessionStorage.getItem('wk_admin_token');
+        if (!token) {
+          alert('Authentication token expired. Please log in again.');
+          return;
+        }
+        
+        const btn = document.querySelector('button[onclick="triggerEmpUpload()"]');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ti ti-loader" style="font-size:16px;animation:spin 1s linear infinite;"></i> Importing...';
+        
+        try {
+          const res = await fetch(_BU + '/admin/employees/import', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ rows: rows })
+          });
+          const d = await res.json();
+          if (d.success) {
+            let msg = `Successfully imported ${d.imported} employees!`;
+            if (d.errors && d.errors.length) {
+              msg += `\n\nSome errors occurred:\n` + d.errors.join('\n');
+            }
+            alert(msg);
+            _empPage = 0;
+            await loadEmployees();
+          } else {
+            alert('Import failed: ' + (d.error || 'Unknown error'));
+          }
+        } catch(err) {
+          alert('Connection error: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/);
+      if (lines.length === 0) return [];
+      
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+      
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const fields = [];
+        let currentField = '';
+        let inQuotes = false;
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            fields.push(currentField.trim());
+            currentField = '';
+          } else {
+            currentField += char;
+          }
+        }
+        fields.push(currentField.trim());
+        
+        const row = {};
+        headers.forEach((h, index) => {
+          let fieldName = h;
+          if (h === 'employee code' || h === 'emp code' || h === 'emp_code') fieldName = 'emp_code';
+          if (h === 'full name' || h === 'fullname' || h === 'full_name') fieldName = 'full_name';
+          if (h === 'email id' || h === 'email') fieldName = 'email';
+          if (h === 'whatsapp' || h === 'whatsapp number' || h === 'mobile' || h === 'phone') fieldName = 'whatsapp';
+          if (h === 'gender') fieldName = 'gender';
+          if (h === 'department' || h === 'dept') fieldName = 'department';
+          if (h === 'designation') fieldName = 'designation';
+          if (h === 'dob' || h === 'date of birth') fieldName = 'dob';
+          if (h === 'joining date' || h === 'joining_date') fieldName = 'joining_date';
+          
+          let val = fields[index] || '';
+          val = val.replace(/^["']|["']$/g, '').trim();
+          row[fieldName] = val;
+        });
+        
+        if (row.emp_code && row.full_name && row.email) {
+          rows.push(row);
+        }
+      }
+      return rows;
+    }
+
     /* ---------- TAB: Registration (Approved) ---------- */
     function renderRows(rows) {
       if (document.getElementById('select-all-checkbox')) {
@@ -821,6 +970,9 @@
                 </svg>
               </button>
               <div class="actions-dropdown">
+                <button class="actions-dropdown-item" onclick="copyStravaDirectLink('${esc(p.emp_code)}', ${p.event_id || 1})">
+                  🔗 Copy Strava Link
+                </button>
                 <button class="actions-dropdown-item" ${p.connected ? '' : 'disabled'} onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')">
                   🔄 Sync Activities
                 </button>
