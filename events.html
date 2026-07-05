@@ -253,6 +253,19 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
         <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
       </div></div>
+      <div class="fld" style="grid-column: span 2;"><label>Personal Bests Stats to Display</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:6px">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_activity" checked> Longest Activity</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_pace" checked> Best Pace</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_session" checked> Longest Session</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_day" checked> Best Day</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_elevation"> Max Elevation</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_speed"> Max Avg Speed</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_distance"> Total Distance</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_elevation"> Total Elevation</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_activities"> Total Activities</label>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -495,6 +508,17 @@ function loadDashboardCfg(rc){
   document.getElementById('sec-streak').checked=sec.streak!==false;
   document.getElementById('sec-medals').checked=sec.medals!==false;
   document.getElementById('sec-challenges').checked=sec.challenges!==false;
+
+  var pb=db.personal_bests||{
+    longest_activity: true,
+    best_pace: true,
+    longest_session: true,
+    best_day: true
+  };
+  ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(k){
+    var el = document.getElementById('pb-' + k);
+    if (el) el.checked = pb[k] !== false;
+  });
 }
 function collectDashboardCfg(){
   var rings=Array.from(document.querySelectorAll('#rings-box .ring-row')).map(function(row){
@@ -512,6 +536,14 @@ function collectDashboardCfg(){
   var tiles=chipValues('tile-chips');if(tiles.length)db.tiles=tiles;
   var cols=chipValues('col-chips');if(cols.length)db.activity_columns=cols;
   db.sections={streak:document.getElementById('sec-streak').checked,medals:document.getElementById('sec-medals').checked,challenges:document.getElementById('sec-challenges').checked};
+
+  var pb={};
+  ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(k){
+    var el = document.getElementById('pb-' + k);
+    if (el) pb[k] = el.checked;
+  });
+  db.personal_bests = pb;
+
   return db;
 }
 document.getElementById('btn-logo-up').addEventListener('click',function(){document.getElementById('logo-file').click();});
