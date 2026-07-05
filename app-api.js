@@ -729,26 +729,132 @@ async function load(isBackgroundRefresh) {
         }
       });
 
-      var pbLongest = document.getElementById('pb-longest');
-      if (pbLongest) pbLongest.textContent = maxDistM > 0 ? (maxDistM / 1000).toFixed(2) + ' km' : '—';
-
-      var pbPace = document.getElementById('pb-pace');
-      if (pbPace) pbPace.textContent = maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—';
-
-      var pbTime = document.getElementById('pb-time');
-      if (pbTime) pbTime.textContent = maxTimeSec > 0 ? fmtDur(maxTimeSec) : '—';
-
-      var pbBestDay = document.getElementById('pb-bestday');
-      var pbBestDayDate = document.getElementById('pb-bestday-date');
-      if (pbBestDay) pbBestDay.textContent = maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—';
-      if (pbBestDayDate) {
-        if (maxDayKm > 0) {
-          var dObj = new Date(bestDayDate + 'T00:00:00');
-          pbBestDayDate.textContent = dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-        } else {
-          pbBestDayDate.textContent = '';
-        }
-      }
+      // ─── Render Personal Bests Dynamically ───
+      (function() {
+        var grid = document.getElementById('pb-grid-container');
+        if (!grid) return;
+        
+        var cfgRows = cacheGet('config') || [];
+        var pbConfigRow = cfgRows.find(function(r) { return r.config_key === 'personal_bests'; });
+        var pbConfig = pbConfigRow ? pbConfigRow.config_value : {
+          longest_activity: true,
+          best_pace: true,
+          longest_session: true,
+          best_day: true
+        };
+        
+        // Find max elevation
+        var maxElevation = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.elevation_gain) || 0); }, 0);
+        
+        // Find max avg speed
+        var maxAvgSpeed = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.avg_speed) || 0); }, 0);
+        
+        // Find total elevation
+        var totalElevation = validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0);
+        
+        var statDefs = {
+          longest_activity: {
+            label: 'Longest Activity',
+            sub: 'single session max',
+            color: '#ffae00',
+            bg: 'rgba(255, 174, 0, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 4 4-8 4 8"/></svg>',
+            val: maxDistM > 0 ? (maxDistM / 1000).toFixed(2) + ' km' : '—'
+          },
+          best_pace: {
+            label: 'Best Pace',
+            sub: 'min/km · walk/run',
+            color: 'var(--brand)',
+            bg: 'rgba(232, 98, 42, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            val: maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—'
+          },
+          longest_session: {
+            label: 'Longest Session',
+            sub: 'longest moving duration',
+            color: 'var(--blue)',
+            bg: 'rgba(96, 165, 250, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            val: maxTimeSec > 0 ? fmtDur(maxTimeSec) : '—'
+          },
+          best_day: {
+            label: 'Best Day',
+            sub: (function() {
+              if (maxDayKm > 0 && bestDayDate) {
+                var dObj = new Date(bestDayDate + 'T00:00:00');
+                return 'daily max · ' + dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+              }
+              return 'daily max';
+            })(),
+            color: 'var(--green)',
+            bg: 'rgba(34, 197, 94, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+            val: maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—'
+          },
+          max_elevation: {
+            label: 'Max Elevation Gain',
+            sub: 'single session max',
+            color: '#8b5cf6',
+            bg: 'rgba(139, 92, 246, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+            val: maxElevation > 0 ? maxElevation.toFixed(0) + ' m' : '—'
+          },
+          max_speed: {
+            label: 'Max Avg Speed',
+            sub: 'single session max',
+            color: '#ec4899',
+            bg: 'rgba(236, 72, 153, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></svg>',
+            val: maxAvgSpeed > 0 ? (maxAvgSpeed * 3.6).toFixed(1) + ' km/h' : '—'
+          },
+          total_distance: {
+            label: 'Total Distance',
+            sub: 'overall event distance',
+            color: '#3b82f6',
+            bg: 'rgba(59, 130, 246, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
+            val: totalDistM > 0 ? (totalDistM / 1000).toFixed(1) + ' km' : '—'
+          },
+          total_elevation: {
+            label: 'Total Elevation',
+            sub: 'overall elevation gain',
+            color: '#10b981',
+            bg: 'rgba(16, 185, 129, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22l-4-4h8l-4 4zM12 2l-4 4h8l-4-4z"/></svg>',
+            val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—'
+          },
+          total_activities: {
+            label: 'Total Activities',
+            sub: 'sync\'d sessions',
+            color: '#64748b',
+            bg: 'rgba(100, 116, 139, 0.12)',
+            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+            val: validActs.length + ' acts'
+          }
+        };
+        
+        var html = '';
+        var keys = ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'];
+        keys.forEach(function(key) {
+          if (pbConfig[key] !== false) {
+            var d = statDefs[key];
+            html += '<div class="pb-card">' +
+              '<div class="pb-card-left">' +
+                '<div class="pb-card-header">' +
+                  '<div class="pb-card-icon" style="background: ' + d.bg + '; color: ' + d.color + ';">' +
+                    d.svg +
+                  '</div>' +
+                  '<div class="pb-card-label">' + d.label + '</div>' +
+                '</div>' +
+                '<div class="pb-card-sub">' + d.sub + '</div>' +
+              '</div>' +
+              '<div class="pb-card-val" style="color: ' + d.color + ';">' + d.val + '</div>' +
+            '</div>';
+          }
+        });
+        
+        grid.innerHTML = html || '<div style="color: var(--muted); font-size: 13px; text-align: center; padding: 20px; grid-column: 1/-1;">No personal bests enabled for this event.</div>';
+      })();
 
       var typeCounts = {};
       validActs.forEach(function(a){
