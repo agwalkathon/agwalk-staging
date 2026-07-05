@@ -315,11 +315,11 @@
     <div class="content">
       <!-- Tab Bar -->
       <div class="tab-bar">
-        <button class="tab-btn" id="tab-employees" onclick="switchTab('employees')">
-          <i class="ti ti-users-group" style="margin-right:6px;font-size:16px;"></i> Employees Master
-        </button>
         <button class="tab-btn active" id="tab-participants" onclick="switchTab('participants')">
           <i class="ti ti-users" style="margin-right:6px;font-size:16px;"></i> Registration
+        </button>
+        <button class="tab-btn" id="tab-employees" onclick="switchTab('employees')">
+          <i class="ti ti-users-group" style="margin-right:6px;font-size:16px;"></i> Employees Master
         </button>
         <button class="tab-btn" id="tab-requests" onclick="switchTab('requests')">
           <i class="ti ti-user-check" style="margin-right:6px;font-size:16px;"></i> New Requests
@@ -456,7 +456,7 @@
                   <th style="min-width: 150px;">Event</th>
                   <th style="width: 100px;">Role</th>
                   <th style="width: 90px;">Gender</th>
-                  <th style="width: 220px;">Strava Status</th>
+                  <th style="width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Strava Status</th>
                   <th style="width: 110px;">Activities</th>
                   <th style="width: 100px;">Status</th>
                   <th style="width: 80px; text-align: center;">Actions</th>
@@ -795,16 +795,16 @@
             </td>
             <td>${roleDrop(p)}</td>
             <td>${esc(p.gender || '—')}</td>
-            <td>
-              <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
-                <div style="display:flex;align-items:center;gap:6px;">
+            <td style="width: 170px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;max-width:100%;">
+                <div style="display:flex;align-items:center;gap:6px;max-width:100%;">
                   <span class="badge ${p.connected ? 'conn' : 'warn'}" 
                         style="${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? 'background:#F3F4F6;color:#4B5563;border:1px solid #E5E7EB;' : ''}">
                     ${p.connected ? '✓ Connected' : ( (!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? 'Disconnected' : 'Not yet' )}
                   </span>
                 </div>
-                ${p.connected && p.strava_connected_at ? `<div class="muted" style="margin-top:2px;">Connected: ${fmtReqDate(p.strava_connected_at)}</div>` : ''}
-                ${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? `<div class="muted" style="margin-top:2px;">Disconnected: ${fmtReqDate(p.strava_disconnected_at)}${p.strava_disconnected_by ? ' by ' + esc(p.strava_disconnected_by) : ''}</div>` : ''}
+                ${p.connected && p.strava_connected_at ? `<div class="muted" style="margin-top:2px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="Connected: ${fmtReqDate(p.strava_connected_at)}">Connected: ${fmtReqDate(p.strava_connected_at)}</div>` : ''}
+                ${(!p.connected && !p.strava_connected_at && p.strava_disconnected_at) ? `<div class="muted" style="margin-top:2px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="Disconnected: ${fmtReqDate(p.strava_disconnected_at)}${p.strava_disconnected_by ? ' by ' + esc(p.strava_disconnected_by) : ''}">Disconnected: ${fmtReqDate(p.strava_disconnected_at)}${p.strava_disconnected_by ? ' by ' + esc(p.strava_disconnected_by) : ''}</div>` : ''}
               </div>
             </td>
             <td><span style="font-weight:600">${p.cnt || 0}</span></td>
@@ -896,19 +896,12 @@
         const token = sessionStorage.getItem('wk_admin_token');
         if (!token) return;
         
-        const actsUrl = EV_ID === 'all'
-          ? SUPABASE_URL + '/rest/v1/activities?select=strava_athlete_id,event_id,distance_meters&is_deleted=eq.false'
-          : SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + EV_ID + '&select=strava_athlete_id,event_id,distance_meters&is_deleted=eq.false';
-
-        const [d, acts] = await Promise.all([
-          fetch(_BU + '/admin/participants?event_id=' + EV_ID + '&_t=' + Date.now(), {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            }
-          }).then(res => res.json()),
-          getAll(actsUrl)
-        ]);
+        const d = await fetch(_BU + '/admin/participants?event_id=' + EV_ID + '&_t=' + Date.now(), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          }
+        }).then(res => res.json());
         
         if (!d.success) throw new Error(d.error || 'Failed to load participants');
         const regs = d.participants || [];
@@ -916,18 +909,7 @@
         // Filter approved and inactive participants for grid display (inactive filtered via reg-status-filter UI dropdown)
         const approvedRegs = regs.filter(r => r.status === 'approved' || r.status === 'active' || r.status === 'inactive' || !r.status);
         
-        const am = {};
-        acts.forEach(a => {
-          if (!a.strava_athlete_id || String(a.strava_athlete_id).trim() === '' || String(a.strava_athlete_id) === 'null') return;
-          const key = a.strava_athlete_id + '_' + a.event_id;
-          if (!am[key]) am[key] = { cnt: 0, dist: 0 };
-          am[key].cnt++;
-          am[key].dist += a.distance_meters || 0;
-        });
-        
         allRows = approvedRegs.map(r => {
-          const hasAthleteId = r.strava_athlete_id && String(r.strava_athlete_id).trim() !== '' && String(r.strava_athlete_id) !== 'null';
-          const key = hasAthleteId ? r.strava_athlete_id + '_' + r.event_id : null;
           const isConn = (r.strava_connected === true || r.strava_connected === 'true' || r.strava_connected === 1 || r.strava_connected === '1');
           
           let eventName = r.event_name;
@@ -941,8 +923,8 @@
             event_name: eventName || '—',
             role:      r.role || 'user',
             connected: isConn,
-            cnt:       (hasAthleteId && am[key]) ? am[key].cnt  : 0,
-            dist:      (hasAthleteId && am[key]) ? am[key].dist : 0
+            cnt:       r.cnt || 0,
+            dist:      r.dist || 0
           };
         });
         
