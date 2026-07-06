@@ -178,6 +178,11 @@ async function loadCelebrate(){
   var box = document.getElementById('celebrate-feed');
   if (!box) return;
 
+  var btnNewPost = document.getElementById('btn-new-post');
+  if (btnNewPost) {
+    btnNewPost.style.display = getToken() ? 'block' : 'none';
+  }
+
   var greetEl = document.getElementById('celebrate-greeting');
   if (greetEl) {
     var userName = '';

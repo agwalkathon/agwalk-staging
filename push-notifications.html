@@ -195,44 +195,8 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
     <div><div class="card-title">Notification Triggers</div><div class="card-sub">Toggle which events send a push notification. Edit the title and message text per trigger.</div></div>
   </div>
   <div class="card-body">
-    <!-- Trigger Selector Dropdown -->
-    <div style="margin-bottom: 20px;">
-      <label for="trigger-select" style="font-size: 11px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; display: block;">Select Trigger Event</label>
-      <select id="trigger-select" onchange="selectTrigger(this.value)" style="padding: 10px 12px; border: 1px solid #e8e8e8; border-radius: 8px; font-size: 13px; font-family: inherit; width: 100%; max-width: 450px; background: #fff; cursor: pointer; color: var(--text); outline: none;">
-        <option value="">Loading triggers...</option>
-      </select>
-    </div>
-
-    <!-- Active Trigger Card -->
-    <div id="active-trigger-card" style="display: none; background: #f8f9fa; border: 1px solid #eee; border-radius: 10px; padding: 18px 20px; margin-bottom: 20px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <label class="toggle-wrap" style="margin-top: 0;">
-            <input type="checkbox" id="active-trigger-enabled" onchange="toggleActiveTrigger(this.checked)">
-            <span class="toggle-track" id="active-trigger-track" style="background: #d1d5db;">
-              <span class="toggle-thumb" id="active-trigger-thumb" style="transform: translateX(0);"></span>
-            </span>
-          </label>
-          <span id="active-trigger-label" style="font-size: 14px; font-weight: 600; color: var(--text);">—</span>
-        </div>
-        <span class="rule-key" id="active-trigger-key" style="margin: 0;">—</span>
-      </div>
-
-      <div class="rule-fields">
-        <div class="fld">
-          <label>Notification Title</label>
-          <input type="text" id="active-trigger-title" oninput="updateActiveTrigger()">
-        </div>
-        <div class="fld">
-          <label>Notification Body — use {distance} {name} {rank} {medal}</label>
-          <input type="text" id="active-trigger-body" oninput="updateActiveTrigger()">
-        </div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center">
-      <button class="btn" onclick="saveRules()">Save all rules</button>
-      <span class="saved" id="rules-saved">Saved!</span>
+    <div id="rules-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+      <p style="color:var(--text-muted);font-size:13px;padding:8px 0">Loading notification triggers...</p>
     </div>
   </div>
 </div>
@@ -378,132 +342,105 @@ async function loadRules() {
     renderRules();
     loadStats();
   } catch(e) {
-    document.getElementById('rules-list').innerHTML = '<p style="color:#c62828;font-size:13px;padding:8px 0">Could not load rules — backend may be starting up. Refresh in a moment.</p>';
+    document.getElementById('rules-list-container').innerHTML = '<p style="color:#c62828;font-size:13px;padding:8px 0">Could not load rules — backend may be starting up. Refresh in a moment.</p>';
   }
 }
-
-var selectedTriggerIndex = 0;
 
 function renderRules() {
   var on = rulesData.filter(function(r){return r.enabled;}).length;
   document.getElementById('stat-enabled').textContent = on;
   document.getElementById('stat-disabled').textContent = rulesData.length - on;
   
-  var select = document.getElementById('trigger-select');
-  if (select) {
-    var originalValue = select.value;
-    select.innerHTML = rulesData.map(function(rule, idx) {
-      var status = rule.enabled ? '🟢' : '⚪';
-      return '<option value="' + idx + '">' + status + ' ' + esc(rule.title) + ' (' + esc(rule.trigger_key) + ')</option>';
+  var container = document.getElementById('rules-list-container');
+  if (container) {
+    container.innerHTML = rulesData.map(function(rule, idx) {
+      var isEnabled = rule.enabled;
+      var trackBg = isEnabled ? '#22c55e' : '#d1d5db';
+      var thumbTranslate = isEnabled ? 'translateX(18px)' : 'translateX(0)';
+      
+      return '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #f8f9fa; border: 1px solid #eee; border-radius: 10px; padding: 18px 20px;">' +
+             '  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">' +
+             '    <div style="display: flex; align-items: center; gap: 12px;">' +
+             '      <label class="toggle-wrap" style="margin-top: 0;">' +
+             '        <input type="checkbox" id="chk-rule-' + idx + '" ' + (isEnabled ? 'checked' : '') + ' onchange="autoSaveToggle(' + idx + ', this.checked)" style="display:none">' +
+             '        <span class="toggle-track" id="track-rule-' + idx + '" style="background: ' + trackBg + '; display: inline-block; width: 34px; height: 16px; border-radius: 9999px; position: relative; cursor: pointer; transition: background .2s;">' +
+             '          <span class="toggle-thumb" id="thumb-rule-' + idx + '" style="transform: ' + thumbTranslate + '; display: block; width: 12px; height: 12px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: transform .2s;"></span>' +
+             '        </span>' +
+             '      </label>' +
+             '      <span style="font-size: 14px; font-weight: 600; color: var(--text);" id="label-rule-' + idx + '">' + esc(rule.title) + '</span>' +
+             '    </div>' +
+             '    <div style="display: flex; align-items: center; gap: 8px;">' +
+             '      <span class="rule-key" style="margin: 0; padding: 3px 8px; background: #e5e7eb; border-radius: 6px; font-size: 11px; font-weight: 500;">' + esc(rule.trigger_key) + '</span>' +
+             '      <span class="saved" id="saved-indicator-' + idx + '" style="font-size: 12px; color: #16a34a; opacity: 0; transition: opacity .3s; font-weight: 600;">Saved!</span>' +
+             '    </div>' +
+             '  </div>' +
+             '  <div class="rule-fields" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">' +
+             '    <div class="fld" style="margin:0;">' +
+             '      <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block; margin-bottom:6px;">Notification Title</label>' +
+             '      <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff;">' +
+             '    </div>' +
+             '    <div class="fld" style="margin:0;">' +
+             '      <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block; margin-bottom:6px;">Notification Body — use {distance} {name} {rank} {medal}</label>' +
+             '      <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff;">' +
+             '    </div>' +
+             '  </div>' +
+             '</div>';
     }).join('');
-    
-    if (originalValue !== '' && originalValue < rulesData.length) {
-      select.value = originalValue;
-      selectedTriggerIndex = parseInt(originalValue);
-    } else {
-      select.value = selectedTriggerIndex;
-    }
   }
-  showActiveTrigger();
 }
 
-function selectTrigger(idx) {
-  selectedTriggerIndex = parseInt(idx);
-  showActiveTrigger();
-}
-
-function showActiveTrigger() {
-  var rule = rulesData[selectedTriggerIndex];
-  if (!rule) return;
-
-  var card = document.getElementById('active-trigger-card');
-  if (card) card.style.display = 'block';
-
-  var label = document.getElementById('active-trigger-label');
-  var key = document.getElementById('active-trigger-key');
-  var checkbox = document.getElementById('active-trigger-enabled');
-  var track = document.getElementById('active-trigger-track');
-  var thumb = document.getElementById('active-trigger-thumb');
-  var titleInput = document.getElementById('active-trigger-title');
-  var bodyInput = document.getElementById('active-trigger-body');
-
-  if (label) label.textContent = rule.title;
-  if (key) key.textContent = rule.trigger_key;
-  if (checkbox) checkbox.checked = rule.enabled;
-  
-  if (track) track.style.background = rule.enabled ? '#22c55e' : '#d1d5db';
-  if (thumb) thumb.style.transform = rule.enabled ? 'translateX(18px)' : 'translateX(0)';
-  
-  if (titleInput) titleInput.value = rule.title;
-  if (bodyInput) bodyInput.value = rule.body;
-}
-
-function toggleActiveTrigger(val) {
-  rulesData[selectedTriggerIndex].enabled = val;
-  
-  var track = document.getElementById('active-trigger-track');
-  var thumb = document.getElementById('active-trigger-thumb');
+async function autoSaveToggle(idx, val) {
+  rulesData[idx].enabled = val;
+  var track = document.getElementById('track-rule-' + idx);
+  var thumb = document.getElementById('thumb-rule-' + idx);
   if (track) track.style.background = val ? '#22c55e' : '#d1d5db';
   if (thumb) thumb.style.transform = val ? 'translateX(18px)' : 'translateX(0)';
-
-  // Update option text in dropdown
-  var select = document.getElementById('trigger-select');
-  if (select) {
-    var option = select.options[selectedTriggerIndex];
-    var status = val ? '🟢' : '⚪';
-    var rule = rulesData[selectedTriggerIndex];
-    option.textContent = status + ' ' + rule.title + ' (' + rule.trigger_key + ')';
-  }
-
+  
   var on = rulesData.filter(function(r){return r.enabled;}).length;
   document.getElementById('stat-enabled').textContent = on;
   document.getElementById('stat-disabled').textContent = rulesData.length - on;
+
+  await executeAutoSave(idx);
 }
 
-function updateActiveTrigger() {
-  var titleVal = document.getElementById('active-trigger-title').value;
-  var bodyVal = document.getElementById('active-trigger-body').value;
-  rulesData[selectedTriggerIndex].title = titleVal;
-  rulesData[selectedTriggerIndex].body = bodyVal;
-
-  var label = document.getElementById('active-trigger-label');
+async function autoSaveText(idx) {
+  var titleVal = document.getElementById('title-rule-' + idx).value.trim();
+  var bodyVal = document.getElementById('body-rule-' + idx).value.trim();
+  
+  if (rulesData[idx].title === titleVal && rulesData[idx].body === bodyVal) return;
+  
+  rulesData[idx].title = titleVal;
+  rulesData[idx].body = bodyVal;
+  
+  var label = document.getElementById('label-rule-' + idx);
   if (label) label.textContent = titleVal;
-
-  // Update option text in dropdown
-  var select = document.getElementById('trigger-select');
-  if (select) {
-    var option = select.options[selectedTriggerIndex];
-    var status = rulesData[selectedTriggerIndex].enabled ? '🟢' : '⚪';
-    option.textContent = status + ' ' + titleVal + ' (' + rulesData[selectedTriggerIndex].trigger_key + ')';
-  }
+  
+  await executeAutoSave(idx);
 }
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-async function saveRules() {
-  // Ensure the visible inputs are synchronized
-  var titleInput = document.getElementById('active-trigger-title');
-  var bodyInput = document.getElementById('active-trigger-body');
-  if (titleInput) rulesData[selectedTriggerIndex].title = titleInput.value;
-  if (bodyInput) rulesData[selectedTriggerIndex].body = bodyInput.value;
-
+async function executeAutoSave(idx) {
   try {
     var r = await fetch(BU + '/push/rules', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ rules: rulesData })
     });
     var j = await r.json();
-    if (j.success) { showSaved('rules-saved'); }
-    else { alert('Save failed: ' + (j.error || 'unknown')); }
-  } catch(e) { alert('Error: ' + e.message); }
+    if (j.success) {
+      showSaved('saved-indicator-' + idx);
+    }
+  } catch(e) {
+    console.error('Auto-save failed:', e);
+  }
 }
 
 function showSaved(id) {
   var el = document.getElementById(id);
   if (!el) return;
-  el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2000);
+  el.style.opacity = '1';
+  setTimeout(function(){ el.style.opacity = '0'; }, 1500);
 }
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function loadStats() {
   try {

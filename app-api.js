@@ -1523,6 +1523,31 @@ async function bootAppUnified() {
     var _maintBlocked = await checkMaintenanceGate(s.athleteId);
     if (_maintBlocked) return;
     await load(false);
+
+    // Exchange participant session for employee token to enable Celebrate tab features
+    try {
+      var exRes = await fetch(BACKEND + '/employee/exchange-participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ athlete_id: s.athleteId })
+      });
+      var exData = await exRes.json();
+      if (exData && exData.success) {
+        if (typeof setToken === 'function') setToken(exData.token);
+        if (typeof setEmp === 'function') setEmp(exData.employee);
+        // Initialize Celebrate tab listeners and load feed
+        if (typeof initEmployeeModeListeners === 'function') {
+          initEmployeeModeListeners();
+        }
+        if (typeof loadCelebrate === 'function') {
+          loadCelebrate();
+        }
+      } else {
+        console.warn('Participant exchange returned non-success:', exData.error);
+      }
+    } catch (exErr) {
+      console.warn('Failed to exchange participant session:', exErr.message);
+    }
   } else {
     if (typeof loadCelebrate === 'function') loadCelebrate();
     if (typeof initEmployeeModeListeners === 'function') initEmployeeModeListeners();
