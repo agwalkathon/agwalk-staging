@@ -48,7 +48,7 @@ function clearLeaderboardTab() {
 }
 
 function showTab(tab) {
-  if (tab === 'feed' && !CONFIG_LB.announcements_enabled) return;
+  if (tab === 'feed' && CONFIG_LB.announcements_enabled === false) return;
   if (_currentTab === tab) {
     var container = document.getElementById('tab-' + tab);
     if (container) {
@@ -128,7 +128,7 @@ function showTab(tab) {
   }
 
   // Poll intervals for live updates
-  if (tab === 'feed' && CONFIG_LB.announcements_enabled) {
+  if (tab === 'feed' && CONFIG_LB.announcements_enabled !== false) {
     if (!_feedPollInterval) {
       _feedPollInterval = setInterval(function() {
         loadFeed(true).catch(function(e) { console.warn('Poll loadFeed error:', e); });
@@ -1376,7 +1376,7 @@ function initializeFeedTab(enabled) {
   var bnav = document.querySelector('.bottom-nav');
   
   var cfg = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.tabs_config) ? CONFIG_LB.tabs_config : {};
-  var shouldShowFeed = enabled && (cfg.feed !== false);
+  var shouldShowFeed = (enabled !== false) && (cfg.feed !== false);
   
   if (shouldShowFeed) {
     if (TAB_ORDER.indexOf('feed') === -1) {
@@ -3185,7 +3185,7 @@ function setupAppLayout(isParticipant) {
       }
     });
     // Add feed if enabled
-    if (CONFIG_LB.announcements_enabled && cfg.feed !== false) {
+    if (CONFIG_LB.announcements_enabled !== false && cfg.feed !== false) {
       TAB_ORDER.splice(TAB_ORDER.indexOf('you') >= 0 ? TAB_ORDER.indexOf('you') : TAB_ORDER.length, 0, 'feed');
     }
     if (TAB_ORDER.length === 0) {
