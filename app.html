@@ -273,7 +273,7 @@
     </div>
   </div>
     <!-- My Points -->
-  <div class="card" style="margin-bottom:12px;">
+  <div class="card" id="my-points-section" style="margin-bottom:12px;">
   <div class="sec">My Points</div>
   <div class="gold-stats" style="padding:0 14px 14px;margin-bottom:0;">
     <div class="gold-stat">
@@ -296,24 +296,24 @@
   </div>
 
     <!-- Metrics -->
-  <div class="card" style="margin-bottom:12px;">
+  <div class="card" id="my-stats-section" style="margin-bottom:12px;">
   <div class="sec">My Stats</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 14px 14px;">
-    <div class="stat-card-item">
+  <div id="mystats-grid-container" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 14px 14px;">
+    <div class="stat-card-item" id="stat-item-activities">
       <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
       <div class="stat-card-val" id="s-acts">—</div>
       <div class="stat-card-label">Activities</div>
     </div>
-    <div class="stat-card-item">
+    <div class="stat-card-item" id="stat-item-distance">
       <div class="stat-card-icon" style="background:rgba(34,197,94,0.12);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
       </div>
       <div class="stat-card-val" id="s-dist">—</div>
       <div class="stat-card-label">km Distance</div>
     </div>
-    <div class="stat-card-item">
+    <div class="stat-card-item" id="stat-item-movingtime">
       <div class="stat-card-icon" style="background:rgba(96,165,250,0.12);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
@@ -323,9 +323,11 @@
   </div>
   </div>
 
-  <div class="sec">Pace Goals</div>
-  <div class="card" id="pace-card">
-    <!-- dynamically rendered by JS -->
+  <div id="pace-goals-section">
+    <div class="sec">Pace Goals</div>
+    <div class="card" id="pace-card">
+      <!-- dynamically rendered by JS -->
+    </div>
   </div>
 
 
@@ -380,11 +382,11 @@
     <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
   </div>
   <!-- My Standing + Rank Movement -->
-  <div style="padding:0 20px; margin-bottom:12px;">
+  <div id="my-standing-section" style="padding:0 20px; margin-bottom:12px;">
   <div class="card">
   <div class="sec">My Standing</div>
   <div style="padding:0 14px 14px;">
-    <div class="standing-grid">
+    <div class="standing-grid" id="standing-grid-container">
       <div class="standing-card">
         <div class="standing-rank-big" id="standing-shift-rank">—</div>
         <div class="standing-cat" id="standing-shift-label">—</div>
@@ -396,13 +398,13 @@
         <div class="standing-sub">Team</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-      <div class="standing-card" style="text-align:left;padding:12px 14px;">
+    <div id="standing-subcards-container" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+      <div class="standing-card" id="standing-this-week-card" style="text-align:left;padding:12px 14px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">This Week</div>
         <div style="font-size:20px;font-weight:800;color:#fff;" id="lb-rank-move">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px;">vs last week</div>
       </div>
-      <div class="standing-card" style="text-align:left;padding:12px 14px;">
+      <div class="standing-card" id="standing-next-rank-card" style="text-align:left;padding:12px 14px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Next Rank</div>
         <div style="font-size:14px;font-weight:800;color:var(--blue);" id="lb-next-gap">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="lb-next-name"></div>
