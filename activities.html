@@ -1467,14 +1467,20 @@ async function loadEventSelector() {
     sel.addEventListener('change', function() {
       EV_ID = parseInt(this.value);
       localStorage.setItem('wk_admin_selected_event_id', EV_ID);
-      // Reload active tab's data
-      loadRegistrations().then(function() {
-        if (currentTab === 'all') {
-          loadActivities();
-        } else if (currentTab === 'deleted') {
-          loadFlaggedData();
-        }
-      });
+      
+      // Update registration map and datalist for autocomplete
+      loadRegistrations();
+      
+      // Clear data and require manual filter action to avoid heavy load
+      var placeholder = document.getElementById('placeholder');
+      var results = document.getElementById('results');
+      if (placeholder) placeholder.style.display = 'block';
+      if (results) results.style.display = 'none';
+      
+      var flaggedBody = document.getElementById('flagged-body');
+      if (flaggedBody) {
+        flaggedBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:var(--text-muted);">Event changed. Please configure filters and search to load data.</td></tr>';
+      }
     });
   } catch (err) {
     console.error('Failed to load event selector:', err);
