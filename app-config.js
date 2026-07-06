@@ -47,7 +47,8 @@ var CONFIG_LB    = {
       minimum_activity_distance_km: 1.0,
       allowed_sports: ["Walk", "Run", "Hike", "Ride"]
     }
-  }
+  },
+  announcements_enabled: true
 };
 var CHALLENGES_LB   = [];
 var SPECIAL_DAYS_LB = [];
