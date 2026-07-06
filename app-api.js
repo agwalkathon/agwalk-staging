@@ -336,8 +336,8 @@ async function load(isBackgroundRefresh) {
     if (window.checkPushSubscriptionState) {
       window.checkPushSubscriptionState();
     }
-    initializeFeedTab(CONFIG_LB.announcements_enabled);
-    if (CONFIG_LB.announcements_enabled) {
+    initializeFeedTab(CONFIG_LB.announcements_enabled !== false);
+    if (CONFIG_LB.announcements_enabled !== false) {
       loadFeed().catch(function(e) { console.warn('Failed initial loadFeed:', e); });
     }
     CHALLENGES_LB=Array.isArray(chRows)?chRows:[];
