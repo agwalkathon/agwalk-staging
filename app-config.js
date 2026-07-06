@@ -1,6 +1,6 @@
 // Global Configuration and State Variables
 var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
-var BACKEND      = (window.location.hostname.indexOf('staging') > -1 || window.location.pathname.indexOf('staging') > -1) ? 'https://agwalk-backend-staging.onrender.com' : 'https://agwalk-backend.onrender.com';
+var BACKEND      = 'https://agwalk-backend.onrender.com';
 var _currentTab  = 'dashboard';
 var _feedData    = [];
 var LB_REG       = [];
