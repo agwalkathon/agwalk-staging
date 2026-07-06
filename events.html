@@ -270,11 +270,26 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="grid" style="margin-bottom:14px">
       <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
       <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-      <div class="fld"><label>Sections</label><div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
-        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
-        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
-        <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
-      </div></div>
+      <div class="fld" style="grid-column: span 2;"><label>Dashboard Sections & Components (Show/Hide)</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:8px">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
+          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-mypoints" checked> My Points</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mystats" checked> My Stats</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-activities" checked> Stats: Activities</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-distance" checked> Stats: Distance</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-movingtime" checked> Stats: Moving Time</label>
+          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-pacegoals" checked> Pace Goals</label>
+        </div>
+      </div>
+      <div class="fld" style="grid-column: span 2;"><label>Leaderboard Section Config (Show/Hide)</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-mystanding" checked> My Standing Grid</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-thisweek" checked> This Week Card</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-nextrank" checked> Next Rank Card</label>
+        </div>
+      </div>
       <div class="fld" style="grid-column: span 2;"><label>Personal Bests Stats to Display</label>
         <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:6px">
           <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_activity" checked> Longest Activity</label>
@@ -530,6 +545,17 @@ function loadDashboardCfg(rc){
   document.getElementById('sec-streak').checked=sec.streak!==false;
   document.getElementById('sec-medals').checked=sec.medals!==false;
   document.getElementById('sec-challenges').checked=sec.challenges!==false;
+  document.getElementById('sec-mypoints').checked=sec.my_points!==false;
+  document.getElementById('sec-mystats').checked=sec.my_stats!==false;
+  document.getElementById('stat-comp-activities').checked=sec.stat_activities!==false;
+  document.getElementById('stat-comp-distance').checked=sec.stat_distance!==false;
+  document.getElementById('stat-comp-movingtime').checked=sec.stat_movingtime!==false;
+  document.getElementById('sec-pacegoals').checked=sec.pace_goals!==false;
+
+  var lb=rc.leaderboard_sections||{};
+  document.getElementById('lb-sec-mystanding').checked=lb.my_standing!==false;
+  document.getElementById('lb-sec-thisweek').checked=lb.this_week!==false;
+  document.getElementById('lb-sec-nextrank').checked=lb.next_rank!==false;
 
   var pb=db.personal_bests||{
     longest_activity: true,
@@ -557,7 +583,17 @@ function collectDashboardCfg(){
   if(rings.length)db.rings=rings;
   var tiles=chipValues('tile-chips');if(tiles.length)db.tiles=tiles;
   var cols=chipValues('col-chips');if(cols.length)db.activity_columns=cols;
-  db.sections={streak:document.getElementById('sec-streak').checked,medals:document.getElementById('sec-medals').checked,challenges:document.getElementById('sec-challenges').checked};
+  db.sections={
+    streak:document.getElementById('sec-streak').checked,
+    medals:document.getElementById('sec-medals').checked,
+    challenges:document.getElementById('sec-challenges').checked,
+    my_points:document.getElementById('sec-mypoints').checked,
+    my_stats:document.getElementById('sec-mystats').checked,
+    stat_activities:document.getElementById('stat-comp-activities').checked,
+    stat_distance:document.getElementById('stat-comp-distance').checked,
+    stat_movingtime:document.getElementById('stat-comp-movingtime').checked,
+    pace_goals:document.getElementById('sec-pacegoals').checked
+  };
 
   var pb={};
   ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(k){
@@ -697,6 +733,11 @@ function collect(){
     logo_url:document.getElementById('f-logo-url').value.trim()||null,
     display_name:document.getElementById('f-display-name').value.trim()||null,
     dashboard:collectDashboardCfg(),
+    leaderboard_sections:{
+      my_standing:document.getElementById('lb-sec-mystanding').checked,
+      this_week:document.getElementById('lb-sec-thisweek').checked,
+      next_rank:document.getElementById('lb-sec-nextrank').checked
+    },
     tracking_mode:document.getElementById('f-tracking').value,
     fetch_start:document.getElementById('f-fetch-start').value||null,
     fetch_end:document.getElementById('f-fetch-end').value||null,
