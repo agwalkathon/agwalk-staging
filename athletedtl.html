@@ -371,7 +371,16 @@
 
     <div class="content">
             <!-- Tab Bar -->
-      <div class="section-tabs">
+    <!-- Event Selection inline toolbar -->
+    <div class="card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
+        <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
+      </div>
+      <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
+    </div>
+
+    <div class="section-tabs">
         <button class="stab active" id="tab-participants" onclick="switchTab('participants')">
           <i class="ti ti-users" style="margin-right:6px;font-size:16px;"></i> Registration
         </button>
@@ -485,7 +494,6 @@
 
         <div class="toolbar">
           <input id="search" oninput="filterTable()" placeholder="Search name, email or team" style="width:240px">
-          <select id="ev-select" style="padding:8px 12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;max-width:230px"></select>
           <select id="status-filter" onchange="filterTable()">
             <option value="">All activity statuses</option>
             <option value="active">Has activities</option>
@@ -638,14 +646,18 @@
         const evs = await r.json();
         if (!Array.isArray(evs) || evs.length === 0) return;
         EV_ALL = evs;
-        sel.innerHTML = '<option value="all">All Events</option>' + evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
         
-        let savedId = localStorage.getItem('wk_admin_selected_event_id');
-        if (!savedId) {
-          const live = evs.find(e => e.status === 'live');
-          savedId = live ? live.id : 'all';
-        }
-        EV_ID = savedId === 'all' ? 'all' : (parseInt(savedId) || 'all');
+        sel.innerHTML = '<option value="all">All Events</option>' + evs.map(e => {
+          const isLive = e.status === 'live';
+          const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
+          const prefix = isLive ? '🟢 ' : '';
+          return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
+        }).join('');
+        
+        const live = evs.find(e => e.status === 'live');
+        let defaultId = live ? live.id : (localStorage.getItem('wk_admin_selected_event_id') || 'all');
+        
+        EV_ID = defaultId === 'all' ? 'all' : (parseInt(defaultId) || 'all');
         sel.value = EV_ID;
         localStorage.setItem('wk_admin_selected_event_id', EV_ID);
         
