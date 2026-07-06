@@ -121,6 +121,15 @@ body{font-family:'Poppins',sans-serif;background:var(--page-bg);color:var(--text
 footer.site-footer{margin-top:auto;padding:16px 28px;font-size:12px;color:#aaa;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between}
 footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 @media(max-width:768px){.rule-fields{grid-template-columns:1fr}.bc-grid{grid-template-columns:1fr}}
+
+/* Section tabs */
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.section-tabs::-webkit-scrollbar{display:none}
+.stab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);white-space:nowrap}
+.stab:hover{color:var(--text-primary)}
+.stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+.push-tab-panel{display:none}
+.push-tab-panel.active{display:block}
   </style>
 </head>
 <body>
@@ -169,6 +178,16 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   <div class="stat-box"><div class="stat-val" id="stat-disabled" style="color:#9ca3af">—</div><div class="stat-lbl">Rules disabled</div></div>
 </div>
 
+<!-- Tabs Navigation -->
+<div class="section-tabs">
+  <button class="stab active" data-target="triggers" onclick="switchPushTab('triggers')">🔔 Notification Triggers</button>
+  <button class="stab" data-target="broadcast" onclick="switchPushTab('broadcast')">📢 Broadcast Message</button>
+  <button class="stab" data-target="history" onclick="switchPushTab('history')">📊 Broadcast History</button>
+  <button class="stab" data-target="devices" onclick="switchPushTab('devices')">📱 Subscribed Devices</button>
+</div>
+
+<!-- Tab Panel: Triggers -->
+<div class="push-tab-panel active" id="panel-triggers">
 <!-- Trigger Rules -->
 <div class="card">
   <div class="card-header">
@@ -218,6 +237,10 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   </div>
 </div>
 
+</div>
+
+<!-- Tab Panel: Broadcast -->
+<div class="push-tab-panel" id="panel-broadcast">
 <!-- Broadcast -->
 <div class="card">
   <div class="card-header">
@@ -238,8 +261,12 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   </div>
 </div>
 
+</div>
+
+<!-- Tab Panel: History -->
+<div class="push-tab-panel" id="panel-history">
 <!-- Sent Broadcast History -->
-<div class="card" style="margin-top: 24px;">
+<div class="card">
   <div class="card-header">
     <div class="card-icon"><i class="ti ti-history"></i></div>
     <div><div class="card-title">Sent Broadcast History</div><div class="card-sub">History of sent broadcast messages. Deleting a message here removes it from the feed and participant notifications.</div></div>
@@ -265,8 +292,12 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   </div>
 </div>
 
+</div>
+
+<!-- Tab Panel: Devices -->
+<div class="push-tab-panel" id="panel-devices">
 <!-- Subscribed Devices List -->
-<div class="card" style="margin-top: 24px;">
+<div class="card">
   <div class="card-header">
     <div class="card-icon"><i class="ti ti-devices"></i></div>
     <div><div class="card-title">Subscribed Devices</div><div class="card-sub">List of participants who have subscribed to receive push notifications on their devices.</div></div>
@@ -292,6 +323,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
       </table>
     </div>
   </div>
+</div>
 </div>
 
 </div><!-- /content -->
@@ -636,6 +668,15 @@ async function deleteBroadcast(id) {
     alert('Error: ' + e.message);
   }
 }
+
+window.switchPushTab = function(tabName) {
+  document.querySelectorAll('.stab').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-target') === tabName);
+  });
+  document.querySelectorAll('.push-tab-panel').forEach(function(panel) {
+    panel.classList.toggle('active', panel.id === 'panel-' + tabName);
+  });
+};
 
 loadRules();
 loadSubscribers();
