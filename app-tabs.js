@@ -1203,6 +1203,42 @@ function renderStanding() {
     var myActs = LB_ACTS.filter(function(a){return String(a.strava_athlete_id)===String(athleteId);});
     var currentPoints = calcFullPts(myActs, reg.gender, reg.shift).total;
     checkMilestoneNotifications(athleteId, shiftRank, currentPoints, reg.gender, myActs, reg);
+
+    // Apply show/hide layout overrides for standing cards based on active event configuration
+    try {
+      var activeEv = JSON.parse(localStorage.getItem('ag_active_event_cache') || 'null');
+      var lbSec = (activeEv && activeEv.rules_config && activeEv.rules_config.leaderboard_sections) || {};
+      var standingSec = document.getElementById('my-standing-section');
+      if (standingSec) {
+        if (lbSec.my_standing === false) {
+          standingSec.style.display = 'none';
+        } else {
+          standingSec.style.display = 'block';
+          
+          var twCard = document.getElementById('standing-this-week-card');
+          var nrCard = document.getElementById('standing-next-rank-card');
+          var subcardsContainer = document.getElementById('standing-subcards-container');
+          
+          var showTW = lbSec.this_week !== false;
+          var showNR = lbSec.next_rank !== false;
+          
+          if (twCard) twCard.style.display = showTW ? 'block' : 'none';
+          if (nrCard) nrCard.style.display = showNR ? 'block' : 'none';
+          
+          if (subcardsContainer) {
+            var showCount = [showTW, showNR].filter(Boolean).length;
+            if (showCount === 0) {
+              subcardsContainer.style.display = 'none';
+            } else {
+              subcardsContainer.style.display = 'grid';
+              subcardsContainer.style.gridTemplateColumns = 'repeat(' + showCount + ', 1fr)';
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to apply standing visibility overrides:', err);
+    }
   } catch(e) {
     console.warn('renderStanding failed:', e);
   }
