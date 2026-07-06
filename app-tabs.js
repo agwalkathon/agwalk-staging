@@ -1779,18 +1779,6 @@ function instantiateFeedMap(el) {
 function initFeedMaps() {
   if (_currentTab !== 'feed') return;
 
-  if (!_feedMapObserver && 'IntersectionObserver' in window) {
-    _feedMapObserver = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          var el = entry.target;
-          _feedMapObserver.unobserve(el);
-          instantiateFeedMap(el);
-        }
-      });
-    }, { rootMargin: '100px 0px 100px 0px' });
-  }
-
   var elements = document.querySelectorAll('.feed-map-container');
   elements.forEach(function(el) {
     if (el.classList.contains('leaflet-container')) {
@@ -1806,11 +1794,7 @@ function initFeedMaps() {
       return;
     }
 
-    if (_feedMapObserver) {
-      _feedMapObserver.observe(el);
-    } else {
-      instantiateFeedMap(el);
-    }
+    instantiateFeedMap(el);
   });
 }
 
