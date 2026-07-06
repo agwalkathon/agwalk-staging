@@ -378,7 +378,7 @@ tr:hover td{background:#FAFAFA}
 }
 
 /* Section tabs */
-.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
 .section-tabs::-webkit-scrollbar{display:none}
 .stab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);white-space:nowrap}
 .stab:hover{color:var(--text-primary)}
@@ -631,8 +631,8 @@ td button.btn:last-child { margin-right: 0; }
       <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
     </div>
 
-    <div class="section-tabs" style="justify-content:space-between; align-items:center;">
-      <div style="display:flex; gap:0; overflow-x:auto; white-space:nowrap;">
+    <div class="section-tabs-wrapper" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:24px; width:100%;">
+      <div class="section-tabs" style="border-bottom:none; margin-bottom:0;">
         <button class="stab active" id="tab-all" onclick="switchTab('all')">🏃 All Workouts</button>
         <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">🔍 Bulk Flag Scanner</button>
         <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">🗑️ Deleted</button>
