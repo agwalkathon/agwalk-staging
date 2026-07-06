@@ -1,0 +1,2 @@
+# PostgREST and Supabase Date Query Rules
+- When querying database timestamp/datetime values stored as strings or varchars using Supabase/PostgREST filter operators (like `gte` or `lte`), always use the standard ISO 8601 `T` separator (e.g. `YYYY-MM-DDT00:00:00`) instead of a space separator (e.g. `YYYY-MM-DD 00:00:00`). Using space characters causes PostgreSQL to compare characters alphabetically (where `T` > space), leading to incorrect query results.
