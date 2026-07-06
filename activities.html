@@ -623,20 +623,22 @@ td button.btn:last-child { margin-right: 0; }
 <div class="main">
 <header class="topbar"><div class="topbar-left"><h1 id="page-title">Activities</h1><p id="page-subtitle">Search and manage all logged workouts</p></div><div class="topbar-right" style="display:flex;align-items:center;gap:12px;"></div></header>
   <div class="content">
-        <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:24px; flex-wrap:wrap; gap:16px; width:100%;">
-      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
-        <div class="section-tabs" style="border-bottom:none; margin-bottom:0;">
-          <button class="stab active" id="tab-all" onclick="switchTab('all')">ðŸƒ All Workouts</button>
-          <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">ðŸ” Bulk Flag Scanner</button>
-          <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">ðŸ—‘ï¸ Deleted</button>
-          <button class="stab" id="tab-rules" onclick="switchTab('rules')">âš™ï¸ Auto-Flag Rules</button>
-        </div>
-        <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom:8px;" onclick="recheckAll()">ðŸ” Re-run Auto-flag</button>
+    <div class="card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
+        <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
       </div>
-      <div style="display:flex; align-items:center; gap:8px; padding-bottom:8px;">
-        <span style="font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Event:</span>
-        <select id="ev-select" style="padding:6px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:230px;"></select>
+      <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
+    </div>
+
+    <div class="section-tabs" style="justify-content:space-between; align-items:center;">
+      <div style="display:flex; gap:0; overflow-x:auto; white-space:nowrap;">
+        <button class="stab active" id="tab-all" onclick="switchTab('all')">🏃 All Workouts</button>
+        <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">🔍 Bulk Flag Scanner</button>
+        <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">🗑️ Deleted</button>
+        <button class="stab" id="tab-rules" onclick="switchTab('rules')">⚙️ Auto-Flag Rules</button>
       </div>
+      <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()">🔍 Re-run Auto-flag</button>
     </div>
 
     <!-- Tab 1: All Workouts -->
@@ -1447,14 +1449,18 @@ async function loadEventSelector() {
     var evs = await r.json();
     if (!Array.isArray(evs) || evs.length === 0) return;
     EV_ALL = evs;
-    sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
     
-    var savedId = localStorage.getItem('wk_admin_selected_event_id');
-    if (!savedId) {
-      var live = evs.find(e => e.status === 'live');
-      savedId = live ? live.id : evs[0].id;
-    }
-    EV_ID = parseInt(savedId) || evs[0].id;
+    sel.innerHTML = evs.map(e => {
+      const isLive = e.status === 'live';
+      const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
+      const prefix = isLive ? '🟢 ' : '';
+      return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
+    }).join('');
+    
+    var live = evs.find(e => e.status === 'live');
+    let defaultId = live ? live.id : (localStorage.getItem('wk_admin_selected_event_id') || evs[0].id);
+    
+    EV_ID = parseInt(defaultId) || evs[0].id;
     sel.value = EV_ID;
     localStorage.setItem('wk_admin_selected_event_id', EV_ID);
     
