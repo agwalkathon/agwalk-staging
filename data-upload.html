@@ -272,6 +272,15 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <div class="content">
 
+    <!-- Event Selection inline toolbar -->
+    <div class="card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
+        <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
+      </div>
+      <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
+    </div>
+
     <!-- ── SECTION TABS ── -->
     <div class="section-tabs">
       <button class="stab active" onclick="switchTab('tab-upload')">⬆️ Upload to Database</button>
@@ -547,10 +556,29 @@ async function loadEventSelector(){
     var r=await fetch(SUPABASE_URL+"/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc",{headers:HDR});
     var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
     sel.innerHTML="";
-    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
-    sel.value="1"; EV_ID=1;
+    evs.forEach(function(e){
+      var o=document.createElement("option");
+      o.value=e.id;
+      if (e.status === "live") {
+        o.textContent = "🟢 " + e.name + " (LIVE)";
+        o.style.color = "#16a34a";
+        o.style.fontWeight = "bold";
+      } else {
+        o.textContent = e.name + " (" + e.status.toUpperCase() + ")";
+      }
+      sel.appendChild(o);
+    });
+    
+    var live = evs.find(e => e.status === 'live');
+    let defaultId = live ? live.id : (localStorage.getItem('wk_admin_selected_event_id') || evs[0].id);
+    
+    EV_ID = parseInt(defaultId) || evs[0].id;
+    sel.value = EV_ID;
+    localStorage.setItem('wk_admin_selected_event_id', EV_ID);
+    
     sel.addEventListener("change",function(){
       EV_ID=parseInt(this.value)||1;
+      localStorage.setItem('wk_admin_selected_event_id', EV_ID);
       var log=document.getElementById('progress-log');
       if(log){ document.getElementById('progress-wrap').style.display='block'; log.innerHTML += '<div style="color:#90caf9">\ud83d\udccc Import target set to: '+sel.options[sel.selectedIndex].textContent+'</div>'; }
     });
