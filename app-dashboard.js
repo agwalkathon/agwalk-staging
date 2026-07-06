@@ -131,7 +131,71 @@
         im.style.width = 'auto';
       }
     }
-    
+    // Cache active event config for other modules
+    try { localStorage.setItem('ag_active_event_cache', JSON.stringify(ev)); } catch(e){}
+
+    // Apply sections show/hide toggles
+    if (ev.rules_config && ev.rules_config.dashboard) {
+      var dash = ev.rules_config.dashboard;
+      var sec = dash.sections || {};
+      
+      // 1. My Points card
+      var ptsSec = document.getElementById('my-points-section');
+      if (ptsSec) {
+        ptsSec.style.display = (sec.my_points === false) ? 'none' : 'block';
+      }
+      
+      // 2. My Stats card
+      var statsSec = document.getElementById('my-stats-section');
+      if (statsSec) {
+        statsSec.style.display = (sec.my_stats === false) ? 'none' : 'block';
+      }
+      
+      // 3. My Stats subcomponents
+      var compActs = document.getElementById('stat-item-activities');
+      var compDist = document.getElementById('stat-item-distance');
+      var compTime = document.getElementById('stat-item-movingtime');
+      var gridContainer = document.getElementById('mystats-grid-container');
+      
+      var showActs = sec.stat_activities !== false;
+      var showDist = sec.stat_distance !== false;
+      var showTime = sec.stat_movingtime !== false;
+      
+      if (compActs) compActs.style.display = showActs ? 'flex' : 'none';
+      if (compDist) compDist.style.display = showDist ? 'flex' : 'none';
+      if (compTime) compTime.style.display = showTime ? 'flex' : 'none';
+      
+      // Adjust grid columns template based on how many subcomponents are visible
+      if (gridContainer) {
+        var visibleCount = [showActs, showDist, showTime].filter(Boolean).length;
+        if (visibleCount === 0) {
+          if (statsSec) statsSec.style.display = 'none'; // hide entire card if all sub-metrics hidden
+        } else {
+          gridContainer.style.gridTemplateColumns = 'repeat(' + visibleCount + ', 1fr)';
+        }
+      }
+      
+      // 4. Pace Goals section
+      var paceSec = document.getElementById('pace-goals-section');
+      if (paceSec) {
+        paceSec.style.display = (sec.pace_goals === false) ? 'none' : 'block';
+      }
+      
+      // 5. Classic streak toggle
+      if (sec.streak === false) {
+        var st = document.getElementById('streak-section') || document.querySelector('[data-section="streak"]');
+        if (st) st.style.display = 'none';
+      }
+      
+      // 6. Classic challenges toggle
+      if (sec.challenges === false) {
+        var ch = document.getElementById('you-panel-challenges');
+        var chBtn = document.getElementById('you-tab-challenges');
+        if (chBtn) chBtn.style.display = 'none';
+        if (ch) ch.style.display = 'none';
+      }
+    }
+
     // 2. Render custom rings if configured. If not, keep the classic layout
     var hasDash = ev.rules_config && ev.rules_config.dashboard &&
                   Array.isArray(ev.rules_config.dashboard.rings) && ev.rules_config.dashboard.rings.length;
