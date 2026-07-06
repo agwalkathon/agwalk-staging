@@ -1247,7 +1247,15 @@ async function load() {
     fetch(SUPABASE_URL + '/rest/v1/participants?select=strava_athlete_id', { headers: HDR })
   ]);
 
-  const regs = await regR.json(), conn = await connR.json();
+  let regs = [], conn = [];
+  try {
+    const regsData = await regR.json();
+    if (Array.isArray(regsData)) regs = regsData;
+  } catch(e) {}
+  try {
+    const connData = await connR.json();
+    if (Array.isArray(connData)) conn = connData;
+  } catch(e) {}
 
   const totalCount = parseInt((countR.headers.get('content-range') || '').split('/')[1]) || 0;
   const flagCount  = parseInt((flagR.headers.get('content-range') || '').split('/')[1]) || 0;
@@ -1266,7 +1274,7 @@ async function load() {
 
   // Filter connected participants by event registration
   const registeredAthleteIds = new Set((regs || []).map(r => String(r.strava_athlete_id)));
-  const connectedRegistered = (conn || []).filter(c => registeredAthleteIds.has(String(c.strava_athlete_id)));
+  const connectedRegistered = (conn || []).filter(c => c && c.strava_athlete_id && registeredAthleteIds.has(String(c.strava_athlete_id)));
 
   function fmtIN(n) {
     n = Math.round(n);
@@ -2044,11 +2052,14 @@ function closeHealthLogsModal() {
 })();
 
 // Close health modal if clicked outside
-document.getElementById('health-logs-modal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeHealthLogsModal();
-  }
-});
+const healthLogsModal = document.getElementById('health-logs-modal');
+if (healthLogsModal) {
+  healthLogsModal.addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeHealthLogsModal();
+    }
+  });
+}
 </script>
 
   <!-- Service Logs Modal -->
