@@ -609,16 +609,26 @@ async function loadEventSelector(){
     var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
     EV_ALL=evs;
     sel.innerHTML="";
-    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
+    evs.forEach(function(e){
+      var o=document.createElement("option");
+      o.value=e.id;
+      if (e.status === "live") {
+        o.textContent = "🟢 " + e.name + " (LIVE)";
+        o.style.color = "#16a34a";
+        o.style.fontWeight = "bold";
+      } else {
+        o.textContent = e.name + " (" + e.status.toUpperCase() + ")";
+      }
+      sel.appendChild(o);
+    });
     
-    var savedId = localStorage.getItem('wk_selected_event_id');
-    if (!savedId) {
-      var live = evs.find(function(e){ return e.status === 'live'; });
-      savedId = live ? String(live.id) : "1";
-    }
-    sel.value = savedId;
-    EV_ID = (savedId === "1") ? null : parseInt(savedId);
-    var _sel = EV_ALL.find(function(e){ return String(e.id) === savedId; });
+    var live = evs.find(function(e){ return e.status === 'live'; });
+    var defaultId = live ? String(live.id) : (localStorage.getItem('wk_selected_event_id') || "1");
+    
+    sel.value = defaultId;
+    EV_ID = (defaultId === "1") ? null : parseInt(defaultId);
+    localStorage.setItem('wk_selected_event_id', defaultId);
+    var _sel = EV_ALL.find(function(e){ return String(e.id) === defaultId; });
     EV_RULES = (_sel && _sel.rules_config) || null;
     
     sel.addEventListener("change",async function(){
@@ -626,13 +636,13 @@ async function loadEventSelector(){
       localStorage.setItem('wk_selected_event_id', this.value);
       var _sel=EV_ALL.find(function(e){return String(e.id)===this.value}.bind(this));
       EV_RULES=(_sel&&_sel.rules_config)||null;
-      await // loadAll() is loaded inside loadEventSelector() after configuration has resolved
+      await loadAll();
     });
     
-    await // loadAll() is loaded inside loadEventSelector() after configuration has resolved
+    await loadAll();
   }catch(e){
     console.warn("event selector failed",e);
-    await // loadAll() is loaded inside loadEventSelector() after configuration has resolved
+    await loadAll();
   }
 }
 loadEventSelector();
@@ -1372,7 +1382,7 @@ async function doRefresh() {
   allActivities = [];
   document.querySelectorAll('.expand-row').forEach(function(r){ r.remove(); });
   document.getElementById('lb-body').innerHTML = '<tr><td colspan="9"><div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:60px"><div style="width:32px;height:32px;border:3px solid #f0f0f0;border-top-color:#E8622A;border-radius:50%;animation:spin 0.8s linear infinite"></div><span style="color:#888;font-size:14px">Refreshing leaderboard...</span></div></td></tr>';
-  await // loadAll() is loaded inside loadEventSelector() after configuration has resolved
+  await loadAll();
   if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Refresh'; }
 }
  // global for sport filter
