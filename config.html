@@ -321,17 +321,20 @@ tr:hover td{background:#FAFAFA}
 .stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
 </style>
 
-<div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:24px; flex-wrap:wrap; gap:16px; width:100%;">
-  <div class="section-tabs" style="border-bottom:none; margin-bottom:0;">
-    <button class="stab active" data-target="security" onclick="switchConfigTab('security')">&#128273; Access & Security</button>
-    <button class="stab" data-target="scoring" onclick="switchConfigTab('scoring')">&#127941; Scoring & Medals</button>
-    <button class="stab" data-target="challenges" onclick="switchConfigTab('challenges')">&#127919; Challenges & Bonuses</button>
-    <button class="stab" data-target="layout" onclick="switchConfigTab('layout')">&#127912; Layout & Cache</button>
+<!-- Event Selection inline toolbar -->
+<div class="card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid var(--border);">
+  <div style="display:flex; align-items:center; gap:8px;">
+    <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
+    <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
   </div>
-  <div style="display:flex; align-items:center; gap:8px; padding-bottom:8px;">
-    <span style="font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Event:</span>
-    <select id="ev-select" style="padding:6px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:230px;"></select>
-  </div>
+  <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
+</div>
+
+<div class="section-tabs">
+  <button class="stab active" data-target="security" onclick="switchConfigTab('security')">&#128273; Access & Security</button>
+  <button class="stab" data-target="scoring" onclick="switchConfigTab('scoring')">&#127941; Scoring & Medals</button>
+  <button class="stab" data-target="challenges" onclick="switchConfigTab('challenges')">&#127919; Challenges & Bonuses</button>
+  <button class="stab" data-target="layout" onclick="switchConfigTab('layout')">&#127912; Layout & Cache</button>
 </div>
 
 <!-- Tab 1: Access & Security -->
@@ -735,13 +738,23 @@ async function loadEventSelector(){
     var r=await fetch(SB_URL+"/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc",{headers:HDR});
     var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
     EV_ALL=evs; sel.innerHTML="";
-    evs.forEach(function(e){var o=document.createElement("option");o.value=e.id;o.textContent=e.name+(e.status==="live"?" \u25CF LIVE":"");sel.appendChild(o);});
-    let savedId = localStorage.getItem('wk_admin_selected_event_id');
-    if (!savedId) {
-      const live = evs.find(e => e.status === 'live');
-      savedId = live ? live.id : evs[0].id;
-    }
-    EV_ID = parseInt(savedId) || evs[0].id;
+    evs.forEach(function(e){
+      var o=document.createElement("option");
+      o.value=e.id;
+      if (e.status === "live") {
+        o.textContent = "🟢 " + e.name + " (LIVE)";
+        o.style.color = "#16a34a";
+        o.style.fontWeight = "bold";
+      } else {
+        o.textContent = e.name + " (" + e.status.toUpperCase() + ")";
+      }
+      sel.appendChild(o);
+    });
+    
+    var live = evs.find(e => e.status === 'live');
+    let defaultId = live ? live.id : (localStorage.getItem('wk_admin_selected_event_id') || evs[0].id);
+    
+    EV_ID = parseInt(defaultId) || evs[0].id;
     sel.value = EV_ID;
     localStorage.setItem('wk_admin_selected_event_id', EV_ID);
     
