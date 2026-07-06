@@ -599,7 +599,7 @@ td button.btn:last-child { margin-right: 0; }
       <div class="sb-section">Operations</div>
       <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
       <a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
-      <a href="leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+      <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
       <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
       <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
 
@@ -3739,9 +3739,10 @@ function showToast(message, isError) {
 
 // ── Startup ──
 loadEventSelector().then(function(){
-loadRegistrations().then(function(){
-  loadAutoFlagConfig().then(function(){
-    // No automatic heavy load of all activities on startup
+  loadRegistrations().then(function(){
+    loadAutoFlagConfig().then(function(){
+      // No automatic heavy load of all activities on startup
+    });
   });
 });
 
