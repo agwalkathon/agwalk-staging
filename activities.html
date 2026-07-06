@@ -599,7 +599,7 @@ td button.btn:last-child { margin-right: 0; }
       <div class="sb-section">Operations</div>
       <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
       <a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
-      <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+      <a href="leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
       <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
       <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
 
@@ -1750,7 +1750,7 @@ function clearFilters(){
   document.getElementById('athlete-id-filter').value='';
   document.getElementById('date-from').value='';
   document.getElementById('date-to').value='';
-  ['sport-filter','team-filter','status-filter','flag-reason-filter'].forEach(function(id){
+  ['sport-filter','team-filter','status-filter','flag-reason-filter','review-filter'].forEach(function(id){
     document.getElementById(id).value='';
   });
   document.getElementById('placeholder').style.display='block';
@@ -1881,8 +1881,8 @@ async function loadActivities(){
   if(actIdVal) {
     url+='&strava_activity_id=eq.'+encodeURIComponent(actIdVal);
   } else {
-    if(df)url+='&activity_date_time_ist=gte.'+df+' 00:00:00';
-    if(dt)url+='&activity_date_time_ist=lte.'+dt+' 23:59:59.999';
+    if(df)url+='&activity_date_time_ist=gte.'+df+'T00:00:00';
+    if(dt)url+='&activity_date_time_ist=lte.'+dt+'T23:59:59.999';
   }
   if(athIdVal) url+='&strava_athlete_id=eq.'+encodeURIComponent(athIdVal);
   if(sp)url+='&sport_type=eq.'+sp;
@@ -3010,8 +3010,8 @@ async function fetchFlagCandidates() {
   var activityId = document.getElementById('fr-activity-id').value.trim();
 
   var q = `is_deleted=eq.false&order=activity_date_time_ist.desc.nullslast,activity_date.desc`;
-  if (dFrom) q += `&activity_date_time_ist=gte.${dFrom} 00:00:00`;
-  if (dTo) q += `&activity_date_time_ist=lte.${dTo} 23:59:59.999`;
+  if (dFrom) q += `&activity_date_time_ist=gte.${dFrom}T00:00:00`;
+  if (dTo) q += `&activity_date_time_ist=lte.${dTo}T23:59:59.999`;
   if (sport) q += `&sport_type=eq.${sport}`;
   if (activityId) q += `&strava_activity_id=eq.${activityId}`;
 
