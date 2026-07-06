@@ -148,6 +148,15 @@
     .status-msg { margin-left: 12px; font-size: 13px; font-weight: 500; display: none; }
     .status-msg.success { color: #059669; display: inline; }
     .status-msg.error { color: #DC2626; display: inline; }
+
+    /* Section tabs */
+    .section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .section-tabs::-webkit-scrollbar{display:none}
+    .stab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);white-space:nowrap}
+    .stab:hover{color:var(--text-primary)}
+    .stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+    .feed-tab-panel{display:none}
+    .feed-tab-panel.active{display:block}
     
     .site-footer { width: 100%; background: var(--card-bg); border-top: 1px solid var(--border); padding: 16px 32px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-sizing: border-box; }
     .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
@@ -256,12 +265,22 @@
         </div>
         <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
       </div>
+
+      <!-- Tabs Navigation -->
+      <div class="section-tabs">
+        <button class="stab active" data-target="announcements" onclick="switchFeedTab('announcements')">📢 Announcement Rules</button>
+        <button class="stab" data-target="filters" onclick="switchFeedTab('filters')">🔍 Content Filters</button>
+        <button class="stab" data-target="customization" onclick="switchFeedTab('customization')">🎨 Global Customization</button>
+        <button class="stab" data-target="posts" onclick="switchFeedTab('posts')">💬 Manage Posts</button>
+      </div>
+
+      <!-- Tab Panel: Announcements -->
+      <div class="feed-tab-panel active" id="panel-announcements">
       <div class="card">
-        <div class="card-head" onclick="toggleCard(this)">
+        <div class="card-head" style="cursor: default; background: none;">
           <div class="card-head-left"><span>📢</span><h2>Feed Announcement Rules</h2></div>
-          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body" style="display: none;">
+        <div class="card-body">
           <div class="toggle-row">
             <div class="toggle-info">
               <div class="toggle-title">Standard Activities</div>
@@ -318,13 +337,15 @@
           </div>
         </div>
       </div>
+      </div>
 
+      <!-- Tab Panel: Filters -->
+      <div class="feed-tab-panel" id="panel-filters">
       <div class="card">
-        <div class="card-head" onclick="toggleCard(this)">
+        <div class="card-head" style="cursor: default; background: none;">
           <div class="card-head-left"><span>🔍</span><h2>Feed Content Filters</h2></div>
-          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
         </div>
-        <div class="card-body" style="display: none;">
+        <div class="card-body">
           <div class="form-group">
             <label class="form-label" for="filter-min-dist">Minimum Activity Distance (KM)</label>
             <input type="number" step="0.1" min="0" class="input-field" id="filter-min-dist" placeholder="e.g. 1.0">
@@ -354,13 +375,15 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <div class="card" style="margin-top:24px;">
-        <div class="card-head" onclick="toggleCard(this)">
-          <div class="card-head-left"><span>⚙️</span><h2>Global Feed Customization</h2></div>
-          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
+      <!-- Tab Panel: Customization -->
+      <div class="feed-tab-panel" id="panel-customization">
+      <div class="card">
+        <div class="card-head" style="cursor: default; background: none;">
+          <div class="card-head-left"><span>🎨</span><h2>Global Feed Customization</h2></div>
         </div>
-        <div class="card-body" style="display: none;">
+        <div class="card-body">
           <div class="toggle-row">
             <div class="toggle-info">
               <div class="toggle-title">Smart Pace Filtering</div>
@@ -433,13 +456,15 @@
         <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
         <span id="status-msg" class="status-msg"></span>
       </div>
+      </div>
 
-      <div class="card" style="margin-top: 30px;">
-        <div class="card-head" onclick="toggleCard(this)">
-          <div class="card-head-left"><span>📰</span><h2>Manage Social Feed Posts</h2></div>
-          <i class="ti ti-chevron-down toggle-icon" style="font-size: 16px; color: var(--text-secondary); transition: transform 0.2s;"></i>
+      <!-- Tab Panel: Posts -->
+      <div class="feed-tab-panel" id="panel-posts">
+      <div class="card">
+        <div class="card-head" style="cursor: default; background: none;">
+          <div class="card-head-left"><span>💬</span><h2>Manage Social Feed Posts</h2></div>
         </div>
-        <div class="card-body" style="display: none;">
+        <div class="card-body">
           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
             View recent social feed posts for this event and remove any unwanted posts.
           </p>
@@ -466,6 +491,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
 
@@ -496,6 +522,15 @@
       });
     }
 
+    window.switchFeedTab = function(tabName) {
+      document.querySelectorAll('.stab').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === tabName);
+      });
+      document.querySelectorAll('.feed-tab-panel').forEach(function(panel) {
+        panel.classList.toggle('active', panel.id === 'panel-' + tabName);
+      });
+    };
+
     async function loadEventSelector() {
       var sel = document.getElementById('ev-select');
       if (!sel) return;
@@ -504,14 +539,18 @@
         var evs = await r.json();
         if (!Array.isArray(evs) || evs.length === 0) return;
         EV_ALL = evs;
-        sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
         
-        var savedId = localStorage.getItem('wk_admin_selected_event_id');
-        if (!savedId) {
-          var live = evs.find(e => e.status === 'live');
-          savedId = live ? live.id : evs[0].id;
-        }
-        EV_ID = parseInt(savedId) || evs[0].id;
+        sel.innerHTML = evs.map(e => {
+          const isLive = e.status === 'live';
+          const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
+          const prefix = isLive ? '🟢 ' : '';
+          return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
+        }).join('');
+        
+        const live = evs.find(e => e.status === 'live');
+        let defaultId = live ? live.id : (localStorage.getItem('wk_admin_selected_event_id') || evs[0].id);
+        
+        EV_ID = parseInt(defaultId) || evs[0].id;
         sel.value = EV_ID;
         localStorage.setItem('wk_admin_selected_event_id', EV_ID);
         
