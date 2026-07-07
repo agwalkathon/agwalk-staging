@@ -387,106 +387,89 @@ async function load(isBackgroundRefresh) {
 
     window.setStravaConnectedState = function(connectedAccountName) {
       var btn = document.getElementById('btn-strava-connect');
-      var msg = document.getElementById('strava-connect-msg');
-      if (!btn) return;
-      btn.setAttribute('data-connected', 'true');
-      
-      // Directly show the red outlined Disconnect style when connected
-      btn.style.background = 'rgba(239, 68, 68, 0.12)';
-      btn.style.backdropFilter = 'blur(16px)';
-      btn.style.webkitBackdropFilter = 'blur(16px)';
-      btn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-      btn.style.color = '#ef4444';
-      btn.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.15)';
-      btn.style.pointerEvents = 'auto';
-      btn.style.cursor = 'pointer';
-      btn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; color:#ef4444;">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-        Disconnect Strava
-      `;
-      
-      if (msg) {
-        var nameToShow = connectedAccountName || (reg && reg.full_name) || 'Connected';
-        msg.innerHTML = '<span style="font-weight:600; color:rgba(255,255,255,0.75);">Connected Account:</span> ' + nameToShow;
-        msg.style.display = 'block';
-        msg.style.background = 'rgba(255, 255, 255, 0.04)';
-        msg.style.border = '1px solid rgba(255, 255, 255, 0.08)';
-        msg.style.padding = '8px 16px';
-        msg.style.borderRadius = '8px';
-        msg.style.color = 'rgba(255, 255, 255, 0.6)';
-        msg.style.textAlign = 'center';
+      var card = document.getElementById('strava-connected-card');
+      var label = document.getElementById('connected-account-name-label');
+      if (btn) btn.style.display = 'none';
+      if (card) {
+        card.style.display = 'flex';
+        if (label) {
+          label.textContent = connectedAccountName || (reg && reg.full_name) || 'Connected';
+        }
       }
     };
 
     // Bind event listeners for Disconnect/Connect click interactions
     (function initStravaDisconnectBtn() {
-      var btn = document.getElementById('btn-strava-connect');
-      if (!btn) return;
+      var btnConnect = document.getElementById('btn-strava-connect');
+      var btnDisconnect = document.getElementById('btn-strava-disconnect-action');
       
-      btn.onclick = null;
-      btn.removeAttribute('onclick');
-
-      btn.addEventListener('click', async function(e) {
-        e.preventDefault();
+      async function triggerDisconnect(e) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
         
-        if (btn.getAttribute('data-connected') === 'true') {
-          var confirmDisconnect = confirm("This will stop syncing your activities from Strava. Your existing points and history will be kept. You can reconnect anytime.");
-          if (!confirmDisconnect) return;
+        var confirmDisconnect = confirm("This will stop syncing your activities from Strava. Your existing points and history will be kept. You can reconnect anytime.");
+        if (!confirmDisconnect) return;
 
-          btn.style.pointerEvents = 'none';
-          btn.style.opacity = '0.7';
-          btn.innerHTML = 'Disconnecting...';
-
-          try {
-            var athleteId = reg.strava_athlete_id || (currentSession && currentSession.athleteId);
-            var res = await fetch(BACKEND + '/participant/disconnect-strava', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                athlete_id: athleteId,
-                event_id: EVENT_ROW ? EVENT_ROW.id : 1
-              })
-            });
-            var data = await res.json();
-            if (data.success) {
-              cacheClear(athleteId);
-              btn.setAttribute('data-connected', 'false');
-              btn.style.pointerEvents = 'auto';
-              btn.style.opacity = '1';
-              btn.style.background = '';
-              btn.style.border = '';
-              btn.style.color = '';
-              btn.style.boxShadow = '';
-              btn.style.backdropFilter = '';
-              btn.style.webkitBackdropFilter = '';
-              btn.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
-                  <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
-                </svg>
-                Connect with Strava
-              `;
-              window.isStravaConnected = false;
-              var msg = document.getElementById('strava-connect-msg');
-              if (msg) {
-                msg.style.display = 'none';
-                msg.innerHTML = '';
-              }
-              if (typeof updateInAppNotificationBanner === 'function') updateInAppNotificationBanner();
-              if (typeof renderNotifications === 'function') renderNotifications();
-            } else {
-              throw new Error(data.error || 'Server error');
-            }
-          } catch (err) {
-            alert("Failed to disconnect Strava: " + err.message);
-            window.setStravaConnectedState();
-          }
-        } else {
-          window.handleStravaConnect(e);
+        var originalText = 'Disconnect';
+        if (btnDisconnect) {
+          btnDisconnect.style.pointerEvents = 'none';
+          btnDisconnect.style.opacity = '0.7';
+          originalText = btnDisconnect.textContent;
+          btnDisconnect.textContent = 'Disconnecting...';
         }
-      });
+
+        try {
+          var athleteId = reg.strava_athlete_id || (currentSession && currentSession.athleteId);
+          var res = await fetch(BACKEND + '/participant/disconnect-strava', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              athlete_id: athleteId,
+              event_id: EVENT_ROW ? EVENT_ROW.id : 1
+            })
+          });
+          var data = await res.json();
+          if (data.success) {
+            cacheClear(athleteId);
+            window.isStravaConnected = false;
+            
+            // Revert DOM back to disconnected view
+            var btn = document.getElementById('btn-strava-connect');
+            var card = document.getElementById('strava-connected-card');
+            if (card) card.style.display = 'none';
+            if (btn) btn.style.display = 'block';
+            
+            if (btnDisconnect) {
+              btnDisconnect.style.pointerEvents = 'auto';
+              btnDisconnect.style.opacity = '1';
+              btnDisconnect.textContent = originalText;
+            }
+
+            if (typeof updateInAppNotificationBanner === 'function') updateInAppNotificationBanner();
+            if (typeof renderNotifications === 'function') renderNotifications();
+          } else {
+            throw new Error(data.error || 'Server error');
+          }
+        } catch (err) {
+          alert("Failed to disconnect Strava: " + err.message);
+          if (btnDisconnect) {
+            btnDisconnect.style.pointerEvents = 'auto';
+            btnDisconnect.style.opacity = '1';
+            btnDisconnect.textContent = originalText;
+          }
+        }
+      }
+
+      if (btnDisconnect) {
+        btnDisconnect.addEventListener('click', triggerDisconnect);
+      }
+
+      if (btnConnect) {
+        btnConnect.onclick = null;
+        btnConnect.removeAttribute('onclick');
+        btnConnect.addEventListener('click', function(e) {
+          window.handleStravaConnect(e);
+        });
+      }
     })();
 
     (async function() {
