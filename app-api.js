@@ -1401,6 +1401,9 @@ async function load(isBackgroundRefresh) {
     var flaggedCount=myActs.filter(function(a){return a.is_flagged;}).length;
     var uniqueDays=new Set(myActs.filter(function(a){return !a.is_flagged;}).map(function(a){return getActDate(a);})).size;
     safeSetText('act-section-title', uniqueDays+' Days \u00b7 '+myActs.length+' Activities'+(flaggedCount?' \u00b7 '+flaggedCount+' Flagged':''));
+    window._myActsGlobal = myActs;
+    window._myRegGlobal = reg;
+    window._myFullPtsGlobal = fullPts;
     renderActivities(myActs, fullPts.dayBreakdown, fullPts.actBreakdown, reg.gender);
 
     hideSplash();
