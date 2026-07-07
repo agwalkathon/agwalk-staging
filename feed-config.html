@@ -303,15 +303,53 @@
             </label>
           </div>
 
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-title">Distance Clubs</div>
-              <div class="toggle-desc">Publish when a participant crosses a total distance marker (100km, 200km, 300km).</div>
+          <div class="toggle-row" style="flex-direction: column; align-items: stretch; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; margin-bottom: 16px;">
+            <div class="toggle-info" style="margin-right: 0;">
+              <div class="toggle-title">Distance Clubs Milestones</div>
+              <div class="toggle-desc" style="margin-bottom: 8px;">Publish when a participant joins a distance club by crossing a total distance threshold:</div>
             </div>
-            <label class="switch">
-              <input type="checkbox" id="rule-clubs">
-              <span class="slider"></span>
-            </label>
+            <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_50">
+                <span>50 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_100">
+                <span>100 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_150">
+                <span>150 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_200">
+                <span>200 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_250">
+                <span>250 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_300">
+                <span>300 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_350">
+                <span>350 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_400">
+                <span>400 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_450">
+                <span>450 KM Club</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" class="club-check" value="club_500">
+                <span>500 KM Club</span>
+              </label>
+            </div>
           </div>
 
           <div class="toggle-row">
@@ -439,16 +477,7 @@
             </label>
           </div>
 
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-title">Allow Private Profiles</div>
-              <div class="toggle-desc">Allow participants to set their profiles to Private and opt-out of the global social feed.</div>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="rule-allow-private">
-              <span class="slider"></span>
-            </label>
-          </div>
+
         </div>
       </div>
 
@@ -611,15 +640,14 @@
       rules: {
         allow_standard_activities: true,
         allow_medals: true,
-        allow_distance_clubs: true,
+        enabled_distance_clubs: ["club_100", "club_200", "club_300"],
         allow_rank_top1: true,
         allow_flagged_activities: false,
         smart_pace_filter: true,
         show_steps: true,
         show_elevation: true,
         post_specific_reactions: true,
-        priority_feed_sorting: true,
-        allow_private_profiles: true
+        priority_feed_sorting: true
       },
       filters: {
         minimum_activity_distance_km: 1.0,
@@ -645,7 +673,20 @@
         
         document.getElementById('rule-activities').checked = !!config.rules.allow_standard_activities;
         document.getElementById('rule-medals').checked = !!config.rules.allow_medals;
-        document.getElementById('rule-clubs').checked = !!config.rules.allow_distance_clubs;
+        
+        var enabledClubs = config.rules.enabled_distance_clubs;
+        if (!Array.isArray(enabledClubs)) {
+          if (config.rules.allow_distance_clubs === false) {
+            enabledClubs = [];
+          } else {
+            enabledClubs = ["club_100", "club_200", "club_300"];
+          }
+        }
+        var clubChecks = document.querySelectorAll('.club-check');
+        clubChecks.forEach(function(checkbox) {
+          checkbox.checked = enabledClubs.indexOf(checkbox.value) > -1;
+        });
+
         document.getElementById('rule-rank').checked = !!config.rules.allow_rank_top1;
         document.getElementById('rule-flagged').checked = !!config.rules.allow_flagged_activities;
         document.getElementById('rule-smart-pace').checked = config.rules.smart_pace_filter !== false;
@@ -653,7 +694,6 @@
         document.getElementById('rule-show-elevation').checked = config.rules.show_elevation !== false;
         document.getElementById('rule-post-emojis').checked = config.rules.post_specific_reactions !== false;
         document.getElementById('rule-priority-sorting').checked = config.rules.priority_feed_sorting !== false;
-        document.getElementById('rule-allow-private').checked = config.rules.allow_private_profiles !== false;
         document.getElementById('filter-min-dist').value = config.filters.minimum_activity_distance_km !== undefined ? config.filters.minimum_activity_distance_km : 1.0;
         
         var allowedSports = config.filters.allowed_sports || ["Walk", "Run", "Hike", "Ride"];
@@ -674,19 +714,24 @@
         if (checkbox.checked) selectedSports.push(checkbox.value);
       });
 
+      var clubChecks = document.querySelectorAll('.club-check');
+      var enabledClubs = [];
+      clubChecks.forEach(function(checkbox) {
+        if (checkbox.checked) enabledClubs.push(checkbox.value);
+      });
+
       var newConfig = {
         rules: {
           allow_standard_activities: document.getElementById('rule-activities').checked,
           allow_medals: document.getElementById('rule-medals').checked,
-          allow_distance_clubs: document.getElementById('rule-clubs').checked,
+          enabled_distance_clubs: enabledClubs,
           allow_rank_top1: document.getElementById('rule-rank').checked,
           allow_flagged_activities: document.getElementById('rule-flagged').checked,
           smart_pace_filter: document.getElementById('rule-smart-pace').checked,
           show_steps: document.getElementById('rule-show-steps').checked,
           show_elevation: document.getElementById('rule-show-elevation').checked,
           post_specific_reactions: document.getElementById('rule-post-emojis').checked,
-          priority_feed_sorting: document.getElementById('rule-priority-sorting').checked,
-          allow_private_profiles: document.getElementById('rule-allow-private').checked
+          priority_feed_sorting: document.getElementById('rule-priority-sorting').checked
         },
         filters: {
           minimum_activity_distance_km: parseFloat(document.getElementById('filter-min-dist').value || 0),
