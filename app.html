@@ -542,15 +542,32 @@
   </div>
 
   <div class="part-only">
-  <!-- Connect with Strava Button (Moved here) -->
+  <!-- Connect with Strava Container -->
   <div id="strava-connect-container" style="margin-top:12px; margin-bottom:16px;">
-    <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)">
+    <!-- View A: Not Connected -->
+    <a id="btn-strava-connect" class="btn-strava-connect" href="javascript:void(0)" style="display:block;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
       </svg>
       Connect with Strava
     </a>
-    <div id="strava-connect-msg" style="margin-top: 8px; font-size: 13px; font-weight: 500; display: none; padding: 10px 12px; border-radius: 8px; border: 1px solid transparent; text-align: center;"></div>
+    
+    <!-- View B: Connected (Merged Card) -->
+    <div id="strava-connected-card" class="glass-card" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; background:rgba(26,29,32,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); margin-bottom:0;">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+        <!-- Strava Icon -->
+        <div style="width:36px; height:36px; border-radius:8px; background:rgba(252,97,0,0.12); display:flex; align-items:center; justify-content:center; color:#FC6100; flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
+          </svg>
+        </div>
+        <div style="display:flex; flex-direction:column; min-width:0;">
+          <span style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Strava Account</span>
+          <span style="font-size:14px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="connected-account-name-label">—</span>
+        </div>
+      </div>
+      <button id="btn-strava-disconnect-action" style="background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.3); border-radius:6px; color:#ef4444; font-size:11px; font-weight:700; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseleave="this.style.background='rgba(239, 68, 68, 0.12)'">Disconnect</button>
+    </div>
   </div>
 
   <!-- Card 1: Event Progress -->
@@ -769,13 +786,13 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
-  <script src="app-config.js?v=20260707_v123" defer></script>
-  <script src="app-employee.js?v=20260707_v123" defer></script>
-  <script src="app-api.js?v=20260707_v123" defer></script>
-  <script src="app-drawers.js?v=20260707_v123" defer></script>
-  <script src="app-events.js?v=20260707_v123" defer></script>
-  <script src="app-dashboard.js?v=20260707_v123" defer></script>
-  <script src="app-tabs.js?v=20260707_v123" defer></script>
+  <script src="app-config.js?v=20260707_v124" defer></script>
+  <script src="app-employee.js?v=20260707_v124" defer></script>
+  <script src="app-api.js?v=20260707_v124" defer></script>
+  <script src="app-drawers.js?v=20260707_v124" defer></script>
+  <script src="app-events.js?v=20260707_v124" defer></script>
+  <script src="app-dashboard.js?v=20260707_v124" defer></script>
+  <script src="app-tabs.js?v=20260707_v124" defer></script>
 
 
 
