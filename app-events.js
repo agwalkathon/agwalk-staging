@@ -143,6 +143,31 @@ function renderEventsTab() {
   }
 }
 
+function detectEventSportType(ev) {
+  var name = (ev.name || '').toLowerCase();
+  var sports = ev.allowed_sports || [];
+  if (Array.isArray(sports)) {
+    sports = sports.map(function(s) { return s.toLowerCase(); });
+  } else if (typeof sports === 'string') {
+    try {
+      sports = JSON.parse(sports).map(function(s) { return s.toLowerCase(); });
+    } catch(e) {
+      sports = [sports.toLowerCase()];
+    }
+  }
+
+  var hasRide = sports.indexOf('ride') > -1 || sports.indexOf('mountainbikeride') > -1 || name.indexOf('ride') > -1 || name.indexOf('cycle') > -1 || name.indexOf('bike') > -1;
+  var hasWalk = sports.indexOf('walk') > -1 || name.indexOf('walk') > -1;
+  var hasRun = sports.indexOf('run') > -1 || sports.indexOf('virtualrun') > -1 || name.indexOf('run') > -1 || name.indexOf('marathon') > -1;
+  var hasHike = sports.indexOf('hike') > -1 || name.indexOf('hike') > -1 || name.indexOf('trek') > -1;
+
+  if (hasRide && !hasWalk && !hasRun && !hasHike) return 'ride';
+  if (hasWalk && !hasRide && !hasRun && !hasHike) return 'walk';
+  if (hasRun && !hasRide && !hasWalk && !hasHike) return 'run';
+  if (hasHike && !hasRide && !hasWalk && !hasRun) return 'hike';
+  return 'mixed';
+}
+
 function buildEventCard(ev, group) {
   var registrationStatus = _myEventRegistrations ? _myEventRegistrations[ev.id] : null;
   var enrolled = _myEventIds.indexOf(ev.id) > -1;
@@ -277,6 +302,29 @@ function buildEventCard(ev, group) {
   }
 
   if (actions.children.length) body.appendChild(actions);
+
+  // Inject sport type background watermark SVG if no banner
+  if (!ev.banner_url) {
+    var sportType = detectEventSportType(ev);
+    var svgHtml = '';
+    if (sportType === 'ride') {
+      svgHtml = '<svg class="ev-card-bg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 5.5l-3-3h3.5l1.5-3M8.5 17.5L12 11.5l6.5 6M12 11.5h6.5"/></svg>';
+    } else if (sportType === 'run') {
+      svgHtml = '<svg class="ev-card-bg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="18" cy="4" r="2"/><path d="M14 9.5L12 5 9 8.5M4 20l4-3 3-5M7 13l3.5-3.5 5 1.5 3.5 3"/></svg>';
+    } else if (sportType === 'walk') {
+      svgHtml = '<svg class="ev-card-bg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="4" r="2"/><path d="M12 6v8M10 14l2-4 2 4M9 20l3-6 3 6M8 8h8"/></svg>';
+    } else if (sportType === 'hike') {
+      svgHtml = '<svg class="ev-card-bg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 20h20M7 20l5-9 5 9M11 20l3-5 3 5M12 4l-4 6 8 0z"/></svg>';
+    } else {
+      svgHtml = '<svg class="ev-card-bg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a4 4 0 0 0-4 4v3a8 8 0 0 0 16 0V6a4 4 0 0 0-4-4z"/></svg>';
+    }
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'ev-card-bg-icon-wrap';
+    wrapper.innerHTML = svgHtml;
+    card.appendChild(wrapper);
+  }
+
   card.appendChild(body);
   return card;
 }
