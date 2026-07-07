@@ -1016,7 +1016,7 @@ async function load(isBackgroundRefresh) {
           if (!isBackgroundRefresh) {
             setTimeout(function(){
               Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=id,strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
                 fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
               ]).then(function(results){
                 function doReload() {
@@ -1037,7 +1037,7 @@ async function load(isBackgroundRefresh) {
         } else {
           console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
           var fetched = await Promise.all([
-            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
+            fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=id,strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
             fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v3', allActsRaw);
