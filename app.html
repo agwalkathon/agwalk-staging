@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
   <script>
+    /**
+     * Cache Smasher Redirect Script
+     * How it works: Parses URL query parameters for 'v'. If it matches an old cached timestamp version (older than July 7, 2026), 
+     * it triggers window.location.replace to load a clean 'app.html' directly, breaking legacy browser caches.
+     * Impact: Prevents blank/black map issues, broken styles, and layout rendering errors caused by legacy cached assets.
+     */
     (function() {
       var urlParams = new URLSearchParams(window.location.search);
       var v = urlParams.get('v');
@@ -306,7 +312,7 @@
 
     <!-- Metrics -->
   <div class="sec">My Stats</div>
-  <div class="card" id="my-stats-section" style="margin-bottom:12px; padding:14px;">
+  <div id="my-stats-section" style="margin-bottom:12px;">
   <div id="mystats-grid-container" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
     <div class="stat-card-item" id="stat-item-activities">
       <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
