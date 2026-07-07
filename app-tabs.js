@@ -2787,9 +2787,10 @@ async function checkPushSubscriptionState() {
     card.style.display = 'flex';
     
     if (Notification.permission === 'denied') {
-      desc.innerHTML = '<span style="color:#ef4444;">❌ Notifications blocked.</span> Please enable notifications in your browser settings to receive alerts.';
-      btn.textContent = 'Blocked in Settings';
+      desc.innerHTML = '<span style="color:#ef4444;">❌ Notifications blocked.</span> Please enable notifications in browser settings.';
+      btn.textContent = 'Blocked';
       btn.style.background = 'rgba(255,255,255,0.06)';
+      btn.style.border = '1px solid rgba(255,255,255,0.1)';
       btn.style.color = 'var(--muted)';
       btn.style.pointerEvents = 'none';
       btn.style.boxShadow = 'none';
@@ -2797,22 +2798,22 @@ async function checkPushSubscriptionState() {
     }
 
     if (sub) {
-      desc.innerHTML = '<span style="color:#10b981;">✓ Push notifications active.</span> You will receive real-time updates when peers react, achievements unlock, and challenges start.';
+      desc.innerHTML = '<span style="color:#10b981;">✓ Push notifications active.</span> Real-time updates are enabled.';
       btn.textContent = 'Active';
       btn.style.background = 'rgba(16, 185, 129, 0.12)';
-      btn.style.border = '1px solid rgba(16, 185, 129, 0.25)';
-      btn.style.color = '#10B981';
+      btn.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      btn.style.color = '#10b981';
       btn.style.pointerEvents = 'auto';
       btn.style.boxShadow = 'none';
       btn.onclick = disablePushNotifications;
     } else {
-      desc.innerHTML = 'Stay updated. Enable push notifications to receive real-time alerts when medals unlock, challenges trigger, and comments/reactions land.';
+      desc.innerHTML = 'Stay updated. Enable push alerts for real-time challenge and reaction updates.';
       btn.textContent = 'Enable';
-      btn.style.background = 'var(--brand)';
-      btn.style.border = 'none';
-      btn.style.color = '#fff';
+      btn.style.background = 'rgba(232, 98, 42, 0.12)';
+      btn.style.border = '1px solid rgba(232, 98, 42, 0.3)';
+      btn.style.color = '#E8622A';
       btn.style.pointerEvents = 'auto';
-      btn.style.boxShadow = '0 4px 12px rgba(232,98,42,0.3)';
+      btn.style.boxShadow = 'none';
       btn.onclick = enablePushNotifications;
     }
   } catch (err) {
