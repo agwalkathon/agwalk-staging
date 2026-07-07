@@ -317,6 +317,11 @@ async function load(isBackgroundRefresh) {
             CONFIG_LB.feed_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
           } catch(e) { console.error("Failed to parse feed_config:", e); }
         }
+        if(row.config_key==='activities_points_config') {
+          try {
+            CONFIG_LB.activities_points_config = typeof row.config_value === 'string' ? JSON.parse(row.config_value) : row.config_value;
+          } catch(e) { console.error("Failed to parse activities_points_config:", e); }
+        }
       });
       if (typeof setupAppLayout === 'function') {
         setupAppLayout(true);
