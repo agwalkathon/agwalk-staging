@@ -459,7 +459,7 @@ function renderActivities(acts, dayBreakdown, actBreakdown, gender) {
   dateOrder.forEach(function(date, gi) {
     var dayActs = groups[date], db = dayBreakdown[date] || {km:0,distPts:0,bonusPts:0,challenges:[]};
     var rawKm = dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.distance_meters||0)/1000;},0);
-    var chPts = parseFloat(dayActs.reduce(function(s,a){var ab=actBreakdown[a.strava_activity_id];return s+(ab?ab.challenges.reduce(function(s2,c){return s2+(c.pts||0);},0):0);},0).toFixed(2));
+    var chPts = parseFloat(dayActs.reduce(function(s,a){var ab=actBreakdown[a.strava_activity_id] || actBreakdown[a.id];return s+(ab?ab.challenges.reduce(function(s2,c){return s2+(c.pts||0);},0):0);},0).toFixed(2));
     var dateObj = new Date(date+'T00:00:00');
     var dN = dateObj.getDate();
     var dM = dateObj.toLocaleDateString('en-US',{month:'long'});
@@ -479,32 +479,79 @@ function renderActivities(acts, dayBreakdown, actBreakdown, gender) {
       '<span class="whoop-stat-val" style="color: #EF4444;">' + dayActs.length + ' (Flagged)</span>' : 
       '<span class="whoop-stat-val">' + dayActs.length + '</span>';
 
+    // Dynamic metrics based on sport type (Ride vs Walk/Run/Hike)
+    var hasWalkRunHike = dayActs.some(function(a) {
+      var t = (a.sport_type || '').toLowerCase();
+      return t === 'walk' || t === 'run' || t === 'virtualrun' || t === 'hike';
+    });
+
+    var statsHtml = '';
+    var gapStyle = '';
+    if (hasWalkRunHike || dayActs.length === 0) {
+      statsHtml =
+        '<div class="whoop-stat-item">' + actValHtml + '<span class="whoop-stat-lbl">ACTS</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + daySteps.toLocaleString('en-IN') + '</span><span class="whoop-stat-lbl">STEPS</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>';
+    } else {
+      gapStyle = 'gap:12px;';
+      var totalM = dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.distance_meters||0);},0);
+      var totalS = dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.moving_time_seconds||0);},0);
+      var avgSpeed = totalS > 0 ? (totalM / totalS) : 0;
+      var speedStr = (typeof fmtPS === 'function') ? fmtPS(avgSpeed, 'Ride') : (avgSpeed * 3.6).toFixed(1) + ' km/h';
+      var elevSum = dayActs.filter(function(a){return !a.is_flagged;}).reduce(function(s,a){return s+(a.elevation_gain||0);},0);
+      var elevStr = Math.round(elevSum) + ' m';
+
+      statsHtml =
+        '<div class="whoop-stat-item">' + actValHtml + '<span class="whoop-stat-lbl">ACTS</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + elevStr + '</span><span class="whoop-stat-lbl">ELEV</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + speedStr + '</span><span class="whoop-stat-lbl">SPEED</span></div>' +
+        '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>';
+    }
+
+    // Points visibility based on event config
+    var ptsCfg = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.activities_points_config) || { base: true, bonus: true, challenge: true, total: true };
+    var pointsItems = [];
+    if (ptsCfg.base !== false) {
+      pointsItems.push('<span>Base: <strong style="color:#60A5FA;">' + db.distPts + '</strong></span>');
+    }
+    if (ptsCfg.bonus !== false) {
+      pointsItems.push('<span>Bonus: <strong style="color:#FFD000;">' + db.bonusPts + '</strong></span>');
+    }
+    if (ptsCfg.challenge !== false) {
+      pointsItems.push('<span>Challenge: <strong style="color:#A78BFA;">' + chPts + '</strong></span>');
+    }
+
+    var pointsBoxHtml = '';
+    if (pointsItems.length > 0) {
+      var divider = '<span style="color:rgba(255,255,255,0.15); margin:0 2px;">&middot;</span>';
+      pointsBoxHtml = '<div class="whoop-points-box" style="display:flex; flex-wrap:wrap; gap:6px; font-size:12px; color:var(--muted); margin-top:6px; justify-content:flex-end; align-self:flex-end; padding-right:8px; font-weight:600; font-family:var(--font);">' +
+        pointsItems.join(divider) +
+      '</div>';
+    }
+
+    var totalHtml = '';
+    if (ptsCfg.total !== false) {
+      totalHtml = '<div class="whoop-total-box" style="font-size:13px; font-weight:700; color:var(--muted); margin-top:4px; align-self:flex-end; padding-right:8px; font-family:var(--font);">' +
+        'Total: <strong style="color:var(--brand); font-size:14px; font-weight:800;">' + dayTotal + ' pts</strong>' +
+      '</div>';
+    }
+
     dateRow.innerHTML =
       '<div class="whoop-date-box">' +
         '<span class="whoop-date-num">' + dN + '</span>' +
         '<span class="whoop-date-month">' + esc(shortMonth) + '</span>' +
       '</div>' +
       '<div style="flex:1; display:flex; flex-direction:column; margin-left:12px; min-width:0; align-items:stretch;">' +
-        '<div class="whoop-stats-box" style="margin-left:auto; justify-content:flex-end; padding-right:8px;">' +
-          '<div class="whoop-stat-item">' + actValHtml + '<span class="whoop-stat-lbl">ACTS</span></div>' +
-          '<div class="whoop-stat-item"><span class="whoop-stat-val">' + daySteps.toLocaleString('en-IN') + '</span><span class="whoop-stat-lbl">STEPS</span></div>' +
-          '<div class="whoop-stat-item"><span class="whoop-stat-val">' + rawKm.toFixed(1) + '</span><span class="whoop-stat-lbl">KM</span></div>' +
+        '<div class="whoop-stats-box" style="margin-left:auto; justify-content:flex-end; padding-right:8px; ' + gapStyle + '">' +
+          statsHtml +
         '</div>' +
-        '<div class="whoop-points-box" style="display:flex; flex-wrap:wrap; gap:6px; font-size:12px; color:var(--muted); margin-top:6px; justify-content:flex-end; align-self:flex-end; padding-right:8px; font-weight:600; font-family:var(--font);">' +
-          '<span>Base: <strong style="color:#60A5FA;">' + db.distPts + '</strong></span>' +
-          '<span style="color:rgba(255,255,255,0.15);">&middot;</span>' +
-          '<span>Bonus: <strong style="color:#FFD000;">' + db.bonusPts + '</strong></span>' +
-          '<span style="color:rgba(255,255,255,0.15);">&middot;</span>' +
-          '<span>Challenge: <strong style="color:#A78BFA;">' + chPts + '</strong></span>' +
-        '</div>' +
-        '<div class="whoop-total-box" style="font-size:13px; font-weight:700; color:var(--muted); margin-top:4px; align-self:flex-end; padding-right:8px; font-family:var(--font);">' +
-          'Total: <strong style="color:var(--brand); font-size:14px; font-weight:800;">' + dayTotal + ' pts</strong>' +
-        '</div>' +
+        pointsBoxHtml +
+        totalHtml +
       '</div>' +
       '<div class="date-chevron">❯</div>';
     
     if (dayActs.length === 1) {
-      var _sid = dayActs[0].strava_activity_id;
+      var _sid = dayActs[0].strava_activity_id || dayActs[0].id;
       dateRow.addEventListener('click', (function(id){return function(e){openActivityDetail(id, e, true);}})(_sid));
     } else {
       dateRow.addEventListener('click', (function(d){return function(){showDateDetails(d);}})(date));
@@ -590,7 +637,7 @@ function showDateDetails(dateStr) {
 
     html +=
       '<div class="detail-act-card' + (isFlag ? ' flagged' : '') + '" id="' + cardId + '">' +
-        '<div class="detail-act-hdr" onclick="openActivityDetail(\'' + a.strava_activity_id + '\', event, true)">' +
+        '<div class="detail-act-hdr" onclick="openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event, true)">' +
           '<div class="detail-act-hdr-left">' +
             '<div class="detail-act-icon ' + tc + '">' + renderIcon(a.sport_type) + '</div>' +
             '<div class="detail-act-title-wrap">' +
@@ -1276,8 +1323,14 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
 
     if (triggerKey.indexOf('medal_') === 0 && rules.allow_medals) {
       isAllowed = true;
-    } else if (triggerKey.indexOf('club_') === 0 && rules.allow_distance_clubs) {
-      isAllowed = true;
+    } else if (triggerKey.indexOf('club_') === 0) {
+      var enabledClubs = rules.enabled_distance_clubs || ["club_100", "club_200", "club_300"];
+      if (rules.allow_distance_clubs === false) {
+        enabledClubs = [];
+      }
+      if (enabledClubs.indexOf(triggerKey) > -1) {
+        isAllowed = true;
+      }
     } else if (triggerKey === 'rank_top1' && rules.allow_rank_top1) {
       isAllowed = true;
     }
@@ -1341,9 +1394,16 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     var prevClubs = prevClubsRaw ? JSON.parse(prevClubsRaw) : [];
 
     var clubsToCheck = [
+      { key: 'club_50', thresh: 50, title: '50 KM Club' },
       { key: 'club_100', thresh: 100, title: '100 KM Club' },
+      { key: 'club_150', thresh: 150, title: '150 KM Club' },
       { key: 'club_200', thresh: 200, title: '200 KM Club' },
-      { key: 'club_300', thresh: 300, title: '300 KM Club' }
+      { key: 'club_250', thresh: 250, title: '250 KM Club' },
+      { key: 'club_300', thresh: 300, title: '300 KM Club' },
+      { key: 'club_350', thresh: 350, title: '350 KM Club' },
+      { key: 'club_400', thresh: 400, title: '400 KM Club' },
+      { key: 'club_450', thresh: 450, title: '450 KM Club' },
+      { key: 'club_500', thresh: 500, title: '500 KM Club' }
     ];
 
     for (var i = 0; i < clubsToCheck.length; i++) {
@@ -2099,11 +2159,13 @@ function renderFeed() {
             ${descriptionHtml}
             ${(function() {
               var statsCols = [];
+              var t = (act.sport_type || '').toLowerCase();
+              var isRide = t === 'ride' || t === 'virtualride' || t === 'mountainbikeride';
               
               // 1. Distance (Always show)
               statsCols.push(`<div class="stat-item"><span class="stat-val">${distKm}</span><span class="stat-unit">km</span></div>`);
 
-              // 2. Pace (if allowed from Feed-config)
+              // 2. Pace / Speed (if allowed from Feed-config)
               var showPace = rules.smart_pace_filter !== false;
               if (showPace) {
                 var paceVal = paceStr, paceUnit = 'pace';
@@ -2122,8 +2184,8 @@ function renderFeed() {
               // 3. Moving Time (Always show)
               statsCols.push(`<div class="stat-item"><span class="stat-val">${fmtDur(act.moving_time_seconds || 0)}</span><span class="stat-unit">Time</span></div>`);
 
-              // 4. Steps (Calculated - if allowed from Feed-config)
-              var showSteps = rules.show_steps !== false;
+              // 4. Steps (Calculated - if allowed from Feed-config and NOT a Ride)
+              var showSteps = rules.show_steps !== false && !isRide;
               if (showSteps) {
                 statsCols.push(`<div class="stat-item"><span class="stat-val">${calculatedStepsDisplay}</span><span class="stat-unit">Steps</span></div>`);
               }
@@ -3238,7 +3300,7 @@ function setupAppLayout(isParticipant) {
       el.style.display = '';
     });
     // Default to activities sub-tab under Profile
-    if (typeof switchYouTab === 'function') switchYouTab('activities');
+    if (typeof switchYouTab === 'function') switchYouTab('info');
   } else {
     TAB_ORDER = ['celebrate', 'events', 'leaderboard', 'you'];
     
