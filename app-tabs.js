@@ -509,6 +509,12 @@ function renderActivities(acts, dayBreakdown, actBreakdown, gender) {
     }
 
     // Points visibility based on event config
+    /**
+     * Date Card Points Visibility Loader
+     * How it works: Checks the event-scoped activities_points_config configuration to conditionally display 
+     * Base, Bonus, Challenge, and Total points boxes on individual Date Cards.
+     * Impact: Organizers can hide/show specific point sub-totals in the participant's Activities tab.
+     */
     var ptsCfg = (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.activities_points_config) || { base: true, bonus: true, challenge: true, total: true };
     var pointsItems = [];
     if (ptsCfg.base !== false) {
@@ -1324,6 +1330,12 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     if (triggerKey.indexOf('medal_') === 0 && rules.allow_medals) {
       isAllowed = true;
     } else if (triggerKey.indexOf('club_') === 0) {
+      /**
+       * Dynamic Milestone Filtering Check
+       * How it works: Compares the triggered 'club_X' milestone key against the list of enabled milestones 
+       * stored in the feed_config.rules.enabled_distance_clubs array (configured by event organizer).
+       * Impact: Only allowed distance club announcements are sent to the backend webhook.
+       */
       var enabledClubs = rules.enabled_distance_clubs || ["club_100", "club_200", "club_300"];
       if (rules.allow_distance_clubs === false) {
         enabledClubs = [];
@@ -1824,12 +1836,14 @@ function instantiateFeedMap(el) {
 
       map._refit();
 
-      setTimeout(function() {
-        try {
-          map.invalidateSize();
-          map._refit();
-        } catch(e) {}
-      }, 100);
+      [100, 300, 800, 1500, 3000].forEach(function(delay) {
+        setTimeout(function() {
+          try {
+            map.invalidateSize();
+            map._refit();
+          } catch(e) {}
+        }, delay);
+      });
     }
   } catch (err) {
     console.warn('Failed lazy initializing map for ' + el.id + ':', err);
