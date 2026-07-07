@@ -33,7 +33,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260707_v121">
+  <link rel="stylesheet" href="app.css?v=20260707_v125">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -530,15 +530,16 @@
   </div>
 
   <!-- Push Notifications Subscription Card -->
-  <div class="card" id="push-notifications-card" style="margin-top:10px;padding:16px 20px;background:rgba(26,29,32,0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 15px rgba(0,0,0,0.15);transition:transform 0.2s ease,border-color 0.2s ease;" onmouseover="this.style.transform='translateY(-1.5px)';this.style.borderColor='rgba(255,255,255,0.15)';" onmouseout="this.style.transform='';this.style.borderColor='';">
-    <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
-      <span style="font-size:18px;flex-shrink:0;">🔔</span>
-      <div style="display:flex;flex-direction:column;min-width:0;">
-        <span style="font-size:12.5px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;">Mobile Push Alerts</span>
-        <span style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="push-status-desc">Tap Enable to get real-time updates</span>
+  <div id="push-notifications-card" class="glass-card" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; background:rgba(26,29,32,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); margin-top:10px; margin-bottom:0;">
+    <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+      <!-- Bell Icon -->
+      <div style="width:36px; height:36px; border-radius:8px; background:rgba(232,98,42,0.12); display:flex; align-items:center; justify-content:center; color:#E8622A; flex-shrink:0; font-size:18px;">🔔</div>
+      <div style="display:flex; flex-direction:column; min-width:0;">
+        <span style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Mobile Push Alerts</span>
+        <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.55); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="push-status-desc">Stay updated. Enable push notifications...</span>
       </div>
     </div>
-    <button class="btn btn-sm" id="btn-enable-push" onclick="enablePushNotifications()" style="font-size:11px;font-weight:700;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;background:var(--brand);color:#fff;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;">Enable</button>
+    <button id="btn-enable-push" onclick="enablePushNotifications()" style="background:rgba(232, 98, 42, 0.12); border:1px solid rgba(232, 98, 42, 0.3); border-radius:6px; color:#E8622A; font-size:11px; font-weight:700; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(232, 98, 42, 0.2)'" onmouseleave="this.style.background='rgba(232, 98, 42, 0.12)'">Enable</button>
   </div>
 
   <div class="part-only">
@@ -659,37 +660,29 @@
   </div>
   </div>
 
-  <!-- Profile Details — collapsed by default -->
-  <div style="margin-top:8px;">
-    <button onclick="(function(){var el=document.getElementById('you-profile-details');var ico=document.getElementById('you-profile-chevron');var open=el.style.display!=='none';el.style.display=open?'none':'block';ico.style.transform=open?'':'rotate(180deg)';})();"
-      style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(26,29,32,0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);color:var(--muted);font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;text-transform:uppercase;letter-spacing:0.8px;box-shadow:0 4px 15px rgba(0,0,0,0.15);transition:border-color 0.2s ease;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)'" onmouseout="this.style.borderColor=''">
-      <span>Profile Details</span>
-      <svg id="you-profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-    <div id="you-profile-details" style="display:none;">
-      <div class="card" style="margin-top:4px;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:rgba(26,29,32,0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 24px rgba(0,0,0,0.2);">
-        <div class="tab-you-detail-row">
-          <span class="tab-you-detail-lbl">Email</span>
-          <span class="tab-you-detail-val" id="you-email">—</span>
-        </div>
-        <div class="tab-you-detail-row">
-          <span class="tab-you-detail-lbl">Gender</span>
-          <span class="tab-you-detail-val" id="you-gender">—</span>
-        </div>
-        <div class="tab-you-detail-row">
-          <span class="tab-you-detail-lbl">Team</span>
-          <span class="tab-you-detail-val" id="you-team">—</span>
-        </div>
-        <div class="tab-you-detail-row">
-          <span class="tab-you-detail-lbl">T-Shirt Size</span>
-          <span class="tab-you-detail-val" id="you-tshirt">—</span>
-        </div>
-        <div class="tab-you-detail-row">
-          <span class="tab-you-detail-lbl">Strava Profile</span>
-          <a id="you-strava-link" href="#" target="_blank" style="font-size:14px;font-weight:700;color:var(--brand);text-decoration:none;">View ↗</a>
-        </div>
-
-      </div>
+  <!-- Profile Details Card -->
+  <div class="sec">Profile Details</div>
+  <div id="you-profile-details" class="card" style="background:rgba(26,29,32,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); margin-top:4px;">
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Email</span>
+      <span class="tab-you-detail-val" id="you-email">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Gender</span>
+      <span class="tab-you-detail-val" id="you-gender">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">Team</span>
+      <span class="tab-you-detail-val" id="you-team">—</span>
+    </div>
+    <div class="tab-you-detail-row">
+      <span class="tab-you-detail-lbl">T-Shirt Size</span>
+      <span class="tab-you-detail-val" id="you-tshirt">—</span>
+    </div>
+    <div class="tab-you-detail-row" style="border-bottom:none;">
+      <span class="tab-you-detail-lbl">Strava Profile</span>
+      <a id="you-strava-link" href="#" target="_blank" style="font-size:14px; font-weight:700; color:var(--brand); text-decoration:none;">View ↗</a>
+    </div>
   </div>
 
   <!-- Social Links -->
@@ -720,7 +713,7 @@
   </div>
 
   <div style="margin-top:10px;padding:0 4px;">
-    <button onclick="logout()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;letter-spacing:0.3px;">Sign Out</button>
+    <button onclick="logout()" style="width:100%; padding:14px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.2); border-radius:12px; color:#ef4444; font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; letter-spacing:0.5px; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.borderColor='rgba(239, 68, 68, 0.35)';" onmouseleave="this.style.background='rgba(239, 68, 68, 0.08)'; this.style.borderColor='rgba(239, 68, 68, 0.2)';">Sign Out</button>
   </div>
 </div>
 </div>
@@ -786,13 +779,13 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
-  <script src="app-config.js?v=20260707_v124" defer></script>
-  <script src="app-employee.js?v=20260707_v124" defer></script>
-  <script src="app-api.js?v=20260707_v124" defer></script>
-  <script src="app-drawers.js?v=20260707_v124" defer></script>
-  <script src="app-events.js?v=20260707_v124" defer></script>
-  <script src="app-dashboard.js?v=20260707_v124" defer></script>
-  <script src="app-tabs.js?v=20260707_v124" defer></script>
+  <script src="app-config.js?v=20260707_v125" defer></script>
+  <script src="app-employee.js?v=20260707_v125" defer></script>
+  <script src="app-api.js?v=20260707_v125" defer></script>
+  <script src="app-drawers.js?v=20260707_v125" defer></script>
+  <script src="app-events.js?v=20260707_v125" defer></script>
+  <script src="app-dashboard.js?v=20260707_v125" defer></script>
+  <script src="app-tabs.js?v=20260707_v125" defer></script>
 
 
 
