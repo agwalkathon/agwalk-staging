@@ -3395,3 +3395,272 @@ function setupAppLayout(isParticipant) {
   _currentTab = null;
   showTab(activeTab);
 }
+
+// ── Dashboard Details Modal Operations ──
+function closeDashModal() {
+  var modal = document.getElementById('dash-details-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openDashStatsModal() {
+  var acts = window._myActsGlobal || [];
+  var modal = document.getElementById('dash-details-modal');
+  if (!modal) return;
+  
+  document.getElementById('dash-modal-title').textContent = 'My Stats Trends';
+  document.getElementById('dash-modal-subtitle').textContent = 'Sport breakdown and weekly distance';
+  
+  // 1. Sport type breakdown
+  var distances = { Walk: 0, Run: 0, Hike: 0, Other: 0 };
+  var totalDist = 0;
+  acts.forEach(function(a) {
+    if (a.is_flagged) return;
+    var dist = parseFloat(a.distance_meters || 0) / 1000;
+    var type = a.sport_type || '';
+    if (type === 'Walk' || type === 'Run' || type === 'Hike') {
+      distances[type] += dist;
+    } else {
+      distances.Other += dist;
+    }
+    totalDist += dist;
+  });
+  
+  var wPct = totalDist > 0 ? (distances.Walk / totalDist) * 100 : 0;
+  var rPct = totalDist > 0 ? (distances.Run / totalDist) * 100 : 0;
+  var hPct = totalDist > 0 ? (distances.Hike / totalDist) * 100 : 0;
+  var oPct = totalDist > 0 ? (distances.Other / totalDist) * 100 : 0;
+  
+  // 2. Weekly daily distance bar chart (last 7 days)
+  var barHtml = '';
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    var dStr = d.toISOString().split('T')[0];
+    var istStr = typeof getISTDate === 'function' ? getISTDate(d.toISOString()) : dStr;
+    days.push({
+      dateStr: istStr,
+      label: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+      dist: 0
+    });
+  }
+  
+  acts.forEach(function(a) {
+    if (a.is_flagged) return;
+    var actDate = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+    var dist = parseFloat(a.distance_meters || 0) / 1000;
+    days.forEach(function(day) {
+      if (day.dateStr === actDate) {
+        day.dist += dist;
+      }
+    });
+  });
+  
+  var maxDist = 0.1;
+  days.forEach(function(day) { if (day.dist > maxDist) maxDist = day.dist; });
+  
+  days.forEach(function(day) {
+    var height = (day.dist / maxDist) * 100;
+    var isToday = (day.dateStr === (new Date().toISOString().split('T')[0]));
+    var barClass = isToday ? 'db-chart-bar highlighted' : 'db-chart-bar';
+    barHtml += '<div class="db-chart-bar-wrap">' +
+      '<span class="db-chart-bar-val">' + day.dist.toFixed(1) + 'k</span>' +
+      '<div class="' + barClass + '" style="height:' + Math.max(4, height) + 'px;"></div>' +
+      '<span class="db-chart-bar-lbl">' + day.label + '</span>' +
+    '</div>';
+  });
+  
+  var bodyHtml = '<div style="margin-bottom:20px;">' +
+    '<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Activity Distribution</div>' +
+    '<div class="db-seg-chart">' +
+      '<div class="db-seg-label-row">' +
+        '<span>🚶 Walk (' + wPct.toFixed(0) + '%)</span>' +
+        '<span>🏃 Run (' + rPct.toFixed(0) + '%)</span>' +
+      '</div>' +
+      '<div class="db-seg-bar-track" style="margin-bottom:12px;">' +
+        '<div class="db-seg-fill" style="width:' + wPct + '%; background:#3b82f6;"></div>' +
+        '<div class="db-seg-fill" style="width:' + rPct + '%; background:#ef4444;"></div>' +
+        '<div class="db-seg-fill" style="width:' + hPct + '%; background:#10b981;"></div>' +
+        '<div class="db-seg-fill" style="width:' + oPct + '%; background:#f59e0b;"></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:rgba(255,255,255,0.5);">' +
+        '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>Walk: ' + distances.Walk.toFixed(1) + ' km</span>' +
+        '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;"></span>Run: ' + distances.Run.toFixed(1) + ' km</span>' +
+        '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;"></span>Hike: ' + distances.Hike.toFixed(1) + ' km</span>' +
+        '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Other: ' + distances.Other.toFixed(1) + ' km</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div>' +
+    '<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;">Weekly Trend</div>' +
+    '<div class="db-chart-bars">' +
+      barHtml +
+    '</div>' +
+    '<div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:8px;">Daily distance (km) for the last 7 days</div>' +
+  '</div>';
+  
+  document.getElementById('dash-modal-body').innerHTML = bodyHtml;
+  modal.style.display = 'flex';
+}
+
+function openDashPointsModal() {
+  var fullPts = window._myFullPtsGlobal || { total: 0, km: 0, distPts: 0, bonusPts: 0, challengePts: 0 };
+  var modal = document.getElementById('dash-details-modal');
+  if (!modal) return;
+  
+  document.getElementById('dash-modal-title').textContent = 'My Points Ledger';
+  document.getElementById('dash-modal-subtitle').textContent = 'Detailed points breakdown';
+  
+  var ledgerHtml = '<div class="ledger-list">' +
+    '<div class="ledger-row">' +
+      '<div class="ledger-left">' +
+        '<span class="ledger-title">🏃 Distance Points</span>' +
+        '<span class="ledger-sub">Base points earned from accumulated distance</span>' +
+      '</div>' +
+      '<span class="ledger-val" style="color:var(--blue);">+' + (fullPts.distPts || 0).toFixed(0) + '</span>' +
+    '</div>' +
+    '<div class="ledger-row">' +
+      '<div class="ledger-left">' +
+        '<span class="ledger-title">⚡ Daily Pace Bonuses</span>' +
+        '<span class="ledger-sub">Streak and target speed matching achievements</span>' +
+      '</div>' +
+      '<span class="ledger-val" style="color:var(--green);">+' + (fullPts.bonusPts || 0).toFixed(0) + '</span>' +
+    '</div>' +
+    '<div class="ledger-row">' +
+      '<div class="ledger-left">' +
+        '<span class="ledger-title">🎯 Challenge Rewards</span>' +
+        '<span class="ledger-sub">Points won from completed challenges</span>' +
+      '</div>' +
+      '<span class="ledger-val" style="color:var(--gold);">+' + (fullPts.challengePts || 0).toFixed(0) + '</span>' +
+    '</div>' +
+    '<div class="ledger-row" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);">' +
+      '<div class="ledger-left">' +
+        '<span class="ledger-title" style="font-size:15px;color:#fff;">🏆 Total Score</span>' +
+        '<span class="ledger-sub" style="color:rgba(255,255,255,0.6);">All verified points in this event</span>' +
+      '</div>' +
+      '<span class="ledger-val" style="font-size:17px;color:var(--brand);">+' + (fullPts.total || 0).toFixed(0) + '</span>' +
+    '</div>' +
+  '</div>';
+  
+  document.getElementById('dash-modal-body').innerHTML = ledgerHtml;
+  modal.style.display = 'flex';
+}
+
+function openDashStreakModal() {
+  var acts = window._myActsGlobal || [];
+  var modal = document.getElementById('dash-details-modal');
+  if (!modal) return;
+  
+  document.getElementById('dash-modal-title').textContent = 'Activity Streak Grid';
+  document.getElementById('dash-modal-subtitle').textContent = 'Active days in the current month';
+  
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth();
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  var activeDays = {};
+  acts.forEach(function(a) {
+    if (a.is_flagged) return;
+    var actDate = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+    if (actDate) {
+      var dPart = actDate.split('-');
+      if (parseInt(dPart[0]) === year && parseInt(dPart[1]) === (month + 1)) {
+        activeDays[parseInt(dPart[2])] = true;
+      }
+    }
+  });
+  
+  var headersHtml = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(function(h) {
+    return '<div class="calendar-day-header">' + h + '</div>';
+  }).join('');
+  
+  var firstDayIndex = new Date(year, month, 1).getDay();
+  var cellsHtml = '';
+  for (var i = 0; i < firstDayIndex; i++) {
+    cellsHtml += '<div style="aspect-ratio:1;"></div>';
+  }
+  
+  for (var day = 1; day <= daysInMonth; day++) {
+    var isActive = activeDays[day];
+    var isFuture = day > now.getDate();
+    var cellClass = isActive ? 'calendar-grid-cell active-day' : 'calendar-grid-cell';
+    if (isFuture) cellClass += ' future-day';
+    
+    cellsHtml += '<div class="' + cellClass + '">' +
+      '<span class="calendar-day-num">' + day + '</span>' +
+      (isActive ? '<div class="calendar-day-dot"></div>' : '') +
+    '</div>';
+  }
+  
+  var bodyHtml = '<div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:15px;line-height:1.5;">' +
+      'Consistency is key! Days you completed at least one activity are marked in green.' +
+    '</div>' +
+    '<div class="calendar-grid-container">' +
+      headersHtml +
+      cellsHtml +
+    '</div>' +
+  '</div>';
+  
+  document.getElementById('dash-modal-body').innerHTML = bodyHtml;
+  modal.style.display = 'flex';
+}
+
+function openDashPaceModal() {
+  var acts = window._myActsGlobal || [];
+  var modal = document.getElementById('dash-details-modal');
+  if (!modal) return;
+  
+  document.getElementById('dash-modal-title').textContent = 'Pace Goal Matching';
+  document.getElementById('dash-modal-subtitle').textContent = 'Target speed vs. performance';
+  
+  var validActs = acts.filter(function(a) { return !a.is_flagged; }).slice(0, 10);
+  var rowsHtml = '';
+  
+  if (validActs.length === 0) {
+    rowsHtml = '<div class="empty-state" style="color:var(--muted);padding:20px 0;">No activities recorded yet</div>';
+  } else {
+    validActs.forEach(function(a) {
+      var distKm = parseFloat(a.distance_meters || 0) / 1000;
+      var dateStr = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+      var name = a.name || 'Activity';
+      
+      var movingSec = parseFloat(a.moving_time_seconds || a.elapsed_time || 0);
+      var speedKmHr = movingSec > 0 ? (distKm / (movingSec / 3600)) : 0;
+      
+      var matches = speedKmHr >= 3.5 && speedKmHr <= 7.0;
+      var statusColor = matches ? 'var(--green)' : 'var(--blue)';
+      var statusLabel = matches ? 'Match' : 'Standard Pace';
+      
+      rowsHtml += '<div class="ledger-row">' +
+        '<div class="ledger-left">' +
+          '<span class="ledger-title">' + name + '</span>' +
+          '<span class="ledger-sub">' + dateStr + ' &middot; ' + distKm.toFixed(2) + ' km</span>' +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<span class="ledger-val" style="color:' + statusColor + ';">' + speedKmHr.toFixed(1) + ' km/h</span>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;">' + statusLabel + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+  }
+  
+  var bodyHtml = '<div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:15px;line-height:1.5;">' +
+      'Average pacing for your last 10 activities:' +
+    '</div>' +
+    '<div class="ledger-list">' +
+      rowsHtml +
+    '</div>' +
+  '</div>';
+  
+  document.getElementById('dash-modal-body').innerHTML = bodyHtml;
+  modal.style.display = 'flex';
+}
+
+window.openDashStatsModal = openDashStatsModal;
+window.openDashPointsModal = openDashPointsModal;
+window.openDashStreakModal = openDashStreakModal;
+window.openDashPaceModal = openDashPaceModal;
+window.closeDashModal = closeDashModal;
