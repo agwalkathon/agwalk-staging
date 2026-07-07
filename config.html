@@ -314,11 +314,11 @@ tr:hover td{background:#FAFAFA}
 
 <style>
 /* Section tabs */
-.section-tabs{display:inline-flex;gap:4px;background:#E4E7EC;padding:4px;border-radius:12px;margin-bottom:28px;overflow-x:auto;scrollbar-width:none;border:1px solid rgba(0,0,0,0.04);box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
 .section-tabs::-webkit-scrollbar{display:none}
-.stab{padding:8px 18px;font-size:13px;font-weight:550;color:#475467;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);background:transparent;border:none;border-radius:9px;font-family:var(--font);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
-.stab:hover{color:#101828}
-.stab.active{background:#fff;color:#E8622A;font-weight:600;box-shadow:0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06)}
+.stab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);white-space:nowrap}
+.stab:hover{color:var(--text-primary)}
+.stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
 </style>
 
 <!-- Event Selection inline toolbar -->
@@ -469,6 +469,28 @@ tr:hover td{background:#FAFAFA}
           </div>
         </div>
       </div>
+        <!-- Activities Date Card Points Configuration -->
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 20px;">
+          <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Activities Tab - Date Card Points</strong>
+          <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+            <label class="check-item">
+              <input type="checkbox" id="pts-opt-base" checked>
+              <span>Base Points</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="pts-opt-bonus" checked>
+              <span>Bonus Points</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="pts-opt-challenge" checked>
+              <span>Challenge Points</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="pts-opt-total" checked>
+              <span>Total Points</span>
+            </label>
+          </div>
+        </div>
       <button class="save-btn" onclick="saveLayoutConfig()">Save layout settings</button>
       <span class="saved-msg" id="layout-saved">&#9989; Saved!</span>
     </div>
@@ -592,7 +614,7 @@ function getActDate(a) {
 var SB_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
 var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON,'Content-Type':'application/json'};
-var _BU = 'https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
 
 window.switchConfigTab = function(tabName) {
@@ -784,6 +806,10 @@ async function loadConfig(){
     var el = document.getElementById('tab-opt-' + t);
     if (el) el.checked = true;
   });
+  ['base', 'bonus', 'challenge', 'total'].forEach(function(t){
+    var el = document.getElementById('pts-opt-' + t);
+    if (el) el.checked = true;
+  });
 
   // Reset personal bests fields to defaults
   ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t) {
@@ -791,7 +817,7 @@ async function loadConfig(){
     if (el) el.checked = ['longest_activity', 'best_pace', 'longest_session', 'best_day'].indexOf(t) !== -1;
   });
 
-  var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,pts:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}
+  var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,points:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}
     if(row.config_key==='hide_strava_connect'){
       document.getElementById('layout-hide-strava').checked = !!row.config_value;
     }
@@ -805,6 +831,16 @@ async function loadConfig(){
       }
       ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
         var el = document.getElementById('tab-opt-' + t);
+        if (el) el.checked = cfg[t] !== false;
+      });
+    }
+    if(row.config_key==='activities_points_config'){
+      var cfg = row.config_value || {};
+      if (typeof cfg === 'string') {
+        try { cfg = JSON.parse(cfg); } catch(e) {}
+      }
+      ['base', 'bonus', 'challenge', 'total'].forEach(function(t){
+        var el = document.getElementById('pts-opt-' + t);
         if (el) el.checked = cfg[t] !== false;
       });
     }
@@ -830,7 +866,34 @@ async function savePersonalBestsConfig() {
     alert('Failed to save Personal Bests settings: ' + e.message);
   }
 }
-async function saveLayoutConfig(){try{var hideStrava=document.getElementById('layout-hide-strava').checked;var teamLb=document.getElementById('layout-team-leaderboard').checked;var tabsCfg={};['dashboard','leaderboard','events','celebrate','feed','you'].forEach(function(t){var el=document.getElementById('tab-opt-'+t);tabsCfg[t]=el?el.checked:true});await Promise.all([upsertConfig('hide_strava_connect',hideStrava),upsertConfig('team_leaderboard_enabled',teamLb),upsertConfig('tabs_config',tabsCfg)]);showSaved('layout-saved')}catch(e){alert('Failed to save layout settings: '+e.message)}}
+async function saveLayoutConfig(){
+  try {
+    var hideStrava = document.getElementById('layout-hide-strava').checked;
+    var teamLb = document.getElementById('layout-team-leaderboard').checked;
+    
+    var tabsCfg = {};
+    ['dashboard','leaderboard','events','celebrate','feed','you'].forEach(function(t){
+      var el = document.getElementById('tab-opt-'+t);
+      tabsCfg[t] = el ? el.checked : true;
+    });
+
+    var ptsCfg = {};
+    ['base','bonus','challenge','total'].forEach(function(t){
+      var el = document.getElementById('pts-opt-'+t);
+      ptsCfg[t] = el ? el.checked : true;
+    });
+
+    await Promise.all([
+      upsertConfig('hide_strava_connect', hideStrava),
+      upsertConfig('team_leaderboard_enabled', teamLb),
+      upsertConfig('tabs_config', tabsCfg),
+      upsertConfig('activities_points_config', ptsCfg)
+    ]);
+    showSaved('layout-saved');
+  } catch(e) {
+    alert('Failed to save layout settings: ' + e.message);
+  }
+}
 function clearMyCache(){var keysToRemove=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('agwalk_')===0){keysToRemove.push(k)}}keysToRemove.forEach(function(k){localStorage.removeItem(k)});showSaved('cache-saved');setTimeout(function(){window.location.reload()},1200)}
 async function saveMedals(){var val={gold:{male:+document.getElementById('gold-male').value,female:+document.getElementById('gold-female').value},silver:{male:+document.getElementById('silver-male').value,female:+document.getElementById('silver-female').value},bronze:{male:+document.getElementById('bronze-male').value,female:+document.getElementById('bronze-female').value}};await upsertConfig('medals',val);showSaved('medals-saved')}
 async function saveBonus(){var bonusArr=bonusData.map(function(b,i){return{km:b.km,points:+(document.getElementById('bp-'+i).value)||0}}),base=parseFloat(document.getElementById('base-per-km').value)||1;await Promise.all([upsertConfig('bonus_points',bonusArr),upsertConfig('base_points',{per_km:base})]);showSaved('bonus-saved')}
