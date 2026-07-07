@@ -994,52 +994,102 @@ async function load(isBackgroundRefresh) {
 
     // ── Phase 2: Load ranking data in background ────────────────────
     (async function loadRanking(){
-      try{
-        var _cachedRankActs = cacheGet('ranking_acts_v4', CACHE_TTL.ranking);
-        var _cachedRankReg  = cacheGet('ranking_reg',  CACHE_TTL.ranking);
-        if (_cachedRankActs && _cachedRankReg) {
-          console.log('[Cache] Serving Phase 2 (ranking) from cache ✓');
-          allActsRaw = _cachedRankActs;
-          allRegRaw  = _cachedRankReg;
-          if (!isBackgroundRefresh) {
-            setTimeout(function(){
-              Promise.all([
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=id,strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
-                fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
-              ]).then(function(results){
-                function doReload() {
-                  if (_touchInteracting) {
-                    console.log('[Cache] User is interacting, deferring background reload...');
-                    setTimeout(doReload, 300);
-                  } else {
-                    console.log('[Cache] Phase 2 background refresh complete. Re-rendering...');
-                    cacheSet('ranking_acts_v4', results[0]);
-                    cacheSet('ranking_reg', results[1]);
-                    load(true);
-                  }
-                }
-                doReload();
-              }).catch(function(e){console.warn('[Cache] Ranking background refresh failed:', e);});
-            }, 500);
+      function applyPrecomputedLBScores(summaries) {
+        LB_REG = summaries.map(function(s) {
+          return {
+            strava_athlete_id: s.athlete_id,
+            full_name: s.full_name,
+            gender: s.gender,
+            shift: s.shift,
+            leaderboard_team: s.leaderboard_team
+          };
+        });
+        
+        LB_SCORES = {};
+        LB_OLD_SCORES = {};
+        
+        summaries.forEach(function(s) {
+          var aid = String(s.athlete_id);
+          LB_SCORES[aid] = {
+            total: parseFloat(s.total_points || 0),
+            km: parseFloat(s.total_distance_km || 0),
+            distPts: parseFloat(s.base_points || 0),
+            bonusPts: parseFloat(s.bonus_points || 0),
+            challengePts: parseFloat(s.challenge_points || 0)
+          };
+          LB_OLD_SCORES[aid] = parseFloat(s.old_total_points || s.total_points || 0);
+        });
+        
+        _lbReady = true;
+        if (typeof lbRender === 'function') lbRender();
+        if (typeof renderFeedHighlights === 'function') renderFeedHighlights();
+        if (typeof renderCommunityPulse === 'function') renderCommunityPulse();
+        if (typeof renderStanding === 'function') renderStanding();
+      }
+
+      async function refreshRankingData() {
+        try {
+          var sumRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=eq.' + EVENT_ROW.id + '&order=total_points.desc', { headers: HDR });
+          var summaries = await sumRes.json();
+          if (Array.isArray(summaries) && summaries.length > 0) {
+            console.log('[Cache] Pre-computed ranking retrieved from Supabase ✓');
+            cacheSet('ranking_summaries', summaries);
+            applyPrecomputedLBScores(summaries);
+            return;
           }
-        } else {
-          console.log('[Cache] Cache miss — fetching Phase 2 from Supabase...');
+        } catch (err) {
+          console.warn('[Cache] Pre-computed points fetch failed, falling back to legacy:', err);
+        }
+
+        try {
           var fetched = await Promise.all([
             fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=id,strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist'),
             fetchAllParallel(SUPABASE_URL+'/rest/v1/registration?event_id=eq.'+EVENT_ROW.id+'&order=strava_athlete_id.asc&select=strava_athlete_id,full_name,gender,shift,leaderboard_team')
           ]);
           allActsRaw = fetched[0]; cacheSet('ranking_acts_v4', allActsRaw);
           allRegRaw  = fetched[1]; cacheSet('ranking_reg',  allRegRaw);
+          allActs = allActsRaw; allRegRes = allRegRaw;
+          
+          var isViewingCustomLb = window._lbCurrentEventId && window._lbCurrentEventId !== window._lbRegisteredEventId;
+          if (!isViewingCustomLb) {
+            LB_REG = allRegRaw;
+            LB_ACTS = allActsRaw;
+            precomputeLBScores();
+            if(LB_ME){_lbReady=true; if(typeof lbRender === 'function') lbRender();}
+          }
+          if (typeof renderFeedHighlights === 'function') renderFeedHighlights();
+          if (typeof renderCommunityPulse === 'function') renderCommunityPulse();
+          if (typeof renderStanding === 'function') renderStanding();
+        } catch (legacyErr) {
+          console.error('[Cache] Legacy fallback loading failed:', legacyErr);
         }
-        allActs=allActsRaw; allRegRes=allRegRaw;
-        LB_REG=allRegRaw;
-        LB_ACTS=allActsRaw;
-        precomputeLBScores();
-        if(LB_ME){_lbReady=true; if(typeof lbRender === 'function') lbRender();}
-        if (typeof renderFeedHighlights === 'function') renderFeedHighlights();
-        if (typeof renderCommunityPulse === 'function') renderCommunityPulse();
+      }
+
+      try{
+        var _cachedSummaries = cacheGet('ranking_summaries', CACHE_TTL.ranking);
+        if (_cachedSummaries) {
+          console.log('[Cache] Serving pre-computed ranking from cache ✓');
+          applyPrecomputedLBScores(_cachedSummaries);
+          if (!isBackgroundRefresh) {
+            setTimeout(refreshRankingData, 500);
+          }
+          return;
+        }
+
+        var _cachedRankActs = cacheGet('ranking_acts_v4', CACHE_TTL.ranking);
+        var _cachedRankReg  = cacheGet('ranking_reg',  CACHE_TTL.ranking);
+        if (_cachedRankActs && _cachedRankReg) {
+          console.log('[Cache] Serving legacy ranking from cache ✓');
+          allActsRaw = _cachedRankActs;
+          allRegRaw  = _cachedRankReg;
+          if (!isBackgroundRefresh) {
+            setTimeout(refreshRankingData, 500);
+          }
+        } else {
+          console.log('[Cache] Cache miss — fetching ranking data...');
+          await refreshRankingData();
+        }
       }catch(e2){console.warn('Ranking load failed:',e2);return;}
-      if (typeof renderStanding === 'function') renderStanding();
     })();
 
     // Pace Goals Card
