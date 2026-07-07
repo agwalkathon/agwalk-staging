@@ -85,6 +85,27 @@ async function fetchEventsData() {
   var statEvents = _eventsData.filter(function(e){ return e.status === 'live' || e.status === 'ended'; }).slice(0, 5);
   await Promise.all(statEvents.map(async function(ev){
     try {
+      var sumRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=eq.' + ev.id + '&select=total_distance_km,activities_count', { headers: HDR });
+      var sumData = await sumRes.json();
+      if (Array.isArray(sumData) && sumData.length > 0) {
+        var totKm = 0;
+        var totActs = 0;
+        sumData.forEach(function(x) {
+          totKm += parseFloat(x.total_distance_km || 0);
+          totActs += parseInt(x.activities_count || 0);
+        });
+        ev._stats = {
+          km: totKm,
+          acts: totActs
+        };
+        ev._participants = sumData.length;
+        return;
+      }
+    } catch(err) {
+      console.warn('Failed to load event stats from points summary cache:', err);
+    }
+
+    try {
       var s = await fetch(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + ev.id +
         '&is_deleted=eq.false&is_flagged=eq.false&select=distance_meters', { headers: HDR });
       var d = await s.json();
