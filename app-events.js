@@ -178,6 +178,33 @@ function buildEventCard(ev, group) {
   card.className = 'ev-card-p';
   card.style.borderLeft = '4px solid ' + (ev.accent_color || '#E8622A');
 
+  /**
+   * Event Card Premium Background & Badge Loader
+   * How it works: If no banner image exists, sets a subtle, sport-specific CSS linear-gradient background 
+   * and appends a floating glass round badge containing the sport icon via the global renderIcon() function.
+   * Impact: Creates a high-fidelity visual identity for each event on the Events tab.
+   */
+  var sportType = detectEventSportType(ev);
+  if (!ev.banner_url) {
+    card.classList.add('has-badge');
+    if (sportType === 'walk') {
+      card.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.09) 0%, #171B24 100%)';
+    } else if (sportType === 'run') {
+      card.style.background = 'linear-gradient(135deg, rgba(232, 98, 42, 0.09) 0%, #171B24 100%)';
+    } else if (sportType === 'hike') {
+      card.style.background = 'linear-gradient(135deg, rgba(244, 63, 94, 0.09) 0%, #171B24 100%)';
+    } else if (sportType === 'ride') {
+      card.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.09) 0%, #171B24 100%)';
+    } else {
+      card.style.background = 'linear-gradient(135deg, rgba(167, 139, 250, 0.09) 0%, #171B24 100%)';
+    }
+
+    var badge = document.createElement('div');
+    badge.className = 'ev-card-sport-badge';
+    badge.innerHTML = renderIcon(sportType === 'ride' ? 'Ride' : sportType === 'run' ? 'Run' : sportType === 'hike' ? 'Hike' : sportType === 'walk' ? 'Walk' : 'Mixed');
+    card.appendChild(badge);
+  }
+
   if (ev.banner_url) {
     var img = document.createElement('img');
     img.className = 'ev-banner';
