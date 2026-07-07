@@ -692,21 +692,66 @@ function openProfileDetail(athleteId, event) {
         var bestPaceSport = 'Walk';
         var dayKm = {};
         
+        var longestAct = null;
+        var longestSessionAct = null;
+        var bestPaceAct = null;
+        var maxElevation = 0;
+        var maxElevationAct = null;
+        var maxAvgSpeed = 0;
+        var maxSpeedAct = null;
+
         validActs.forEach(function(a) {
           var km = (a.distance_meters || 0) / 1000;
-          if (a.distance_meters > maxDist) maxDist = a.distance_meters;
-          if (a.moving_time_seconds > maxTime) maxTime = a.moving_time_seconds;
+          if (a.distance_meters > maxDist) {
+            maxDist = a.distance_meters;
+            longestAct = a;
+          }
+          if (a.moving_time_seconds > maxTime) {
+            maxTime = a.moving_time_seconds;
+            longestSessionAct = a;
+          }
           
           var t = a.sport_type;
           var isWalkRun = t === 'Walk' || t === 'Run' || t === 'VirtualRun' || t === 'Hike';
           if (isWalkRun && a.avg_speed > maxSpeed && a.avg_speed < 12) {
             maxSpeed = a.avg_speed;
             bestPaceSport = t;
+            bestPaceAct = a;
+          }
+
+          var elev = parseFloat(a.elevation_gain) || 0;
+          if (elev > maxElevation) {
+            maxElevation = elev;
+            maxElevationAct = a;
+          }
+
+          var speed = parseFloat(a.avg_speed) || 0;
+          if (speed > maxAvgSpeed) {
+            maxAvgSpeed = speed;
+            maxSpeedAct = a;
           }
 
           var d = getActDate(a);
           if (d) dayKm[d] = (dayKm[d] || 0) + km;
         });
+
+        var maxDayKm = 0;
+        var bestDayDate = '';
+        Object.keys(dayKm).forEach(function(d){
+          if (dayKm[d] > maxDayKm) {
+            maxDayKm = dayKm[d];
+            bestDayDate = d;
+          }
+        });
+
+        var bestDayAct = null;
+        if (bestDayDate) {
+          var dayActs = validActs.filter(function(a) { return getActDate(a) === bestDayDate; });
+          if (dayActs.length > 0) {
+            dayActs.sort(function(x, y) { return (y.distance_meters || 0) - (x.distance_meters || 0); });
+            bestDayAct = dayActs[0];
+          }
+        }
 
         // --- Render Profile Personal Bests Dynamically ---
         (function() {
@@ -719,15 +764,6 @@ function openProfileDetail(athleteId, event) {
             longest_session: true,
             best_day: true
           };
-          
-          // Find max elevation
-          var maxElevation = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.elevation_gain) || 0); }, 0);
-          
-          // Find max avg speed
-          var maxAvgSpeed = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.avg_speed) || 0); }, 0);
-          
-          // Find total elevation
-          var totalElevation = validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0);
           
           // Calculate streak
           var activeDays = {};
@@ -765,11 +801,7 @@ function openProfileDetail(athleteId, event) {
             best_day: {
               lbl: "Best Day",
               sub: "daily max",
-              val: (function() {
-                var maxDayKm = 0;
-                Object.keys(dayKm).forEach(function(d){ if (dayKm[d] > maxDayKm) maxDayKm = dayKm[d]; });
-                return maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—';
-              })()
+              val: maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—'
             },
             max_elevation: {
               lbl: "Max Elevation",
@@ -789,7 +821,7 @@ function openProfileDetail(athleteId, event) {
             total_elevation: {
               lbl: "Total Elevation",
               sub: "overall elevation",
-              val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—'
+              val: validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0).toFixed(0) + ' m'
             },
             total_activities: {
               lbl: "Total Activities",
@@ -803,20 +835,41 @@ function openProfileDetail(athleteId, event) {
           keys.forEach(function(key) {
             if (pbConfig[key] !== false) {
               var d = statDefs[key];
-              html += "<div class=\\"prof-pb-card\\">" +
-                "<span class=\\"lbl\\">" + d.lbl + "</span>" +
-                "<span class=\\"val\\">" + d.val + "</span>" +
-                "<span class=\\"sub\\">" + d.sub + "</span>" +
-              "</div>";
+              var clickAttr = '';
+              var styleAttr = ' style="display: flex; flex-direction: column;"';
+              if (key === 'longest_activity' && longestAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (longestAct.strava_activity_id || longestAct.id) + '\', event, ' + (longestAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              } else if (key === 'best_pace' && bestPaceAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (bestPaceAct.strava_activity_id || bestPaceAct.id) + '\', event, ' + (bestPaceAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              } else if (key === 'longest_session' && longestSessionAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (longestSessionAct.strava_activity_id || longestSessionAct.id) + '\', event, ' + (longestSessionAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              } else if (key === 'max_elevation' && maxElevationAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (maxElevationAct.strava_activity_id || maxElevationAct.id) + '\', event, ' + (maxElevationAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              } else if (key === 'max_speed' && maxSpeedAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (maxSpeedAct.strava_activity_id || maxSpeedAct.id) + '\', event, ' + (maxSpeedAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              } else if (key === 'best_day' && bestDayAct) {
+                clickAttr = ' onclick="openActivityDetail(\'' + (bestDayAct.strava_activity_id || bestDayAct.id) + '\', event, ' + (bestDayAct.strava_activity_id ? 'true' : 'false') + ')"';
+                styleAttr = ' style="display: flex; flex-direction: column; cursor: pointer;"';
+              }
+              html += '<div class="prof-pb-card"' + clickAttr + styleAttr + '>' +
+                '<span class="lbl">' + d.lbl + '</span>' +
+                '<span class="val">' + d.val + '</span>' +
+                '<span class="sub">' + d.sub + '</span>' +
+              '</div>';
             }
           });
           
           // Always append streak
-          html += "<div class=\\"prof-pb-card\\">" +
-            "<span class=\\"lbl\\">Active Streak</span>" +
-            "<span class=\\"val\\">" + streakBest + " days</span>" +
-            "<span class=\\"sub\\">consecutive days</span>" +
-          "</div>";
+          html += '<div class="prof-pb-card">' +
+            '<span class="lbl">Active Streak</span>' +
+            '<span class="val">' + streakBest + ' days</span>' +
+            '<span class="sub">consecutive days</span>' +
+          '</div>';
 
           container.innerHTML = html;
         })();
