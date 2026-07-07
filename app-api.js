@@ -385,6 +385,11 @@ async function load(isBackgroundRefresh) {
     var stravaLink=document.getElementById('you-strava-link');
     if(stravaLink){var surl=reg.strava_profile_url||('https://www.strava.com/athletes/'+s.athleteId);stravaLink.href=surl;}
 
+    // Load past events performance card
+    if (typeof loadPastEventsPerformance === 'function') {
+      loadPastEventsPerformance(reg, s.athleteId);
+    }
+
     window.setStravaConnectedState = function(connectedAccountName) {
       var btn = document.getElementById('btn-strava-connect');
       var card = document.getElementById('strava-connected-card');
@@ -1566,4 +1571,108 @@ async function bootAppUnified() {
   }
 }
 window.bootAppUnified = bootAppUnified;
+
+async function loadPastEventsPerformance(reg, athleteId) {
+  var sec = document.getElementById('you-past-events-section');
+  var card = document.getElementById('you-past-events-card');
+  if (!sec || !card || !reg || !reg.email) return;
+
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(reg.email) + '&event_id=neq.' + reg.event_id + '&select=event_id,event_name,leaderboard_team,gender,shift,strava_athlete_id', { headers: HDR });
+    var otherRegs = await res.json();
+    if (!Array.isArray(otherRegs) || otherRegs.length === 0) {
+      sec.style.display = 'none';
+      return;
+    }
+
+    sec.style.display = 'block';
+    card.innerHTML = '<div style="text-align:center;padding:15px;color:var(--muted);font-size:13px;">Loading past events...</div>';
+
+    var html = '';
+    otherRegs.sort(function(a, b) { return a.event_id - b.event_id; });
+
+    for (var i = 0; i < otherRegs.length; i++) {
+      var pReg = otherRegs[i];
+      var pastEventId = pReg.event_id;
+      var pastEventName = pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId);
+      var team = pReg.leaderboard_team || 'No Team';
+      
+      var scoreObj = null;
+      try {
+        var cacheRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?athlete_id=eq.' + pReg.strava_athlete_id + '&event_id=eq.' + pastEventId, { headers: HDR });
+        var cacheData = await cacheRes.json();
+        if (Array.isArray(cacheData) && cacheData.length > 0) {
+          scoreObj = cacheData[0];
+        }
+      } catch(e) {}
+
+      var totalKm = 0;
+      var totalPts = 0;
+      var actsCount = 0;
+
+      if (scoreObj) {
+        totalKm = parseFloat(scoreObj.total_distance_km || 0);
+        totalPts = parseFloat(scoreObj.total_points || 0);
+        actsCount = parseInt(scoreObj.activities_count || 0);
+      } else {
+        try {
+          var actRes = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + pReg.strava_athlete_id + '&event_id=eq.' + pastEventId + '&is_deleted=eq.false', { headers: HDR });
+          var pastActs = await actRes.json();
+          if (Array.isArray(pastActs)) {
+            actsCount = pastActs.length;
+            pastActs.forEach(function(a) {
+              if (!a.is_flagged) {
+                totalKm += parseFloat(a.distance_meters || 0) / 1000;
+              }
+            });
+            totalPts = totalKm;
+          }
+        } catch(err) {
+          console.warn('Fallback past activity check failed:', err);
+        }
+      }
+
+      var isCycling = pastEventName.toLowerCase().indexOf('cycling') > -1 || pastEventName.toLowerCase().indexOf('cyclothon') > -1 || pastEventId === 2;
+      var goldThresh = isCycling ? 750 : 300;
+      var silverThresh = isCycling ? 500 : 200;
+      var bronzeThresh = isCycling ? 250 : 125;
+
+      var medalBadge = '🏅';
+      var medalTitle = 'Participant';
+      if (totalKm >= goldThresh) {
+        medalBadge = '🥇';
+        medalTitle = 'Gold Medal';
+      } else if (totalKm >= silverThresh) {
+        medalBadge = '🥈';
+        medalTitle = 'Silver Medal';
+      } else if (totalKm >= bronzeThresh) {
+        medalBadge = '🥉';
+        medalTitle = 'Bronze Medal';
+      }
+
+      var borderStyle = i === otherRegs.length - 1 ? 'border-bottom:none;' : '';
+
+      html += '<div class="tab-you-detail-row" style="' + borderStyle + 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);">' +
+        '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
+          '<span style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + pastEventName + '</span>' +
+          '<span style="font-size:11px;color:rgba(255,255,255,0.4);">' + team + ' &middot; ' + actsCount + ' workouts</span>' +
+        '</div>' +
+        '<div style="text-align:right;display:flex;align-items:center;gap:10px;flex-shrink:0;">' +
+          '<div style="display:flex;flex-direction:column;">' +
+            '<span style="font-size:14px;font-weight:800;color:var(--brand);">' + totalKm.toFixed(1) + ' km</span>' +
+            '<span style="font-size:10px;color:rgba(255,255,255,0.4);">' + totalPts.toFixed(0) + ' pts</span>' +
+          '</div>' +
+          '<span style="font-size:22px;line-height:1;" title="' + medalTitle + '">' + medalBadge + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    card.innerHTML = html;
+
+  } catch(ex) {
+    console.error('Failed to load past events performance card:', ex);
+    sec.style.display = 'none';
+  }
+}
+window.loadPastEventsPerformance = loadPastEventsPerformance;
 // Trigger rebuild: fix config fetches and call setupAppLayout after loading config
