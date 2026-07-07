@@ -357,8 +357,24 @@ function applyLbState(st) {
   }
 }
 
-async function fetchEventLbState(evId) {
+async function fetchEventLbState(evId, evStatus) {
   if (_lbEventCache[evId]) return _lbEventCache[evId];
+
+  var cacheKey = 'agwalk_event_lb_cache_' + evId;
+  var cachedRaw = typeof safeGetItem === 'function' ? safeGetItem(cacheKey) : null;
+  if (cachedRaw) {
+    try {
+      var cachedObj = JSON.parse(cachedRaw);
+      var isEnded = evStatus === 'ended' || evStatus === 'archived';
+      var age = Date.now() - (cachedObj.ts || 0);
+      if (isEnded || age < 300000) {
+        console.log('[Cache] Loading custom event leaderboard ' + evId + ' from localStorage ✓');
+        _lbEventCache[evId] = cachedObj.data;
+        return cachedObj.data;
+      }
+    } catch(e){}
+  }
+
   var slimActs = '&select=strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist';
   var results = await Promise.all([
     fetchAllParallel(SUPABASE_URL + '/rest/v1/activities?event_id=eq.' + evId + '&is_deleted=eq.false&order=id.asc' + slimActs),
@@ -379,6 +395,11 @@ async function fetchEventLbState(evId) {
     challenges: Array.isArray(results[3]) ? results[3] : [],
     specialDays: (Array.isArray(results[4]) ? results[4] : []).map(function(x){ return x.special_date; })
   };
+  
+  if (typeof safeSetItem === 'function') {
+    safeSetItem(cacheKey, JSON.stringify({ ts: Date.now(), data: st }));
+  }
+
   _lbEventCache[evId] = st;
   return st;
 }
@@ -386,42 +407,43 @@ async function fetchEventLbState(evId) {
 async function openEventLeaderboard(ev) {
   try {
     var suffix = (ev.status === 'ended' || ev.status === 'archived') ? ' — Final Results' : '';
+    var defaultId = window._lbRegisteredEventId || 2;
     
     // Check if default leaderboard data is actually loaded in memory
     var dataLoaded = (typeof LB_REG !== 'undefined' && LB_REG && LB_REG.length > 0);
     
     if (ev.id === _lbCurrentEventId && dataLoaded) {
-      setLbTitle(_lbCurrentEventId === 1 ? '' : '🏆 ' + ev.name + suffix);
+      setLbTitle(_lbCurrentEventId === defaultId ? '' : '🏆 ' + ev.name + suffix);
       showTab('leaderboard');
       return;
     }
     
-    if (ev.id === 1 && _lbDefaultState && dataLoaded) {
+    if (ev.id === defaultId && _lbDefaultState && dataLoaded) {
       applyLbState(_lbDefaultState);
       _LB_EV_RULES = null;
-      _lbCurrentEventId = 1;
+      _lbCurrentEventId = defaultId;
       setLbTitle('');
       showTab('leaderboard');
       lbBoot();
       return;
     }
     
-    if (ev.id !== 1 && dataLoaded) {
+    if (ev.id !== defaultId && dataLoaded) {
       saveDefaultLbState();
     }
     
     var st;
-    if (ev.id === 1 && !_lbDefaultState) {
-      st = await fetchEventLbState(ev.id);
+    if (ev.id === defaultId && !_lbDefaultState) {
+      st = await fetchEventLbState(ev.id, ev.status);
       _lbDefaultState = st;
     } else {
-      st = await fetchEventLbState(ev.id);
+      st = await fetchEventLbState(ev.id, ev.status);
     }
     
     applyLbState(st);
     _LB_EV_RULES = ev.rules_config || null;
     _lbCurrentEventId = ev.id;
-    setLbTitle(ev.id === 1 ? '' : '🏆 ' + ev.name + suffix);
+    setLbTitle(ev.id === defaultId ? '' : '🏆 ' + ev.name + suffix);
     showTab('leaderboard');
     
     // Force re-calculation and rendering
