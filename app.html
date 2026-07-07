@@ -3,16 +3,56 @@
 <head>
   <script>
     /**
-     * Cache Smasher Redirect Script
-     * How it works: Parses URL query parameters for 'v'. If it matches an old cached timestamp version (older than July 7, 2026), 
-     * it triggers window.location.replace to load a clean 'app.html' directly, breaking legacy browser caches.
-     * Impact: Prevents blank/black map issues, broken styles, and layout rendering errors caused by legacy cached assets.
+     * Cache Smasher & Version Auto-Update Script
+     * How it works:
+     * 1. If URL has an old timestamp parameter 'v', it redirects to break legacy cache.
+     * 2. If the client runs a new app update (version mismatch with last seen), it programmatically
+     *    unregisters service workers, deletes all cache storage, and clears old local storage keys,
+     *    then performs a clean reload. This guarantees a seamless update without manual cache clearing.
      */
     (function() {
       var urlParams = new URLSearchParams(window.location.search);
       var v = urlParams.get('v');
       if (v && v.length === 13 && parseInt(v) < 1783480000000) {
         window.location.replace('app.html');
+        return;
+      }
+
+      var APP_VERSION = '20260707_v128';
+      var lastSeen = localStorage.getItem('app_last_seen_version');
+      if (lastSeen !== APP_VERSION) {
+        // Clear LocalStorage cached keys prefix-matched with agwalk_
+        try {
+          for (var i = localStorage.length - 1; i >= 0; i--) {
+            var k = localStorage.key(i);
+            if (k && k.indexOf('agwalk_') === 0) {
+              localStorage.removeItem(k);
+            }
+          }
+        } catch(e) {}
+        
+        // Unregister Service Workers and clear Cache Storage
+        if ('serviceWorker' in navigator || 'caches' in window) {
+          var psw = ('serviceWorker' in navigator) ? 
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              return Promise.all(regs.map(function(r) { return r.unregister(); }));
+            }) : Promise.resolve();
+            
+          var pcaches = ('caches' in window) ? 
+            caches.keys().then(function(names) {
+              return Promise.all(names.map(function(name) { return caches.delete(name); }));
+            }) : Promise.resolve();
+            
+          Promise.all([psw, pcaches]).then(function() {
+            localStorage.setItem('app_last_seen_version', APP_VERSION);
+            window.location.reload();
+          }).catch(function() {
+            localStorage.setItem('app_last_seen_version', APP_VERSION);
+            window.location.reload();
+          });
+        } else {
+          localStorage.setItem('app_last_seen_version', APP_VERSION);
+        }
       }
     })();
   </script>
