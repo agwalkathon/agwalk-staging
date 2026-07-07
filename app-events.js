@@ -219,8 +219,10 @@ function buildEventCard(ev, group) {
 
   var top = document.createElement('div');
   top.className = 'ev-card-top';
+  
   var name = document.createElement('div');
   name.className = 'ev-card-name';
+  name.style.cssText = 'flex:1;min-width:0;';
   name.textContent = ev.name;
   top.appendChild(name);
   
@@ -242,76 +244,67 @@ function buildEventCard(ev, group) {
   }
   body.appendChild(dates);
 
-
-
-
-
   var actions = document.createElement('div');
   actions.className = 'ev-card-actions';
+
+  // Event Details Info Button (placed first, before other action buttons)
+  var infoBtn = document.createElement('button');
+  infoBtn.className = 'ev-btn';
+  infoBtn.style.height = '42px';
+  infoBtn.style.display = 'inline-flex';
+  infoBtn.style.alignItems = 'center';
+  infoBtn.style.justifyContent = 'center';
+  infoBtn.style.gap = '6px';
+  infoBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Event Info';
+  infoBtn.addEventListener('click', function(e) { e.stopPropagation(); openEventDetailsModal(ev); });
+  actions.appendChild(infoBtn);
 
   var today0 = new Date().toISOString().split('T')[0];
   var regOpenNow = ev.registration_open_date && ev.registration_close_date &&
                    today0 >= ev.registration_open_date && today0 <= ev.registration_close_date;
-  if (group === 'live' || group === 'past') {
-    var lb = document.createElement('button');
-    lb.className = 'ev-btn';
-    lb.textContent = group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard';
-    lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
-    actions.appendChild(lb);
-    
-    if (group === 'live' && !enrolled && regOpenNow) {
-      var jrb = document.createElement('button');
-      jrb.className = 'ev-btn ev-btn-primary';
-      jrb.style.background = ev.accent_color || '';
-      jrb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
-      jrb.addEventListener('click', function(){ openEventRegistration(ev); });
-      actions.appendChild(jrb);
-    } else if (group === 'live' && isPending) {
-      var jrb = document.createElement('button');
-      jrb.className = 'ev-btn ev-btn-primary';
-      jrb.style.background = 'rgba(255, 255, 255, 0.08)';
-      jrb.style.color = 'rgba(255, 255, 255, 0.4)';
-      jrb.style.cursor = 'not-allowed';
-      jrb.disabled = true;
-      jrb.textContent = 'Registered (Pending)';
-      actions.appendChild(jrb);
-    } else if (group === 'live' && !enrolled) {
-      var sp = document.createElement('div');
-      sp.className = 'ev-spectator-note';
-      sp.textContent = "You're watching — join the next event to compete!";
-      body.appendChild(sp);
-    }
-  }
 
-  if (group === 'upcoming') {
-    var regOpen = regOpenNow;
-    if (isApproved) {
-      var ok = document.createElement('div');
-      ok.className = 'ev-spectator-note';
-      ok.textContent = "You're enrolled. Get ready! 💪";
-      body.appendChild(ok);
+  // Leaderboard Button (always visible)
+  var lb = document.createElement('button');
+  lb.className = 'ev-btn';
+  lb.style.height = '42px';
+  lb.style.display = 'inline-flex';
+  lb.style.alignItems = 'center';
+  lb.style.justifyContent = 'center';
+  lb.style.gap = '6px';
+  lb.innerHTML = (group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard');
+  lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
+  actions.appendChild(lb);
+
+  // Register Now (Green) / Registered (Orange) Button (hidden on past events)
+  if (group !== 'past') {
+    var regBtn = document.createElement('button');
+    regBtn.style.height = '42px';
+    regBtn.style.display = 'inline-flex';
+    regBtn.style.alignItems = 'center';
+    regBtn.style.justifyContent = 'center';
+    regBtn.style.gap = '6px';
+    if (isApproved || enrolled) {
+      regBtn.className = 'ev-btn ev-btn-registered';
+      regBtn.textContent = '✓ Registered';
+      regBtn.style.cursor = 'default';
     } else if (isPending) {
-      var rb = document.createElement('button');
-      rb.className = 'ev-btn ev-btn-primary';
-      rb.style.background = 'rgba(255, 255, 255, 0.08)';
-      rb.style.color = 'rgba(255, 255, 255, 0.4)';
-      rb.style.cursor = 'not-allowed';
-      rb.disabled = true;
-      rb.textContent = 'Registered (Pending)';
-      actions.appendChild(rb);
-    } else if (regOpen) {
-      var rb = document.createElement('button');
-      rb.className = 'ev-btn ev-btn-primary';
-      rb.style.background = ev.accent_color || '';
-      rb.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
-      rb.addEventListener('click', function(){ openEventRegistration(ev); });
-      actions.appendChild(rb);
-    } else if (ev.registration_open_date) {
-      var no = document.createElement('div');
-      no.className = 'ev-spectator-note';
-      no.textContent = 'Registration opens ' + evFmtDate(ev.registration_open_date);
-      body.appendChild(no);
+      regBtn.className = 'ev-btn ev-btn-registered';
+      regBtn.textContent = '⌛ Registered (Pending)';
+      regBtn.style.cursor = 'default';
+    } else if (regOpenNow || group === 'upcoming') {
+      regBtn.className = 'ev-btn ev-btn-register';
+      regBtn.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
+      regBtn.addEventListener('click', function(){ openEventRegistration(ev); });
+      regBtn.style.cursor = 'pointer';
+    } else {
+      // Registration not open or closed
+      regBtn.className = 'ev-btn';
+      regBtn.style.opacity = '0.5';
+      regBtn.style.cursor = 'not-allowed';
+      regBtn.disabled = true;
+      regBtn.textContent = ev.registration_open_date ? 'Registration Opens ' + evFmtDate(ev.registration_open_date) : 'Registration Closed';
     }
+    actions.appendChild(regBtn);
   }
 
   if (actions.children.length) body.appendChild(actions);
