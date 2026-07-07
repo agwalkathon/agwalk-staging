@@ -193,16 +193,20 @@
       margin-bottom: 0;
     }
     .you-card {
-      background: var(--surface);
+      background: rgba(26, 29, 32, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: var(--radius-sm);
       padding: 16px 18px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
     .you-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      background: var(--surface2);
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
     }
     .you-card-icon {
       width: 36px;
@@ -541,7 +545,7 @@
     .medal-pred > .sec,.heatmap-wrap > .sec{margin:0 0 14px;}
 
     /* ── Card ── */
-    .card{background:var(--surface);border-radius:16px;overflow:hidden;margin-bottom:12px;}
+    .card{background:rgba(26, 29, 32, 0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255, 255, 255, 0.08);border-radius:16px;overflow:hidden;margin-bottom:12px;}
 
     /* ── List row ── */
     .lrow {
@@ -577,7 +581,10 @@
       margin-bottom: 16px;
     }
     .pb-card {
-      background: var(--surface);
+      background: rgba(26, 29, 32, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 12px;
       padding: 12px 16px;
       display: flex;
@@ -587,14 +594,15 @@
       gap: 12px;
       position: relative;
       overflow: hidden;
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
       min-height: 64px;
     }
     .pb-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-      background: var(--surface2);
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
     }
     .pb-card-left {
       display: flex;
@@ -1294,17 +1302,21 @@
 
     /* ── Leaderboard row ── */
     .lb-row {
-      background: var(--surface);
+      background: rgba(26, 29, 32, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: var(--radius-sm);
       margin-bottom: 6px;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
     }
     .lb-row:hover {
       transform: translateY(-1.5px);
       border-color: rgba(255, 255, 255, 0.15);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.06);
     }
     /* podium left accent — medal color lives here, not on the number */
     .lb-row.rank-1{border-left:3px solid rgba(255, 208, 0, 0.7);}
@@ -1960,15 +1972,19 @@
   }
 
   .feed-card {
-    background: var(--surface);
+    background: rgba(26, 29, 32, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 18px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
   }
   .feed-card:hover {
     border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
   }
   .feed-card.type-milestone {
     border-left: 2.5px solid rgba(255, 208, 0, 0.5);
