@@ -339,7 +339,7 @@
   </div>
 
   <!-- My Activities Navigation Card -->
-  <div class="glass-card" onclick="showTab('you'); switchYouTab('activities');" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
+  <div class="glass-card" onclick="openActivitiesDrawer();" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
     <div style="display:flex; align-items:center; gap:12px;">
       <div style="width:38px; height:38px; border-radius:10px; background:rgba(232, 98, 42, 0.2); display:flex; align-items:center; justify-content:center; color:var(--brand);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -517,22 +517,7 @@
   <div class="lb-tabs part-only" style="margin-bottom:14px;">
     <button class="lb-tab active" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
     <button class="lb-tab" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
-    <button class="lb-tab" id="you-tab-activities" onclick="switchYouTab('activities')">&#9889; Activities</button>
   </div>
-
-  <!-- Activities panel (moved from old Activities tab) -->
-  <div id="you-panel-activities" style="display:none;">
-<div class="max-w">
-  <div class="flagged-info" id="flagged-banner">
-    <strong>⚑ Flagged activities</strong> — Some activities were flagged for admin review. They're excluded from your score until reviewed.
-  </div>
-  <div class="sec" id="act-section-title">My Activities</div>
-  <div id="act-list">
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-    <div class="skel-card"><div class="skeleton skel-line full"></div><div class="skeleton skel-line medium"></div><div class="skeleton skel-line short"></div></div>
-  </div>
-</div></div>
 
   <!-- Info panel -->
   <div id="you-panel-info" style="display:block;">
@@ -784,13 +769,13 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
-  <script src="app-config.js?v=20260707_v122" defer></script>
-  <script src="app-employee.js?v=20260707_v122" defer></script>
-  <script src="app-api.js?v=20260707_v122" defer></script>
-  <script src="app-drawers.js?v=20260707_v122" defer></script>
-  <script src="app-events.js?v=20260707_v122" defer></script>
-  <script src="app-dashboard.js?v=20260707_v122" defer></script>
-  <script src="app-tabs.js?v=20260707_v122" defer></script>
+  <script src="app-config.js?v=20260707_v123" defer></script>
+  <script src="app-employee.js?v=20260707_v123" defer></script>
+  <script src="app-api.js?v=20260707_v123" defer></script>
+  <script src="app-drawers.js?v=20260707_v123" defer></script>
+  <script src="app-events.js?v=20260707_v123" defer></script>
+  <script src="app-dashboard.js?v=20260707_v123" defer></script>
+  <script src="app-tabs.js?v=20260707_v123" defer></script>
 
 
 
@@ -1091,6 +1076,31 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- My Activities Detail Modal Drawer -->
+  <div id="you-panel-activities" class="detail-modal">
+    <!-- Top Nav Bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
+      <button class="btn-back" onclick="closeActivitiesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back
+      </button>
+      <div style="font-size:16px; font-weight:800; color:#fff; text-align:center;">My Activities</div>
+      <div style="width:50px;"></div>
+    </div>
+
+    <!-- Activities content -->
+    <div class="detail-content" style="padding-top:20px;">
+      <div class="max-w">
+        <div class="flagged-info" id="flagged-banner" style="margin: 0 16px 16px; display:none;">
+          <strong>⚑ Flagged activities</strong> — Some activities were flagged for admin review. They're excluded from your score until reviewed.
+        </div>
+        <div id="act-list" style="padding:0 16px;">
+          <!-- Activities list -->
+        </div>
+      </div>
     </div>
   </div>
 
