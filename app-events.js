@@ -249,7 +249,7 @@ function buildEventCard(ev, group) {
 
   // Event Details Info Button (placed first, before other action buttons)
   var infoBtn = document.createElement('button');
-  infoBtn.className = 'ev-btn';
+  infoBtn.className = 'ev-btn ev-btn-info';
   infoBtn.style.height = '42px';
   infoBtn.style.display = 'inline-flex';
   infoBtn.style.alignItems = 'center';
@@ -265,7 +265,7 @@ function buildEventCard(ev, group) {
 
   // Leaderboard Button (always visible)
   var lb = document.createElement('button');
-  lb.className = 'ev-btn';
+  lb.className = 'ev-btn ev-btn-leaderboard';
   lb.style.height = '42px';
   lb.style.display = 'inline-flex';
   lb.style.alignItems = 'center';
