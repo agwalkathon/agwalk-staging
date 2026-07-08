@@ -324,6 +324,15 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   <div class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-circle-dot"></i> Configure Dashboard Rings</h3>
     <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">Configure the circular progress indicators displayed at the top of the participant's dashboard (e.g., daily steps, overall distance). Each ring tracks progress towards a specific goal value. To display progress towards Medals, add a ring tracking Total Points with your Gold Medal threshold as the goal.</div>
+    <div style="display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.7fr 1fr 0.6fr auto;gap:8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;padding-right:24px;border-bottom:1px solid #eee;padding-bottom:4px;">
+      <span>Metric</span>
+      <span>Label</span>
+      <span>Goal Type</span>
+      <span>Target Goal</span>
+      <span>Visual Shape</span>
+      <span>Color</span>
+      <span></span>
+    </div>
     <div id="rings-box" style="margin-bottom:12px"></div>
     <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
   </div>
@@ -332,7 +341,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   <div class="edit-group" style="border-left: 4px solid #10B981; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #10B981; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-award"></i> Daily Milestone Points</h3>
     <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>Base points per km (Walkathon/Cyclothon)</label><input type="number" id="base-per-km" value="1" step="0.1"></div>
+      <div class="fld" style="display:none;"><label>Base points per km (Walkathon/Cyclothon)</label><input type="number" id="base-per-km" value="1" step="0.1"></div>
     </div>
     
     <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Daily Distance Milestone Bonuses</div>
@@ -1282,7 +1291,11 @@ async function openEditor(ev){
       }
 
       var basePointsRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'base_points'; }) : null;
-      document.getElementById('base-per-km').value = (basePointsRow && basePointsRow.config_value && basePointsRow.config_value.per_km) ? basePointsRow.config_value.per_km : 1;
+      var baseVal = (basePointsRow && basePointsRow.config_value && basePointsRow.config_value.per_km) ? basePointsRow.config_value.per_km : 1;
+      document.getElementById('base-per-km').value = baseVal;
+      if (rc.rate == null) {
+        document.getElementById('f-rate').value = baseVal;
+      }
 
       var bonusPointsRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'bonus_points'; }) : null;
       _milestonesData = (bonusPointsRow && Array.isArray(bonusPointsRow.config_value)) ? bonusPointsRow.config_value.map(function(x) { return { km: x.km, points: x.points || x.pts || 0 }; }) : [];
@@ -1447,7 +1460,7 @@ document.getElementById('btn-save').addEventListener('click',async function(){
         bronze: { male: +document.getElementById('bronze-male').value || 125, female: +document.getElementById('bronze-female').value || 100 }
       };
 
-      var basePointsVal = { per_km: parseFloat(document.getElementById('base-per-km').value) || 1 };
+      var basePointsVal = { per_km: parseFloat(document.getElementById('f-rate').value) || 1 };
       
       var bonusArr = [];
       document.querySelectorAll('.milestone-row-input').forEach(function(row) {
