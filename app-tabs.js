@@ -48,6 +48,9 @@ function clearLeaderboardTab() {
 }
 
 function showTab(tab) {
+  if (tab !== 'leaderboard') {
+    window._lbCameFromEvents = false;
+  }
   if (tab === 'feed' && CONFIG_LB.announcements_enabled === false) return;
   if (_currentTab === tab) {
     var container = document.getElementById('tab-' + tab);
@@ -642,8 +645,8 @@ function showDateDetails(dateStr) {
     });
 
     html +=
-      '<div class="detail-act-card' + (isFlag ? ' flagged' : '') + '" id="' + cardId + '">' +
-        '<div class="detail-act-hdr" onclick="openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event, true)">' +
+      '<div class="detail-act-card' + (isFlag ? ' flagged' : '') + '" id="' + cardId + '" onclick="openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event, true)" style="cursor:pointer;">' +
+        '<div class="detail-act-hdr">' +
           '<div class="detail-act-hdr-left">' +
             '<div class="detail-act-icon ' + tc + '">' + renderIcon(a.sport_type) + '</div>' +
             '<div class="detail-act-title-wrap">' +
@@ -844,7 +847,7 @@ function precomputeLBScores() {
 (function() {
   try {
     var cachedReg = JSON.parse(safeGetItem('agwalk_ranking_reg') || 'null');
-    var cachedActs = JSON.parse(safeGetItem('agwalk_ranking_acts_v3') || 'null');
+    var cachedActs = JSON.parse(safeGetItem('agwalk_ranking_acts_v4') || 'null');
     if (cachedReg && cachedReg.data && cachedActs && cachedActs.data) {
       LB_REG = cachedReg.data;
       LB_ACTS = cachedActs.data;
@@ -1191,6 +1194,13 @@ function lbRender() {
 window.lbRender = lbRender;
 
 function lbBoot() {
+  if (window.EVENT_ROW) {
+    var suffix = (window.EVENT_ROW.status === 'ended' || window.EVENT_ROW.status === 'archived') ? ' — Final Results' : '';
+    var defaultId = window._lbRegisteredEventId || 2;
+    if (window._lbCurrentEventId === defaultId && typeof setLbTitle === 'function') {
+      setLbTitle('🏆 ' + window.EVENT_ROW.name + suffix);
+    }
+  }
   if (!_lbReady) {
     precomputeLBScores();
     _lbReady = true;
@@ -2702,7 +2712,6 @@ function openActivitiesDrawer() {
 }
 window.openActivitiesDrawer = openActivitiesDrawer;
 
-// Define closeActivitiesDrawer globally
 function closeActivitiesDrawer() {
   var el = document.getElementById('you-panel-activities');
   if (el) el.classList.remove('open');
@@ -2744,7 +2753,7 @@ function clearPWACache(btn) {
 // ── Service Worker & Push Notifications ──────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/agwalk-staging/sw.js')
+    navigator.serviceWorker.register('sw.js')
       .then(function(reg) { 
         console.log('[SW] Registered:', reg.scope); 
         setTimeout(checkPushSubscriptionState, 1000);
@@ -3277,19 +3286,27 @@ function setupAppLayout(isParticipant) {
   var bnav = document.querySelector('.bottom-nav');
   var track = document.getElementById('tab-track');
   
-  var isParticipantOrCached = isParticipant;
-  if (!isParticipantOrCached) {
-    try {
-      var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
-      if (s && s.loggedIn && s.athleteId) isParticipantOrCached = true;
-    } catch(e){}
+  var isEmbedded = window.location.search.indexOf('embed=1') > -1 || window.self !== window.top;
+  if (isEmbedded) {
+    document.documentElement.classList.add('is-embedded');
   }
 
-  document.body.classList.toggle('employee-mode', !isParticipantOrCached);
+  document.body.classList.toggle('employee-mode', !isParticipant);
   
   var allTabs = ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'];
   
-  if (isParticipantOrCached) {
+  var cachedEv = null;
+  try {
+    var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
+    var athId = s.athleteId || (window.currentSession ? window.currentSession.athleteId : '');
+    var raw = localStorage.getItem('agwalk_event_row_' + athId);
+    if (raw) cachedEv = JSON.parse(raw).data;
+  } catch(e){}
+  var isEventLive = (window.EVENT_ROW && window.EVENT_ROW.status === 'live') || (cachedEv && cachedEv.status === 'live') || isParticipant;
+
+  if (isEmbedded) {
+    TAB_ORDER = ['celebrate'];
+  } else if (isParticipant && isEventLive) {
     var rawOrder = ['dashboard', 'leaderboard', 'events', 'celebrate', 'you'];
     var cfg = CONFIG_LB.tabs_config || {};
     TAB_ORDER = [];
@@ -3324,8 +3341,8 @@ function setupAppLayout(isParticipant) {
       teamBtn.style.display = teamLbEnabled ? 'block' : 'none';
     }
 
-    var backBtn = document.getElementById('lb-back-to-events-row');
-    if (backBtn) backBtn.style.display = 'none';
+    var backBtn = document.getElementById('lb-back-btn');
+    if (backBtn) backBtn.style.display = (window._lbCurrentEventId && window._lbCurrentEventId !== window._lbRegisteredEventId) ? 'flex' : 'none';
 
     // Show participant-only layout controls
     document.querySelectorAll('.part-only').forEach(function(el) {
@@ -3341,15 +3358,18 @@ function setupAppLayout(isParticipant) {
       var bnavBtn = document.getElementById('bnav-' + t);
       var tabPane = document.getElementById('tab-' + t);
       
-      if (bnavBtn) bnavBtn.style.display = isVisible ? 'flex' : 'none';
+      // Bottom nav button is only visible for celebrate, events, you (hide leaderboard/dashboard)
+      var showBnav = isVisible && (t !== 'leaderboard');
+      
+      if (bnavBtn) bnavBtn.style.display = showBnav ? 'flex' : 'none';
       if (tabPane) {
         if (isVisible) tabPane.classList.remove('hidden-tab');
         else tabPane.classList.add('hidden-tab');
       }
     });
 
-    var backBtn = document.getElementById('lb-back-to-events-row');
-    if (backBtn) backBtn.style.display = 'block';
+    var backBtn = document.getElementById('lb-back-btn');
+    if (backBtn) backBtn.style.display = 'flex';
 
     // Hide all participant-only activities/challenges sub-tabs and event progress
     document.querySelectorAll('.part-only').forEach(function(el) {
