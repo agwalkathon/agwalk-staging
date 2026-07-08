@@ -1007,6 +1007,27 @@ async function startImport(mode) {
   if (failed) addLog('❌ Failed:    ' + failed, '#ef9a9a');
   addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#555');
 
+  // Trigger automatic backfill for the event to recalculate points, bonus, challenges etc.
+  addLog('⏳ Recalculating all participant points, bonuses, and challenges...', '#E8622A');
+  try {
+    var bfRes = await fetch(BACKEND_URL + '/admin/backfill-points', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
+      body: JSON.stringify({ event_id: EV_ID })
+    });
+    var bfResult = await bfRes.json();
+    if (bfResult.success) {
+      addLog('✓ Points, bonuses, and challenges recalculated successfully!', '#2e7d32');
+    } else {
+      addLog('⚠️ Recalculation warning: ' + (bfResult.error || 'Check backend logs'), '#ef6c00');
+    }
+  } catch(e) {
+    addLog('⚠️ Recalculation failed: ' + e.message, '#ef6c00');
+  }
+
   activeBtn.innerHTML = '✅ Done — ' + success + ' processed';
   
   // Re-enable all buttons after 2 seconds
