@@ -144,7 +144,18 @@
     } else {
       if (im) {
         im.style.display = 'block';
-        im.src = 'logo-white.png';
+        var cachedBr = null;
+        try { cachedBr = JSON.parse(localStorage.getItem('ag_branding_cache')); } catch(e){}
+        var brLogo = (cachedBr && cachedBr.logo_url) ? cachedBr.logo_url : 'logo-white.png';
+        im.onerror = function() {
+          this.src = 'logo-white.png';
+        };
+        if (brLogo !== 'logo-white.png') {
+          var sep = brLogo.indexOf('?') !== -1 ? '&' : '?';
+          im.src = brLogo + sep + 'cb=' + Date.now();
+        } else {
+          im.src = 'logo-white.png';
+        }
         im.style.height = '26px';
         im.style.width = 'auto';
       }
