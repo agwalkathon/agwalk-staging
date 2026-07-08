@@ -206,6 +206,18 @@ function buildEventCard(ev, group) {
    * Impact: Creates a high-fidelity visual identity for each event on the Events tab.
    */
   var sportType = detectEventSportType(ev);
+  
+  // Clean, lightweight watermark representing the event's sport type, matching the card accent color
+  var watermark = document.createElement('div');
+  watermark.className = 'ev-card-watermark';
+  watermark.style.color = ev.accent_color || '#E8622A';
+  var iconStr = renderIcon(sportType === 'ride' ? 'Ride' : sportType === 'run' ? 'Run' : sportType === 'hike' ? 'Hike' : sportType === 'walk' ? 'Walk' : 'Mixed');
+  if (iconStr) {
+    iconStr = iconStr.replace(/stroke="[^"]*"/g, 'stroke="currentColor"');
+    watermark.innerHTML = iconStr;
+    card.appendChild(watermark);
+  }
+
   if (!ev.banner_url) {
     card.classList.add('has-badge');
     var badge = document.createElement('div');
