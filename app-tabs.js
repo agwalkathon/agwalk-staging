@@ -2626,6 +2626,10 @@ function openNotificationItem(n) {
     } else if (n.url.startsWith('tab:')) {
       var targetTab = n.url.split(':')[1];
       showTab(targetTab);
+    } else if (n.url === 'connect_strava') {
+      if (window.handleStravaConnect) window.handleStravaConnect();
+    } else if (n.url !== 'null') {
+      window.location.href = n.url;
     }
   }
 }
@@ -2641,7 +2645,7 @@ function renderNotifications() {
   if (badge) {
     if (unreadCount > 0) {
       badge.textContent = unreadCount;
-      badge.style.display = 'block';
+      badge.style.display = 'inline-flex';
     } else {
       badge.style.display = 'none';
     }
@@ -2672,16 +2676,7 @@ function renderNotifications() {
     var notifBody = '';
     if (n.body) { try { var bd = JSON.parse(n.body); notifBody = ''; } catch(e) { notifBody = n.body; } }
 
-    var clickHandler = '';
-    var isFeedNotif = n.url && n.url.startsWith('feed:');
-    if (isFeedNotif) {
-      var _nid = n.id; var _nref = n;
-      clickHandler = 'openNotificationItem(' + JSON.stringify(n).replace(/"/g, '&quot;') + ')';
-    } else if (n.url === 'connect_strava') {
-      clickHandler = 'window.handleStravaConnect(event);';
-    } else if (n.url) {
-      clickHandler = 'if(\'' + n.url + '\' && \'' + n.url + '\' !== \'null\') { window.location.href=\'' + n.url + '\'; }';
-    }
+    var clickHandler = 'openNotificationItem(' + JSON.stringify(n).replace(/"/g, '&quot;') + ')';
 
     card.innerHTML = `
       <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer;" onclick="${clickHandler}">
@@ -2978,6 +2973,11 @@ function toggleNotificationDropdown(e) {
   var dd = document.getElementById('notification-dropdown');
   if (!dd) return;
   var isVisible = dd.style.display === 'block';
+  if (!isVisible) {
+    if (typeof loadNotifications === 'function') {
+      loadNotifications();
+    }
+  }
   dd.style.display = isVisible ? 'none' : 'block';
 }
 
