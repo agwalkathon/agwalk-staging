@@ -255,7 +255,18 @@
       else { value = todaySum; }
       
       if (ring.metric === 'points') {
-        value = (window._myFullPtsGlobal && window._myFullPtsGlobal.total) ? window._myFullPtsGlobal.total : 0;
+        var pTotal = 0;
+        if (window._myFullPtsGlobal && window._myFullPtsGlobal.total !== undefined) {
+          pTotal = window._myFullPtsGlobal.total;
+        } else {
+          try {
+            if (typeof calcFullPts === 'function') {
+              var p = calcFullPts(acts, ctx.gender, ctx.shift);
+              pTotal = p.total;
+            }
+          } catch(e){}
+        }
+        value = pTotal;
       }
       host.appendChild(ringBox(ring, value, goal));
     });
