@@ -589,6 +589,19 @@ async function loadBranding() {
   var aEl = document.getElementById('app-logo');
   var appNameEl = document.getElementById('br-app-name');
 
+  // Check if we are in preview mode
+  var isPreview = window.location.search.indexOf('preview=1') !== -1;
+  if (isPreview) {
+    try {
+      var temp = localStorage.getItem('ag_branding_preview_temp');
+      if (temp) {
+        var b = JSON.parse(temp);
+        applyBrandingDOM(b, lEl, aEl, appNameEl);
+        return; // Intercept and do not load normal branding
+      }
+    } catch(e) {}
+  }
+
   // 1. Try to load and render cached branding instantly
   try {
     var cached = localStorage.getItem('ag_branding_cache');
@@ -640,6 +653,10 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
   }
   
   var logoSrc = b.logo_url || 'logo-white.png';
+  if (logoSrc !== 'logo-white.png') {
+    var separator = logoSrc.indexOf('?') !== -1 ? '&' : '?';
+    logoSrc = logoSrc + separator + 'cb=' + Date.now();
+  }
   if (lEl) {
     lEl.onerror = function() {
       this.parentNode.innerHTML = '<div class="fallback">🏆</div>';
@@ -662,41 +679,76 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     }
   }
 
-  // Inject custom accent color style overrides if set
-  if (b.accent_color) {
-    var styleEl = document.getElementById('dynamic-branding-style');
-    if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = 'dynamic-branding-style';
-      document.head.appendChild(styleEl);
+  // Adjust Logo Position dynamically if present on login page
+  var logoDiv = document.querySelector('.login-logo');
+  var appNameDiv = document.getElementById('br-app-name');
+  var titleDiv = document.getElementById('br-login-title');
+  if (logoDiv && appNameDiv && titleDiv) {
+    var pos = b.logo_position || 'top';
+    if (pos === 'center') {
+      appNameDiv.parentNode.insertBefore(logoDiv, titleDiv);
+      logoDiv.style.display = 'block';
+    } else if (pos === 'hidden') {
+      logoDiv.style.display = 'none';
+    } else { // top
+      appNameDiv.parentNode.insertBefore(logoDiv, appNameDiv);
+      logoDiv.style.display = 'block';
     }
-    
-    var hexToRgba = function(hex, alpha) {
-      var c = hex.replace('#', '');
-      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
-      var rVal = parseInt(c.substring(0, 2), 16);
-      var gVal = parseInt(c.substring(2, 4), 16);
-      var bVal = parseInt(c.substring(4, 6), 16);
-      return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
-    };
-    
-    styleEl.textContent = `
-      .login-btn {
-        background: ${b.accent_color} !important;
-        box-shadow: 0 4px 20px ${hexToRgba(b.accent_color, 0.28)} !important;
-      }
-      .login-btn:hover {
-        opacity: 0.95;
-      }
-      .login-link, .login-terms a {
-        color: ${b.accent_color} !important;
-      }
-      #br-app-name {
-        color: ${b.accent_color} !important;
-      }
-      input.login-field:focus {
-        border-color: ${b.accent_color} !important;
-      }
-    `;
   }
+
+  // Inject custom branding style overrides if set
+  var styleEl = document.getElementById('dynamic-branding-style');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'dynamic-branding-style';
+    document.head.appendChild(styleEl);
+  }
+  
+  var hexToRgba = function(hex, alpha) {
+    if (!hex) return 'rgba(232,98,42,' + alpha + ')';
+    var c = hex.replace('#', '');
+    if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    var rVal = parseInt(c.substring(0, 2), 16);
+    var gVal = parseInt(c.substring(2, 4), 16);
+    var bVal = parseInt(c.substring(4, 6), 16);
+    return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
+  };
+  
+  var accentColor = b.accent_color || '#E8622A';
+  styleEl.textContent = `
+    body, input, button, select {
+      font-family: "${b.font_family || 'Inter'}", sans-serif !important;
+    }
+    .login-btn {
+      background: ${accentColor} !important;
+      box-shadow: 0 4px 20px ${hexToRgba(accentColor, 0.28)} !important;
+    }
+    .login-btn:hover {
+      opacity: 0.95;
+    }
+    .login-link, .login-terms a {
+      color: ${accentColor} !important;
+    }
+    #br-app-name {
+      color: ${accentColor} !important;
+    }
+    input.login-field:focus {
+      border-color: ${accentColor} !important;
+    }
+    #br-login-title {
+      font-size: ${b.title_size || 26}px !important;
+      color: ${b.title_color || '#FFFFFF'} !important;
+    }
+    #br-login-sub {
+      font-size: ${b.tagline_size || 14}px !important;
+      color: ${b.tagline_color || '#9CA3AF'} !important;
+    }
+    .login-footnote {
+      color: ${b.footnote_color || '#6B7280'} !important;
+    }
+    #login-logo-img {
+      width: ${b.logo_width || 120}px !important;
+      max-width: ${b.logo_width || 120}px !important;
+    }
+  `;
 }
