@@ -1166,8 +1166,10 @@ function lbRender() {
             rmEl.style.color = 'var(--muted)';
           } else if (curRank < oldRank) {
             rmEl.innerHTML = '<span style="color:var(--green)">&#8679; ' + (oldRank - curRank) + '</span> up';
+            rmEl.style.color = '';
           } else {
             rmEl.innerHTML = '<span style="color:#f87171">&#8681; ' + (curRank - oldRank) + '</span> down';
+            rmEl.style.color = '';
           }
         }
         
