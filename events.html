@@ -333,6 +333,11 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <span>Color</span>
       <span></span>
     </div>
+    <datalist id="ring-goal-options">
+      <option value="bronze">Bronze Medal Milestone Target</option>
+      <option value="silver">Silver Medal Milestone Target</option>
+      <option value="gold">Gold Medal Milestone Target</option>
+    </datalist>
     <div id="rings-box" style="margin-bottom:12px"></div>
     <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
   </div>
@@ -649,7 +654,7 @@ function ringRow(r){
   var m=sel(RING_METRICS,r.metric||'distance_km');m.className='rr-metric';
   var lb=inp('text',r.label||'','Label');lb.className='rr-label';
   var gt=sel([['daily','Daily goal'],['total','Event total'],['auto','Auto pace']],r.goal_type||'daily');gt.className='rr-gtype';
-  var gv=inp('number',r.goal!==undefined?r.goal:5,'Goal');gv.className='rr-goal';gv.min=0;gv.step='any';
+  var gv=inp('text',r.goal!==undefined?r.goal:'5','Goal');gv.className='rr-goal';gv.setAttribute('list','ring-goal-options');
   var sh=sel(RING_SHAPES,r.shape||'circle');sh.className='rr-shape';
   var cl=inp('color',r.color||'#E8622A');cl.className='rr-color';cl.style.padding='2px';cl.style.height='34px';
   var del=document.createElement('button');del.type='button';del.className='btn btn-ghost btn-sm';del.innerHTML='<i class="ti ti-x"></i>';
@@ -719,15 +724,25 @@ function loadDashboardCfg(rc){
 }
 function collectDashboardCfg(){
   var rings=Array.from(document.querySelectorAll('#rings-box .ring-row')).map(function(row){
+    var rawGoal = row.querySelector('.rr-goal').value.trim();
+    var goalVal = rawGoal.toLowerCase();
+    var goal;
+    if (goalVal === 'gold' || goalVal === 'silver' || goalVal === 'bronze') {
+      goal = goalVal;
+    } else {
+      goal = parseFloat(rawGoal) || 0;
+    }
     return {
       metric:row.querySelector('.rr-metric').value,
       label:row.querySelector('.rr-label').value.trim(),
       goal_type:row.querySelector('.rr-gtype').value,
-      goal:parseFloat(row.querySelector('.rr-goal').value)||0,
+      goal:goal,
       shape:row.querySelector('.rr-shape').value,
       color:row.querySelector('.rr-color').value
     };
-  }).filter(function(r){return r.goal>0;});
+  }).filter(function(r){
+    return r.goal === 'gold' || r.goal === 'silver' || r.goal === 'bronze' || (typeof r.goal === 'number' && r.goal > 0);
+  });
   var db={};
   if(rings.length)db.rings=rings;
   var tiles=chipValues('tile-chips');if(tiles.length)db.tiles=tiles;
