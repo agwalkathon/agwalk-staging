@@ -167,19 +167,19 @@ input[type=checkbox].sw:checked::after{left:21px}
     <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
   </aside>
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Celebrate</h1><p>Moderation, employees and feed configuration</p></div></header>
+<header class="topbar"><div class="topbar-left"><h1>Celebrate</h1><p>Moderation, feed, and app configuration</p></div></header>
 <div class="content">
 
 <div class="section-tabs">
-  <button class="stab active" data-tab="moderation">Moderation<span class="cnt hidden" id="mod-count"></span></button>
-  <button class="stab" data-tab="employees">Employees</button>
+  <button class="stab active" data-tab="moderation">Moderation Queue<span class="cnt hidden" id="mod-count"></span></button>
+  <button class="stab" data-tab="modrules">Moderation Rules</button>
   <button class="stab" data-tab="autoposts">Auto-Posts</button>
   <button class="stab" data-tab="notifications">Notifications</button>
   <button class="stab" data-tab="media">Media</button>
   <button class="stab" data-tab="branding">Branding</button>
 </div>
 
-<!-- ==================== MODERATION ==================== -->
+<!-- ==================== MODERATION QUEUE ==================== -->
 <div class="panel active" id="panel-moderation">
   <div class="card">
     <div class="subhead">Pending Posts</div>
@@ -189,6 +189,10 @@ input[type=checkbox].sw:checked::after{left:21px}
     <div class="subhead">Pending Wishes</div>
     <div id="pending-wishes"><div class="empty">Loading…</div></div>
   </div>
+</div>
+
+<!-- ==================== MODERATION RULES ==================== -->
+<div class="panel" id="panel-modrules">
   <div class="card">
     <div class="subhead">Moderation Rules</div>
     <div class="toggle-row"><div><div class="t-lbl">Custom posts</div><div class="t-sub">Employee-created celebration posts</div></div><div class="seg" data-cfg="custom_posts"><button data-v="auto">Auto-approve</button><button data-v="manual">Manual review</button></div></div>
@@ -198,50 +202,7 @@ input[type=checkbox].sw:checked::after{left:21px}
   </div>
 </div>
 
-<!-- ==================== EMPLOYEES ==================== -->
-<div class="panel" id="panel-employees">
-  <div class="card">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <input id="emp-search" placeholder="Search name / code / email…" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
-      <button class="btn btn-ghost btn-sm" id="btn-emp-add"><i class="ti ti-plus"></i> Add Employee</button>
-      <button class="btn btn-ghost btn-sm" id="btn-emp-import"><i class="ti ti-file-upload"></i> Import CSV</button>
-      <input type="file" id="csv-file" accept=".csv" style="display:none">
-      <span id="emp-total" style="font-size:12px;color:var(--text-muted)"></span>
-    </div>
-    <div id="emp-form" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-      <div class="grid">
-        <div class="fld"><label>Employee Code *</label><input id="ef-code"></div>
-        <div class="fld"><label>Full Name *</label><input id="ef-name"></div>
-        <div class="fld"><label>Email *</label><input id="ef-email" type="email"></div>
-        <div class="fld"><label>WhatsApp</label><input id="ef-wa"></div>
-        <div class="fld"><label>Gender</label><select id="ef-gender"><option value="">—</option><option>Male</option><option>Female</option></select></div>
-        <div class="fld"><label>Department</label><input id="ef-dept"></div>
-        <div class="fld"><label>Designation</label><input id="ef-desig"></div>
-        <div class="fld"><label>Date of Birth</label><input id="ef-dob" type="date"></div>
-        <div class="fld"><label>Joining Date</label><input id="ef-join" type="date"></div>
-      </div>
-      <div class="row-end"><span style="color:#DC2626;font-size:12.5px;margin-right:auto" id="ef-err"></span><button class="btn btn-ghost btn-sm" id="ef-cancel">Cancel</button><button class="btn btn-primary btn-sm" id="ef-save" style="margin-left:8px">Save Employee</button></div>
-    </div>
-  </div>
-  <div class="card" style="overflow-x:auto">
-    <table>
-      <thead><tr><th>Code</th><th>Name</th><th>Email</th><th>Dept</th><th>DOB</th><th>Joined</th><th>Status</th><th></th></tr></thead>
-      <tbody id="emp-rows"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
-    </table>
-    <div class="row-end" style="justify-content:center;gap:12px"><button class="btn btn-ghost btn-sm" id="emp-prev">← Prev</button><span id="emp-page" style="font-size:12.5px;color:var(--text-muted)">Page 1</span><button class="btn btn-ghost btn-sm" id="emp-next">Next →</button></div>
-  </div>
-  <div class="card">
-    <div class="subhead">CRM API Sync <span class="pill off">Scope — not connected</span></div>
-    <div class="scope-note">Configuration placeholder. When your CRM API is ready, add the details here and enable the connection — employee data will then sync automatically.</div>
-    <div class="grid">
-      <div class="fld"><label>API Endpoint URL</label><input id="crm-url" placeholder="https://crm.arcgate.com/api/employees"></div>
-      <div class="fld"><label>API Key</label><input id="crm-key" type="password" placeholder="••••••••"></div>
-      <div class="fld"><label>Sync Frequency</label><select id="crm-freq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="manual">Manual only</option></select></div>
-      <div class="fld"><label>Enable Sync</label><div style="padding-top:6px"><input type="checkbox" class="sw" id="crm-enabled"></div></div>
-    </div>
-    <div class="row-end"><span class="saved-msg" id="saved-crm">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="crm">Save CRM Scope</button></div>
-  </div>
-</div>
+
 
 <!-- ==================== AUTO-POSTS ==================== -->
 <div class="panel" id="panel-autoposts">
@@ -301,31 +262,80 @@ input[type=checkbox].sw:checked::after{left:21px}
 <!-- ==================== BRANDING ==================== -->
 <div class="panel" id="panel-branding">
   <div class="card">
-    <div class="subhead">Employee App Branding</div>
-    <div class="scope-note">Applied to the Employee App login screen and header. Changes are live on next app load — no deploy needed.</div>
+    <div class="subhead">Employee App Branding & Login Designer</div>
+    <div class="scope-note">Customize the layout, colors, typography, and logo of the participant login page. Changes are live on next app load.</div>
     <div class="grid">
+      <!-- Typography & Basic Info -->
       <div class="fld"><label>App Name</label><input id="br-name" maxlength="40" placeholder="Arcgate"></div>
       <div class="fld"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
       <div class="fld"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
-      <div class="fld"><label>Logo</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="br-logo" placeholder="https://… or upload →" style="flex:1">
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-brlogo-up">Upload</button>
-          <input type="file" id="brlogo-file" accept="image/*" style="display:none">
-        </div>
-        <div style="margin-top:10px;background:#0F1117;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;min-height:60px">
-          <img id="br-logo-preview" style="max-height:60px;max-width:200px;object-fit:contain;display:none">
-          <span id="br-logo-empty" style="color:var(--text-muted);font-size:12px">No logo set — preview appears here</span>
-        </div>
+      
+      <div class="fld"><label>Font Family</label>
+        <select id="br-font">
+          <option value="Inter">Inter (Sleek sans-serif)</option>
+          <option value="Poppins">Poppins (Modern geometric)</option>
+          <option value="Roboto">Roboto (Clean neo-grotesque)</option>
+          <option value="Outfit">Outfit (Friendly sans)</option>
+          <option value="system-ui">System Default</option>
+        </select>
       </div>
+      <div class="fld"><label>Title Text Size (px)</label><input id="br-title-size" type="number" min="14" max="64" value="26"></div>
+      <div class="fld"><label>Tagline Text Size (px)</label><input id="br-tag-size" type="number" min="10" max="32" value="14"></div>
+
+      <!-- Colors -->
       <div class="fld"><label>Accent Color</label>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="color" id="br-accent" style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer">
           <input type="text" id="br-accent-hex" placeholder="#E8622A" style="flex:1" maxlength="7">
         </div>
       </div>
+      <div class="fld"><label>Title Color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="br-title-color" style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer">
+          <input type="text" id="br-title-color-hex" placeholder="#FFFFFF" style="flex:1" maxlength="7">
+        </div>
+      </div>
+      <div class="fld"><label>Tagline Color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="br-tag-color" style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer">
+          <input type="text" id="br-tag-color-hex" placeholder="#9CA3AF" style="flex:1" maxlength="7">
+        </div>
+      </div>
+      <div class="fld"><label>Footnote Color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="br-footnote-color" style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer">
+          <input type="text" id="br-footnote-color-hex" placeholder="#6B7280" style="flex:1" maxlength="7">
+        </div>
+      </div>
+
+      <!-- Logo Options -->
+      <div class="fld"><label>Logo URL & Upload</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="br-logo" placeholder="https://… or upload →" style="flex:1">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-brlogo-up">Upload</button>
+          <input type="file" id="brlogo-file" accept="image/*" style="display:none">
+        </div>
+      </div>
+      <div class="fld"><label>Logo Width (px)</label><input id="br-logo-size" type="number" min="30" max="400" value="120"></div>
+      <div class="fld"><label>Logo Position</label>
+        <select id="br-logo-pos">
+          <option value="top">Top (above App Name)</option>
+          <option value="center">Center (between App Name & Title)</option>
+          <option value="hidden">Hidden</option>
+        </select>
+      </div>
     </div>
-    <div class="row-end"><span class="saved-msg" id="saved-branding">✅ Saved</span><button class="btn btn-primary btn-sm" data-save="branding">Save Branding</button></div>
+    
+    <div style="margin-top:14px;background:#0F1117;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;min-height:60px">
+      <img id="br-logo-preview" style="max-height:60px;max-width:200px;object-fit:contain;display:none">
+      <span id="br-logo-empty" style="color:var(--text-muted);font-size:12px">No logo set — preview appears here</span>
+    </div>
+
+    <div class="row-end" style="gap:10px">
+      <button class="btn btn-ghost btn-sm" id="btn-br-preview" type="button">👁️ Show Preview</button>
+      <span class="saved-msg" id="saved-branding">✅ Saved</span>
+      <button class="btn btn-primary btn-sm" data-save="branding">Save Branding</button>
+    </div>
   </div>
 </div>
 
@@ -454,93 +464,6 @@ async function moderate(kind,id,action,row){
   if(r.success){row.style.opacity='.35';setTimeout(loadPending,400);}else alert('Failed: '+(r.error||''));
 }
 
-/* ---------- employees ---------- */
-var _empPage=0,_empSearch='';
-async function loadEmployees(){
-  var d=await api('/admin/employees?page='+_empPage+'&search='+encodeURIComponent(_empSearch));
-  var tb=document.getElementById('emp-rows');
-  tb.textContent='';
-  document.getElementById('emp-total').textContent=(d.total||0)+' employees';
-  document.getElementById('emp-page').textContent='Page '+(_empPage+1)+' of '+Math.max(1,Math.ceil((d.total||0)/50));
-  if(!d.employees||!d.employees.length){var tr=document.createElement('tr');var td=document.createElement('td');td.colSpan=8;td.className='empty';td.textContent='No employees found.';tr.appendChild(td);tb.appendChild(tr);return;}
-  d.employees.forEach(function(e){
-    var tr=document.createElement('tr');
-    [['emp_code'],['full_name'],['email'],['department'],['dob'],['joining_date']].forEach(function(k){
-      var td=document.createElement('td');td.textContent=e[k[0]]||'—';tr.appendChild(td);
-    });
-    var st=document.createElement('td');var pill=document.createElement('span');pill.className='pill '+(e.is_active?'on':'off');pill.textContent=e.is_active?'Active':'Inactive';st.appendChild(pill);tr.appendChild(st);
-    var act=document.createElement('td');
-    var eb=document.createElement('button');eb.className='btn btn-ghost btn-sm';eb.textContent='Edit';
-    eb.addEventListener('click',function(){openEmpForm(e);});
-    var db=document.createElement('button');db.className='btn btn-ghost btn-sm';db.style.marginLeft='6px';db.textContent=e.is_active?'Deactivate':'Activate';
-    db.addEventListener('click',async function(){
-      await api('/admin/employees/deactivate',{method:'POST',body:JSON.stringify({emp_code:e.emp_code,is_active:!e.is_active})});
-      loadEmployees();
-    });
-    act.appendChild(eb);act.appendChild(db);tr.appendChild(act);
-    tb.appendChild(tr);
-  });
-}
-var _searchT=null;
-document.getElementById('emp-search').addEventListener('input',function(){
-  clearTimeout(_searchT);var v=this.value;
-  _searchT=setTimeout(function(){_empSearch=v.trim();_empPage=0;loadEmployees();},350);
-});
-document.getElementById('emp-prev').addEventListener('click',function(){if(_empPage>0){_empPage--;loadEmployees();}});
-document.getElementById('emp-next').addEventListener('click',function(){_empPage++;loadEmployees();});
-function openEmpForm(e){
-  document.getElementById('emp-form').style.display='block';
-  document.getElementById('ef-code').value=e?e.emp_code:'';
-  document.getElementById('ef-code').readOnly=!!e;
-  document.getElementById('ef-name').value=e?e.full_name:'';
-  document.getElementById('ef-email').value=e?e.email:'';
-  document.getElementById('ef-wa').value=e?(e.whatsapp||''):'';
-  document.getElementById('ef-gender').value=e?(e.gender||''):'';
-  document.getElementById('ef-dept').value=e?(e.department||''):'';
-  document.getElementById('ef-desig').value=e?(e.designation||''):'';
-  document.getElementById('ef-dob').value=e?(e.dob||''):'';
-  document.getElementById('ef-join').value=e?(e.joining_date||''):'';
-  document.getElementById('ef-err').textContent='';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.getElementById('btn-emp-add').addEventListener('click',function(){openEmpForm(null);});
-document.getElementById('ef-cancel').addEventListener('click',function(){document.getElementById('emp-form').style.display='none';});
-document.getElementById('ef-save').addEventListener('click',async function(){
-  var err=document.getElementById('ef-err');err.textContent='';
-  var body={emp_code:document.getElementById('ef-code').value.trim(),full_name:document.getElementById('ef-name').value.trim(),
-    email:document.getElementById('ef-email').value.trim(),whatsapp:document.getElementById('ef-wa').value.trim()||null,
-    gender:document.getElementById('ef-gender').value||null,department:document.getElementById('ef-dept').value.trim()||null,
-    designation:document.getElementById('ef-desig').value.trim()||null,dob:document.getElementById('ef-dob').value||null,
-    joining_date:document.getElementById('ef-join').value||null};
-  if(!body.emp_code||!body.full_name||!body.email){err.textContent='Code, name and email are required';return;}
-  this.disabled=true;
-  var r=await api('/admin/employees',{method:'POST',body:JSON.stringify(body)});
-  this.disabled=false;
-  if(r.success){document.getElementById('emp-form').style.display='none';loadEmployees();}
-  else err.textContent=r.error||'Save failed';
-});
-/* CSV import: emp_code,full_name,email,whatsapp,gender,department,designation,dob,joining_date */
-document.getElementById('btn-emp-import').addEventListener('click',function(){document.getElementById('csv-file').click();});
-document.getElementById('csv-file').addEventListener('change',function(){
-  var f=this.files[0];if(!f)return;
-  var reader=new FileReader();
-  reader.onload=async function(){
-    var lines=String(reader.result).split(/\r?\n/).filter(function(l){return l.trim();});
-    if(lines.length<2){alert('CSV needs a header row + data rows');return;}
-    var head=lines[0].split(',').map(function(h){return h.trim().toLowerCase();});
-    var rows=lines.slice(1).map(function(l){
-      var cells=l.split(',');var o={};
-      head.forEach(function(h,i){o[h]=(cells[i]||'').trim();});
-      return o;
-    });
-    if(!confirm('Import '+rows.length+' rows? Existing employee codes will be updated.'))return;
-    var r=await api('/admin/employees/import',{method:'POST',body:JSON.stringify({rows:rows})});
-    alert(r.success?('Imported/updated '+r.imported+' employees.'+(r.errors&&r.errors.length?'\nErrors:\n'+r.errors.join('\n'):'')):('Import failed: '+(r.error||'')));
-    loadEmployees();
-  };
-  reader.readAsText(f);
-  this.value='';
-});
 
 document.getElementById('btn-announce').addEventListener('click',async function(){
   var t=document.getElementById('an-title').value.trim();
@@ -571,17 +494,45 @@ document.getElementById('brlogo-file').addEventListener('change',function(){
   rd.readAsDataURL(f);
 });
 
-document.getElementById('br-accent').addEventListener('input', function(){
-  document.getElementById('br-accent-hex').value = this.value.toUpperCase();
-});
-document.getElementById('br-accent-hex').addEventListener('input', function(){
-  var val = this.value.trim();
-  if (val.match(/^#[0-9A-F]{6}$/i)) {
-    document.getElementById('br-accent').value = val;
-  }
+function bindColorPair(pickerId, hexId) {
+  var picker = document.getElementById(pickerId);
+  var hexInput = document.getElementById(hexId);
+  picker.addEventListener('input', function(){
+    hexInput.value = this.value.toUpperCase();
+  });
+  hexInput.addEventListener('input', function(){
+    var val = this.value.trim();
+    if (val.match(/^#[0-9A-F]{6}$/i)) {
+      picker.value = val;
+    }
+  });
+}
+bindColorPair('br-accent', 'br-accent-hex');
+bindColorPair('br-title-color', 'br-title-color-hex');
+bindColorPair('br-tag-color', 'br-tag-color-hex');
+bindColorPair('br-footnote-color', 'br-footnote-color-hex');
+
+document.getElementById('btn-br-preview').addEventListener('click', function(){
+  var previewObj = {
+    app_name:document.getElementById('br-name').value.trim(),
+    login_title:document.getElementById('br-title').value.trim(),
+    tagline:document.getElementById('br-tag').value.trim(),
+    logo_url:document.getElementById('br-logo').value.trim(),
+    accent_color:document.getElementById('br-accent-hex').value.trim(),
+    font_family:document.getElementById('br-font').value,
+    title_size:parseInt(document.getElementById('br-title-size').value)||26,
+    tagline_size:parseInt(document.getElementById('br-tag-size').value)||14,
+    title_color:document.getElementById('br-title-color-hex').value.trim(),
+    tagline_color:document.getElementById('br-tag-color-hex').value.trim(),
+    footnote_color:document.getElementById('br-footnote-color-hex').value.trim(),
+    logo_width:parseInt(document.getElementById('br-logo-size').value)||120,
+    logo_position:document.getElementById('br-logo-pos').value
+  };
+  localStorage.setItem('ag_branding_preview_temp', JSON.stringify(previewObj));
+  window.open('index.html?preview=1', '_blank');
 });
 
-loadConfig();loadPending();loadEmployees();
+loadConfig();loadPending();
 </script>
 </body>
 </html>
