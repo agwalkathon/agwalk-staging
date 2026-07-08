@@ -24,7 +24,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API & Logic Documentation ?" Arcgate Walkathon 2026</title>
+  <title>API & Scoring Logic Documentation - Arcgate Walkathon 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -87,7 +87,7 @@
     .content { flex: 1; padding: 28px 32px; display: flex; gap: 24px; }
 
     /* Layout Doc Navigation & Details */
-    .doc-nav { width: 260px; flex-shrink: 0; background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; height: fit-content; position: sticky; top: 84px; }
+    .doc-nav { width: 280px; flex-shrink: 0; background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; height: fit-content; position: sticky; top: 84px; }
     .doc-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; text-decoration: none; color: var(--text-secondary); font-size: 13px; font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s; cursor: pointer; border: none; background: none; text-align: left; }
     .doc-nav-item:hover { background: #F3F4F6; color: var(--text-primary); }
     .doc-nav-item.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
@@ -100,13 +100,14 @@
     /* Documentation Typography & Style */
     h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; border-bottom: 2px solid var(--page-bg); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     h2 i { color: var(--brand); }
-    h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 24px 0 10px; }
+    h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 24px 0 10px; border-left: 3px solid var(--brand); padding-left: 8px; }
     p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
     ul, ol { margin-left: 20px; margin-bottom: 14px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
     li { margin-bottom: 6px; }
     
     .alert-box { background: var(--brand-light); border-left: 4px solid var(--brand); padding: 16px; border-radius: var(--radius-sm); margin: 16px 0; }
     .alert-box.blue { background: #EFF6FF; border-left-color: #3B82F6; }
+    .alert-box.green { background: #ECFDF5; border-left-color: #059669; }
     .alert-box h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .alert-box p { font-size: 12px; margin-bottom: 0; line-height: 1.5; }
 
@@ -122,7 +123,7 @@
     pre code { background: none; padding: 0; color: #E2E8F0; font-size: 12px; line-height: 1.5; }
 
     /* Responsive */
-    @media (max-width: 900px) {
+    @media (max-width: 1000px) {
       .content { flex-direction: column; }
       .doc-nav { width: 100%; position: static; }
     }
@@ -180,9 +181,12 @@
       <!-- Doc Navigation -->
       <nav class="doc-nav">
         <button class="doc-nav-item active" onclick="switchSection('overview')"><i class="ti ti-info-circle"></i> Overview</button>
-        <button class="doc-nav-item" onclick="switchSection('strava-api')"><i class="ti ti-api"></i> Strava API Sync</button>
+        <button class="doc-nav-item" onclick="switchSection('registration-flow')"><i class="ti ti-user-plus"></i> Registration & Approvals</button>
+        <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Engine</button>
+        <button class="doc-nav-item" onclick="switchSection('strava-mappings')"><i class="ti ti-api"></i> Strava Payload Mappings</button>
+        <button class="doc-nav-item" onclick="switchSection('social-feed')"><i class="ti ti-rss"></i> Social Feed & Celebrate</button>
+        <button class="doc-nav-item" onclick="switchSection('notifications-doc')"><i class="ti ti-bell"></i> Push Notifications</button>
         <button class="doc-nav-item" onclick="switchSection('db-schema')"><i class="ti ti-database"></i> DB Schema & Fields</button>
-        <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Rules</button>
         <button class="doc-nav-item" onclick="switchSection('endpoints')"><i class="ti ti-plug"></i> API Endpoints</button>
         <button class="doc-nav-item" onclick="switchSection('operations')"><i class="ti ti-tool"></i> Common Fixes</button>
       </nav>
@@ -204,121 +208,44 @@
           </div>
         </section>
 
-        <!-- Section: Strava API Sync -->
-        <section id="strava-api" class="doc-section">
-          <h2><i class="ti ti-api"></i> Strava API Sync</h2>
-          <p>Activity data is retrieved from Strava using two primary methods:</p>
-          <ol>
-            <li><strong>Strava Webhook Subscription</strong>: Triggers real-time synchronization whenever a registered athlete creates, updates, or deletes an activity.</li>
-            <li><strong>Manual / History Sync</strong>: Triggered via the Admin Panel to fetch or backfill history directly using the athlete's OAuth tokens.</li>
-          </ol>
-
-          <h3>Timezone Offset Resolution (IST Correction)</h3>
-          <p>Activities on Strava are timestamped based on the athlete's location. When fetching data from Strava, the API returns two date fields:</p>
-          <ul>
-            <li><code>start_date</code>: The activity start time in <strong>UTC time</strong>.</li>
-            <li><code>start_date_local</code>: The activity start time in the <strong>athlete's local timezone</strong> as recorded by the device.</li>
-          </ul>
-
-          <div class="alert-box">
-            <h4><i class="ti ti-alert-triangle"></i> Important Timezone Rule</h4>
-            <p>We prioritize <code>start_date_local</code> directly from the Strava payload to set the database's <code>activity_date_time_ist</code> field. This prevents timezone desyncs where Strava records a wrong UTC timestamp relative to the local timestamp (a common issue with manual entries). 
-            <br>We only fall back to adding <code>+5.5 hours</code> to <code>start_date</code> if <code>start_date_local</code> is missing.</p>
+        <!-- Section: Registration & Approvals Flow -->
+        <section id="registration-flow" class="doc-section">
+          <h2><i class="ti ti-user-plus"></i> Participant Registration & Approval Flow</h2>
+          <p>The onboarding pipeline secures participant entries by verifying profiles against an active employee allowlist before authorizing Strava connectivity.</p>
+          
+          <div class="alert-box green">
+            <h4>Onboarding Sequence Overview</h4>
+            <p><strong>Step 1: Registration Request</strong> (<code>new-participant.html</code>) ➜ <strong>Step 2: Employee Verification</strong> (<code>employees_master</code> lookup) ➜ <strong>Step 3: Pending Entry Creation</strong> (<code>registration</code> table) ➜ <strong>Step 4: Strava OAuth Redirect</strong> (<code>connect-strava.html</code>) ➜ <strong>Step 5: Authorization Token Exchange</strong> (<code>POST /register</code>) ➜ <strong>Step 6: Organizer Approval</strong> (<code>athletedtl.html</code>).</p>
           </div>
 
-          <h3>Field Mappings from Strava payload</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Strava Field</th>
-                <th>Database Column</th>
-                <th>Description / Conversion</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>id</code></td>
-                <td><code>strava_activity_id</code></td>
-                <td>Unique ID of the activity (primary identifier).</td>
-              </tr>
-              <tr>
-                <td><code>athlete.id</code></td>
-                <td><code>strava_athlete_id</code></td>
-                <td>Reference linking the activity to the registered athlete.</td>
-              </tr>
-              <tr>
-                <td><code>name</code></td>
-                <td><code>activity_name</code></td>
-                <td>Title given by the user on Strava.</td>
-              </tr>
-              <tr>
-                <td><code>distance</code></td>
-                <td><code>distance_meters</code></td>
-                <td>Activity distance in meters. Divided by <code>1000</code> in frontend.</td>
-              </tr>
-              <tr>
-                <td><code>moving_time</code></td>
-                <td><code>moving_time_seconds</code></td>
-                <td>Duration of the activity spent moving (seconds).</td>
-              </tr>
-              <tr>
-                <td><code>start_date_local</code></td>
-                <td><code>activity_date_time_ist</code></td>
-                <td>Prioritized field (stripped of 'Z') representing local clock time.</td>
-              </tr>
-              <tr>
-                <td><code>start_date</code></td>
-                <td><code>activity_date</code></td>
-                <td>Raw UTC timestamp representation.</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Section: DB Schema -->
-        <section id="db-schema" class="doc-section">
-          <h2><i class="ti ti-database"></i> Database Schema & Fields</h2>
-          <p>Below are the primary Supabase tables used for tracking and scoring activities.</p>
-
-          <h3>1. <code>registration</code> (Athlete Details)</h3>
-          <p>Stores the registered user profiles, shift details, and OAuth tokens.</p>
-          <ul>
-            <li><code>strava_athlete_id</code>: Unique numeric id returned by Strava.</li>
-            <li><code>full_name</code>: Full name of the participant.</li>
-            <li><code>emp_code</code>: Unique employee code.</li>
-            <li><code>shift</code>: Athlete's work shift (e.g. <code>Dayshift</code>, <code>Nightshift</code>, etc.).</li>
-            <li><code>access_token</code> & <code>refresh_token</code>: API credentials used to pull data.</li>
-            <li><code>strava_connected</code>: Boolean flag showing active integration.</li>
-          </ul>
-
-          <h3>2. <code>activities</code> (Raw Activities)</h3>
-          <p>Stores individual activity logs fetched from Strava API.</p>
-          <ul>
-            <li><code>activity_date_time_ist</code>: Stores the local calendar date and time. **The primary field used for daily groupings on leaderboards.**</li>
-            <li><code>activity_date</code>: The raw UTC time stored for safety.</li>
-            <li><code>start_time</code>: Time portion parsed from the local date (e.g., <code>05:03:42</code>).</li>
-            <li><code>distance_meters</code>: Float distance.</li>
-            <li><code>moving_time_seconds</code>: Float time duration.</li>
-            <li><code>is_flagged</code>: Indicates if the activity violates validation rules (e.g., pace too fast, overlapping times).</li>
-          </ul>
-
-          <h3>3. <code>athlete_points_summary</code> (Cached Standings)</h3>
-          <p>Holds pre-calculated aggregated statistics for high-performance frontend loads.</p>
-          <ul>
-            <li><code>total_distance_km</code>: Cumulative distance across the event.</li>
-            <li><code>base_points</code>: Base score awarded from active walking.</li>
-            <li><code>challenge_points</code>: Points earned from participating in specific challenges.</li>
-            <li><code>bonus_points</code>: Cumulative milestone/special day bonuses.</li>
-            <li><code>total_points</code>: <code>base_points + challenge_points + bonus_points</code>. **This cached value is queried by leaderboards.**</li>
-          </ul>
-
-          <h3>4. <code>challenges</code> (Challenge Targets)</h3>
-          <p>Maintains dynamic active challenges.</p>
-          <ul>
-            <li><code>distance_type</code>: Can be <code>fixed</code> (e.g., complete exactly 5km) or <code>range</code> (split-based logic).</li>
-            <li><code>distance</code>: The threshold target in km.</li>
-            <li><code>points</code>: The points rewarded if achieved.</li>
-          </ul>
+          <h3>Detailed Onboarding Lifecycle</h3>
+          <ol>
+            <li>
+              <strong>Initial Registration Form Submission</strong> (<code>POST /register-request</code>):
+              <br>An athlete fills in details on the registration form. The backend verifies the email and employee code against the <code>employees_master</code> table to ensure the user is an active employee. 
+              <br>If verified, an entry is created in the <code>registration</code> table with <code>status = 'pending'</code>, <code>role = 'user'</code>, and <code>strava_connected = false</code>.
+            </li>
+            <li>
+              <strong>OAuth Handshake with Strava</strong>:
+              <br>Once the employee registration entry is saved, the user is redirected to Strava to authenticate. Upon consent, Strava redirects back to <code>connect-strava.html</code> with an authorization code.
+            </li>
+            <li>
+              <strong>Token Exchange and Connection</strong> (<code>POST /register</code>):
+              <br>The frontend sends the authorization code to the backend. The backend calls the Strava OAuth endpoint (<code>https://www.strava.com/oauth/token</code>) to swap it for a <code>refresh_token</code>, <code>access_token</code>, and the athlete profile.
+              <br>The backend updates the registration entry with:
+              <ul>
+                <li><code>strava_athlete_id</code> (Strava athlete profile ID)</li>
+                <li><code>access_token</code> & <code>refresh_token</code> (encrypted tokens)</li>
+                <li><code>profile_photo</code> (URL to Strava profile image)</li>
+                <li><code>strava_connected = true</code></li>
+                <li><code>strava_connected_at = NOW()</code></li>
+              </ul>
+            </li>
+            <li>
+              <strong>Organizer Review & Approval</strong> (<code>athletedtl.html</code>):
+              <br>Organizers inspect the pending queue. Approving a user triggers a database <code>PATCH</code> setting <code>status = 'approved'</code>. This activates the user on the leaderboard and schedules history synchronization.
+            </li>
+          </ol>
         </section>
 
         <!-- Section: Scoring Engine -->
@@ -389,6 +316,334 @@
 
           <h3>5. Multi-Challenge Days</h3>
           <p>If an athlete enters two challenges on a single day, the engine resolves them in order of priority, separating challenge pools to prevent double-dipping, and scores the remaining remainder towards daily base standings.</p>
+        </section>
+
+        <!-- Section: Strava Payload Mappings -->
+        <section id="strava-mappings" class="doc-section">
+          <h2><i class="ti ti-api"></i> Full Strava API Field Mappings</h2>
+          <p>This table lists all fields mapped from the incoming Strava activity payload (via webhooks or history fetch API) to the Supabase <code>activities</code> database schema.</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Strava Payload Field</th>
+                <th>Database Column</th>
+                <th>Type</th>
+                <th>Description & Resolution Logic</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>id</code></td>
+                <td><code>strava_activity_id</code></td>
+                <td>BIGINT</td>
+                <td>Unique ID assigned to the activity by Strava (Primary key).</td>
+              </tr>
+              <tr>
+                <td><code>athlete.id</code></td>
+                <td><code>strava_athlete_id</code></td>
+                <td>BIGINT</td>
+                <td>Identifies which athlete recorded the activity.</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td><code>activity_name</code></td>
+                <td>VARCHAR</td>
+                <td>Name of the activity. Defaults to "Activity".</td>
+              </tr>
+              <tr>
+                <td><code>sport_type</code></td>
+                <td><code>sport_type</code></td>
+                <td>VARCHAR</td>
+                <td>Standard Strava sports: <code>Walk</code>, <code>Run</code>, <code>Hike</code>, <code>Ride</code>.</td>
+              </tr>
+              <tr>
+                <td><code>description</code></td>
+                <td><code>description</code></td>
+                <td>TEXT</td>
+                <td>User description (nullable).</td>
+              </tr>
+              <tr>
+                <td><code>start_date</code></td>
+                <td><code>activity_date</code></td>
+                <td>TIMESTAMPTZ</td>
+                <td>The raw activity start time in UTC.</td>
+              </tr>
+              <tr>
+                <td><code>start_date_local</code></td>
+                <td><code>activity_date_time_ist</code></td>
+                <td>TIMESTAMP</td>
+                <td><strong>Primary Field for IST logic</strong>. Stripped of 'Z' timezone indicator and stored directly. Falls back to <code>start_date + 5.5 hours</code> if local timestamp is unavailable.</td>
+              </tr>
+              <tr>
+                <td>Derived from local time</td>
+                <td><code>start_time</code></td>
+                <td>TIME</td>
+                <td>Time slice parsed from local time (e.g. <code>05:03:42</code>).</td>
+              </tr>
+              <tr>
+                <td><code>distance</code></td>
+                <td><code>distance_meters</code></td>
+                <td>FLOAT</td>
+                <td>Distance measured in meters.</td>
+              </tr>
+              <tr>
+                <td><code>moving_time</code></td>
+                <td><code>moving_time_seconds</code></td>
+                <td>INTEGER</td>
+                <td>Moving duration in seconds.</td>
+              </tr>
+              <tr>
+                <td><code>elapsed_time</code></td>
+                <td><code>elapsed_time_seconds</code></td>
+                <td>INTEGER</td>
+                <td>Total elapsed duration in seconds.</td>
+              </tr>
+              <tr>
+                <td><code>total_elevation_gain</code></td>
+                <td><code>elevation_gain</code></td>
+                <td>FLOAT</td>
+                <td>Climbing elevation gain in meters.</td>
+              </tr>
+              <tr>
+                <td><code>average_speed</code></td>
+                <td><code>avg_speed</code></td>
+                <td>FLOAT</td>
+                <td>Average velocity in meters/second.</td>
+              </tr>
+              <tr>
+                <td><code>max_speed</code></td>
+                <td><code>max_speed</code></td>
+                <td>FLOAT</td>
+                <td>Maximum velocity in meters/second.</td>
+              </tr>
+              <tr>
+                <td><code>average_cadence</code></td>
+                <td><code>avg_cadence</code></td>
+                <td>FLOAT</td>
+                <td>Average stride cadence (steps/minute).</td>
+              </tr>
+              <tr>
+                <td><code>calories</code></td>
+                <td><code>calories</code></td>
+                <td>INTEGER</td>
+                <td>Calculated energy expenditure (kcal).</td>
+              </tr>
+              <tr>
+                <td><code>average_heartrate</code></td>
+                <td><code>avg_heart_rate</code></td>
+                <td>FLOAT</td>
+                <td>Average pulse rate (bpm).</td>
+              </tr>
+              <tr>
+                <td><code>max_heartrate</code></td>
+                <td><code>max_heart_rate</code></td>
+                <td>FLOAT</td>
+                <td>Peak pulse rate (bpm).</td>
+              </tr>
+              <tr>
+                <td><code>device_name</code></td>
+                <td><code>device_name</code></td>
+                <td>VARCHAR</td>
+                <td>GPS device name (e.g. "Garmin Instinct 2", "Strava App").</td>
+              </tr>
+              <tr>
+                <td><code>map.summary_polyline</code></td>
+                <td><code>summary_polyline</code></td>
+                <td>TEXT</td>
+                <td>Encoded coordinates representation for rendering map routes.</td>
+              </tr>
+              <tr>
+                <td><code>photos</code></td>
+                <td><code>photos</code></td>
+                <td>JSONB</td>
+                <td>Embedded metadata/URLs of images attached to the activity.</td>
+              </tr>
+              <tr>
+                <td><code>best_efforts</code></td>
+                <td><code>best_efforts</code></td>
+                <td>JSONB</td>
+                <td>Performance stats (e.g. best 1k, best 5k times).</td>
+              </tr>
+              <tr>
+                <td>Generated at parse</td>
+                <td><code>steps</code></td>
+                <td>INTEGER</td>
+                <td>Calculated steps count. See resolution rules below.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Steps Resolution Rules</h3>
+          <p>Because some devices do not write steps directly to Strava, the steps count is resolved via the following prioritization pipeline in <code>resolveSteps(a)</code>:</p>
+          <pre><code>function resolveSteps(activity) {
+  // Tier 1: Strava native steps field
+  if (activity.steps &amp;&amp; activity.steps > 0) {
+    return activity.steps;
+  }
+  // Tier 2: Stride cadence calculation
+  if (activity.average_cadence &amp;&amp; activity.moving_time) {
+    return Math.round(activity.average_cadence * 2 * (activity.moving_time / 60));
+  }
+  // Tier 3: Distance estimates based on sport type
+  const distKm = (activity.distance || 0) / 1000;
+  if (activity.sport_type === 'Walk' || activity.sport_type === 'Hike') {
+    return Math.round(distKm * 1350); // 1,350 steps/km
+  }
+  if (activity.sport_type === 'Run' || activity.sport_type === 'VirtualRun') {
+    return Math.round(distKm * 1150); // 1,150 steps/km
+  }
+  return null;
+}</code></pre>
+        </section>
+
+        <!-- Section: Social Feed & Celebrate -->
+        <section id="social-feed" class="doc-section">
+          <h2><i class="ti ti-rss"></i> Social Feed & Celebrate Settings</h2>
+          <p>The social feed (announcements) and the celebrate feed push achievements to participants in real time. Configuration is managed in <code>feed-config.html</code> and stored in the <code>leaderboard_config</code> table.</p>
+
+          <h3>1. Feed Configuration JSON Schema</h3>
+          <p>The configuration row matches <code>config_key = 'feed_config'</code> in `leaderboard_config` and stores the following JSON payload:</p>
+          <pre><code>{
+  "rules": {
+    "allow_standard_activities": true,  // Display standard daily walks
+    "allow_medals": true,               // Celebrate milestones (clubs, streaks)
+    "allow_distance_clubs": true,       // Highlight 100k, 200k, 300k clubs
+    "allow_rank_top1": true,            // Push rank #1 shifts
+    "allow_flagged_activities": false,  // Block flagged walks from appearing
+    "allow_private_profiles": true      // Allow private users' details (obfuscated)
+  },
+  "filters": {
+    "minimum_activity_distance_km": 1.0,
+    "allowed_sports": ["Walk", "Run", "Hike", "Ride"]
+  }
+}</code></pre>
+
+          <h3>2. Announcement Pipeline (<code>ensureActivityAnnouncement</code>)</h3>
+          <p>When an activity is synced, it passes through the filter check:</p>
+          <ul>
+            <li>Checks if a duplicate announcement exists for <code>title = 'Activity:{strava_activity_id}'</code>.</li>
+            <li>Enforces participant exclusion settings: Admins, system roles, flagged athletes, and private profile toggles.</li>
+            <li>Filters out activities that fall below <code>minimum_activity_distance_km</code> or sport types not included in <code>allowed_sports</code>.</li>
+            <li>Inserts a record into the <code>announcements</code> table with the body stringified as JSON.</li>
+          </ul>
+
+          <h3>3. Celebrate Page configuration (<code>celebrate-config.html</code>)</h3>
+          <p>Controls event celebration styling (e.g. background effects, sound highlights, visual layouts, and color themes). Settings are saved under <code>config_key = 'celebrate_config'</code> in `leaderboard_config`.</p>
+        </section>
+
+        <!-- Section: Push Notifications -->
+        <section id="notifications-doc" class="doc-section">
+          <h2><i class="ti ti-bell"></i> Push Notification Engine</h2>
+          <p>Push notifications allow organizers to alert users of progress milestone achievements (clubs, streaks, long walks, and daily updates) using W3C WebPush subscriptions.</p>
+
+          <h3>1. WebPush Subscriptions Flow</h3>
+          <ol>
+            <li>
+              <strong>Subscription Registration</strong> (<code>POST /push/subscribe</code>):
+              <br>The frontend portal requests push credentials from the browser. The resulting subscription object is posted to the backend along with the <code>athlete_id</code> and <code>device_name</code>.
+              <br>The backend inserts/patches the subscription JSON directly into the <code>push_subscriptions</code> table.
+            </li>
+            <li>
+              <strong>Removing Inactive Keys</strong>:
+              <br>If the WebPush dispatch (via <code>webpush.sendNotification</code>) fails with status <code>410 (Gone)</code>, the backend automatically deletes the inactive subscription record.
+            </li>
+          </ol>
+
+          <h3>2. Trigger Keys and Default Templates</h3>
+          <p>Rules are stored in `push_notification_rules`. If a rule lacks a custom override, the system falls back to default notification templates:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Trigger Key</th>
+                <th>Default Title</th>
+                <th>Default Message Template</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>activity_synced</code></td>
+                <td>Activity Synced</td>
+                <td>You synced a walk of {distance} KM!</td>
+              </tr>
+              <tr>
+                <td><code>club_100</code></td>
+                <td>🏆 100 KM Club!</td>
+                <td>Congratulations! You joined the 100 KM Club!</td>
+              </tr>
+              <tr>
+                <td><code>club_200</code></td>
+                <td>🏆 200 KM Club!</td>
+                <td>Amazing! You joined the 200 KM Club!</td>
+              </tr>
+              <tr>
+                <td><code>streak_7</code></td>
+                <td>🔥 7-Day Active Streak!</td>
+                <td>You are on fire with a 7-Day Active Streak!</td>
+              </tr>
+              <tr>
+                <td><code>streak_14</code></td>
+                <td>🔥 14-Day Active Streak!</td>
+                <td>Unstoppable! You achieved a 14-Day Active Streak!</td>
+              </tr>
+              <tr>
+                <td><code>single_10k</code></td>
+                <td>⚡ Double-Digit Walk (10+ KM)!</td>
+                <td>You completed a single activity of {distance} KM!</td>
+              </tr>
+              <tr>
+                <td><code>daily_10k_3</code></td>
+                <td>👟 10 KM Daily Streak (3 Days)!</td>
+                <td>You walked 10+ KM daily for 3 consecutive days!</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section: DB Schema -->
+        <section id="db-schema" class="doc-section">
+          <h2><i class="ti ti-database"></i> Database Schema & Fields</h2>
+          <p>Below are the primary Supabase tables used for tracking and scoring activities.</p>
+
+          <h3>1. <code>registration</code> (Athlete Details)</h3>
+          <p>Stores the registered user profiles, shift details, and OAuth tokens.</p>
+          <ul>
+            <li><code>strava_athlete_id</code>: Unique numeric id returned by Strava.</li>
+            <li><code>full_name</code>: Full name of the participant.</li>
+            <li><code>emp_code</code>: Unique employee code.</li>
+            <li><code>shift</code>: Athlete's work shift (e.g. <code>Dayshift</code>, <code>Nightshift</code>, etc.).</li>
+            <li><code>access_token</code> & <code>refresh_token</code>: API credentials used to pull data.</li>
+            <li><code>strava_connected</code>: Boolean flag showing active integration.</li>
+          </ul>
+
+          <h3>2. <code>activities</code> (Raw Activities)</h3>
+          <p>Stores individual activity logs fetched from Strava API.</p>
+          <ul>
+            <li><code>activity_date_time_ist</code>: Stores the local calendar date and time. **The primary field used for daily groupings on leaderboards.**</li>
+            <li><code>activity_date</code>: The raw UTC time stored for safety.</li>
+            <li><code>start_time</code>: Time portion parsed from the local date (e.g., <code>05:03:42</code>).</li>
+            <li><code>distance_meters</code>: Float distance.</li>
+            <li><code>moving_time_seconds</code>: Float time duration.</li>
+            <li><code>is_flagged</code>: Indicates if the activity violates validation rules (e.g., pace too fast, overlapping times).</li>
+          </ul>
+
+          <h3>3. <code>athlete_points_summary</code> (Cached Standings)</h3>
+          <p>Holds pre-calculated aggregated statistics for high-performance frontend loads.</p>
+          <ul>
+            <li><code>total_distance_km</code>: Cumulative distance across the event.</li>
+            <li><code>base_points</code>: Base score awarded from active walking.</li>
+            <li><code>challenge_points</code>: Points earned from participating in specific challenges.</li>
+            <li><code>bonus_points</code>: Cumulative milestone/special day bonuses.</li>
+            <li><code>total_points</code>: <code>base_points + challenge_points + bonus_points</code>. **This cached value is queried by leaderboards.**</li>
+          </ul>
+
+          <h3>4. <code>challenges</code> (Challenge Targets)</h3>
+          <p>Maintains dynamic active challenges.</p>
+          <ul>
+            <li><code>distance_type</code>: Can be <code>fixed</code> (e.g., complete exactly 5km) or <code>range</code> (split-based logic).</li>
+            <li><code>distance</code>: The threshold target in km.</li>
+            <li><code>points</code>: The points rewarded if achieved.</li>
+          </ul>
         </section>
 
         <!-- Section: API Endpoints -->
