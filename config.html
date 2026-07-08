@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <script>
@@ -311,6 +311,10 @@ tr:hover td{background:#FAFAFA}
 <div class="main">
 <header class="topbar"><div class="topbar-left"><h1>Configuration</h1><p>Medal thresholds, bonus rules, flag settings</p></div><div class="topbar-right"></div></header>
   <div class="content">
+  <div class="section-tabs">
+    <button class="stab active" data-target="security" onclick="switchConfigTab('security')">&#128273; Access & Security</button>
+    <button class="stab" data-target="layout" onclick="switchConfigTab('layout')">&#129529; Cache Management</button>
+  </div>
 
 <style>
 /* Section tabs */
@@ -320,22 +324,6 @@ tr:hover td{background:#FAFAFA}
 .stab:hover{color:var(--text-primary)}
 .stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
 </style>
-
-<!-- Event Selection inline toolbar -->
-<div class="card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid var(--border);">
-  <div style="display:flex; align-items:center; gap:8px;">
-    <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
-    <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
-  </div>
-  <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
-</div>
-
-<div class="section-tabs">
-  <button class="stab active" data-target="security" onclick="switchConfigTab('security')">&#128273; Access & Security</button>
-  <button class="stab" data-target="scoring" onclick="switchConfigTab('scoring')">&#127941; Scoring & Medals</button>
-  <button class="stab" data-target="challenges" onclick="switchConfigTab('challenges')">&#127919; Challenges & Bonuses</button>
-  <button class="stab" data-target="layout" onclick="switchConfigTab('layout')">&#127912; Layout & Cache</button>
-</div>
 
 <!-- Tab 1: Access & Security -->
 <div class="config-tab-panel" id="tab-panel-security">
@@ -383,204 +371,7 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<!-- Tab 2: Scoring & Medals -->
-<div class="config-tab-panel" id="tab-panel-scoring" style="display: none;">
-  <div class="section"><div class="section-header" onclick="toggleSection('medals')"><div class="section-header-left"><span>&#127941;</span><div><div class="section-title">Medal Milestones <span class="ev-context-badge"></span></div><div class="section-sub-inline">Points required for Bronze, Silver, Gold  &mdash;  by gender</div></div></div><span class="section-chevron" id="chev-medals">&#9660;</span></div><div class="section-body" id="body-medals"><div class="form-grid"><div class="field"><label>&#129351; Gold  &mdash;  Male</label><input type="number" id="gold-male" value="300"></div><div class="field"><label>&#129351; Gold  &mdash;  Female</label><input type="number" id="gold-female" value="250"></div><div class="field"><label>&#129352; Silver  &mdash;  Male</label><input type="number" id="silver-male" value="200"></div><div class="field"><label>&#129352; Silver  &mdash;  Female</label><input type="number" id="silver-female" value="150"></div><div class="field"><label>&#129353; Bronze  &mdash;  Male</label><input type="number" id="bronze-male" value="125"></div><div class="field"><label>&#129353; Bronze  &mdash;  Female</label><input type="number" id="bronze-female" value="100"></div></div><button class="save-btn" onclick="saveMedals()">Save medals</button><span class="saved-msg" id="medals-saved">&#9989; Saved!</span></div></div>
-
-  <div class="section"><div class="section-header" onclick="toggleSection('bonus')"><div class="section-header-left"><span>&#128202;</span><div><div class="section-title">Points Configuration <span class="ev-context-badge"></span></div><div class="section-sub-inline">Base points per km + daily bonus milestones</div></div></div><span class="section-chevron" id="chev-bonus">&#9660;</span></div><div class="section-body" id="body-bonus"><div class="form-grid" style="max-width:300px;margin-bottom:20px"><div class="field"><label>Base points per km</label><input type="number" id="base-per-km" value="1" step="0.1"></div></div><table class="bonus-table"><thead><tr><th>Daily distance milestone</th><th>Bonus points</th></tr></thead><tbody id="bonus-rows"></tbody></table><button class="save-btn" onclick="saveBonus()">Save points config</button><span class="saved-msg" id="bonus-saved">&#9989; Saved!</span></div></div>
-
-  <div class="section"><div class="section-header" onclick="toggleSection('dailycap')"><div class="section-header-left"><span>&#128197;</span><div><div class="section-title">Daily Cap & Special Days <span class="ev-context-badge"></span></div><div class="section-sub-inline">21 km cap on normal days; selected dates count full distance</div></div></div><span class="section-chevron" id="chev-dailycap">&#9660;</span></div><div class="section-body" id="body-dailycap"><div class="rule-box"><strong>Normal Days Rule:</strong><br>Daily walk/run cap is <strong>21 km</strong>. If a participant walks/runs more than 21 km on a normal day, recorded scoring distance will be capped at 21 km, worth 21 base points, and they will receive a flat <strong>+7 bonus points</strong>. Total = 28 points.</div><div class="rule-box"><strong>Special Days Rule Exception:</strong><br>On selected special dates, the 21 km limit is removed. Participants receive <strong>1 point per full kilometer</strong>, while bonus remains capped at <strong>+7 points</strong>. Example: 25 km = 25 base points + 7 bonus = 32 points.</div><div class="form-grid" style="align-items:end"><div class="field"><label>Special date</label><input type="date" id="special-date"></div><div class="field" style="grid-column:span 2"><label>Reason / Label</label><input type="text" id="special-label" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="addSpecialDate()">Add Special Date</button><button class="btn-add" style="margin-left:8px;background:#f0f0f0;color:#555" onclick="loadSpecialDates()">Refresh</button><span class="saved-msg" id="special-saved">&#9989; Saved!</span><div id="special-msg-ok" class="msg ok"></div><div id="special-msg-err" class="msg err"></div><div style="font-size:14px;font-weight:600;margin:20px 0 12px">Configured Special Dates</div><div id="special-dates-list">Loading...</div></div></div>
-</div>
-
-<!-- Tab 3: Challenges & Bonuses -->
-<div class="config-tab-panel" id="tab-panel-challenges" style="display: none;">
-  <div class="section"><div class="section-header" onclick="toggleSection('challenges')"><div class="section-header-left"><span>&#127919;</span><div><div class="section-title">Challenges <span class="ev-context-badge"></span></div><div class="section-sub-inline">Configure challenge bonus criteria and points</div></div></div><span class="section-chevron" id="chev-challenges">&#9660;</span></div><div class="section-body" id="body-challenges"><div id="challenges-list">Loading...</div><button class="btn-add" onclick="addChallenge()">+ Add challenge</button><span class="saved-msg" id="ch-saved">&#9989; Saved!</span></div></div>
-
-  <div class="section"><div class="section-header" onclick="toggleSection('manual')"><div class="section-header-left"><span>&#127873;</span><div><div class="section-title">Manual Bonus by Activity ID <span class="ev-context-badge"></span></div><div class="section-sub-inline">Apply bonus points to specific activities manually</div></div></div><span class="section-chevron" id="chev-manual">&#9660;</span></div><div class="section-body" id="body-manual"><div class="form-grid" style="max-width:700px"><div class="field" style="grid-column:1/-1"><label>Activity IDs (one per line, or comma separated)</label><textarea id="manual-ids" rows="5" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="18757426157&#10;18755858909"></textarea></div><div class="field"><label>Apply bonus to</label><select id="manual-apply-to"><option value="each">Each activity individually</option><option value="day">All activities on same day</option></select></div><div class="field"><label>Bonus points</label><input type="number" id="manual-pts" value="3" min="1" max="50"></div><div class="field"><label>Date</label><input type="date" id="manual-date"></div><div class="field"><label>Challenge name</label><input type="text" id="manual-reason" placeholder="e.g. World Environment Day"></div></div><button class="save-btn" onclick="saveManualBonus()">Apply manual bonus</button><span class="saved-msg" id="manual-saved">&#9989; Applied!</span><div id="manual-result" style="margin-top:14px;font-size:13px;color:#666"></div><div style="margin-top:20px"><div onclick="toggleManualList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:8px;user-select:none"><div style="font-size:14px;font-weight:600">Existing manual bonuses</div><span id="chev-manuallist" style="font-size:13px;color:#bbb;transition:transform .2s">&#9660;</span></div><div id="body-manuallist" style="display:none;margin-top:8px"><div id="manual-list"></div></div></div></div></div>
-</div>
-
-<!-- Tab 4: Layout & Cache -->
 <div class="config-tab-panel" id="tab-panel-layout" style="display: none;">
-  <div class="section">
-    <div class="section-header" onclick="toggleSection('layout')">
-      <div class="section-header-left">
-        <span>&#127912;</span>
-        <div>
-          <div class="section-title">App Layout & UI Features <span class="ev-context-badge"></span></div>
-          <div class="section-sub-inline">Configure tab visibilities and Connect Strava card visibility</div>
-        </div>
-      </div>
-      <span class="section-chevron" id="chev-layout">&#9660;</span>
-    </div>
-    <div class="section-body" id="body-layout" style="padding: 24px;">
-      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
-        <!-- Toggle Strava Connect -->
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
-          <div style="flex: 1; text-align: left;">
-            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Hide Strava Connect Card</strong>
-            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Hide the "Connect with Strava" card under the Profile tab for this event.</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="layout-hide-strava">
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <!-- Toggle Team Leaderboard Filter -->
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
-          <div style="flex: 1; text-align: left;">
-            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Enable Team-Based Leaderboard Filter</strong>
-            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Show the "Team" sub-tab on the Leaderboard tab (filtered to participant's leaderboard_team).</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="layout-team-leaderboard">
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <!-- Tab Visibilities -->
-        <div style="margin-top: 10px;">
-          <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Floating Nav Bar - Active Tabs</strong>
-          <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-dashboard" checked>
-              <span>Dashboard</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-leaderboard" checked>
-              <span>Leaderboard</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-events" checked>
-              <span>Events</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-celebrate" checked>
-              <span>Celebrate</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-feed" checked>
-              <span>Feed</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="tab-opt-you" checked>
-              <span>You (Profile)</span>
-            </label>
-          </div>
-        </div>
-      </div>
-        <!-- Activities Date Card Points Configuration -->
-        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 20px;">
-          <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Activities Tab - Date Card Points</strong>
-          <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
-            <label class="check-item">
-              <input type="checkbox" id="pts-opt-base" checked>
-              <span>Base Points</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="pts-opt-bonus" checked>
-              <span>Bonus Points</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="pts-opt-challenge" checked>
-              <span>Challenge Points</span>
-            </label>
-            <label class="check-item">
-              <input type="checkbox" id="pts-opt-total" checked>
-              <span>Total Points</span>
-            </label>
-          </div>
-        </div>
-      <button class="save-btn" onclick="saveLayoutConfig()">Save layout settings</button>
-      <span class="saved-msg" id="layout-saved">&#9989; Saved!</span>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-header" onclick="toggleSection('pbconfig')">
-      <div class="section-header-left">
-        <span>🏆</span>
-        <div>
-          <div class="section-title">Personal Bests Settings <span class="ev-context-badge"></span></div>
-          <div class="section-sub-inline">Choose which personal stats to show in the participant view</div>
-        </div>
-      </div>
-      <span class="section-chevron" id="chev-pbconfig">&#9660;</span>
-    </div>
-    <div class="section-body" id="body-pbconfig" style="padding: 24px;">
-      <div style="margin-bottom: 20px;">
-        <strong style="font-size:13.5px; display:block; margin-bottom:8px; color: var(--text-primary);">Select Stats to Display</strong>
-        <div class="check-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-longest_activity" checked>
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Longest Activity</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Single session max distance</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-best_pace" checked>
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Best Pace</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Min/KM pace (walk/run)</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-longest_session" checked>
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Longest Session</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Longest moving duration</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-best_day" checked>
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Best Day</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Daily max distance</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-max_elevation">
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Max Elevation Gain</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Single session max (M)</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-max_speed">
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Max Avg Speed</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Single session max (KM/H)</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-total_distance">
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Total Distance</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Overall event distance</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-total_elevation">
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Total Elevation Gain</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Overall elevation gain</span>
-            </div>
-          </label>
-          <label class="check-item" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="pb-opt-total_activities">
-            <div>
-              <span style="font-weight: 600; display: block; font-size: 13px;">Total Activities</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">Number of sync'd sessions</span>
-            </div>
-          </label>
-        </div>
-      </div>
-      <button class="save-btn" onclick="savePersonalBestsConfig()">Save personal bests settings</button>
-      <span class="saved-msg" id="pbconfig-saved">&#9989; Saved!</span>
-    </div>
-  </div>
-
   <div class="section"><div class="section-header" onclick="toggleSection('cachemgmt')"><div class="section-header-left"><span>&#129529;</span><div><div class="section-title">Cache Management</div><div class="section-sub-inline">Clear browser local cache to see updates immediately</div></div></div><span class="section-chevron" id="chev-cachemgmt">&#9660;</span></div><div class="section-body" id="body-cachemgmt"><div class="rule-box"><strong>Application Cache:</strong><br>The frontend caches leaderboard and configuration data to reduce database load. If you applied manual bonuses, added new challenges, or flagged activities, it may take up to 5 minutes to show up. Click below to clear your local cache and reload immediately.</div><button class="save-btn" onclick="clearMyCache()">ðŸ§¹ Clear My Browser Cache</button><span class="saved-msg" id="cache-saved">&#9989; Cache Cleared!</span></div></div>
 </div>
 
@@ -794,64 +585,22 @@ async function upsertConfig(key,value){
 }
 async function loadConfig(){
   loadPWARestrictions();
-  // Reset fields first so a switch to an unconfigured event shows blanks, not the previous event's stale values
-  ['gold-male','gold-female','silver-male','silver-female','bronze-male','bronze-female','base-per-km'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  loadFeedConfig();
   var lm=document.getElementById('login-method-select'); if(lm) lm.value='';
-  bonusData=[]; renderBonusRows();
-  
-  // Reset layout fields to defaults
-  document.getElementById('layout-hide-strava').checked = false;
-  document.getElementById('layout-team-leaderboard').checked = true;
-  ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
-    var el = document.getElementById('tab-opt-' + t);
-    if (el) el.checked = true;
-  });
-  ['base', 'bonus', 'challenge', 'total'].forEach(function(t){
-    var el = document.getElementById('pts-opt-' + t);
-    if (el) el.checked = true;
-  });
-
-  // Reset personal bests fields to defaults
-  ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t) {
-    var el = document.getElementById('pb-opt-' + t);
-    if (el) el.checked = ['longest_activity', 'best_pace', 'longest_session', 'best_day'].indexOf(t) !== -1;
-  });
-
-  var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});var rows=await r.json();if(!Array.isArray(rows))rows=[];rows.forEach(function(row){if(row.config_key==='medals'){var m=row.config_value;document.getElementById('gold-male').value=m.gold.male;document.getElementById('gold-female').value=m.gold.female;document.getElementById('silver-male').value=m.silver.male;document.getElementById('silver-female').value=m.silver.female;document.getElementById('bronze-male').value=m.bronze.male;document.getElementById('bronze-female').value=m.bronze.female}if(row.config_key==='bonus_points'){bonusData=row.config_value.map(function(b){return{km:b.km,points:b.points||b.pts}});renderBonusRows()}if(row.config_key==='base_points')document.getElementById('base-per-km').value=row.config_value.per_km||1;if(row.config_key==='login_method'){var sel=document.getElementById('login-method-select');if(sel)sel.value=row.config_value;}
-    if(row.config_key==='hide_strava_connect'){
-      document.getElementById('layout-hide-strava').checked = !!row.config_value;
-    }
-    if(row.config_key==='team_leaderboard_enabled'){
-      document.getElementById('layout-team-leaderboard').checked = !!row.config_value;
-    }
-    if(row.config_key==='tabs_config'){
-      var cfg = row.config_value || {};
-      if (typeof cfg === 'string') {
-        try { cfg = JSON.parse(cfg); } catch(e) {}
+  try {
+    var r=await fetch(SB_URL+'/rest/v1/leaderboard_config?select=config_key,config_value'+evq(),{headers:HDR});
+    var rows=await r.json();
+    if(!Array.isArray(rows)) rows=[];
+    rows.forEach(function(row){
+      if(row.config_key==='login_method'){
+        var sel=document.getElementById('login-method-select');
+        if(sel) sel.value=row.config_value;
       }
-      ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t){
-        var el = document.getElementById('tab-opt-' + t);
-        if (el) el.checked = cfg[t] !== false;
-      });
-    }
-    if(row.config_key==='activities_points_config'){
-      var cfg = row.config_value || {};
-      if (typeof cfg === 'string') {
-        try { cfg = JSON.parse(cfg); } catch(e) {}
-      }
-      ['base', 'bonus', 'challenge', 'total'].forEach(function(t){
-        var el = document.getElementById('pts-opt-' + t);
-        if (el) el.checked = cfg[t] !== false;
-      });
-    }
-    if(row.config_key==='personal_bests'){
-      var cfg = row.config_value || {};
-      ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'].forEach(function(t){
-        var el = document.getElementById('pb-opt-' + t);
-        if (el) el.checked = cfg[t] !== false;
-      });
-    }
-  });if(!rows.find(function(r){return r.config_key==='bonus_points'}))renderBonusRows()}
+    });
+  } catch(e) {
+    console.warn("Failed to load login method config:", e);
+  }
+}
 async function saveLoginMethod(){var val=document.getElementById('login-method-select').value;await upsertConfig('login_method',val);showSaved('loginmethod-saved');}
 async function savePersonalBestsConfig() {
   try {
