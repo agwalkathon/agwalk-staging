@@ -230,14 +230,6 @@
     host.textContent = '';
     host.style.opacity = '1';
     
-    var medalData = [];
-    try {
-      medalData = await fetchJSON(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=eq.' + ev.id + '&config_key=eq.medals&select=config_value');
-    } catch(e){}
-    var medals = {gold:{male:300,female:250},silver:{male:200,female:150},bronze:{male:125,female:100}};
-    if (Array.isArray(medalData) && medalData.length && medalData[0].config_value) {
-      medals = medalData[0].config_value;
-    }
     var gKey = (ctx.gender || '').toLowerCase() === 'female' ? 'female' : 'male';
 
     dash.rings.slice(0,5).forEach(function(ring){
@@ -248,13 +240,9 @@
         if (actDay(a) === today) todaySum += v;
       });
       
-      var goalRaw = String(ring.goal).toLowerCase().trim();
-      var goal;
-      if (goalRaw === 'gold' || goalRaw === 'silver' || goalRaw === 'bronze') {
-        goal = Number(medals[goalRaw][gKey]) || 100;
-      } else {
-        goal = parseFloat(goalRaw) || 0;
-      }
+      var goalRaw = (gKey === 'female') ? (ring.goal_female !== undefined ? ring.goal_female : ring.goal) : (ring.goal_male !== undefined ? ring.goal_male : ring.goal);
+      goalRaw = String(goalRaw || '').toLowerCase().trim();
+      var goal = parseFloat(goalRaw) || 0;
 
       var value;
       if (ring.goal_type === 'total') { value = total; }
