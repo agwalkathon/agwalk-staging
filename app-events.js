@@ -677,43 +677,114 @@ async function submitEventRegistration(ev) {
 }
 
 function openEventDetailsModal(ev) {
+  function linkify(text) {
+    if (!text) return 'No description provided.';
+    var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlRegex, function(url) {
+      return '<a href="' + url + '" target="_blank" style="color:var(--brand); text-decoration:underline; font-weight:800; word-break:break-all;">' + url + '</a>';
+    });
+  }
+
   var id = 'event-details-modal-container';
   var modal = document.getElementById(id);
   if (!modal) {
     modal = document.createElement('div');
     modal.id = id;
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;';
     document.body.appendChild(modal);
   }
+  
+  // Style container as a full-page cover with no scrollbar
+  modal.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg, #0d0f12 0%, #15191e 100%);z-index:10000;display:none;flex-direction:column;overflow:hidden;font-family:inherit;';
   
   var start = evFmtDate(ev.start_date);
   var end = evFmtDate(ev.end_date);
   var sports = Array.isArray(ev.sport_types) ? ev.sport_types.join(', ') : (ev.sport_types || 'Walk/Run');
   
-  var bannerHtml = ev.banner_url ? '<img src="' + ev.banner_url + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:14px;">' : '';
-  
+  var statusBadgeStyle = '';
+  var statusText = '';
+  if (ev.status === 'live') {
+    statusBadgeStyle = 'background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); color:#10B981;';
+    statusText = '● Live Event';
+  } else if (ev.status === 'upcoming') {
+    statusBadgeStyle = 'background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.35); color:#3B82F6;';
+    statusText = 'Upcoming Event';
+  } else {
+    statusBadgeStyle = 'background:rgba(156,163,175,0.12); border:1px solid rgba(156,163,175,0.25); color:#9CA3AF;';
+    statusText = 'Past Event';
+  }
+
+  var bannerHtml = ev.banner_url ? 
+    '<div style="width:100%; border-radius:16px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); position:relative; aspect-ratio:21/9; max-height:220px; flex-shrink:0; margin-bottom:10px;">' +
+      '<img src="' + ev.banner_url + '" style="width:100%; height:100%; object-fit:cover;">' +
+      '<div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);"></div>' +
+    '</div>' : '';
+
   modal.innerHTML = 
-    '<div class="glass-card" style="width:100%;max-width:480px;background:rgba(22,27,33,.85);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:22px;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.5);position:relative;">' +
-      '<button id="close-ev-details-btn" style="position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:6px;">✕</button>' +
-      bannerHtml +
-      '<div style="font-size:20px;font-weight:800;margin-bottom:6px;line-height:1.2;padding-right:24px;">' + ev.name + '</div>' +
-      '<div style="font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;">' + (ev.status === 'live' ? '● Live Event' : (ev.status === 'upcoming' ? 'Upcoming Event' : 'Past Event')) + '</div>' +
-      
-      '<div style="display:flex;flex-direction:column;gap:12px;font-size:13px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;margin-bottom:14px;">' +
-        '<div><strong style="color:rgba(255,255,255,.5);">Duration:</strong> <span style="float:right;">' + start + ' — ' + end + '</span></div>' +
-        '<div><strong style="color:rgba(255,255,255,.5);">Sport Type Allowed:</strong> <span style="float:right;">' + sports + '</span></div>' +
-        '<div><strong style="color:rgba(255,255,255,.5);">Primary Goal Metric:</strong> <span style="float:right;">Distance</span></div>' +
+    '<!-- Header -->' +
+    '<div style="height:60px; display:flex; align-items:center; padding:0 16px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(21,25,30,0.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:10; flex-shrink:0;">' +
+      '<button id="close-ev-details-btn" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:30px; transition:all 0.2s; outline:none; -webkit-tap-highlight-color:transparent;">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
+        '<span>Back</span>' +
+      '</button>' +
+      '<div style="flex:1; text-align:center; font-size:16px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:1px; margin-right:60px;">Event Details</div>' +
+    '</div>' +
+    
+    '<!-- Scrollable Content -->' +
+    '<div style="flex:1; overflow-y:auto; padding:20px 16px; display:flex; flex-direction:column; align-items:center; -webkit-overflow-scrolling:touch;">' +
+      '<div style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:16px;">' +
+        
+        bannerHtml +
+        
+        '<!-- Title Card -->' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,0.15);">' +
+          '<div style="font-size:22px; font-weight:900; color:#fff; line-height:1.25; margin-bottom:8px;">' + ev.name + '</div>' +
+          '<div style="display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:800; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.8px; ' + statusBadgeStyle + '">' +
+            statusText +
+          '</div>' +
+        '</div>' +
+        
+        '<!-- Quick Info Grid -->' +
+        '<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">' +
+          '<div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 6px; text-align:center;">' +
+            '<div style="font-size:18px; margin-bottom:4px;">📅</div>' +
+            '<div style="font-size:9px; color:var(--muted); font-weight:750; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:2px;">Starts</div>' +
+            '<div style="font-size:11.5px; font-weight:800; color:#fff;">' + start + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 6px; text-align:center;">' +
+            '<div style="font-size:18px; margin-bottom:4px;">🏁</div>' +
+            '<div style="font-size:9px; color:var(--muted); font-weight:750; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:2px;">Ends</div>' +
+            '<div style="font-size:11.5px; font-weight:800; color:#fff;">' + end + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 6px; text-align:center;">' +
+            '<div style="font-size:18px; margin-bottom:4px;">🏃‍♂️</div>' +
+            '<div style="font-size:9px; color:var(--muted); font-weight:750; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:2px;">Sports</div>' +
+            '<div style="font-size:11.5px; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="' + sports + '">' + sports + '</div>' +
+          '</div>' +
+        '</div>' +
+        
+        '<!-- Description Card -->' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px;">' +
+          '<div style="font-size:12px; font-weight:850; color:var(--brand); text-transform:uppercase; letter-spacing:1px;">About the Event</div>' +
+          '<div style="font-size:14px; color:rgba(255,255,255,0.9); line-height:1.6; white-space:pre-wrap; word-break:break-word;">' +
+            linkify(ev.description) +
+          '</div>' +
+        '</div>' +
+        
       '</div>' +
-      
-      '<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px;">What is event?</div>' +
-      '<div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.5;background:rgba(255,255,255,.03);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.04);max-height:120px;overflow-y:auto;white-space:pre-wrap;">' + (ev.description || 'No description provided.') + '</div>' +
     '</div>';
     
   modal.style.display = 'flex';
-  document.getElementById('close-ev-details-btn').onclick = function() {
+  document.body.style.overflow = 'hidden'; // Remove main page scrollbar
+  
+  var closeBtn = document.getElementById('close-ev-details-btn');
+  closeBtn.onclick = function() {
     modal.style.display = 'none';
+    document.body.style.overflow = ''; // Restore main page scrollbar
   };
-  modal.onclick = function(e) {
-    if (e.target === modal) modal.style.display = 'none';
+  closeBtn.onmouseenter = function() {
+    closeBtn.style.background = 'rgba(255,255,255,0.08)';
+  };
+  closeBtn.onmouseleave = function() {
+    closeBtn.style.background = 'rgba(255,255,255,0.04)';
   };
 }
