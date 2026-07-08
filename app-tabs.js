@@ -1785,20 +1785,18 @@ function openHighlightDetail(key) {
   }
   if (bodyEl) bodyEl.textContent = data.body;
   
-  modal.style.display = 'flex';
-  var card = modal.querySelector('.modal-card');
-  if (card) {
-    card.style.transform = 'scale(0.9)';
-    setTimeout(function() {
-      card.style.transform = 'scale(1)';
-    }, 10);
-  }
+  modal.classList.add('open');
 }
 
-function triggerHighlightCheer() {
-  triggerConfettiBurst();
+function closeHighlightDetail() {
   var modal = document.getElementById('highlight-detail-modal');
-  if (modal) modal.style.display = 'none';
+  if (modal) modal.classList.remove('open');
+}
+
+function triggerHighlightCheer(e) {
+  if (e) e.stopPropagation();
+  triggerConfettiBurst();
+  closeHighlightDetail();
 }
 
 function triggerConfettiBurst() {
@@ -3180,10 +3178,12 @@ function closeReactionsDetail() {
     var profModal = document.getElementById('profile-detail-modal');
     var highModal = document.getElementById('highlight-detail-modal');
     var rxModal = document.getElementById('reactions-detail-modal');
+    var dashModal = document.getElementById('dash-details-modal');
     return (actModal && actModal.classList.contains('open')) ||
            (profModal && profModal.classList.contains('open')) ||
-           (highModal && highModal.style.display === 'flex') ||
-           (rxModal && rxModal.classList.contains('open'));
+           (highModal && highModal.classList.contains('open')) ||
+           (rxModal && rxModal.classList.contains('open')) ||
+           (dashModal && dashModal.classList.contains('open'));
   }
 
   window.addEventListener('touchstart', function(e) {
@@ -3491,7 +3491,7 @@ function setupAppLayout(isParticipant) {
 // ── Dashboard Details Modal Operations ──
 function closeDashModal() {
   var modal = document.getElementById('dash-details-modal');
-  if (modal) modal.style.display = 'none';
+  if (modal) modal.classList.remove('open');
 }
 
 function openDashStatsModal() {
@@ -3592,7 +3592,7 @@ function openDashStatsModal() {
   '</div>';
   
   document.getElementById('dash-modal-body').innerHTML = bodyHtml;
-  modal.style.display = 'flex';
+  modal.classList.add('open');
 }
 
 function openDashPointsModal() {
@@ -3635,7 +3635,7 @@ function openDashPointsModal() {
   '</div>';
   
   document.getElementById('dash-modal-body').innerHTML = ledgerHtml;
-  modal.style.display = 'flex';
+  modal.classList.add('open');
 }
 
 function openDashStreakModal() {
@@ -3696,7 +3696,7 @@ function openDashStreakModal() {
   '</div>';
   
   document.getElementById('dash-modal-body').innerHTML = bodyHtml;
-  modal.style.display = 'flex';
+  modal.classList.add('open');
 }
 
 function openDashPaceModal() {
@@ -3748,7 +3748,7 @@ function openDashPaceModal() {
   '</div>';
   
   document.getElementById('dash-modal-body').innerHTML = bodyHtml;
-  modal.style.display = 'flex';
+  modal.classList.add('open');
 }
 
 window.openDashStatsModal = openDashStatsModal;
