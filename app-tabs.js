@@ -2981,6 +2981,53 @@ function toggleNotificationDropdown(e) {
   dd.style.display = isVisible ? 'none' : 'block';
 }
 
+async function triggerParticipantStravaSync(e) {
+  if (e) e.stopPropagation();
+  var btn = document.getElementById('strava-sync-btn');
+  if (!btn) return;
+  
+  if (btn.classList.contains('spinning')) return;
+  
+  var session = {};
+  try {
+    session = JSON.parse(safeGetItem('wk_user') || '{}');
+  } catch(err) {}
+  var athleteId = session.athleteId;
+  if (!athleteId) {
+    alert('You must be a registered participant connected with Strava to sync.');
+    return;
+  }
+  
+  btn.classList.add('spinning');
+  
+  try {
+    var res = await fetch(BACKEND + '/participant/sync-activities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ athlete_id: athleteId })
+    });
+    
+    var data = await res.json();
+    if (res.status === 429) {
+      alert(data.error || 'Sync cooldown active. Please wait before trying again.');
+    } else if (res.ok && data.success) {
+      alert(data.message || 'Sync completed successfully!');
+      if (typeof load === 'function') {
+        load(true).catch(function(err){ console.warn('Reload load error:', err); });
+      }
+    } else {
+      alert(data.error || 'Failed to sync activities. Please try again.');
+    }
+  } catch (err) {
+    console.error('Participant sync fetch error:', err);
+    alert('Network error. Failed to connect to server.');
+  } finally {
+    setTimeout(function() {
+      btn.classList.remove('spinning');
+    }, 1000);
+  }
+}
+
 async function clearNotifications(e) {
   if (e) e.stopPropagation();
   var badge = document.getElementById('notification-badge');
@@ -3381,6 +3428,11 @@ function setupAppLayout(isParticipant) {
     if (document.getElementById('you-panel-activities')) document.getElementById('you-panel-activities').style.display = 'none';
     if (document.getElementById('you-panel-challenges')) document.getElementById('you-panel-challenges').style.display = 'none';
     if (document.getElementById('you-panel-info')) document.getElementById('you-panel-info').style.display = 'block';
+  }
+  
+  var syncBtn = document.getElementById('strava-sync-btn');
+  if (syncBtn) {
+    syncBtn.style.display = isParticipant ? 'inline-flex' : 'none';
   }
   
   if (bnav) {
