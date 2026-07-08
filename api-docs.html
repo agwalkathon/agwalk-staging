@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].update();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
+          });
+        });
+      }
+    })();
+  </script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API & Logic Documentation ?" Arcgate Walkathon 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --brand: #E8622A; --brand-light: #FFF0EA; --brand-mid: #f97d4e;
+      --sidebar-bg: #0F1117; --sidebar-w: 64px; --sidebar-exp: 220px;
+      --page-bg: #F4F6FA; --card-bg: #FFFFFF;
+      --text-primary: #0F1117; --text-secondary: #6B7280; --text-muted: #9CA3AF;
+      --border: rgba(0,0,0,0.07);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px;
+      --font: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--page-bg); color: var(--text-primary); min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); display: flex; flex-direction: column; align-items: center; padding: 12px 0; z-index: 300; transition: width .24s cubic-bezier(.4,0,.2,1); overflow-x: hidden; overflow-y: hidden; }
+    .sidebar:hover { width: var(--sidebar-exp); overflow-y: auto; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+    .sidebar:hover::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.22); }
+    .sb-logo { display: flex; align-items: center; width: 100%; padding: 4px 14px 12px; text-decoration: none; gap: 10px; flex-shrink: 0; }
+    .sb-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-logo-icon i { color: #fff; font-size: 20px; }
+    .sb-logo-text { font-size: 13px; font-weight: 600; color: #fff; opacity: 0; white-space: nowrap; transition: opacity .18s; line-height: 1.3; }
+    .sb-logo-text span { display: block; font-size: 10px; font-weight: 400; color: rgba(255,255,255,.45); }
+    .sidebar:hover .sb-logo-text { opacity: 1; }
+    .sb-scroll-area { width: 100%; display: flex; flex-direction: column; }
+    .sb-section { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.22); padding: 8px 14px 4px; width: 100%; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+    .sidebar:hover .sb-section { opacity: 1; }
+    .sb-item { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 34px; text-decoration: none; gap: 10px; border-left: 3px solid transparent; transition: all .16s; margin-bottom: 2px; }
+    .sb-item:hover { background: rgba(255,255,255,.06); border-left-color: rgba(232,98,42,.5); }
+    .sb-item.active { background: rgba(232,98,42,.12); border-left-color: var(--brand); }
+    .sb-item i { font-size: 18px; color: rgba(255,255,255,.38); flex-shrink: 0; width: 28px; text-align: center; transition: color .16s; }
+    .sb-item:hover i { color: rgba(255,255,255,.7); }
+    .sb-item.active i { color: var(--brand); }
+    .sb-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+    .sb-spacer { flex: 1; }
+    .sb-divider { width: calc(100% - 24px); height: 1px; background: rgba(255,255,255,.07); margin: 6px 12px; flex-shrink: 0; }
+    .sb-signout { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 34px; gap: 10px; border: none; background: none; cursor: pointer; transition: all .16s; font-family: var(--font); }
+    .sb-signout:hover { background: rgba(255,80,80,.08); }
+    .sb-signout i { font-size: 18px; color: rgba(255,255,255,.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+    
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar-left h1 { font-size: 17px; font-weight: 600; }
+    .topbar-left p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .content { flex: 1; padding: 28px 32px; display: flex; gap: 24px; }
+
+    /* Layout Doc Navigation & Details */
+    .doc-nav { width: 260px; flex-shrink: 0; background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; height: fit-content; position: sticky; top: 84px; }
+    .doc-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; text-decoration: none; color: var(--text-secondary); font-size: 13px; font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s; cursor: pointer; border: none; background: none; text-align: left; }
+    .doc-nav-item:hover { background: #F3F4F6; color: var(--text-primary); }
+    .doc-nav-item.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
+    .doc-nav-item i { font-size: 16px; }
+
+    .doc-body { flex: 1; min-width: 0; }
+    .doc-section { display: none; background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 32px; box-shadow: var(--shadow-sm); }
+    .doc-section.active { display: block; }
+
+    /* Documentation Typography & Style */
+    h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; border-bottom: 2px solid var(--page-bg); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    h2 i { color: var(--brand); }
+    h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 24px 0 10px; }
+    p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+    ul, ol { margin-left: 20px; margin-bottom: 14px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    li { margin-bottom: 6px; }
+    
+    .alert-box { background: var(--brand-light); border-left: 4px solid var(--brand); padding: 16px; border-radius: var(--radius-sm); margin: 16px 0; }
+    .alert-box.blue { background: #EFF6FF; border-left-color: #3B82F6; }
+    .alert-box h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .alert-box p { font-size: 12px; margin-bottom: 0; line-height: 1.5; }
+
+    /* Table styling */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+    th { background: #F9FAFB; text-align: left; padding: 10px 12px; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid rgba(0,0,0,0.08); }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.04); color: var(--text-secondary); vertical-align: top; }
+    tr:hover td { background: #FAFAFA; }
+    code { font-family: monospace; background: #F3F4F6; padding: 2px 5px; border-radius: 4px; color: #D2341D; font-size: 12px; }
+    
+    /* Code Blocks */
+    pre { background: #1E293B; border-radius: var(--radius-sm); padding: 16px; overflow-x: auto; margin: 14px 0; border: 1px solid #334155; }
+    pre code { background: none; padding: 0; color: #E2E8F0; font-size: 12px; line-height: 1.5; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .content { flex-direction: column; }
+      .doc-nav { width: 100%; position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+    
+    <div class="sb-scroll-area">
+      <div class="sb-section">Operations</div>
+      <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+      <a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+      <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+      <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+      <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+
+      <div class="sb-section">Social Feed</div>
+      <a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
+      <a href="celebrate-config.html" class="sb-item"><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
+      <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+      <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+
+      <div class="sb-section">System</div>
+      <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+      <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+      <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item active"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
+    </div>
+
+    <div class="sb-spacer"></div>
+    <div class="sb-divider"></div>
+    <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>API & Scoring Logic Documentation</h1>
+        <p>Developer Reference and Configuration Guide</p>
+      </div>
+      <div class="topbar-right">
+        <a href="admin.html" class="doc-nav-item" style="padding: 6px 12px; background: #F3F4F6;"><i class="ti ti-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Doc Navigation -->
+      <nav class="doc-nav">
+        <button class="doc-nav-item active" onclick="switchSection('overview')"><i class="ti ti-info-circle"></i> Overview</button>
+        <button class="doc-nav-item" onclick="switchSection('strava-api')"><i class="ti ti-api"></i> Strava API Sync</button>
+        <button class="doc-nav-item" onclick="switchSection('db-schema')"><i class="ti ti-database"></i> DB Schema & Fields</button>
+        <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Rules</button>
+        <button class="doc-nav-item" onclick="switchSection('endpoints')"><i class="ti ti-plug"></i> API Endpoints</button>
+        <button class="doc-nav-item" onclick="switchSection('operations')"><i class="ti ti-tool"></i> Common Fixes</button>
+      </nav>
+
+      <!-- Documentation body -->
+      <main class="doc-body">
+        
+        <!-- Section: Overview -->
+        <section id="overview" class="doc-section active">
+          <h2><i class="ti ti-info-circle"></i> Overview</h2>
+          <p>The Arcgate Walkathon application integrates directly with the <strong>Strava API</strong> to track and reward walking and running activities for employees. This document is a centralized reference outlining how data flows from Strava, how it is processed by the backend scoring engine, and how it is saved and summarized in Supabase.</p>
+          <div class="alert-box blue">
+            <h4><i class="ti ti-info-circle"></i> Key Architecture</h4>
+            <p>The system is split into three main components:
+              <br>1. <strong>Backend Server (Node.js/Express)</strong>: Handles Webhooks, token refreshes, sync triggers, and runs the scoring engine.
+              <br>2. <strong>Supabase (PostgreSQL)</strong>: Holds activities, challenge configurations, athlete settings, and points summaries.
+              <br>3. <strong>Frontend Portal (HTML/JS)</strong>: Renders leaderboard statistics, user dashboards, and organizers' administrative controls.
+            </p>
+          </div>
+        </section>
+
+        <!-- Section: Strava API Sync -->
+        <section id="strava-api" class="doc-section">
+          <h2><i class="ti ti-api"></i> Strava API Sync</h2>
+          <p>Activity data is retrieved from Strava using two primary methods:</p>
+          <ol>
+            <li><strong>Strava Webhook Subscription</strong>: Triggers real-time synchronization whenever a registered athlete creates, updates, or deletes an activity.</li>
+            <li><strong>Manual / History Sync</strong>: Triggered via the Admin Panel to fetch or backfill history directly using the athlete's OAuth tokens.</li>
+          </ol>
+
+          <h3>Timezone Offset Resolution (IST Correction)</h3>
+          <p>Activities on Strava are timestamped based on the athlete's location. When fetching data from Strava, the API returns two date fields:</p>
+          <ul>
+            <li><code>start_date</code>: The activity start time in <strong>UTC time</strong>.</li>
+            <li><code>start_date_local</code>: The activity start time in the <strong>athlete's local timezone</strong> as recorded by the device.</li>
+          </ul>
+
+          <div class="alert-box">
+            <h4><i class="ti ti-alert-triangle"></i> Important Timezone Rule</h4>
+            <p>We prioritize <code>start_date_local</code> directly from the Strava payload to set the database's <code>activity_date_time_ist</code> field. This prevents timezone desyncs where Strava records a wrong UTC timestamp relative to the local timestamp (a common issue with manual entries). 
+            <br>We only fall back to adding <code>+5.5 hours</code> to <code>start_date</code> if <code>start_date_local</code> is missing.</p>
+          </div>
+
+          <h3>Field Mappings from Strava payload</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Strava Field</th>
+                <th>Database Column</th>
+                <th>Description / Conversion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>id</code></td>
+                <td><code>strava_activity_id</code></td>
+                <td>Unique ID of the activity (primary identifier).</td>
+              </tr>
+              <tr>
+                <td><code>athlete.id</code></td>
+                <td><code>strava_athlete_id</code></td>
+                <td>Reference linking the activity to the registered athlete.</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td><code>activity_name</code></td>
+                <td>Title given by the user on Strava.</td>
+              </tr>
+              <tr>
+                <td><code>distance</code></td>
+                <td><code>distance_meters</code></td>
+                <td>Activity distance in meters. Divided by <code>1000</code> in frontend.</td>
+              </tr>
+              <tr>
+                <td><code>moving_time</code></td>
+                <td><code>moving_time_seconds</code></td>
+                <td>Duration of the activity spent moving (seconds).</td>
+              </tr>
+              <tr>
+                <td><code>start_date_local</code></td>
+                <td><code>activity_date_time_ist</code></td>
+                <td>Prioritized field (stripped of 'Z') representing local clock time.</td>
+              </tr>
+              <tr>
+                <td><code>start_date</code></td>
+                <td><code>activity_date</code></td>
+                <td>Raw UTC timestamp representation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section: DB Schema -->
+        <section id="db-schema" class="doc-section">
+          <h2><i class="ti ti-database"></i> Database Schema & Fields</h2>
+          <p>Below are the primary Supabase tables used for tracking and scoring activities.</p>
+
+          <h3>1. <code>registration</code> (Athlete Details)</h3>
+          <p>Stores the registered user profiles, shift details, and OAuth tokens.</p>
+          <ul>
+            <li><code>strava_athlete_id</code>: Unique numeric id returned by Strava.</li>
+            <li><code>full_name</code>: Full name of the participant.</li>
+            <li><code>emp_code</code>: Unique employee code.</li>
+            <li><code>shift</code>: Athlete's work shift (e.g. <code>Dayshift</code>, <code>Nightshift</code>, etc.).</li>
+            <li><code>access_token</code> & <code>refresh_token</code>: API credentials used to pull data.</li>
+            <li><code>strava_connected</code>: Boolean flag showing active integration.</li>
+          </ul>
+
+          <h3>2. <code>activities</code> (Raw Activities)</h3>
+          <p>Stores individual activity logs fetched from Strava API.</p>
+          <ul>
+            <li><code>activity_date_time_ist</code>: Stores the local calendar date and time. **The primary field used for daily groupings on leaderboards.**</li>
+            <li><code>activity_date</code>: The raw UTC time stored for safety.</li>
+            <li><code>start_time</code>: Time portion parsed from the local date (e.g., <code>05:03:42</code>).</li>
+            <li><code>distance_meters</code>: Float distance.</li>
+            <li><code>moving_time_seconds</code>: Float time duration.</li>
+            <li><code>is_flagged</code>: Indicates if the activity violates validation rules (e.g., pace too fast, overlapping times).</li>
+          </ul>
+
+          <h3>3. <code>athlete_points_summary</code> (Cached Standings)</h3>
+          <p>Holds pre-calculated aggregated statistics for high-performance frontend loads.</p>
+          <ul>
+            <li><code>total_distance_km</code>: Cumulative distance across the event.</li>
+            <li><code>base_points</code>: Base score awarded from active walking.</li>
+            <li><code>challenge_points</code>: Points earned from participating in specific challenges.</li>
+            <li><code>bonus_points</code>: Cumulative milestone/special day bonuses.</li>
+            <li><code>total_points</code>: <code>base_points + challenge_points + bonus_points</code>. **This cached value is queried by leaderboards.**</li>
+          </ul>
+
+          <h3>4. <code>challenges</code> (Challenge Targets)</h3>
+          <p>Maintains dynamic active challenges.</p>
+          <ul>
+            <li><code>distance_type</code>: Can be <code>fixed</code> (e.g., complete exactly 5km) or <code>range</code> (split-based logic).</li>
+            <li><code>distance</code>: The threshold target in km.</li>
+            <li><code>points</code>: The points rewarded if achieved.</li>
+          </ul>
+        </section>
+
+        <!-- Section: Scoring Engine -->
+        <section id="scoring" class="doc-section">
+          <h2><i class="ti ti-calculator"></i> Scoring Rules & Engine</h2>
+          <p>Points are calculated per athlete per calendar day using their local <code>activity_date_time_ist</code> date.</p>
+
+          <h3>1. Base Points</h3>
+          <ul>
+            <li>Calculated as <code>1 Point per 1 km</code> walked.</li>
+            <li>Distances are not rounded down; e.g. walking <code>5.45 km</code> grants <code>5.45 base points</code>.</li>
+          </ul>
+
+          <h3>2. Milestone Bonuses (Base Tier)</h3>
+          <p>Athletes earn extra points based on their cumulative distance on any single calendar day:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Daily Distance Milestone</th>
+                <th>Bonus Points Awarded</th>
+                <th>Total Earned (Base + Bonus)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>5.0 km to 7.99 km</strong></td>
+                <td>+1.0 Point</td>
+                <td>Distance + 1.0</td>
+              </tr>
+              <tr>
+                <td><strong>8.0 km to 9.99 km</strong></td>
+                <td>+2.0 Points</td>
+                <td>Distance + 2.0</td>
+              </tr>
+              <tr>
+                <td><strong>10.0 km to 14.99 km</strong></td>
+                <td>+3.0 Points</td>
+                <td>Distance + 3.0</td>
+              </tr>
+              <tr>
+                <td><strong>15.0 km to 20.99 km</strong></td>
+                <td>+4.0 Points</td>
+                <td>Distance + 4.0</td>
+              </tr>
+              <tr>
+                <td><strong>21.0 km or more</strong></td>
+                <td>+5.0 Points</td>
+                <td>Distance + 5.0 (Capped at 26.0)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>3. Daily Cap (21 km / 26 Points Limit)</h3>
+          <p>To ensure fair competition, active walking distance is capped at <strong>21 km per calendar day</strong> (maximum 26.0 total points including the 5.0 milestone bonus).</p>
+          <div class="alert-box blue">
+            <h4><i class="ti ti-calendar-event"></i> Special Double Point Days</h4>
+            <p>Certain dates loaded into the <code>special_days</code> table bypass the cap or multiply scoring. On these dates, the caps are adjusted programmatically (e.g. 2x points or a higher cap).</p>
+          </div>
+
+          <h3>4. Range-Split Active Challenges Logic</h3>
+          <p>If a challenge on a day is a <strong>range-split type</strong> (e.g. walk 5km for a challenge):</p>
+          <ol>
+            <li>We identify the activities matching the challenge.</li>
+            <li>We deduct the challenge distance (e.g. 5km) from the day's total walking pool.</li>
+            <li>The deducted distance is scored separately as <strong>Challenge Points</strong>.</li>
+            <li>The remaining distance is evaluated against the milestone tiers to compute <strong>Base Points + Milestone Bonuses</strong>.</li>
+          </ol>
+
+          <h3>5. Multi-Challenge Days</h3>
+          <p>If an athlete enters two challenges on a single day, the engine resolves them in order of priority, separating challenge pools to prevent double-dipping, and scores the remaining remainder towards daily base standings.</p>
+        </section>
+
+        <!-- Section: API Endpoints -->
+        <section id="endpoints" class="doc-section">
+          <h2><i class="ti ti-plug"></i> API Endpoints</h2>
+          <p>The backend server hosts the following crucial endpoints for syncing and administration:</p>
+
+          <h3>Sync Operations</h3>
+          <ul>
+            <li><code>POST /admin/refresh-strava-tokens</code>: Iterates through registered athletes, checks oauth expiry, and retrieves fresh access tokens from Strava.</li>
+            <li><code>POST /admin/backfill-points</code>: Recalculates and caches points summaries for all registered participants. Runs when adjustments to milestones or past errors are made.</li>
+            <li><code>POST /register</code>: Webhook endpoint called by Strava's servers during athlete authorization.</li>
+          </ul>
+
+          <h3>System Settings</h3>
+          <ul>
+            <li><code>GET /maintenance-status</code>: Light API checking if the portal is in maintenance mode. Allows bypassing for administrators.</li>
+            <li><code>PATCH /admin/maintenance</code>: Admin endpoint to toggle maintenance mode, add whitelist IDs, and write system announcement text.</li>
+          </ul>
+        </section>
+
+        <!-- Section: Common Fixes -->
+        <section id="operations" class="doc-section">
+          <h2><i class="ti ti-tool"></i> Common Fixes & Playbook</h2>
+          
+          <h3>1. Recalculating Leaderboard Points</h3>
+          <p>If points are showing incorrectly for a participant due to a configuration change or timezone update, run a full recalculation of points summaries:
+            <br>Navigate to the <strong>Data Upload</strong> page and hit the <strong>Recalculate Summary</strong> button. This updates the cached table in Supabase.
+          </p>
+
+          <h3>2. Clear Cache Button</h3>
+          <p>If frontend points are desynced from raw database values, click the <strong>Clear App Cache</strong> button in the admin banner. This clears cookies, sessionStorage, and deletes browser service-worker cache keys forcing a hard refetch of the stats API.</p>
+
+          <h3>3. Repairing a Single Incorrect Activity Date</h3>
+          <p>If an activity is placed under the wrong date (e.g. UTC offset desync), you can manually update it in Supabase:
+            <pre><code>UPDATE activities 
+SET activity_date_time_ist = '2026-06-25T05:03:42' 
+WHERE strava_activity_id = 19055574519;</code></pre>
+            After applying the change, run the <strong>Recalculate Summary</strong> operation to sync the leaderboard totals.
+          </p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Security check
+    if (typeof authGuard === 'function') {
+      authGuard();
+    }
+
+    function switchSection(sectionId) {
+      // Toggle nav buttons
+      document.querySelectorAll('.doc-nav-item').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Handle the button highlight
+      const activeBtn = Array.from(document.querySelectorAll('.doc-nav-item')).find(btn => 
+        btn.getAttribute('onclick').includes(sectionId)
+      );
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Toggle sections
+      document.querySelectorAll('.doc-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
