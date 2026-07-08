@@ -1068,7 +1068,7 @@ async function load(isBackgroundRefresh) {
       
       if(needEl){
         if(done){needEl.textContent='✓ Achieved';needEl.style.color='var(--green)';}
-        else{needEl.textContent='Need '+needed.toFixed(0)+' pts';}
+        else{needEl.textContent='Need '+needed.toFixed(0)+' pts';needEl.style.color='#ffffff';}
       }
     });
     triggerRingAnimation();
