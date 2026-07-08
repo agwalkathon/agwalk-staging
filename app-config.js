@@ -834,7 +834,7 @@ function calcFullPts(myActs, gender, shift) {
 var _LB_EV_RULES = null; /* rules_config of currently viewed event; null = legacy Walkathon distance scoring */
 function lbScoringMode(){ return (_LB_EV_RULES && _LB_EV_RULES.scoring_mode) || 'single_metric'; }
 function lbScoringMetric(){ return (_LB_EV_RULES && _LB_EV_RULES.metric) || 'distance_km'; }
-function lbIsLegacyScoring(){ return !_LB_EV_RULES || (lbScoringMode()==='single_metric' && lbScoringMetric()==='distance_km'); }
+function lbIsLegacyScoring(){ return !window.EVENT_ROW || !window.EVENT_ROW.id || window.EVENT_ROW.id === 1; }
 var LB_METRIC_META = {
   distance_km:     { label:'Distance (km)', short:'KM',    dec:2 },
   elevation_m:     { label:'Elevation (m)', short:'M',     dec:0 },
