@@ -15,6 +15,36 @@ async function fetchAll(url) {
   return all;
 }
 
+function resolveEventMilestones(eventRow, gender) {
+  var gKey = (gender || '').toLowerCase() === 'female' ? 'female' : 'male';
+  var defaults = {
+    bronze: { label: 'Bronze', thresh: (eventRow && eventRow.type === 'cycling') ? 250 : 125 },
+    silver: { label: 'Silver', thresh: (eventRow && eventRow.type === 'cycling') ? 500 : 200 },
+    gold: { label: 'Gold', thresh: (eventRow && eventRow.type === 'cycling') ? 750 : 300 }
+  };
+  
+  if (eventRow && eventRow.rules_config && eventRow.rules_config.dashboard && Array.isArray(eventRow.rules_config.dashboard.rings)) {
+    var rings = eventRow.rules_config.dashboard.rings;
+    var bronzeRing = rings.find(function(r) { var l = (r.label || '').toLowerCase(); return l.indexOf('bronze') > -1 || l.indexOf('level 1') > -1 || l.indexOf('tier 1') > -1; }) || rings[0];
+    var silverRing = rings.find(function(r) { var l = (r.label || '').toLowerCase(); return l.indexOf('silver') > -1 || l.indexOf('level 2') > -1 || l.indexOf('tier 2') > -1; }) || rings[1];
+    var goldRing = rings.find(function(r) { var l = (r.label || '').toLowerCase(); return l.indexOf('gold') > -1 || l.indexOf('level 3') > -1 || l.indexOf('tier 3') > -1; }) || rings[2];
+    
+    if (bronzeRing) {
+      var val = (gKey === 'female') ? (bronzeRing.goal_female !== undefined ? bronzeRing.goal_female : bronzeRing.goal) : (bronzeRing.goal_male !== undefined ? bronzeRing.goal_male : bronzeRing.goal);
+      defaults.bronze = { label: bronzeRing.label || 'Bronze', thresh: parseFloat(val) || defaults.bronze.thresh };
+    }
+    if (silverRing) {
+      var val = (gKey === 'female') ? (silverRing.goal_female !== undefined ? silverRing.goal_female : silverRing.goal) : (silverRing.goal_male !== undefined ? silverRing.goal_male : silverRing.goal);
+      defaults.silver = { label: silverRing.label || 'Silver', thresh: parseFloat(val) || defaults.silver.thresh };
+    }
+    if (goldRing) {
+      var val = (gKey === 'female') ? (goldRing.goal_female !== undefined ? goldRing.goal_female : goldRing.goal) : (goldRing.goal_male !== undefined ? goldRing.goal_male : goldRing.goal);
+      defaults.gold = { label: goldRing.label || 'Gold', thresh: parseFloat(val) || defaults.gold.thresh };
+    }
+  }
+  return defaults;
+}
+
 async function fetchAllParallel(url) {
   var sep = url.indexOf('?') > -1 ? '&' : '?';
   var countHeaders = Object.assign({}, HDR, { 'Prefer': 'count=exact' });
@@ -177,6 +207,23 @@ async function load(isBackgroundRefresh) {
     }
   }
 
+  if (window._currentTab === 'leaderboard' && window._lbCurrentEventId && window._lbCurrentEventId !== window._lbRegisteredEventId) {
+    if (typeof window.fetchEventLbState === 'function') {
+      try {
+        if (window._lbEventCache) delete window._lbEventCache[window._lbCurrentEventId];
+        var st = await window.fetchEventLbState(window._lbCurrentEventId);
+        if (typeof window.applyLbState === 'function') {
+          window.applyLbState(st);
+          window._lbReady = false;
+          if (typeof window.lbBoot === 'function') window.lbBoot();
+        }
+      } catch(e) {
+        console.warn('PTR custom leaderboard reload failed:', e);
+      }
+    }
+    return;
+  }
+
   var s;
   var urlParams = new URLSearchParams(window.location.search);
   var urlActivityId = urlParams.get('activityId');
@@ -197,7 +244,7 @@ async function load(isBackgroundRefresh) {
   var athleteId = s.athleteId;
 
   // ── Maintenance mode gate — block immediately if enabled ────────────────
-  var _maintBlocked = await checkMaintenanceGate(athleteId);
+  var _maintBlocked = await checkMaintenanceGate(athleteId, s.empCode);
   if (_maintBlocked) return;
 
   loadNotifications();
@@ -323,6 +370,9 @@ async function load(isBackgroundRefresh) {
         }
       });
       if (typeof setupAppLayout === 'function') {
+        if (window.EVENT_ROW && window.EVENT_ROW.status === 'live') {
+          window._currentTab = 'dashboard';
+        }
         setupAppLayout(true);
       }
     }
@@ -610,20 +660,28 @@ async function load(isBackgroundRefresh) {
       var avgPtDay=myPtsNow/daysElapsed;
       var projPts=myPtsNow+(avgPtDay*daysLeft);
       var predIco,predTitle,predSub;
-      var bT=bronzeThresh||100,sT=silverThresh||150,gT=goldThresh||200;
+      var activeMilestones = resolveEventMilestones(EVENT_ROW, reg.gender);
+      var bT = activeMilestones.bronze.thresh;
+      var sT = activeMilestones.silver.thresh;
+      var gT = activeMilestones.gold.thresh;
+      
+      var bL = activeMilestones.bronze.label;
+      var sL = activeMilestones.silver.label;
+      var gL = activeMilestones.gold.label;
+
       var topMotivation=[
         'You\'re a legend — can you crack Top 3? 🏆',
         'Elite level achieved! Eyes on the podium 👀',
-        'Gold secured — now chase the #1 spot! 🥇',
+        'Achievement secured — now chase the #1 spot! 🥇',
         'You\'re unstoppable — keep pushing for glory! 💪',
         'Champion energy! The Top 3 is within reach 🚀',
-        'All medals unlocked — now go for the win! 🔥'
+        'All milestones unlocked — now go for the win! 🔥'
       ];
-      if(myPtsNow>=gT){predIco='🏆';predTitle='All Medals Achieved!';predSub=topMotivation[Math.floor(Math.random()*topMotivation.length)];}
-      else if(projPts>=gT){predIco='🥇';predTitle='On track for Gold';predSub='Projected ~'+Math.round(projPts)+' pts at current pace';}
-      else if(projPts>=sT){predIco='🥈';predTitle='On track for Silver';predSub='Need '+(Math.round(gT-projPts))+' more pts to reach Gold';}
-      else if(projPts>=bT){predIco='🥉';predTitle='On track for Bronze';predSub='Walk '+(daysLeft>0?((sT-myPtsNow)/daysLeft).toFixed(1):0)+' km/day to reach Silver';}
-      else{predIco='🏃';predTitle='Keep going!';predSub='Walk '+(daysLeft>0?((bT-myPtsNow)/daysLeft).toFixed(1):0)+' km/day to reach Bronze';}
+      if(myPtsNow>=gT){predIco='🏆';predTitle='All Achievements Achieved!';predSub=topMotivation[Math.floor(Math.random()*topMotivation.length)];}
+      else if(projPts>=gT){predIco='🥇';predTitle='On track for ' + gL;predSub='Projected ~'+Math.round(projPts)+' pts at current pace';}
+      else if(projPts>=sT){predIco='🥈';predTitle='On track for ' + sL;predSub='Need '+(Math.round(gT-projPts))+' more pts to reach ' + gL;}
+      else if(projPts>=bT){predIco='🥉';predTitle='On track for ' + bL;predSub='Walk '+(daysLeft>0?((sT-myPtsNow)/daysLeft).toFixed(1):0)+' km/day to reach ' + sL;}
+      else{predIco='🏃';predTitle='Keep going!';predSub='Walk '+(daysLeft>0?((bT-myPtsNow)/daysLeft).toFixed(1):0)+' km/day to reach ' + bL;}
       var pico=document.getElementById('you-medal-pred-ico');if(pico)pico.textContent=predIco;
       var ptit=document.getElementById('you-medal-pred-title');if(ptit)ptit.textContent=predTitle;
       var psub=document.getElementById('you-medal-pred-sub');if(psub)psub.textContent=predSub;
@@ -705,16 +763,43 @@ async function load(isBackgroundRefresh) {
       var bestPaceSport = 'Walk';
       var dayKm = {};
 
+      var longestAct = null;
+      var bestPaceAct = null;
+      var longestSessionAct = null;
+      var maxElevationAct = null;
+      var maxSpeedAct = null;
+      var maxElevation = 0;
+      var maxAvgSpeed = 0;
+
       validActs.forEach(function(a){
         var km = (a.distance_meters || 0) / 1000;
-        if (a.distance_meters > maxDistM) maxDistM = a.distance_meters;
-        if (a.moving_time_seconds > maxTimeSec) maxTimeSec = a.moving_time_seconds;
+        if (a.distance_meters > maxDistM) {
+          maxDistM = a.distance_meters;
+          longestAct = a;
+        }
+        if (a.moving_time_seconds > maxTimeSec) {
+          maxTimeSec = a.moving_time_seconds;
+          longestSessionAct = a;
+        }
         
         var t = a.sport_type;
         var isWalkRun = t === 'Walk' || t === 'Run' || t === 'VirtualRun' || t === 'Hike';
         if (isWalkRun && a.avg_speed > maxSpeed && a.avg_speed < 12) {
           maxSpeed = a.avg_speed;
           bestPaceSport = t;
+          bestPaceAct = a;
+        }
+
+        var elev = parseFloat(a.elevation_gain) || 0;
+        if (elev > maxElevation) {
+          maxElevation = elev;
+          maxElevationAct = a;
+        }
+
+        var speed = parseFloat(a.avg_speed) || 0;
+        if (speed > maxAvgSpeed) {
+          maxAvgSpeed = speed;
+          maxSpeedAct = a;
         }
 
         var d = getActDate(a);
@@ -741,12 +826,6 @@ async function load(isBackgroundRefresh) {
           longest_session: true,
           best_day: true
         };
-        
-        // Find max elevation
-        var maxElevation = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.elevation_gain) || 0); }, 0);
-        
-        // Find max avg speed
-        var maxAvgSpeed = validActs.reduce(function(mx, a) { return Math.max(mx, parseFloat(a.avg_speed) || 0); }, 0);
         
         // Find total elevation
         var totalElevation = validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0);
@@ -837,7 +916,23 @@ async function load(isBackgroundRefresh) {
         keys.forEach(function(key) {
           if (pbConfig[key] !== false) {
             var d = statDefs[key];
-            html += '<div class="pb-card">' +
+            var clickAttr = '';
+             if (key === 'longest_activity' && longestAct) {
+               clickAttr = ' onclick="openActivityDetail(\'' + (longestAct.strava_activity_id || longestAct.id) + '\', event, ' + (longestAct.strava_activity_id ? 'true' : 'false') + ')"';
+             } else if (key === 'best_pace' && bestPaceAct) {
+               clickAttr = ' onclick="openActivityDetail(\'' + (bestPaceAct.strava_activity_id || bestPaceAct.id) + '\', event, ' + (bestPaceAct.strava_activity_id ? 'true' : 'false') + ')"';
+             } else if (key === 'longest_session' && longestSessionAct) {
+               clickAttr = ' onclick="openActivityDetail(\'' + (longestSessionAct.strava_activity_id || longestSessionAct.id) + '\', event, ' + (longestSessionAct.strava_activity_id ? 'true' : 'false') + ')"';
+             } else if (key === 'max_elevation' && maxElevationAct) {
+               clickAttr = ' onclick="openActivityDetail(\'' + (maxElevationAct.strava_activity_id || maxElevationAct.id) + '\', event, ' + (maxElevationAct.strava_activity_id ? 'true' : 'false') + ')"';
+             } else if (key === 'max_speed' && maxSpeedAct) {
+               clickAttr = ' onclick="openActivityDetail(\'' + (maxSpeedAct.strava_activity_id || maxSpeedAct.id) + '\', event, ' + (maxSpeedAct.strava_activity_id ? 'true' : 'false') + ')"';
+             } else if (key === 'best_day' && bestDayDate) {
+              clickAttr = ' onclick="showDateDetails(\'' + bestDayDate + '\')"';
+            }
+
+            var styleAttr = clickAttr ? ' style="cursor: pointer;"' : '';
+            html += '<div class="pb-card"' + clickAttr + styleAttr + '>' +
               '<div class="pb-card-left">' +
                 '<div class="pb-card-header">' +
                   '<div class="pb-card-icon" style="background: ' + d.bg + '; color: ' + d.color + ';">' +
@@ -932,17 +1027,22 @@ async function load(isBackgroundRefresh) {
       });
     })();
 
-    var medals={gold:{male:300,female:250},silver:{male:200,female:150},bronze:{male:125,female:100}};
-    if(Array.isArray(medalData)&&medalData.length&&medalData[0].config_value)medals=medalData[0].config_value;
-    var gKey=(reg.gender||'').toLowerCase()==='female'?'female':'male';
-    var bronzeThresh=Number(medals.bronze[gKey])||100,silverThresh=Number(medals.silver[gKey])||150,goldThresh=Number(medals.gold[gKey])||200;
-    var myPts=fullPts.total;
-    var sptEl=document.getElementById('s-pts-display');if(sptEl)sptEl.textContent=myPts.toFixed(2);
+    var activeMilestones = resolveEventMilestones(EVENT_ROW, reg.gender);
+    var bronzeThresh = activeMilestones.bronze.thresh;
+    var silverThresh = activeMilestones.silver.thresh;
+    var goldThresh = activeMilestones.gold.thresh;
+    
+    var bronzeLabel = activeMilestones.bronze.label;
+    var silverLabel = activeMilestones.silver.label;
+    var goldLabel = activeMilestones.gold.label;
+
+    var myPts = fullPts.total;
+    var sptEl = document.getElementById('s-pts-display');if(sptEl)sptEl.textContent=myPts.toFixed(2);
 
     // Medal Progress Rings
     var CIRC=270.2;
     _ringAnimationData = [];
-    [{id:'br',thresh:bronzeThresh},{id:'si',thresh:silverThresh},{id:'go',thresh:goldThresh}].forEach(function(m){
+    [{id:'br',thresh:bronzeThresh,lbl:bronzeLabel},{id:'si',thresh:silverThresh,lbl:silverLabel},{id:'go',thresh:goldThresh,lbl:goldLabel}].forEach(function(m){
       var done=myPts>=m.thresh;
       var rawPct=(myPts/m.thresh)*100;
       var needed=Math.max(0,m.thresh-myPts);
@@ -953,6 +1053,9 @@ async function load(isBackgroundRefresh) {
       var fillEl=document.getElementById('ring-fill-'+m.id);
       var pctEl=document.getElementById('ring-pct-'+m.id);
       var needEl=document.getElementById('ring-need-'+m.id);
+      
+      var nameEl=document.querySelector('.ring-name.'+m.id);
+      if(nameEl)nameEl.textContent=m.lbl;
       
       if (fillEl && pctEl) {
         _ringAnimationData.push({
@@ -975,20 +1078,20 @@ async function load(isBackgroundRefresh) {
       var iKey = 'insight_' + todayStr;
       var emoji, title, body;
       if (myPts >= goldThresh) {
-        emoji = '🥇'; title = 'Gold Medal Achieved!';
-        body = 'Outstanding! You\'ve crossed the Gold threshold with ' + myPts.toFixed(0) + ' pts. Keep it up!';
+        emoji = '🥇'; title = goldLabel + ' Achieved!';
+        body = 'Outstanding! You\'ve crossed the ' + goldLabel + ' threshold with ' + myPts.toFixed(0) + ' pts. Keep it up!';
       } else if (myPts >= silverThresh) {
         var need = (goldThresh - myPts).toFixed(0);
-        emoji = '🥈'; title = 'Silver Medal — Gold is close!';
-        body = 'You need just ' + need + ' more pts to unlock Gold. Push a little harder!';
+        emoji = '🥈'; title = silverLabel + ' — ' + goldLabel + ' is close!';
+        body = 'You need just ' + need + ' more pts to unlock ' + goldLabel + '. Push a little harder!';
       } else if (myPts >= bronzeThresh) {
         var need = (silverThresh - myPts).toFixed(0);
-        emoji = '🥉'; title = 'Bronze Medal Achieved!';
-        body = 'Great start! ' + need + ' pts more gets you Silver. Keep walking!';
+        emoji = '🥉'; title = bronzeLabel + ' Achieved!';
+        body = 'Great start! ' + need + ' pts more gets you ' + silverLabel + '. Keep walking!';
       } else {
         var need = (bronzeThresh - myPts).toFixed(0);
-        emoji = '🏃'; title = 'On your way to Bronze!';
-        body = 'Walk ' + need + ' more pts to earn your first medal. You can do it!';
+        emoji = '🏃'; title = 'On your way to ' + bronzeLabel + '!';
+        body = 'Walk ' + need + ' more pts to earn your ' + bronzeLabel + '. You can do it!';
       }
       _activeInsight = { key: iKey, emoji: emoji, title: title, body: body };
       updateInAppNotificationBanner();
@@ -1568,7 +1671,7 @@ async function bootAppUnified() {
   if (isParticipant) {
     currentSession = s;
     loadNotifications();
-    var _maintBlocked = await checkMaintenanceGate(s.athleteId);
+    var _maintBlocked = await checkMaintenanceGate(s.athleteId, s.empCode);
     if (_maintBlocked) return;
     await load(false);
 
