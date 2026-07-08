@@ -93,8 +93,7 @@
       '<div class="ring-svg-wrap">' +
         '<svg viewBox="0 0 100 100">' +
           '<g fill="none" stroke="' + brightColor + '" stroke-opacity="0.28" stroke-width="6">' + shape + '</g>' +
-          '<g fill="none" stroke="' + brightColor + '" stroke-width="6" stroke-linecap="round" ' +
-             'style="filter:drop-shadow(0 0 8px ' + brightColor + 'cc)">' +
+          '<g fill="none" stroke="' + brightColor + '" stroke-width="6" stroke-linecap="round">' +
             shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '"' + rot + '/>') +
           '</g>' +
         '</svg>' +
@@ -102,7 +101,7 @@
       '</div>' +
       '<div class="ring-name" style="color:' + brightColor + '">' + (ring.label || ring.metric) + '</div>' +
       '<div class="ring-need" style="color:' + needColor + '; font-weight: 600; font-size: 11.5px; margin-top: 4px; margin-bottom: 2px;">' + needText + '</div>' +
-      '<div style="font-size: 10px; color: var(--text-muted); opacity: 0.85;">' + fmt(value) + ' / ' + fmt(goal) + ' ' + unit + '</div>';
+      (done ? '' : '<div style="font-size: 10px; color: var(--text-muted); opacity: 0.85;">' + fmt(value) + ' / ' + fmt(goal) + ' ' + unit + '</div>');
     return box;
   }
 
@@ -255,8 +254,8 @@
       else if (ring.goal_type === 'auto') { value = todaySum; goal = goal / evDays; }
       else { value = todaySum; }
       
-      if (ring.metric === 'points') { value = 0;
-        try { if (typeof calcFullPtsAdaptive === 'function') { var p = calcFullPtsAdaptive(acts, null, null); value = (ring.goal_type === 'daily') ? 0 : p.total; } } catch(e){}
+      if (ring.metric === 'points') {
+        value = (window._myFullPtsGlobal && window._myFullPtsGlobal.total) ? window._myFullPtsGlobal.total : 0;
       }
       host.appendChild(ringBox(ring, value, goal));
     });
