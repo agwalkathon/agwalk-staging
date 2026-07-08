@@ -18,7 +18,7 @@
         return;
       }
 
-      var APP_VERSION = '20260708_v132';
+      var APP_VERSION = '20260708_v133';
       var lastSeen = localStorage.getItem('app_last_seen_version');
       if (lastSeen !== APP_VERSION) {
         // Clear LocalStorage cached keys prefix-matched with agwalk_
@@ -73,7 +73,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260708_v132">
+  <link rel="stylesheet" href="app.css?v=20260708_v133">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -447,7 +447,7 @@
     </button>
     <div id="lb-event-title-text" style="text-align:center; width:100%; padding:0 30px;"></div>
   </div>
-  <div class="lb-tabs">
+  <div class="lb-tabs" style="margin-left: 20px; margin-right: 20px;">
     <button class="lb-tab active" id="lb-tab-shift" onclick="switchTab('shift')">My Category</button>
     <button class="lb-tab" id="lb-tab-team" onclick="switchTab('team')">My Team</button>
     <button class="lb-tab" id="lb-tab-hof" onclick="switchTab('hof')">🏆 HOF</button>
@@ -470,18 +470,18 @@
       </div>
     </div>
     <div id="standing-subcards-container" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-      <div class="standing-card" id="standing-this-week-card" style="text-align:left;padding:12px 14px;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">This Week</div>
-        <div style="font-size:20px;font-weight:800;color:#fff;" id="lb-rank-move">—</div>
+      <div class="standing-card" id="standing-this-week-card" style="text-align:left;padding:8px 12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">This Week</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;" id="lb-rank-move">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px;">vs last week</div>
       </div>
-      <div class="standing-card" id="standing-next-rank-card" style="text-align:left;padding:12px 14px;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Next Rank</div>
-        <div style="font-size:14px;font-weight:800;color:var(--blue);" id="lb-next-gap">—</div>
+      <div class="standing-card" id="standing-next-rank-card" style="text-align:left;padding:8px 12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">Next Rank</div>
+        <div style="font-size:13px;font-weight:800;color:var(--blue);" id="lb-next-gap">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="lb-next-name"></div>
       </div>
     </div>
-    <div class="lb-info-banner">
+    <div style="text-align:center; margin-top:12px; font-size:11px; color:var(--muted); font-weight:600; display:flex; align-items:center; justify-content:center; gap:4px;">
       <span>ℹ️ Tap any row or podium card to view points breakdown</span>
     </div>
   </div>
@@ -837,13 +837,13 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
-  <script src="app-config.js?v=20260708_v132" defer></script>
-  <script src="app-employee.js?v=20260708_v132" defer></script>
-  <script src="app-api.js?v=20260708_v132" defer></script>
-  <script src="app-drawers.js?v=20260708_v132" defer></script>
-  <script src="app-events.js?v=20260708_v132" defer></script>
-  <script src="app-dashboard.js?v=20260708_v132" defer></script>
-  <script src="app-tabs.js?v=20260708_v132" defer></script>
+  <script src="app-config.js?v=20260708_v133" defer></script>
+  <script src="app-employee.js?v=20260708_v133" defer></script>
+  <script src="app-api.js?v=20260708_v133" defer></script>
+  <script src="app-drawers.js?v=20260708_v133" defer></script>
+  <script src="app-events.js?v=20260708_v133" defer></script>
+  <script src="app-dashboard.js?v=20260708_v133" defer></script>
+  <script src="app-tabs.js?v=20260708_v133" defer></script>
 
 
 
