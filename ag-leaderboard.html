@@ -779,7 +779,7 @@ function clearFilters() {
   applyFilters();
 }
 
-function applyFilters() {
+async function applyFilters() {
   var board  = document.getElementById('board-select').value;
   var team   = document.getElementById('team-filter').value;
   var sport  = document.getElementById('sport-filter').value;
@@ -790,6 +790,16 @@ function applyFilters() {
   currentBoard = board;
 
   if (!allData[board]) { loadBoard(board); return; }
+
+  if ((sport || challenge) && (!allActivities || !allActivities.length)) {
+    var infoEl = document.getElementById('result-info');
+    if (infoEl) infoEl.innerHTML = '<span style="color:#E8622A">⏳ Loading activity details for filtering...</span>';
+    try {
+      allActivities = await loadActivities();
+    } catch(e) {
+      console.error('Failed to load activities for filtering:', e);
+    }
+  }
 
   var rows = allData[board].slice();
 
@@ -1508,9 +1518,10 @@ async function loadAll() {
   try {
   allData = {};
   await Promise.all([loadConfig(), loadChallenges(), loadSpecialDays()]);
-  var [reg, acts] = await Promise.all([loadRegistration(), loadActivities()]);
-  allActivities = acts; // store globally for sport filter
-  allRegistrations = reg; // store globally for activity export
+  var reg = await loadRegistration();
+  var acts = [];
+  allActivities = acts;
+  allRegistrations = reg;
 
   // Dynamic dropdown population including custom manual bonus descriptions
   var completedChallenges = new Set();
@@ -1672,7 +1683,7 @@ function renderBoard(rows, board) {
   });
 }
 
-function toggleExpand(athleteId, gender, trEl) {
+async function toggleExpand(athleteId, gender, trEl) {
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   var expId = 'exp-' + athleteId;
   var existing = document.getElementById(expId);
@@ -1709,8 +1720,25 @@ function toggleExpand(athleteId, gender, trEl) {
   });
   if (athleteReg) { shift = athleteReg.shift; }
 
+  // Dynamically fetch activities for this athlete
+  var athleteActs = [];
+  try {
+    var query = SB_URL + '/rest/v1/activities?strava_athlete_id=eq.' + athleteId + '&is_deleted=eq.false';
+    if (EV_ID) {
+      query += '&event_id=eq.' + EV_ID;
+    } else {
+      query += '&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-07-01T15:00:00';
+    }
+    query += '&select=strava_athlete_id,distance_meters,sport_type,activity_date,avg_speed,elevation_gain,strava_activity_id,is_flagged,manual_bonus,activity_name,start_time,description,activity_date_time_ist&order=id.asc';
+    var rActs = await fetch(query, { headers: HDR });
+    athleteActs = await rActs.json();
+    if (!Array.isArray(athleteActs)) athleteActs = [];
+  } catch(e) {
+    console.error('Failed to load dynamic athlete activities:', e);
+  }
+
   // Call calcPoints to get exact daily points details
-  var ptsDetail = calcPointsAdaptive(allActivities, athleteId, gender, shift);
+  var ptsDetail = calcPointsAdaptive(athleteActs, athleteId, gender, shift);
   var byDay = ptsDetail.byDay;
   var dayBreakdown = ptsDetail.dayBreakdown;
 
