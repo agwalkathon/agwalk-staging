@@ -531,7 +531,7 @@ function getActDate(a) {
   if (a.activity_date_time_ist) {
     return a.activity_date_time_ist.split(/[T ]/)[0];
   }
-  return getISTDate(a.activity_date);
+  return '';
 }
 authGuard();
 
