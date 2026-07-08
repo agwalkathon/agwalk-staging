@@ -312,6 +312,44 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
       <button class="btn btn-sm" onclick="showAddTriggerModal()" style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 4px; background: var(--brand); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: opacity .2s;"><i class="ti ti-plus" style="font-size:14px;"></i> Add Trigger</button>
     </div>
     <div class="card-body">
+      <!-- Bulk Actions Bar -->
+      <div id="bulk-actions-bar" style="display: none; align-items: center; justify-content: space-between; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <input type="checkbox" id="chk-select-all-triggers" onchange="selectAllTriggers(this.checked)" style="width: 16px; height: 16px; cursor: pointer; accent-color: #8b5cf6;">
+          <span style="font-size: 13px; font-weight: 600; color: #6b21a8;"><span id="bulk-selected-count">0</span> Selected</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <!-- Bulk Active/Inactive -->
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button class="btn btn-ghost btn-sm" onclick="bulkSetStatus(true)" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px;"><i class="ti ti-toggle-right" style="color:#16a34a; font-size: 14px;"></i> Activate</button>
+            <button class="btn btn-ghost btn-sm" onclick="bulkSetStatus(false)" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px;"><i class="ti ti-toggle-left" style="color:#9ca3af; font-size: 14px;"></i> Deactivate</button>
+          </div>
+          <!-- Destination Channels -->
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; border-left: 1px solid #ddd; padding-left: 12px;">
+            <span style="font-weight:600; color:#555">Channels:</span>
+            <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-push"> Push</label>
+            <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-inapp"> In-App</label>
+            <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-feed"> Feed Tab</label>
+            <button class="btn btn-sm" onclick="bulkSetChannels()" style="padding: 4px 8px; font-size: 11px; background:#8b5cf6; border: none; color: #fff; cursor: pointer; border-radius: 4px; font-weight: 500;">Apply</button>
+          </div>
+          <!-- Send First Time Only -->
+          <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid #ddd; padding-left: 12px; font-size: 11.5px;">
+            <label style="cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-weight:600; color:#9d174d">
+              <input type="checkbox" id="bulk-ch-once"> Send 1st time only
+            </label>
+            <button class="btn btn-sm" onclick="bulkSetOnceOnly()" style="padding: 4px 8px; font-size: 11px; background:#ec4899; border: none; color: #fff; cursor: pointer; border-radius: 4px; font-weight: 500;">Apply</button>
+          </div>
+          <!-- Bulk Delete -->
+          <button class="btn btn-sm" onclick="bulkDelete()" style="background:#dc2626; color:#fff; padding: 4px 10px; font-size: 11px; display:flex; align-items:center; gap:4px; border: none; cursor: pointer; border-radius: 4px; font-weight: 500;"><i class="ti ti-trash"></i> Delete</button>
+        </div>
+      </div>
+      
+      <!-- Select All check (visible when bulk action bar is not showing, to allow selecting all) -->
+      <div id="select-all-header-wrap" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; font-size: 12.5px; font-weight: 500; color: var(--sub);">
+        <input type="checkbox" id="chk-select-all-init" onchange="selectAllTriggers(this.checked)" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--brand);">
+        <span>Select All Triggers for Bulk Actions</span>
+      </div>
+
       <div id="rules-list-container" style="display: flex; flex-direction: column; gap: 16px;">
         <p style="color:var(--text-muted);font-size:13px;padding:8px 0">Loading notification triggers...</p>
       </div>
@@ -452,6 +490,7 @@ function renderRules() {
       return '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; transition: box-shadow .2s; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
              '  <div class="rule-row-header" onclick="toggleRowExpand(' + idx + ')" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; background: #fafafa; border-bottom: 1px solid #f3f4f6; user-select: none;">' +
              '    <div style="display: flex; align-items: center; gap: 12px;" onclick="event.stopPropagation()">' +
+             '      <input type="checkbox" class="trigger-row-select" data-idx="' + idx + '" onchange="updateBulkActionsBar()" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--brand); margin-right: 4px;">' +
              '      <label class="toggle-wrap" style="margin-top: 0; width: 34px; height: 16px;">' +
              '        <input type="checkbox" id="chk-rule-' + idx + '" ' + (isEnabled ? 'checked' : '') + ' onchange="autoSaveToggle(' + idx + ', this.checked)" style="display:none">' +
              '        <span class="toggle-track" id="track-rule-' + idx + '" style="background: ' + trackBg + '; display: inline-block; width: 34px; height: 16px; border-radius: 9999px; position: relative; cursor: pointer; transition: background .2s;">' +
@@ -883,6 +922,152 @@ async function saveFrequencySettings() {
     }
   } catch(e) {
     console.error('Failed to save frequency settings:', e.message);
+  }
+}
+
+function updateBulkActionsBar() {
+  var chks = document.querySelectorAll('.trigger-row-select');
+  var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
+  var count = checkedBoxes.length;
+  
+  var bar = document.getElementById('bulk-actions-bar');
+  var selectAllWrap = document.getElementById('select-all-header-wrap');
+  
+  if (count > 0) {
+    if (bar) bar.style.display = 'flex';
+    if (selectAllWrap) selectAllWrap.style.display = 'none';
+    var countEl = document.getElementById('bulk-selected-count');
+    if (countEl) countEl.textContent = count;
+  } else {
+    if (bar) bar.style.display = 'none';
+    if (selectAllWrap) selectAllWrap.style.display = 'flex';
+  }
+  
+  // Keep select-all checkboxes in sync
+  var selectAllInit = document.getElementById('chk-select-all-init');
+  var selectAllTriggers = document.getElementById('chk-select-all-triggers');
+  var allChecked = chks.length > 0 && count === chks.length;
+  if (selectAllInit) selectAllInit.checked = allChecked;
+  if (selectAllTriggers) selectAllTriggers.checked = allChecked;
+}
+
+function selectAllTriggers(checked) {
+  var chks = document.querySelectorAll('.trigger-row-select');
+  chks.forEach(function(chk) {
+    chk.checked = checked;
+  });
+  updateBulkActionsBar();
+}
+
+async function bulkSetStatus(enabled) {
+  var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
+  if (!checkedBoxes.length) return;
+  checkedBoxes.forEach(function(chk) {
+    var idx = parseInt(chk.getAttribute('data-idx'));
+    rulesData[idx].enabled = enabled;
+  });
+  await executeBulkSave();
+}
+
+async function bulkSetChannels() {
+  var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
+  if (!checkedBoxes.length) return;
+  var pushVal = document.getElementById('bulk-ch-push').checked;
+  var inappVal = document.getElementById('bulk-ch-inapp').checked;
+  var feedVal = document.getElementById('bulk-ch-feed').checked;
+  
+  checkedBoxes.forEach(function(chk) {
+    var idx = parseInt(chk.getAttribute('data-idx'));
+    var rule = rulesData[idx];
+    if (!channelsData[rule.trigger_key]) {
+      channelsData[rule.trigger_key] = { push: true, inapp: true, feed: false, once: false };
+    }
+    channelsData[rule.trigger_key].push = pushVal;
+    channelsData[rule.trigger_key].inapp = inappVal;
+    channelsData[rule.trigger_key].feed = feedVal;
+  });
+  await executeBulkSave();
+}
+
+async function bulkSetOnceOnly() {
+  var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
+  if (!checkedBoxes.length) return;
+  var onceVal = document.getElementById('bulk-ch-once').checked;
+  
+  checkedBoxes.forEach(function(chk) {
+    var idx = parseInt(chk.getAttribute('data-idx'));
+    var rule = rulesData[idx];
+    if (!channelsData[rule.trigger_key]) {
+      channelsData[rule.trigger_key] = { push: true, inapp: true, feed: false, once: false };
+    }
+    channelsData[rule.trigger_key].once = onceVal;
+  });
+  await executeBulkSave();
+}
+
+async function bulkDelete() {
+  var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
+  if (!checkedBoxes.length) return;
+  
+  var idxs = [];
+  checkedBoxes.forEach(function(chk) {
+    idxs.push(parseInt(chk.getAttribute('data-idx')));
+  });
+  idxs.sort(function(a, b) { return b - a; });
+  
+  var hasSystem = false;
+  var systemTriggers = [
+    'activity_synced', 'activity_flagged', 'activity_cleared',
+    'medal_bronze', 'medal_silver', 'medal_gold', 'challenge_bonus',
+    'rank_improved', 'rank_dropped', 'rank_top1', 'broadcast',
+    'registration_approved', 'registration_rejected'
+  ];
+  
+  idxs.forEach(function(idx) {
+    if (systemTriggers.indexOf(rulesData[idx].trigger_key) !== -1) {
+      hasSystem = true;
+    }
+  });
+  
+  var msg = 'Are you sure you want to delete the ' + idxs.length + ' selected triggers?';
+  if (hasSystem) {
+    msg += '\n\n⚠️ WARNING: One or more selected triggers are core system triggers. Deleting them may prevent automated notifications from working!';
+  }
+  if (!confirm(msg)) return;
+  
+  idxs.forEach(function(idx) {
+    var rule = rulesData[idx];
+    rulesData.splice(idx, 1);
+    if (channelsData[rule.trigger_key]) {
+      delete channelsData[rule.trigger_key];
+    }
+  });
+  
+  await executeBulkSave();
+}
+
+async function executeBulkSave() {
+  try {
+    var r = await fetch(BU + '/push/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rules: rulesData, channels: channelsData })
+    });
+    var j = await r.json();
+    if (j.success) {
+      alert('Bulk action executed successfully!');
+      renderRules();
+      // Reset checkboxes
+      var selectAllInit = document.getElementById('chk-select-all-init');
+      if (selectAllInit) selectAllInit.checked = false;
+      var selectAllTriggers = document.getElementById('chk-select-all-triggers');
+      if (selectAllTriggers) selectAllTriggers.checked = false;
+      updateBulkActionsBar();
+    } else {
+      alert('Save failed: ' + (j.error || 'unknown'));
+    }
+  } catch (e) {
+    alert('Save failed: ' + e.message);
   }
 }
 
