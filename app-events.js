@@ -265,6 +265,10 @@ function buildEventCard(ev, group) {
   }
   body.appendChild(dates);
 
+
+
+
+
   var actions = document.createElement('div');
   actions.className = 'ev-card-actions';
 
@@ -334,13 +338,21 @@ function buildEventCard(ev, group) {
 }
 
 // ===== Event-scoped leaderboard switching =====
-var _lbCurrentEventId = 1;          // event 1 = Walkathon 2026, the data Phase 1/2 loads by default
-var _lbDefaultState = null;         // saved event-1 globals
+var _lbCurrentEventId = 1;          // dynamic, initialized from registration
+var _lbDefaultState = null;         // saved default (registered event) globals
 var _lbEventCache = {};             // fetched data per event id
 
 function setLbTitle(txt) {
-  var el = document.getElementById('lb-event-title');
-  if (el) { el.textContent = txt || ''; el.style.display = txt ? 'block' : 'none'; }
+  var el = document.getElementById('lb-event-title-text');
+  var wrapper = document.getElementById('lb-event-title');
+  if (el) { el.textContent = txt || ''; }
+  if (wrapper) { wrapper.style.display = txt ? 'flex' : 'none'; }
+  var btn = document.getElementById('lb-back-btn');
+  var defaultId = window._lbRegisteredEventId || 1;
+  var bnavLb = document.getElementById('bnav-leaderboard');
+  var bnavLbHidden = bnavLb && bnavLb.style.display === 'none';
+  var alwaysShowBack = window._lbCameFromEvents || bnavLbHidden;
+  if (btn) { btn.style.display = (alwaysShowBack || (window._lbCurrentEventId && window._lbCurrentEventId !== defaultId)) ? 'flex' : 'none'; }
 }
 
 function saveDefaultLbState() {
@@ -419,6 +431,7 @@ async function fetchEventLbState(evId, evStatus) {
 }
 
 async function openEventLeaderboard(ev) {
+  window._lbCameFromEvents = true;
   try {
     var suffix = (ev.status === 'ended' || ev.status === 'archived') ? ' — Final Results' : '';
     var defaultId = window._lbRegisteredEventId || 1;
@@ -675,4 +688,46 @@ async function submitEventRegistration(ev) {
     err.textContent = e.message;
     btn.disabled = false; btn.textContent = 'Submit Registration Request';
   }
+}
+
+function openEventDetailsModal(ev) {
+  var id = 'event-details-modal-container';
+  var modal = document.getElementById(id);
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = id;
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;';
+    document.body.appendChild(modal);
+  }
+  
+  var start = evFmtDate(ev.start_date);
+  var end = evFmtDate(ev.end_date);
+  var sports = Array.isArray(ev.sport_types) ? ev.sport_types.join(', ') : (ev.sport_types || 'Walk/Run');
+  
+  var bannerHtml = ev.banner_url ? '<img src="' + ev.banner_url + '" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:14px;">' : '';
+  
+  modal.innerHTML = 
+    '<div class="glass-card" style="width:100%;max-width:480px;background:rgba(22,27,33,.85);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:22px;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.5);position:relative;">' +
+      '<button id="close-ev-details-btn" style="position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:6px;">✕</button>' +
+      bannerHtml +
+      '<div style="font-size:20px;font-weight:800;margin-bottom:6px;line-height:1.2;padding-right:24px;">' + ev.name + '</div>' +
+      '<div style="font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;">' + (ev.status === 'live' ? '● Live Event' : (ev.status === 'upcoming' ? 'Upcoming Event' : 'Past Event')) + '</div>' +
+      
+      '<div style="display:flex;flex-direction:column;gap:12px;font-size:13px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;margin-bottom:14px;">' +
+        '<div><strong style="color:rgba(255,255,255,.5);">Duration:</strong> <span style="float:right;">' + start + ' — ' + end + '</span></div>' +
+        '<div><strong style="color:rgba(255,255,255,.5);">Sport Type Allowed:</strong> <span style="float:right;">' + sports + '</span></div>' +
+        '<div><strong style="color:rgba(255,255,255,.5);">Primary Goal Metric:</strong> <span style="float:right;">Distance</span></div>' +
+      '</div>' +
+      
+      '<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px;">What is event?</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.5;background:rgba(255,255,255,.03);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.04);max-height:120px;overflow-y:auto;white-space:pre-wrap;">' + (ev.description || 'No description provided.') + '</div>' +
+    '</div>';
+    
+  modal.style.display = 'flex';
+  document.getElementById('close-ev-details-btn').onclick = function() {
+    modal.style.display = 'none';
+  };
+  modal.onclick = function(e) {
+    if (e.target === modal) modal.style.display = 'none';
+  };
 }
