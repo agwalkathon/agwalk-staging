@@ -672,7 +672,11 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
   }
 
   if (b.app_name) {
-    document.title = b.app_name + ' — Dashboard';
+    if (document.getElementById('login-logo-img')) {
+      document.title = 'Sign In — ' + b.app_name;
+    } else {
+      document.title = b.app_name + ' — Dashboard';
+    }
     if (appNameEl) {
       appNameEl.textContent = b.app_name;
       appNameEl.style.opacity = '1';
