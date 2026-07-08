@@ -60,7 +60,12 @@
         });
       }
       
-      return pick ? { ev: pick, athleteId: s.athleteId } : null;
+      var gender = 'Male';
+      if (pick) {
+        var regRes = await fetchJSON(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&event_id=eq.' + pick.id + '&select=gender');
+        if (Array.isArray(regRes) && regRes.length && regRes[0].gender) gender = regRes[0].gender;
+      }
+      return pick ? { ev: pick, athleteId: s.athleteId, gender: gender } : null;
     } catch(e){ return null; }
   }
 
@@ -72,18 +77,25 @@
     var unit = unitOf(ring.metric);
     var fmt = function(v){ return (unit==='km') ? v.toFixed(1) : Math.round(v).toString(); };
     var rot = (ring.shape === 'circle' || !ring.shape) ? ' transform="rotate(-90 50 50)"' : '';
+    
+    var brightColor = ring.color || '#fff';
+    var c = brightColor.toLowerCase();
+    if (c === '#70f0db') brightColor = '#00ffd5';
+    else if (c === '#e8622a') brightColor = '#ff5a00';
+    else if (c === '#d3e92b') brightColor = '#c6ff00';
+
     box.innerHTML =
       '<div class="ring-svg-wrap">' +
         '<svg viewBox="0 0 100 100">' +
-          '<g fill="none" stroke="' + ring.color + '" stroke-opacity="0.18" stroke-width="8">' + shape + '</g>' +
-          '<g fill="none" stroke="' + ring.color + '" stroke-width="8" stroke-linecap="round" ' +
-             'style="filter:drop-shadow(0 0 6px ' + ring.color + '66)">' +
+          '<g fill="none" stroke="' + brightColor + '" stroke-opacity="0.28" stroke-width="6">' + shape + '</g>' +
+          '<g fill="none" stroke="' + brightColor + '" stroke-width="6" stroke-linecap="round" ' +
+             'style="filter:drop-shadow(0 0 8px ' + brightColor + 'cc)">' +
             shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '"' + rot + '/>') +
           '</g>' +
         '</svg>' +
         '<div class="ring-inner"><span class="ring-pct">' + Math.round(pct) + '%</span></div>' +
       '</div>' +
-      '<div class="ring-name" style="color:' + ring.color + '">' + (ring.label || ring.metric) + '</div>' +
+      '<div class="ring-name" style="color:' + brightColor + '">' + (ring.label || ring.metric) + '</div>' +
       '<div class="ring-need">' + fmt(value) + ' / ' + fmt(goal) + ' ' + unit + '</div>';
     return box;
   }
@@ -109,7 +121,8 @@
         im.onerror = function() {
           this.src = 'logo-white.png';
         };
-        im.src = ev.rules_config.logo_url;
+        var separator = ev.rules_config.logo_url.indexOf('?') !== -1 ? '&' : '?';
+        im.src = ev.rules_config.logo_url + separator + 'cb=' + Date.now();
         im.style.maxHeight = '34px';
         im.style.height = 'auto';
         im.style.width = 'auto';
@@ -217,6 +230,16 @@
     host.textContent = '';
     host.style.opacity = '1';
     
+    var medalData = [];
+    try {
+      medalData = await fetchJSON(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=eq.' + ev.id + '&config_key=eq.medals&select=config_value');
+    } catch(e){}
+    var medals = {gold:{male:300,female:250},silver:{male:200,female:150},bronze:{male:125,female:100}};
+    if (Array.isArray(medalData) && medalData.length && medalData[0].config_value) {
+      medals = medalData[0].config_value;
+    }
+    var gKey = (ctx.gender || '').toLowerCase() === 'female' ? 'female' : 'male';
+
     dash.rings.slice(0,5).forEach(function(ring){
       var total = 0, todaySum = 0;
       acts.forEach(function(a){
@@ -224,11 +247,21 @@
         total += v;
         if (actDay(a) === today) todaySum += v;
       });
-      var value, goal;
-      if (ring.goal_type === 'total') { value = total; goal = ring.goal; }
-      else if (ring.goal_type === 'auto') { value = todaySum; goal = ring.goal / evDays; }
-      else { value = todaySum; goal = ring.goal; }
-      if (ring.metric === 'points') { value = 0; goal = ring.goal;
+      
+      var goalRaw = String(ring.goal).toLowerCase().trim();
+      var goal;
+      if (goalRaw === 'gold' || goalRaw === 'silver' || goalRaw === 'bronze') {
+        goal = Number(medals[goalRaw][gKey]) || 100;
+      } else {
+        goal = parseFloat(goalRaw) || 0;
+      }
+
+      var value;
+      if (ring.goal_type === 'total') { value = total; }
+      else if (ring.goal_type === 'auto') { value = todaySum; goal = goal / evDays; }
+      else { value = todaySum; }
+      
+      if (ring.metric === 'points') { value = 0;
         try { if (typeof calcFullPtsAdaptive === 'function') { var p = calcFullPtsAdaptive(acts, null, null); value = (ring.goal_type === 'daily') ? 0 : p.total; } } catch(e){}
       }
       host.appendChild(ringBox(ring, value, goal));
