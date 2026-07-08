@@ -1576,6 +1576,18 @@ document.getElementById('btn-save').addEventListener('click',async function(){
         upsertConfigValue('tabs_config', tabsCfg, savedEventId),
         upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
       ]);
+      try {
+        await fetch(BACKEND + '/admin/backfill-points', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+          },
+          body: JSON.stringify({ event_id: savedEventId })
+        });
+      } catch(e) {
+        console.warn('Auto backfill failed:', e.message);
+      }
     }
 
     document.getElementById('ed-saved').classList.add('show');
