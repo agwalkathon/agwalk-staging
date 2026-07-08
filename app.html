@@ -441,12 +441,12 @@
   <span id="lb-my-pts" style="display:none"></span>
   <span id="lb-my-rank" style="display:none"></span>
   <div class="max-w">
-  <div id="lb-back-to-events-row" style="display:none; padding:14px 20px 0;">
-    <button onclick="showTab('events')" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background 0.2s;" onmouseenter="this.style.background='rgba(255,255,255,0.12)'" onmouseleave="this.style.background='rgba(255,255,255,0.06)'" title="Back to Events">
+  <div id="lb-event-title" style="display:none; margin:14px 20px 0px; padding:12px 14px; border-radius:12px; font-size:14px; font-weight:700; color:#fff; background:linear-gradient(135deg, rgba(249,125,78,0.2) 0%, rgba(249,125,78,0.08) 100%); border:1px solid rgba(249,125,78,0.3); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:0 4px 24px 0 rgba(0,0,0,0.25); position:relative; text-transform:uppercase; letter-spacing:0.5px; min-height:44px; align-items:center; justify-content:center;">
+    <button id="lb-back-btn" onclick="showTab('events')" style="background:none; border:none; color:#fff; cursor:pointer; display:none; align-items:center; justify-content:center; padding:0; position:absolute; left:14px; top:50%; transform:translateY(-50%);">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     </button>
+    <div id="lb-event-title-text" style="text-align:center; width:100%; padding:0 30px;"></div>
   </div>
-  <div id="lb-event-title" style="display:none; margin:14px 20px 0px; padding:12px 18px; border-radius:12px; font-size:14px; font-weight:700; color:#fff; background:linear-gradient(135deg, rgba(249,125,78,0.2) 0%, rgba(249,125,78,0.08) 100%); border:1px solid rgba(249,125,78,0.3); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:0 4px 24px 0 rgba(0,0,0,0.25); text-align:center; text-transform:uppercase; letter-spacing:0.5px;"></div>
   <div class="lb-tabs">
     <button class="lb-tab active" id="lb-tab-shift" onclick="switchTab('shift')">My Category</button>
     <button class="lb-tab" id="lb-tab-team" onclick="switchTab('team')">My Team</button>
@@ -874,12 +874,12 @@
     </div>
   </div>
 
-  <div id="activity-detail-modal" class="detail-modal">
+  <div id="activity-detail-modal" class="detail-modal" style="z-index:10200;">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeActivityDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
-        <span style="font-size:18px;line-height:1;margin-top:-2px;">✕</span>
-        Close
+      <button class="btn-back" onclick="closeActivityDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back
       </button>
       <div id="detail-top-date" style="font-size:16px; font-weight:800; color:#fff; text-align:center;">Activity</div>
       <button id="detail-share-btn" onclick="showShareSheet()" style="width:50px;background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:flex-end;padding:0;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
@@ -1173,7 +1173,7 @@
   </div>
 
   <!-- Reactions Detail Modal Drawer -->
-  <div id="reactions-detail-modal" class="detail-modal">
+  <div id="reactions-detail-modal" class="detail-modal" style="z-index:10300;">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
       <button class="btn-back" onclick="closeReactionsDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
