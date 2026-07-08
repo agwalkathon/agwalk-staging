@@ -460,10 +460,7 @@ tr:hover td{background:#FAFAFA}
       </div>
     </div>
     <div class="filter-right">
-      <div class="info-chips">
-        <span class="chip">📅 June 1–30</span>
-        
-      </div>
+      <div class="info-chips"></div>
       <div class="filter-actions" style="display:flex;align-items:center;gap:8px">
         <button class="btn-refresh" id="recalc-points-btn" onclick="doRecalculatePoints()" style="background:#d97706;color:white;border:1px solid #d97706;">⚡ Recalculate Points</button>
         <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">📥 Export Activities</button>
@@ -1503,24 +1500,54 @@ async function doRecalculatePoints() {
   
   btn.disabled = true;
   var oldHtml = btn.innerHTML;
-  btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block"></span>Recalculating...</span>';
   
   try {
-    var res = await fetch(_BU + '/admin/backfill-points', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
-      },
-      body: JSON.stringify({ event_id: EV_ID || 1 })
+    btn.innerHTML = '⏳ Loading participant list...';
+    var evId = EV_ID || 1;
+    var resRegs = await fetch(SB_URL + '/rest/v1/registration?event_id=eq.' + evId + '&select=strava_athlete_id,full_name', {
+      headers: HDR
     });
-    var result = await res.json();
-    if (result.success) {
-      alert('✓ Recalculation complete! Refreshing leaderboard scores.');
-      await doRefresh();
-    } else {
-      alert('❌ Recalculation failed: ' + (result.error || 'Server error'));
+    var regs = await resRegs.json();
+    if (!Array.isArray(regs)) {
+      throw new Error('Could not fetch registration list');
     }
+    
+    var validAthletes = regs.filter(function(r) {
+      return r.strava_athlete_id !== null && r.strava_athlete_id !== undefined && String(r.strava_athlete_id).trim() !== '';
+    });
+    
+    if (validAthletes.length === 0) {
+      alert('No active participants found to recalculate.');
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+      return;
+    }
+    
+    var startTime = Date.now();
+    for (var i = 0; i < validAthletes.length; i++) {
+      var ath = validAthletes[i];
+      var percent = Math.round(((i + 1) / validAthletes.length) * 100);
+      var elapsed = Math.round((Date.now() - startTime) / 1000);
+      
+      btn.innerHTML = '⏳ Recalculating: ' + percent + '% (' + (i + 1) + '/' + validAthletes.length + ') - ' + elapsed + 's';
+      
+      var res = await fetch(_BU + '/admin/backfill-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+        },
+        body: JSON.stringify({ event_id: evId, athlete_id: ath.strava_athlete_id })
+      });
+      var result = await res.json();
+      if (!result.success) {
+        console.warn('Recalculation failed for ' + ath.full_name + ': ' + (result.error || 'Server error'));
+      }
+    }
+    
+    var totalTime = Math.round((Date.now() - startTime) / 1000);
+    alert('✓ Recalculation complete! Total athletes: ' + validAthletes.length + ' (' + totalTime + 's). Refreshing leaderboard scores.');
+    await doRefresh();
   } catch(e) {
     alert('❌ Recalculation error: ' + e.message);
   } finally {
