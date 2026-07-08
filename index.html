@@ -72,6 +72,9 @@
               'input.login-field:focus { border-color: ' + b.accent_color + ' !important; }' +
             '</style>');
           }
+          if (b.app_name) {
+            document.title = 'Sign In — ' + b.app_name;
+          }
         }
       } catch(e){}
 
