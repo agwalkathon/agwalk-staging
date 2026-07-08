@@ -421,7 +421,7 @@ async function fetchEventLbState(evId, evStatus) {
 async function openEventLeaderboard(ev) {
   try {
     var suffix = (ev.status === 'ended' || ev.status === 'archived') ? ' — Final Results' : '';
-    var defaultId = window._lbRegisteredEventId || 2;
+    var defaultId = window._lbRegisteredEventId || 1;
     
     // Check if default leaderboard data is actually loaded in memory
     var dataLoaded = (typeof LB_REG !== 'undefined' && LB_REG && LB_REG.length > 0);
@@ -469,15 +469,16 @@ async function openEventLeaderboard(ev) {
   }
 }
 
-// When the nav Leaderboard icon is tapped directly, always show the default (event 1) board
+// When the nav Leaderboard icon is tapped directly, always show the default (registered event) board
 (function hookNavLeaderboardReset(){
   var nav = document.getElementById('bnav-leaderboard');
   if (!nav) return;
   nav.addEventListener('click', function(){
-    if (_lbCurrentEventId !== 1 && _lbDefaultState) {
+    var defaultId = window._lbRegisteredEventId || 1;
+    if (_lbCurrentEventId !== defaultId && _lbDefaultState) {
       applyLbState(_lbDefaultState);
       _LB_EV_RULES = null;
-      _lbCurrentEventId = 1;
+      _lbCurrentEventId = defaultId;
       setLbTitle('');
       lbBoot();
     }
