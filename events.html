@@ -311,13 +311,21 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Milestones</h3>
     <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">Configure the overall event points thresholds required for participants to earn Gold, Silver, and Bronze medals. When an athlete hits these thresholds, they are automatically awarded the corresponding medal tier.</div>
     <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>🥇 Gold — Male</label><input type="number" id="gold-male" value="300"></div>
-      <div class="fld"><label>🥇 Gold — Female</label><input type="number" id="gold-female" value="250"></div>
-      <div class="fld"><label>🥈 Silver — Male</label><input type="number" id="silver-male" value="200"></div>
-      <div class="fld"><label>🥈 Silver — Female</label><input type="number" id="silver-female" value="150"></div>
-      <div class="fld"><label>🥉 Bronze — Male</label><input type="number" id="bronze-male" value="125"></div>
-      <div class="fld"><label>🥉 Bronze — Female</label><input type="number" id="bronze-female" value="100"></div>
+      <div class="fld"><label>🥇 Gold — Male <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="gold-male" value="300"></div>
+      <div class="fld"><label>🥇 Gold — Female <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="gold-female" value="250"></div>
+      <div class="fld"><label>🥈 Silver — Male <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="silver-male" value="200"></div>
+      <div class="fld"><label>🥈 Silver — Female <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="silver-female" value="150"></div>
+      <div class="fld"><label>🥉 Bronze — Male <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="bronze-male" value="125"></div>
+      <div class="fld"><label>🥉 Bronze — Female <span class="medal-unit" style="font-weight:700;color:var(--brand)"></span></label><input type="number" id="bronze-female" value="100"></div>
     </div>
+  </div>
+
+  <!-- Group 4f: Configure Rings (max 5) -->
+  <div class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-circle-dot"></i> Configure Dashboard Rings</h3>
+    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">Configure the circular progress indicators displayed at the top of the participant's dashboard (e.g., daily steps, overall distance). Each ring tracks progress towards a specific goal value. To display progress towards Medals, add a ring tracking Total Points with your Gold Medal threshold as the goal.</div>
+    <div id="rings-box" style="margin-bottom:12px"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
   </div>
 
   <!-- Group 4b: Points Configuration -->
@@ -386,11 +394,6 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
       </div>
     </div>
-    
-    <div style="font-size:12.5px; font-weight:600; margin-bottom:4px; color: var(--text-secondary);">Configure Rings (max 5)</div>
-    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">Configure the circular progress indicators displayed at the top of the participant's dashboard (e.g., daily steps, overall distance). Each ring tracks progress towards a specific goal value. To display progress towards Medals, add a ring tracking Total Points with your Gold Medal threshold as the goal.</div>
-    <div id="rings-box" style="margin-bottom:12px"></div>
-    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
     
     <div class="grid" style="margin-bottom:14px">
       <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
@@ -754,6 +757,25 @@ document.getElementById('logo-file').addEventListener('change',function(){
 });
 document.getElementById('f-smode').addEventListener('change',updateScoringUI);
 document.getElementById('f-tracking').addEventListener('change',updateScoringUI);
+document.getElementById('f-metric').addEventListener('change',updateScoringUI);
+
+function updateMedalMilestonesUnit() {
+  var smode = document.getElementById('f-smode').value;
+  var metric = document.getElementById('f-metric').value;
+  var unit = ' (Points)';
+  if (smode === 'raw') {
+    if (metric === 'distance_km') unit = ' (KM)';
+    else if (metric === 'steps') unit = ' (Steps)';
+    else if (metric === 'moving_time_min') unit = ' (Minutes)';
+    else if (metric === 'elevation_m') unit = ' (m)';
+    else if (metric === 'activity_count') unit = ' (Activities)';
+  }
+  var spans = document.querySelectorAll('.medal-unit');
+  spans.forEach(function(span) {
+    span.textContent = unit;
+  });
+}
+
 function updateScoringUI(){
   var m=document.getElementById('f-smode').value;
   var trk=document.getElementById('f-tracking').value;
@@ -774,6 +796,8 @@ function updateScoringUI(){
   if(!showScoring)document.getElementById('composite-box').style.display='none';
   document.getElementById('dashboard-config-block').style.display=showScoring?'block':'none';
   document.getElementById('manual-event-note').style.display=showScoring?'none':'block';
+  
+  updateMedalMilestonesUnit();
 }
 function buildChips(sel){
   var box=document.getElementById('sport-chips');box.textContent='';
@@ -1527,7 +1551,8 @@ function fmtIST(dt) {
   return dateStr + ' ' + displayHour + ':' + minute + ' ' + ampm;
 }
 function esc(str) {
-  if (!str) return '';
+  if (str === null || str === undefined) return '';
+  str = String(str);
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 function toggleActivityPanel(eventId) {
