@@ -1421,6 +1421,20 @@ async function loadAll() {
     cel.value = currentFilterVal;
   }
 
+  var summaries = [];
+  try {
+    var rSum = await fetch(SB_URL+'/rest/v1/athlete_points_summary?event_id=eq.'+(EV_ID||1), {headers:HDR});
+    summaries = await rSum.json();
+    if (!Array.isArray(summaries)) summaries = [];
+  } catch(e) {
+    console.error('Failed to load athlete points summaries:', e);
+  }
+
+  var summaryMap = {};
+  summaries.forEach(function(s) {
+    summaryMap[String(s.athlete_id)] = s;
+  });
+
   var boardMap = {
     'dayshift-male':'dm', 'dayshift-female':'df', 'nightshift-all':'ns',
     'team-male':'team-m', 'team-female':'team-f'
@@ -1429,7 +1443,32 @@ async function loadAll() {
     var filtered = filterReg(reg, board);
     var rows = [];
     filtered.forEach(function(p) {
-      var pts = calcPointsAdaptive(acts, p.strava_athlete_id, p.gender, p.shift);
+      var s = summaryMap[String(p.strava_athlete_id)];
+      var pts;
+      if (s) {
+        pts = {
+          totalPts: parseFloat(s.total_points) || 0,
+          distKm: parseFloat(s.total_distance_km) || 0,
+          bonusPts: parseFloat(s.bonus_points) || 0,
+          challengePts: parseFloat(s.challenge_points) || 0,
+          basePts: parseFloat(s.base_points) || 0,
+          actCount: parseInt(s.activities_count) || 0,
+          movingTime: parseInt(s.total_moving_time_sec) || 0,
+          challenges: []
+        };
+        var uActs = acts.filter(function(a) { return String(a.strava_athlete_id) === String(p.strava_athlete_id) && !a.is_flagged; });
+        CHALLENGES.forEach(function(c) {
+          if (uActs.some(function(a) { return checkChallenge(a, c); })) {
+            pts.challenges.push(c.name);
+          }
+        });
+        if (isLegacyScoring()) {
+          var legPts = calcPoints(uActs, p.strava_athlete_id, p.gender, p.shift);
+          pts.challenges = legPts.challenges || [];
+        }
+      } else {
+        pts = calcPointsAdaptive(acts, p.strava_athlete_id, p.gender, p.shift);
+      }
       if (pts.totalPts === 0 && pts.distKm === 0) return;
       rows.push({ p: p, pts: pts });
     });
