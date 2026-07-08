@@ -1152,6 +1152,28 @@ async function load(isBackgroundRefresh) {
         if (typeof renderStanding === 'function') renderStanding();
       }
 
+      async function fetchHofActivitiesBackground() {
+        try {
+          var cachedActs = cacheGet('ranking_acts_v4', CACHE_TTL.ranking);
+          if (cachedActs) {
+            LB_ACTS = cachedActs;
+            return;
+          }
+          console.log('[Cache] Fetching HOF activities in background...');
+          var acts = await fetchAllParallel(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+EVENT_ROW.id+'&is_deleted=eq.false&created_at=lt.'+getEventCutoffUTC()+'&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=id.asc&select=id,strava_activity_id,strava_athlete_id,distance_meters,activity_date,is_flagged,sport_type,manual_bonus,activity_date_time_ist');
+          if (Array.isArray(acts)) {
+            LB_ACTS = acts;
+            cacheSet('ranking_acts_v4', acts);
+            console.log('[Cache] HOF activities background fetch completed. Count:', acts.length);
+            if (window.LB_currentTab === 'hof' && typeof renderHallOfFame === 'function') {
+              renderHallOfFame();
+            }
+          }
+        } catch(e) {
+          console.warn('[Cache] Background HOF activities fetch failed:', e);
+        }
+      }
+
       async function refreshRankingData() {
         try {
           var sumRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=eq.' + EVENT_ROW.id + '&order=total_points.desc', { headers: HDR });
@@ -1160,6 +1182,7 @@ async function load(isBackgroundRefresh) {
             console.log('[Cache] Pre-computed ranking retrieved from Supabase ✓');
             cacheSet('ranking_summaries', summaries);
             applyPrecomputedLBScores(summaries);
+            fetchHofActivitiesBackground();
             return;
           }
         } catch (err) {
@@ -1193,8 +1216,9 @@ async function load(isBackgroundRefresh) {
       try{
         var _cachedSummaries = cacheGet('ranking_summaries', CACHE_TTL.ranking);
         if (_cachedSummaries) {
-          console.log('[Cache] Serving pre-computed ranking from cache ✓');
+          console.log('[Cache] Serving pre-computed ranking from cache ⚡');
           applyPrecomputedLBScores(_cachedSummaries);
+          fetchHofActivitiesBackground();
           if (!isBackgroundRefresh) {
             setTimeout(refreshRankingData, 500);
           }
