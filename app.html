@@ -97,6 +97,21 @@
     }
 
     (function(){
+      try {
+        var cached = localStorage.getItem('ag_branding_cache');
+        if (cached) {
+          var b = JSON.parse(cached);
+          if (b.font_family) {
+            var linkId = 'gfont-' + b.font_family.replace(/\s+/g, '-').toLowerCase();
+            document.write('<link rel="stylesheet" id="' + linkId + '" href="https://fonts.googleapis.com/css2?family=' + encodeURIComponent(b.font_family) + ':wght@300;400;500;600;700;800;900&display=swap">');
+            document.write('<style>body, input, button, select { font-family: "' + b.font_family + '", sans-serif !important; }</style>');
+          }
+          if (b.app_name) {
+            document.title = b.app_name + ' — Dashboard';
+          }
+        }
+      } catch(e){}
+
       function decodeJwt(token) {
         try {
           var base64Url = token.split('.')[1];
