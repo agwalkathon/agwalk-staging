@@ -125,9 +125,8 @@ async function verifyCode(){
     // Redirect to app.html if logging in from the index/login gateway
     var path = window.location.pathname;
     if (path.includes("index.html") || path.endsWith("/") || path.endsWith("/agwalk-staging")) {
-      var cb = "v=" + Date.now();
-      var qs = window.location.search ? ("&" + window.location.search.substring(1)) : "";
-      window.location.replace("app.html?" + cb + qs);
+      var qs = window.location.search ? window.location.search : "";
+      window.location.replace("app.html" + qs);
     } else if (window.bootAppUnified) {
       await window.bootAppUnified();
     } else {
@@ -664,12 +663,7 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     lEl.src = logoSrc;
     lEl.style.opacity = '1';
   }
-  if (aEl) {
-    aEl.onerror = function() {
-      this.src = 'logo-white.png';
-    };
-    aEl.src = logoSrc;
-  }
+
 
   if (b.app_name) {
     if (document.getElementById('login-logo-img')) {
