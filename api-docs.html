@@ -442,21 +442,23 @@ WHERE strava_activity_id = 19055574519;</code></pre>
     }
 
     function switchSection(sectionId) {
-      // Toggle nav buttons
-      document.querySelectorAll('.doc-nav-item').forEach(btn => {
+      // Toggle nav buttons inside doc-nav
+      document.querySelectorAll('.doc-nav .doc-nav-item').forEach(btn => {
         btn.classList.remove('active');
       });
-      // Handle the button highlight
-      const activeBtn = Array.from(document.querySelectorAll('.doc-nav-item')).find(btn => 
-        btn.getAttribute('onclick').includes(sectionId)
-      );
+      // Handle the button highlight safely
+      const activeBtn = Array.from(document.querySelectorAll('.doc-nav .doc-nav-item')).find(btn => {
+        const attr = btn.getAttribute('onclick');
+        return attr && attr.includes(sectionId);
+      });
       if (activeBtn) activeBtn.classList.add('active');
 
       // Toggle sections
       document.querySelectorAll('.doc-section').forEach(sec => {
         sec.classList.remove('active');
       });
-      document.getElementById(sectionId).classList.add('active');
+      const targetSec = document.getElementById(sectionId);
+      if (targetSec) targetSec.classList.add('active');
     }
   </script>
 </body>
