@@ -54,6 +54,16 @@
           localStorage.setItem('app_last_seen_version', APP_VERSION);
         }
       }
+
+      // Clean query parameters from the address bar to keep it beautiful
+      if (window.history && window.history.replaceState && window.location.search) {
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.delete('v');
+          url.searchParams.delete('_cb');
+          window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+        } catch(e) {}
+      }
     })();
   </script>
   <meta charset="UTF-8">
