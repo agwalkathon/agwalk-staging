@@ -564,8 +564,6 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   </div>
 
-  </div>
-
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
     <span class="saved-msg" id="ed-saved">✅ Saved</span>
@@ -1721,24 +1719,12 @@ function toggleActivityPanel(eventId) {
   var isHidden = p.style.display === 'none';
   p.style.display = isHidden ? 'block' : 'none';
 }
-async function loadActivityStatsForEvents() {
-  try {
-    var rReg = await fetch(SB_URL + '/rest/v1/registration?select=strava_athlete_id,full_name,event_id', { headers: HDR });
-    var allRegs = await rReg.json();
-    var regMap = {};
-    if (Array.isArray(allRegs)) {
-      allRegs.forEach(function(r) {
-        regMap[r.event_id + '_' + r.strava_athlete_id] = r.full_name;
-      });
-    }
-    EVENTS.forEach(function(ev) {
-      loadActivityStatsForEvent(ev, regMap);
-    });
-  } catch (e) {
-    console.error('Failed to load activity stats lookup:', e);
-  }
+function loadActivityStatsForEvents() {
+  EVENTS.forEach(function(ev) {
+    loadActivityStatsForEvent(ev);
+  });
 }
-async function loadActivityStatsForEvent(ev, regMap) {
+async function loadActivityStatsForEvent(ev) {
   try {
     var url = SB_URL + '/rest/v1/activities?event_id=eq.' + ev.id + '&is_deleted=eq.false&order=activity_date_time_ist.desc,id.desc&select=strava_athlete_id,distance_meters,sport_type,activity_date_time_ist&limit=5';
     var res = await fetch(url, {
@@ -1755,6 +1741,23 @@ async function loadActivityStatsForEvent(ev, regMap) {
     var recent = await res.json();
     if (!Array.isArray(recent)) recent = [];
     
+    // Fetch athlete names only for the athletes present in the recent 5 activities
+    var regMap = {};
+    var athleteIds = recent.map(function(a) { return a.strava_athlete_id; }).filter(Boolean);
+    if (athleteIds.length > 0) {
+      try {
+        var rReg = await fetch(SB_URL + '/rest/v1/registration?event_id=eq.' + ev.id + '&strava_athlete_id=in.(' + athleteIds.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
+        var regs = await rReg.json();
+        if (Array.isArray(regs)) {
+          regs.forEach(function(r) {
+            regMap[r.strava_athlete_id] = r.full_name;
+          });
+        }
+      } catch (eReg) {
+        console.error('Failed to load names for athletes:', eReg);
+      }
+    }
+    
     var badge = document.getElementById('ev-act-badge-' + ev.id);
     if (badge) {
       badge.innerHTML = '<i class="ti ti-activity"></i> ' + totalCount.toLocaleString() + ' Activities';
@@ -1768,7 +1771,7 @@ async function loadActivityStatsForEvent(ev, regMap) {
         var html = '<div style="font-size:12.5px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><i class="ti ti-history"></i> Recent 5 Activities</div>';
         html += '<div style="display:flex;flex-direction:column;gap:8px;">';
         recent.forEach(function(a) {
-          var name = regMap[ev.id + '_' + a.strava_athlete_id] || ('Athlete #' + a.strava_athlete_id);
+          var name = regMap[a.strava_athlete_id] || ('Athlete #' + a.strava_athlete_id);
           var dist = (a.distance_meters / 1000).toFixed(2);
           var sport = a.sport_type || 'Activity';
           var dateStr = fmtIST(a.activity_date_time_ist);
