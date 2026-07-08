@@ -265,11 +265,51 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 
 <!-- Tab Panel: Notification Channels & Templates -->
 <div class="push-tab-panel" id="panel-triggers_channels">
+  <!-- Frequency & Throttle Controls -->
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-header">
+      <div class="card-icon"><i class="ti ti-alarm-clock"></i></div>
+      <div><div class="card-title">Notification Frequency &amp; Throttle Controls</div><div class="card-sub">Prevent notification fatigue by setting global limits, quiet hours, and frequency policies.</div></div>
+    </div>
+    <div class="card-body">
+      <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; padding: 10px 0;">
+        <div class="fld" style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Push Frequency Cap</label>
+          <select id="freq-push-cap" onchange="saveFrequencySettings()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; background: #fff; color: var(--text);">
+            <option value="immediate">Send Immediately</option>
+            <option value="hourly">Hourly Summary</option>
+            <option value="daily">Daily Digest</option>
+          </select>
+        </div>
+        <div class="fld" style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Daily Push Throttle per Athlete</label>
+          <input type="number" id="freq-daily-throttle" min="1" max="50" onchange="saveFrequencySettings()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+        </div>
+        <div class="fld" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 90px; display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Quiet Hours Start (IST)</label>
+            <input type="time" id="freq-quiet-start" onchange="saveFrequencySettings()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+          </div>
+          <div style="flex: 1; min-width: 90px; display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Quiet Hours End (IST)</label>
+            <input type="time" id="freq-quiet-end" onchange="saveFrequencySettings()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: #16a34a; font-weight: 600; opacity: 0; transition: opacity .3s;" id="freq-saved-indicator">
+        <i class="ti ti-check"></i> Frequency settings saved automatically!
+      </div>
+    </div>
+  </div>
+
   <!-- Trigger Rules -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-icon"><i class="ti ti-toggle-right"></i></div>
-      <div><div class="card-title">Notification Triggers &amp; Channels</div><div class="card-sub">Configure which events trigger alerts, select destinations (Push, In-App, Feed), and customize templates.</div></div>
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="card-icon"><i class="ti ti-toggle-right"></i></div>
+        <div><div class="card-title">Notification Triggers &amp; Channels</div><div class="card-sub">Configure which events trigger alerts, select destinations (Push, In-App, Feed), and customize templates.</div></div>
+      </div>
+      <button class="btn btn-sm" onclick="showAddTriggerModal()" style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 4px; background: var(--brand); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: opacity .2s;"><i class="ti ti-plus" style="font-size:14px;"></i> Add Trigger</button>
     </div>
     <div class="card-body">
       <div id="rules-list-container" style="display: flex; flex-direction: column; gap: 16px;">
@@ -327,9 +367,17 @@ async function loadRules() {
     channelsData = (j.success && j.channels) ? j.channels : {};
     var map = {};
     saved.forEach(function(s) { map[s.trigger_key] = s; });
-    rulesData = DEFAULT_RULES.map(function(d) {
-      return map[d.trigger_key] ? Object.assign({}, d, map[d.trigger_key]) : Object.assign({}, d);
+    
+    rulesData = [];
+    saved.forEach(function(s) {
+      rulesData.push(Object.assign({}, s));
     });
+    DEFAULT_RULES.forEach(function(d) {
+      if (!map[d.trigger_key]) {
+        rulesData.push(Object.assign({}, d));
+      }
+    });
+
     renderRules();
     loadStats();
   } catch(e) {
@@ -367,6 +415,7 @@ function renderRules() {
              '    </div>' +
              '    <div style="display: flex; align-items: center; gap: 8px;">' +
              '      <span class="rule-key" style="margin: 0; padding: 3px 8px; background: #e5e7eb; border-radius: 6px; font-size: 11px; font-weight: 500;">' + esc(rule.trigger_key) + '</span>' +
+             '      <button onclick="deleteTrigger(' + idx + ')" style="background: none; border: none; cursor: pointer; color: #dc2626; padding: 4px; display: flex; align-items: center; justify-content: center;" title="Delete Trigger"><i class="ti ti-trash" style="font-size: 16px;"></i></button>' +
              '      <span class="saved" id="saved-indicator-' + idx + '" style="font-size: 12px; color: #16a34a; opacity: 0; transition: opacity .3s; font-weight: 600;">Saved!</span>' +
              '    </div>' +
              '  </div>' +
@@ -389,7 +438,7 @@ function renderRules() {
              '      <input type="checkbox" id="chk-dest-inapp-' + idx + '" ' + inappChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> In-App Alert' +
              '    </label>' +
              '    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500;">' +
-             '      <input type="checkbox" id="chk-dest-feed-' + idx + '" ' + feedChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Celebrate Feed' +
+             '      <input type="checkbox" id="chk-dest-feed-' + idx + '" ' + feedChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Feed Tab' +
              '    </label>' +
              '  </div>' +
              '</div>';
@@ -629,6 +678,155 @@ async function deleteBroadcast(id) {
   }
 }
 
+function showAddTriggerModal() {
+  document.getElementById('new-trigger-preset').value = '';
+  document.getElementById('new-trigger-key').value = '';
+  document.getElementById('new-trigger-title').value = '';
+  document.getElementById('new-trigger-body').value = '';
+  document.getElementById('add-trigger-modal').style.display = 'flex';
+}
+
+function hideAddTriggerModal() {
+  document.getElementById('add-trigger-modal').style.display = 'none';
+}
+
+function applyTriggerPreset() {
+  var sel = document.getElementById('new-trigger-preset');
+  var opt = sel.options[sel.selectedIndex];
+  if (sel.value) {
+    document.getElementById('new-trigger-key').value = sel.value;
+    document.getElementById('new-trigger-title').value = opt.getAttribute('data-title') || '';
+    document.getElementById('new-trigger-body').value = opt.getAttribute('data-body') || '';
+  }
+}
+
+async function saveNewTrigger() {
+  var key = document.getElementById('new-trigger-key').value.trim();
+  var title = document.getElementById('new-trigger-title').value.trim();
+  var body = document.getElementById('new-trigger-body').value.trim();
+  
+  if (!key || !title || !body) {
+    alert('All fields are required.');
+    return;
+  }
+  
+  var exists = rulesData.some(function(r) { return r.trigger_key === key; });
+  if (exists) {
+    alert('A trigger with key "' + key + '" already exists.');
+    return;
+  }
+  
+  var newRule = {
+    trigger_key: key,
+    title: title,
+    body: body,
+    enabled: true
+  };
+  
+  rulesData.push(newRule);
+  channelsData[key] = { push: true, inapp: true, feed: false };
+  
+  try {
+    var r = await fetch(BU + '/push/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rules: rulesData, channels: channelsData })
+    });
+    var j = await r.json();
+    if (j.success) {
+      alert('Trigger added successfully!');
+      hideAddTriggerModal();
+      renderRules();
+    } else {
+      alert('Save failed: ' + (j.error || 'unknown'));
+    }
+  } catch(e) {
+    alert('Failed to save trigger: ' + e.message);
+  }
+}
+
+async function deleteTrigger(idx) {
+  var rule = rulesData[idx];
+  var isSystem = [
+    'activity_synced', 'activity_flagged', 'activity_cleared',
+    'medal_bronze', 'medal_silver', 'medal_gold', 'challenge_bonus',
+    'rank_improved', 'rank_dropped', 'rank_top1', 'broadcast',
+    'registration_approved', 'registration_rejected'
+  ].indexOf(rule.trigger_key) !== -1;
+  
+  var msg = 'Are you sure you want to delete the trigger "' + rule.trigger_key + '"?';
+  if (isSystem) {
+    msg += '\n\n⚠️ WARNING: This is a core system trigger. Deleting it may prevent participants from receiving automated notifications for this event type!';
+  }
+  if (!confirm(msg)) return;
+  
+  rulesData.splice(idx, 1);
+  if (channelsData[rule.trigger_key]) {
+    delete channelsData[rule.trigger_key];
+  }
+  
+  try {
+    var r = await fetch(BU + '/push/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rules: rulesData, channels: channelsData })
+    });
+    var j = await r.json();
+    if (j.success) {
+      alert('Trigger deleted successfully!');
+      renderRules();
+    }
+  } catch(e) {
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+async function loadFrequencySettings() {
+  try {
+    var r = await fetch(BU + '/push/frequency');
+    var j = await r.json();
+    if (j.success && j.config) {
+      var cfg = j.config;
+      document.getElementById('freq-push-cap').value = cfg.push_frequency_cap || 'immediate';
+      document.getElementById('freq-daily-throttle').value = cfg.daily_push_throttle || 5;
+      document.getElementById('freq-quiet-start').value = cfg.quiet_hours_start || '22:00';
+      document.getElementById('freq-quiet-end').value = cfg.quiet_hours_end || '07:00';
+    }
+  } catch(e) {
+    console.warn('Failed to load frequency settings:', e.message);
+  }
+}
+
+async function saveFrequencySettings() {
+  var cap = document.getElementById('freq-push-cap').value;
+  var throttle = parseInt(document.getElementById('freq-daily-throttle').value) || 5;
+  var start = document.getElementById('freq-quiet-start').value || '22:00';
+  var end = document.getElementById('freq-quiet-end').value || '07:00';
+  
+  try {
+    var r = await fetch(BU + '/push/frequency', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        push_frequency_cap: cap,
+        daily_push_throttle: throttle,
+        quiet_hours_start: start,
+        quiet_hours_end: end
+      })
+    });
+    var j = await r.json();
+    if (j.success) {
+      var ind = document.getElementById('freq-saved-indicator');
+      if (ind) {
+        ind.style.opacity = '1';
+        setTimeout(function() { ind.style.opacity = '0'; }, 2000);
+      }
+    }
+  } catch(e) {
+    console.error('Failed to save frequency settings:', e.message);
+  }
+}
+
 window.switchPushTab = function(tabName) {
   document.querySelectorAll('.stab').forEach(function(btn) {
     btn.classList.toggle('active', btn.getAttribute('data-target') === tabName);
@@ -641,6 +839,56 @@ window.switchPushTab = function(tabName) {
 loadRules();
 loadSubscribers();
 loadBroadcasts();
+loadFrequencySettings();
 </script>
+<!-- Add Trigger Modal Overlay -->
+<div id="add-trigger-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 16px; font-family: system-ui, -apple-system, sans-serif;">
+  <div class="card" style="width: 100%; max-width: 500px; margin-bottom: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #fff; border-radius: 12px; overflow: hidden;">
+    <div class="card-header" style="border-bottom: 1px solid #f0f0f0; padding: 16px 20px; display: flex; align-items: center; gap: 12px;">
+      <div class="card-icon" style="background: var(--brand-light); color: var(--brand); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="ti ti-plus" style="font-size: 20px;"></i></div>
+      <div>
+        <div class="card-title" style="font-size: 16px; font-weight: 700; color: var(--text);">Add Custom Trigger</div>
+        <div class="card-sub" style="font-size: 12px; color: var(--sub);">Create a new milestone, streak, or event-based trigger.</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Suggested Presets (Optional)</label>
+        <select id="new-trigger-preset" onchange="applyTriggerPreset()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; background: #fff; color: var(--text);">
+          <option value="">-- Choose a Preset or type below --</option>
+          <option value="club_50" data-title="50 KM Club!" data-body="Congratulations! You joined the 50 KM Club!">👟 50 KM Club (club_50)</option>
+          <option value="club_500" data-title="500 KM Club!" data-body="Incredible! You joined the 500 KM Club!">👟 500 KM Club (club_500)</option>
+          <option value="club_1000" data-title="1000 KM Club!" data-body="Unstoppable! You joined the 1000 KM Club!">👟 1000 KM Club (club_1000)</option>
+          <option value="streak_5" data-title="5-Day Active Streak!" data-body="Awesome! You achieved a 5-Day Active Streak!">🔥 5-Day Streak (streak_5)</option>
+          <option value="streak_10" data-title="10-Day Active Streak!" data-body="Incredible! You achieved a 10-Day Active Streak!">🔥 10-Day Streak (streak_10)</option>
+          <option value="streak_30" data-title="30-Day Active Streak!" data-body="Legendary! You achieved a 30-Day Active Streak!">🔥 30-Day Streak (streak_30)</option>
+          <option value="single_5k" data-title="5 KM Completed!" data-body="You completed a single activity of {distance} KM!">🏃 5 KM Single Walk (single_5k)</option>
+          <option value="single_30k" data-title="30 KM Ultra-Walk!" data-body="Incredible! You completed a single activity of {distance} KM!">🏃 30 KM Single Walk (single_30k)</option>
+          <option value="daily_5k_3" data-title="5 KM Daily Streak!" data-body="You walked 5+ KM daily for 3 consecutive days!">💪 5 KM Daily Streak (3 Days) (daily_5k_3)</option>
+          <option value="event_started" data-title="Togethera Walkathon is Live! 👟" data-body="The event has officially started! Sync your first activity now and hit the ground running.">📅 Event Started (event_started)</option>
+          <option value="event_ending_soon" data-title="Only 48 Hours Left! ⏳" data-body="The final stretch is here. Sync all your pending Strava activities before the leaderboard freezes!">📅 Event Ending Soon (event_ending_soon)</option>
+          <option value="event_ended" data-title="Congratulations! Event Completed 🎉" data-body="Togethera Walkathon has concluded. Check out the final standings and Hall of Fame!">📅 Event Ended (event_ended)</option>
+          <option value="daily_summary" data-title="Daily Leaderboard Update 🏆" data-body="See who holds the top spots today. Tap here to check the standings!">📅 Daily summary (daily_summary)</option>
+        </select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Trigger Key</label>
+        <input type="text" id="new-trigger-key" placeholder="e.g. club_500" style="padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Notification Title</label>
+        <input type="text" id="new-trigger-title" placeholder="e.g. 500 KM Club!" style="padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Notification Body</label>
+        <input type="text" id="new-trigger-body" placeholder="e.g. You crossed 500 KM!" style="padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; color: var(--text);">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button class="btn btn-ghost" onclick="hideAddTriggerModal()" style="padding: 8px 16px; border: 1px solid #e8e8e8; background: #fff; border-radius: 6px; cursor: pointer;">Cancel</button>
+        <button class="btn" onclick="saveNewTrigger()" style="padding: 8px 16px; background: var(--brand); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Add Trigger</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
