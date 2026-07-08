@@ -121,8 +121,28 @@ function cacheGet(key, ttl) {
   } catch(e) { return null; }
 }
 function cacheClear(athleteId) {
-  var keys = ['reg_'+athleteId,'acts_v4_'+athleteId,'config','challenges','special_days','medals','ranking_acts_v4','ranking_reg'];
-  keys.forEach(function(k){ safeRemoveItem('agwalk_'+k); });
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var k = localStorage.key(i);
+      if (k && (
+        k.indexOf('agwalk_reg_' + athleteId) === 0 ||
+        k.indexOf('agwalk_acts_v4_' + athleteId) === 0 ||
+        k === 'agwalk_config' ||
+        k.indexOf('agwalk_config_') === 0 ||
+        k === 'agwalk_challenges' ||
+        k.indexOf('agwalk_challenges_') === 0 ||
+        k === 'agwalk_special_days' ||
+        k.indexOf('agwalk_special_days_') === 0 ||
+        k === 'agwalk_medals' ||
+        k.indexOf('agwalk_medals_') === 0 ||
+        k === 'agwalk_ranking_acts_v4' ||
+        k === 'agwalk_ranking_reg' ||
+        k === 'agwalk_ranking_summaries'
+      )) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch(e) {}
   console.log('[Cache] Cleared for athlete', athleteId);
 }
 
