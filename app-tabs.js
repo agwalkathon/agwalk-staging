@@ -3756,3 +3756,162 @@ window.openDashPointsModal = openDashPointsModal;
 window.openDashStreakModal = openDashStreakModal;
 window.openDashPaceModal = openDashPaceModal;
 window.closeDashModal = closeDashModal;
+
+// ── Pull to Refresh smooth implementation ──
+(function initPullToRefresh() {
+  var ptr = document.getElementById('ptr-loader');
+  if (!ptr) {
+    ptr = document.createElement('div');
+    ptr.id = 'ptr-loader';
+    ptr.className = 'ptr-loader';
+    ptr.innerHTML = '<svg class="ptr-spinner-svg" viewBox="0 0 24 24"><circle class="ptr-spinner-circle" cx="12" cy="12" r="9.5"></circle></svg>';
+    document.body.appendChild(ptr);
+  }
+  var circle = ptr.querySelector('.ptr-spinner-circle');
+  var svg = ptr.querySelector('.ptr-spinner-svg');
+
+  var startY = 0;
+  var currentY = 0;
+  var pulling = false;
+  var loading = false;
+  var activeContainer = null;
+  var maxPull = 120; // max Y offset in pixels
+  var triggerPull = 75; // trigger refresh at 75px
+
+  function getActiveScrollContainer() {
+    return document.querySelector('.content.active');
+  }
+
+  async function refreshDataUnified() {
+    try {
+      var session = JSON.parse(safeGetItem('wk_user') || '{}');
+      var athleteId = session.athleteId;
+      if (athleteId && typeof cacheClear === 'function') {
+        console.log('[PTR] Clearing local cache...');
+        cacheClear(athleteId);
+      }
+    } catch(e) {}
+    
+    if (typeof load === 'function') {
+      await load(true);
+    }
+  }
+
+  function handleStart(yVal) {
+    if (loading) return;
+    var container = getActiveScrollContainer();
+    if (!container) return;
+    
+    if (container.scrollTop <= 0) {
+      startY = yVal;
+      currentY = yVal;
+      pulling = true;
+      activeContainer = container;
+      ptr.classList.remove('transitioning');
+    }
+  }
+
+  function handleMove(yVal, e) {
+    if (!pulling || loading) return;
+    
+    var diff = yVal - startY;
+    if (diff > 0) {
+      if (e.cancelable) e.preventDefault();
+      
+      var pullDistance = Math.min(maxPull, diff);
+      var yOffset = Math.pow(pullDistance, 0.85) * 1.5;
+
+      ptr.classList.add('visible');
+      ptr.style.transform = 'translate3d(-50%, ' + (-60 + yOffset) + 'px, 0)';
+
+      var pct = Math.min(1, yOffset / triggerPull);
+      var rot = pct * 360;
+      svg.style.transform = 'rotate(' + rot + 'deg)';
+      
+      var offset = 60 - (pct * 45);
+      circle.style.strokeDashoffset = offset;
+    } else {
+      ptr.classList.remove('visible');
+      ptr.style.transform = 'translate3d(-50%, -60px, 0)';
+      pulling = false;
+    }
+  }
+
+  function handleEnd() {
+    if (!pulling || loading) return;
+    pulling = false;
+    
+    var transformStr = ptr.style.transform;
+    var match = /translate3d\([^,]+,\s*([^px]+)px/.exec(transformStr);
+    var currentOffset = match ? parseFloat(match[1]) : -60;
+
+    ptr.classList.add('transitioning');
+
+    if (currentOffset >= (triggerPull - 60)) {
+      loading = true;
+      ptr.classList.add('loading');
+      ptr.style.transform = 'translate3d(-50%, 15px, 0)';
+
+      refreshDataUnified().then(function() {
+        finishPTR();
+      }).catch(function() {
+        finishPTR();
+      });
+    } else {
+      ptr.style.transform = 'translate3d(-50%, -60px, 0)';
+      setTimeout(function() {
+        if (!pulling && !loading) ptr.classList.remove('visible');
+      }, 220);
+    }
+  }
+
+  function finishPTR() {
+    loading = false;
+    ptr.classList.remove('loading');
+    ptr.style.transform = 'translate3d(-50%, -60px, 0)';
+    setTimeout(function() {
+      if (!pulling && !loading) {
+        ptr.classList.remove('visible');
+        circle.style.strokeDashoffset = 60;
+      }
+    }, 220);
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+      handleStart(e.touches[0].pageY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (pulling && e.touches.length === 1) {
+      handleMove(e.touches[0].pageY, e);
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', function() {
+    handleEnd();
+  }, { passive: true });
+
+  var isMouseDown = false;
+  document.addEventListener('mousedown', function(e) {
+    var container = getActiveScrollContainer();
+    if (container && container.scrollTop <= 0) {
+      isMouseDown = true;
+      handleStart(e.pageY);
+    }
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (isMouseDown && pulling) {
+      handleMove(e.pageY, e);
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (isMouseDown) {
+      isMouseDown = false;
+      handleEnd();
+    }
+  });
+})();
