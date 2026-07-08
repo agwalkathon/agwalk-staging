@@ -385,6 +385,44 @@ async function loadRules() {
   }
 }
 
+function toggleRowExpand(idx) {
+  var p = document.getElementById('body-panel-rule-' + idx);
+  var chev = document.getElementById('chevron-rule-' + idx);
+  if (p && chev) {
+    var isHidden = p.style.display === 'none';
+    p.style.display = isHidden ? 'block' : 'none';
+    chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+  }
+}
+
+function updateHeaderPills(idx) {
+  var rule = rulesData[idx];
+  var ch = channelsData[rule.trigger_key] || { push: true, inapp: true, feed: false };
+  var activePills = [];
+  if (ch.push !== false) activePills.push('<span style="padding: 2px 6px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 10px; font-weight: 600;">Push</span>');
+  if (ch.inapp !== false) activePills.push('<span style="padding: 2px 6px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 10px; font-weight: 600;">In-App</span>');
+  if (ch.feed === true) activePills.push('<span style="padding: 2px 6px; background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; border-radius: 4px; font-size: 10px; font-weight: 600;">Feed Tab</span>');
+  if (activePills.length === 0) activePills.push('<span style="padding: 2px 6px; background: #f3f4f6; color: #4b5563; border-radius: 4px; font-size: 10px; font-weight: 600;">None</span>');
+  if (ch.once === true) activePills.push('<span style="padding: 2px 6px; background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; border-radius: 4px; font-size: 10px; font-weight: 600;">First-Time Only</span>');
+  
+  var row = document.getElementById('rule-row-' + idx);
+  if (row) {
+    var pillsEl = row.querySelector('.active-channel-pills');
+    if (pillsEl) pillsEl.innerHTML = activePills.join(' ');
+  }
+}
+
+async function autoSaveOnceOnly(idx) {
+  var rule = rulesData[idx];
+  var val = document.getElementById('chk-once-only-' + idx).checked;
+  if (!channelsData[rule.trigger_key]) {
+    channelsData[rule.trigger_key] = { push: true, inapp: true, feed: false, once: false };
+  }
+  channelsData[rule.trigger_key].once = val;
+  updateHeaderPills(idx);
+  await executeAutoSave(idx);
+}
+
 function renderRules() {
   var on = rulesData.filter(function(r){return r.enabled;}).length;
   document.getElementById('stat-enabled').textContent = on;
@@ -397,49 +435,70 @@ function renderRules() {
       var trackBg = isEnabled ? '#22c55e' : '#d1d5db';
       var thumbTranslate = isEnabled ? 'translateX(18px)' : 'translateX(0)';
       
-      var ch = channelsData[rule.trigger_key] || { push: true, inapp: true, feed: false };
+      var ch = channelsData[rule.trigger_key] || { push: true, inapp: true, feed: false, once: false };
       var pushChecked = ch.push !== false ? 'checked' : '';
       var inappChecked = ch.inapp !== false ? 'checked' : '';
       var feedChecked = ch.feed === true ? 'checked' : '';
+      var onceChecked = ch.once === true ? 'checked' : '';
       
-      return '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #f8f9fa; border: 1px solid #eee; border-radius: 10px; padding: 18px 20px;">' +
-             '  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">' +
-             '    <div style="display: flex; align-items: center; gap: 12px;">' +
+      var activePills = [];
+      if (ch.push !== false) activePills.push('<span style="padding: 2px 6px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 10px; font-weight: 600;">Push</span>');
+      if (ch.inapp !== false) activePills.push('<span style="padding: 2px 6px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 10px; font-weight: 600;">In-App</span>');
+      if (ch.feed === true) activePills.push('<span style="padding: 2px 6px; background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; border-radius: 4px; font-size: 10px; font-weight: 600;">Feed Tab</span>');
+      if (activePills.length === 0) activePills.push('<span style="padding: 2px 6px; background: #f3f4f6; color: #4b5563; border-radius: 4px; font-size: 10px; font-weight: 600;">None</span>');
+      if (rule.send_once_only === true) activePills.push('<span style="padding: 2px 6px; background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; border-radius: 4px; font-size: 10px; font-weight: 600;">First-Time Only</span>');
+      var pillsHtml = activePills.join(' ');
+
+      return '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; transition: box-shadow .2s; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
+             '  <div class="rule-row-header" onclick="toggleRowExpand(' + idx + ')" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; background: #fafafa; border-bottom: 1px solid #f3f4f6; user-select: none;">' +
+             '    <div style="display: flex; align-items: center; gap: 12px;" onclick="event.stopPropagation()">' +
              '      <label class="toggle-wrap" style="margin-top: 0; width: 34px; height: 16px;">' +
              '        <input type="checkbox" id="chk-rule-' + idx + '" ' + (isEnabled ? 'checked' : '') + ' onchange="autoSaveToggle(' + idx + ', this.checked)" style="display:none">' +
              '        <span class="toggle-track" id="track-rule-' + idx + '" style="background: ' + trackBg + '; display: inline-block; width: 34px; height: 16px; border-radius: 9999px; position: relative; cursor: pointer; transition: background .2s;">' +
              '          <span class="toggle-thumb" id="thumb-rule-' + idx + '" style="transform: ' + thumbTranslate + '; display: block; width: 12px; height: 12px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: transform .2s;"></span>' +
              '        </span>' +
              '      </label>' +
-             '      <span style="font-size: 14px; font-weight: 600; color: var(--text);" id="label-rule-' + idx + '">' + esc(rule.title) + '</span>' +
+             '      <span style="font-size: 13px; font-weight: 600; color: var(--text);" id="label-rule-' + idx + '">' + esc(rule.title) + '</span>' +
+             '      <span class="rule-key" style="margin: 0; padding: 2px 6px; background: #e5e7eb; border-radius: 4px; font-size: 10px; font-weight: 500; color: #4b5563;">' + esc(rule.trigger_key) + '</span>' +
              '    </div>' +
-             '    <div style="display: flex; align-items: center; gap: 8px;">' +
-             '      <span class="rule-key" style="margin: 0; padding: 3px 8px; background: #e5e7eb; border-radius: 6px; font-size: 11px; font-weight: 500;">' + esc(rule.trigger_key) + '</span>' +
-             '      <button onclick="deleteTrigger(' + idx + ')" style="background: none; border: none; cursor: pointer; color: #dc2626; padding: 4px; display: flex; align-items: center; justify-content: center;" title="Delete Trigger"><i class="ti ti-trash" style="font-size: 16px;"></i></button>' +
-             '      <span class="saved" id="saved-indicator-' + idx + '" style="font-size: 12px; color: #16a34a; opacity: 0; transition: opacity .3s; font-weight: 600;">Saved!</span>' +
-             '    </div>' +
-             '  </div>' +
-             '  <div class="rule-fields" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 12px;">' +
-             '    <div class="fld" style="margin:0;">' +
-             '      <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block; margin-bottom:6px;">Notification Title</label>' +
-             '      <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff;">' +
-             '    </div>' +
-             '    <div class="fld" style="margin:0;">' +
-             '      <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block; margin-bottom:6px;">Notification Body — use {distance} {name} {rank} {medal}</label>' +
-             '      <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff;">' +
+             '    <div style="display: flex; align-items: center; gap: 12px;">' +
+             '      <div class="active-channel-pills" style="display: flex; gap: 6px;">' + pillsHtml + '</div>' +
+             '      <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation()">' +
+             '        <button onclick="deleteTrigger(' + idx + ')" style="background: none; border: none; cursor: pointer; color: #dc2626; padding: 4px; display: flex; align-items: center; justify-content: center;" title="Delete Trigger"><i class="ti ti-trash" style="font-size: 16px;"></i></button>' +
+             '        <span class="saved" id="saved-indicator-' + idx + '" style="font-size: 11px; color: #16a34a; opacity: 0; transition: opacity .3s; font-weight: 600;">Saved!</span>' +
+             '      </div>' +
+             '      <i class="ti ti-chevron-down" id="chevron-rule-' + idx + '" style="font-size: 14px; color: #9ca3af; transition: transform .2s;"></i>' +
              '    </div>' +
              '  </div>' +
-             '  <div style="display: flex; gap: 20px; align-items: center; background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #eee;">' +
-             '    <span style="font-size: 12px; font-weight: 600; color: var(--sub);">Destination Channels:</span>' +
-             '    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500;">' +
-             '      <input type="checkbox" id="chk-dest-push-' + idx + '" ' + pushChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Push Notification' +
-             '    </label>' +
-             '    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500;">' +
-             '      <input type="checkbox" id="chk-dest-inapp-' + idx + '" ' + inappChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> In-App Alert' +
-             '    </label>' +
-             '    <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500;">' +
-             '      <input type="checkbox" id="chk-dest-feed-' + idx + '" ' + feedChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Feed Tab' +
-             '    </label>' +
+             '  <div class="rule-row-body" id="body-panel-rule-' + idx + '" style="display: none; padding: 20px; background: #fff; border-top: 1px solid #f3f4f6;">' +
+             '    <div class="rule-fields" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">' +
+             '      <div class="fld" style="margin:0; display:flex; flex-direction:column; gap:4px;">' +
+             '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Title</label>' +
+             '        <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; outline:none; background:#fff; color:var(--text);">' +
+             '      </div>' +
+             '      <div class="fld" style="margin:0; display:flex; flex-direction:column; gap:4px;">' +
+             '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Body — use {distance} {name} {rank} {medal}</label>' +
+             '        <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; outline:none; background:#fff; color:var(--text);">' +
+             '      </div>' +
+             '    </div>' +
+             '    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap; background: #f9fafb; padding: 12px 18px; border-radius: 8px; border: 1px solid #f3f4f6;">' +
+             '      <div style="display: flex; gap: 16px; align-items: center;">' +
+             '        <span style="font-size: 12px; font-weight: 600; color: var(--sub);">Destination Channels:</span>' +
+             '        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500; user-select: none;">' +
+             '          <input type="checkbox" id="chk-dest-push-' + idx + '" ' + pushChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Push' +
+             '        </label>' +
+             '        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500; user-select: none;">' +
+             '          <input type="checkbox" id="chk-dest-inapp-' + idx + '" ' + inappChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> In-App' +
+             '        </label>' +
+             '        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--text); font-weight: 500; user-select: none;">' +
+             '          <input type="checkbox" id="chk-dest-feed-' + idx + '" ' + feedChecked + ' onchange="autoSaveChannels(' + idx + ')" style="accent-color: var(--brand); cursor: pointer;"> Feed Tab' +
+             '        </label>' +
+             '      </div>' +
+             '      <div style="border-left: 1px solid #e5e7eb; height: 16px; display: inline-block;"></div>' +
+             '      <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: #9d174d; font-weight: 600; user-select: none;">' +
+             '        <input type="checkbox" id="chk-once-only-' + idx + '" ' + onceChecked + ' onchange="autoSaveOnceOnly(' + idx + ')" style="accent-color: #ec4899; cursor: pointer;"> Send first time only (prevent repeats)' +
+             '      </label>' +
+             '    </div>' +
              '  </div>' +
              '</div>';
     }).join('');
