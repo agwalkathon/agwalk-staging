@@ -45,11 +45,17 @@
   </style>
   <script>
     (function(){
-      // 1. Synchronously inject cached branding style to prevent FOUC
+      // 1. Synchronously inject cached/preview branding style and Google Font to prevent FOUC/FOUT
       try {
-        var cached = localStorage.getItem('ag_branding_cache');
+        var isPreview = window.location.search.indexOf('preview=1') !== -1;
+        var cached = isPreview ? localStorage.getItem('ag_branding_preview_temp') : localStorage.getItem('ag_branding_cache');
         if (cached) {
           var b = JSON.parse(cached);
+          if (b.font_family) {
+            var linkId = 'gfont-' + b.font_family.replace(/\s+/g, '-').toLowerCase();
+            document.write('<link rel="stylesheet" id="' + linkId + '" href="https://fonts.googleapis.com/css2?family=' + encodeURIComponent(b.font_family) + ':wght@300;400;500;600;700;800;900&display=swap">');
+            document.write('<style>body, input, button, select { font-family: "' + b.font_family + '", sans-serif !important; }</style>');
+          }
           if (b.accent_color) {
             var hexToRgba = function(hex, alpha) {
               var c = hex.replace('#', '');
