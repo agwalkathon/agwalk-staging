@@ -696,6 +696,21 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     }
   }
 
+  if (b.font_family) {
+    var loadGoogleFont = function(fontName) {
+      if (!fontName) return;
+      var linkId = 'gfont-' + fontName.replace(/\s+/g, '-').toLowerCase();
+      if (!document.getElementById(linkId)) {
+        var link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontName) + ':wght@300;400;500;600;700;800;900&display=swap';
+        document.head.appendChild(link);
+      }
+    };
+    loadGoogleFont(b.font_family);
+  }
+
   // Inject custom branding style overrides if set
   var styleEl = document.getElementById('dynamic-branding-style');
   if (!styleEl) {
