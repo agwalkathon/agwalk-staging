@@ -170,6 +170,12 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 .toggle-row{display:flex;align-items:center;gap:10px;font-size:13.5px}
 .empty{text-align:center;padding:50px 20px;color:var(--text-muted);font-size:14px}
 @media(max-width:640px){.content{padding:16px}.ev-body{padding:14px 16px}}
+/* Section tabs */
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.section-tabs::-webkit-scrollbar{display:none}
+.stab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);white-space:nowrap}
+.stab:hover{color:var(--text-primary)}
+.stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
   </style>
 </head>
 <body>
@@ -210,7 +216,16 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
 <div class="panel" id="editor" style="padding: 24px; background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
   <h2 id="editor-title" style="margin-bottom: 20px; font-size: 18px; font-weight: 700; color: var(--text-primary); border-bottom: 2px solid var(--border); padding-bottom: 12px;"><i class="ti ti-calendar-plus"></i> New Event</h2>
-  
+  <div class="section-tabs" style="margin-bottom: 20px;">
+    <button type="button" class="stab active" data-tab="basic" onclick="switchEditorTab('basic')"><i class="ti ti-info-circle"></i> Basic Info</button>
+    <button type="button" class="stab" data-tab="registration" onclick="switchEditorTab('registration')"><i class="ti ti-users"></i> Registration</button>
+    <button type="button" class="stab" data-tab="scoring" onclick="switchEditorTab('scoring')"><i class="ti ti-medal"></i> Scoring & Medals</button>
+    <button type="button" class="stab" data-tab="challenges" onclick="switchEditorTab('challenges')"><i class="ti ti-target-arrow"></i> Challenges</button>
+    <button type="button" class="stab" data-tab="layout" onclick="switchEditorTab('layout')"><i class="ti ti-palette"></i> App Layout</button>
+  </div>
+
+  <!-- Tab Panel 1: Basic Info -->
+  <div class="editor-tab-panel" id="editor-tab-panel-basic">
   <!-- Group 1: General Information -->
   <div class="edit-group" style="border-left: 4px solid #2563EB; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #2563EB; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-info-circle"></i> General Information</h3>
@@ -247,67 +262,24 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="chips" id="sport-chips"></div>
   </div>
 
-  <!-- Group 3: Participant Dashboard Config -->
-  <div id="dashboard-config-block" class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-dashboard"></i> Dashboard Tab</h3>
-    <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>Event Logo (shown above rings)</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
-          <input type="file" id="logo-file" accept="image/*" style="display:none">
-        </div>
-      </div>
-      <div class="fld"><label>Event Display Name (shown if no logo)</label>
-        <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
-      </div>
-    </div>
-    
-    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Configure Rings (max 5)</div>
-    <div id="rings-box" style="margin-bottom:12px"></div>
-    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
-    
-    <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-      <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-      <div class="fld" style="grid-column: span 2;"><label>Dashboard Sections & Components (Show/Hide)</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:8px">
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
-          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-mypoints" checked> My Points</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mystats" checked> My Stats</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-activities" checked> Stats: Activities</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-distance" checked> Stats: Distance</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-movingtime" checked> Stats: Moving Time</label>
-          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-pacegoals" checked> Pace Goals</label>
-        </div>
-      </div>
-      <div class="fld" style="grid-column: span 2;"><label>Leaderboard Section Config (Show/Hide)</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-mystanding" checked> My Standing Grid</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-thisweek" checked> This Week Card</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-nextrank" checked> Next Rank Card</label>
-        </div>
-      </div>
-      <div class="fld" style="grid-column: span 2;"><label>Personal Bests Stats to Display</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:6px">
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_activity" checked> Longest Activity</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_pace" checked> Best Pace</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_session" checked> Longest Session</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_day" checked> Best Day</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_elevation"> Max Elevation</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_speed"> Max Avg Speed</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_distance"> Total Distance</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_elevation"> Total Elevation</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_activities"> Total Activities</label>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
 
+  </div>
+
+  <!-- Tab Panel 2: Registration -->
+  <div class="editor-tab-panel" id="editor-tab-panel-registration" style="display:none">
+  <!-- Group 5: Registration Questions -->
+  <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-help-circle"></i> Registration Questions</h3>
+    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Configure custom extra questions for the registration form (core employee fields are always included).</p>
+    <div id="ff-list"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-addff" style="margin-top: 8px;"><i class="ti ti-plus"></i> Add Question</button>
+  </div>
+
+  </div>
+
+  <!-- Tab Panel 3: Scoring & Medals -->
+  <div class="editor-tab-panel" id="editor-tab-panel-scoring" style="display:none">
   <!-- Group 4: Scoring Method -->
   <div class="edit-group" id="scoring-section-block" style="border-left: 4px solid #EF4444; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #EF4444; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;" id="scoring-head"><i class="ti ti-calculator"></i> Scoring Method</h3>
@@ -336,7 +308,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <!-- Group 4a: Medal Milestones -->
   <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Milestones</h3>
+    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Milestones</h3>
+    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">Configure the overall event points thresholds required for participants to earn Gold, Silver, and Bronze medals. When an athlete hits these thresholds, they are automatically awarded the corresponding medal tier.</div>
     <div class="grid" style="margin-bottom:14px">
       <div class="fld"><label>🥇 Gold — Male</label><input type="number" id="gold-male" value="300"></div>
       <div class="fld"><label>🥇 Gold — Female</label><input type="number" id="gold-female" value="250"></div>
@@ -380,6 +353,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div id="special-days-box" style="display:flex; flex-direction:column; gap:8px;"></div>
   </div>
 
+  </div>
+
+  <!-- Tab Panel 4: Challenges -->
+  <div class="editor-tab-panel" id="editor-tab-panel-challenges" style="display:none">
   <!-- Group 4d: Challenges -->
   <div class="edit-group" id="group-challenges" style="border-left: 4px solid #EF4444; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #EF4444; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-target-arrow"></i> Qualifying Challenges</h3>
@@ -388,6 +365,70 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
     <div id="challenges-box" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;"></div>
     <button type="button" class="btn btn-ghost btn-sm" id="btn-add-challenge-card"><i class="ti ti-plus"></i> Add New Challenge</button>
+  </div>
+
+  </div>
+
+  <!-- Tab Panel 5: App Layout -->
+  <div class="editor-tab-panel" id="editor-tab-panel-layout" style="display:none">
+  <!-- Group 3: Participant Dashboard Config -->
+  <div id="dashboard-config-block" class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-dashboard"></i> Dashboard Tab</h3>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Event Logo (shown above rings)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
+          <input type="file" id="logo-file" accept="image/*" style="display:none">
+        </div>
+      </div>
+      <div class="fld"><label>Event Display Name (shown if no logo)</label>
+        <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
+      </div>
+    </div>
+    
+    <div style="font-size:12.5px; font-weight:600; margin-bottom:4px; color: var(--text-secondary);">Configure Rings (max 5)</div>
+    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">Configure the circular progress indicators displayed at the top of the participant's dashboard (e.g., daily steps, overall distance). Each ring tracks progress towards a specific goal value. To display progress towards Medals, add a ring tracking Total Points with your Gold Medal threshold as the goal.</div>
+    <div id="rings-box" style="margin-bottom:12px"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
+    
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
+      <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
+      <div class="fld" style="grid-column: span 2;"><label>Dashboard Sections & Components (Show/Hide)</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:8px">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
+          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-mypoints" checked> My Points</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mystats" checked> My Stats</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-activities" checked> Stats: Activities</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-distance" checked> Stats: Distance</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-movingtime" checked> Stats: Moving Time</label>
+          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-pacegoals" checked> Pace Goals</label>
+        </div>
+      </div>
+      <div class="fld" style="grid-column: span 2;"><label>Leaderboard Section Config (Show/Hide)</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-mystanding" checked> My Standing Grid</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-thisweek" checked> This Week Card</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-nextrank" checked> Next Rank Card</label>
+        </div>
+      </div>
+      <div class="fld" style="grid-column: span 2;"><label>Personal Bests Stats to Display</label>
+        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:6px">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_activity" checked> Longest Activity</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_pace" checked> Best Pace</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_session" checked> Longest Session</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_day" checked> Best Day</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_elevation"> Max Elevation</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-max_speed"> Max Avg Speed</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_distance"> Total Distance</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_elevation"> Total Elevation</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-total_activities"> Total Activities</label>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Group 4e: Layout & UI Config -->
@@ -417,18 +458,12 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
   </div>
 
-  <!-- Group 5: Registration Questions -->
-  <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-help-circle"></i> Registration Questions</h3>
-    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Configure custom extra questions for the registration form (core employee fields are always included).</p>
-    <div id="ff-list"></div>
-    <button type="button" class="btn btn-ghost btn-sm" id="btn-addff" style="margin-top: 8px;"><i class="ti ti-plus"></i> Add Question</button>
-  </div>
-
   <!-- Group 6: Post-Event Actions -->
   <div class="edit-group" style="border-left: 4px solid #6B7280; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #6B7280; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-settings"></i> Post-Event Settings</h3>
     <div class="toggle-row"><input type="checkbox" id="f-feedopen"><label for="f-feedopen" style="cursor:pointer">Keep feed open for reactions & comments after event ends</label></div>
+  </div>
+
   </div>
 
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
@@ -565,6 +600,25 @@ document.getElementById('ev-list').addEventListener('click',function(e){
 
 /* ---------- editor ---------- */
 function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+window.switchEditorTab = function(tabName) {
+  var btns = document.querySelectorAll("#editor .stab");
+  btns.forEach(function(btn) {
+    if (btn.getAttribute("data-tab") === tabName) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+  var panels = document.querySelectorAll("#editor .editor-tab-panel");
+  panels.forEach(function(panel) {
+    if (panel.id === "editor-tab-panel-" + tabName) {
+      panel.style.display = "block";
+    } else {
+      panel.style.display = "none";
+    }
+  });
+}
+
 document.getElementById('f-name').addEventListener('input',function(){
   if(!editId)document.getElementById('f-slug').value=slugify(this.value);
 });
@@ -881,7 +935,7 @@ function renderChallengesUI() {
   var box = document.getElementById('challenges-box');
   box.textContent = '';
   if (!_challengesData.length) {
-    box.innerHTML = '<div style="font-size:12.5px; color:var(--text-muted); font-style:italic;">No challenges configured yet.</div>';
+    box.innerHTML = '<div style="font-size:12.5px; color:var(--text-muted); font-style:italic; padding: 20px 0; text-align: center;">No challenges configured yet for this event. Click the "Add New Challenge" button below to add your first challenge!</div>';
     return;
   }
   _challengesData.forEach(function(c) {
@@ -1130,6 +1184,7 @@ async function upsertConfigValue(key, value, eventId) {
 }
 
 async function openEditor(ev){
+  switchEditorTab('basic');
   editId=ev?ev.id:null;
   document.getElementById('editor-title').innerHTML='<i class="ti ti-calendar-'+(ev?'cog':'plus')+'"></i> '+(ev?'Edit: '+ev.name:'New Event');
   var rc=(ev&&ev.rules_config)||{};
