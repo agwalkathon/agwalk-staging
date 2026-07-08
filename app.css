@@ -10,8 +10,8 @@
       --gold:#FFD000; --gold-dim:rgba(255,208,0,0.15);
       --silver:#C8D8E8; --bronze:#F4A84A;
       --radius:16px; --radius-sm:12px; --radius-xs:8px;
-      --font:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      
+      --font:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-num:'Barlow Semi Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
       /* Typography scale tokens (Instagram style, larger & readable) */
       --fs-xs: 12px;
       --fs-sm: 14px;
@@ -36,6 +36,31 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
       letter-spacing: -0.011em;
+    }
+
+    /* Numerical font targets for high readability stats */
+    .ring-pct,
+    .ring-need,
+    .standing-rank-big,
+    .ledger-val,
+    .detail-cell-val,
+    .detail-field-val,
+    .row-pts-num,
+    .rank-col,
+    .rank-delta,
+    .podium-pts,
+    .podium-badge,
+    .feed-act-val,
+    .ch-pts,
+    .stat-card-val,
+    .gold-stat-val,
+    .streak-num,
+    .streak-best-val,
+    .you-streak-val,
+    .pace-val,
+    .stat-val,
+    .modal-summary-val {
+      font-family: var(--font-num) !important;
     }
 
     /* ── Header ── */
@@ -361,9 +386,9 @@
     .rings-row{display:flex;justify-content:space-around;align-items:flex-start;margin-bottom:14px;}
     .ring-box{display:flex;flex-direction:column;align-items:center;gap:0;}
     .ring-svg-wrap{position:relative;width:min(90px,24vw);height:min(90px,24vw);flex-shrink:0;}
-    .ring-svg-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
-    .ring-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4.5;}
-    .ring-fill{fill:none;stroke-width:4.5;stroke-linecap:round;transition:stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1);}
+    .ring-svg-wrap svg{width:100%;height:100%;transform:rotate(-90deg) translateZ(0);backface-visibility:hidden;shape-rendering:geometricPrecision;}
+    .ring-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4.5;shape-rendering:geometricPrecision;}
+    .ring-fill{fill:none;stroke-width:4.5;stroke-linecap:round;transition:stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1);shape-rendering:geometricPrecision;}
     .ring-fill.br{ stroke: #C8843A; }
     .ring-fill.si{ stroke: #A8BCC8; }
     .ring-fill.go{ stroke: #D4A030; }
@@ -371,7 +396,7 @@
       position:absolute;inset:0;display:flex;flex-direction:column;
       align-items:center;justify-content:center;
     }
-    .ring-pct{font-size:20px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px;}
+    .ring-pct{font-size:20px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;}
     .ring-check{font-size:22px;line-height:1;}
     .ring-emoji{font-size:20px;margin-bottom:3px;}
     .ring-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-top:10px;color:#fff;}
