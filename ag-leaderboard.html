@@ -465,6 +465,7 @@ tr:hover td{background:#FAFAFA}
         
       </div>
       <div class="filter-actions" style="display:flex;align-items:center;gap:8px">
+        <button class="btn-refresh" id="recalc-points-btn" onclick="doRecalculatePoints()" style="background:#d97706;color:white;border:1px solid #d97706;">⚡ Recalculate Points</button>
         <button class="btn-refresh" onclick="doRefresh()">🔄 Refresh</button>
         <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">📥 Export Activities</button>
         <a href="config.html" class="btn-config">⚙️ Config</a>
@@ -1496,6 +1497,39 @@ function calcPoints(acts, athleteId, gender, shift) {
 
 var allActivities = [];
 var allRegistrations = [];
+
+async function doRecalculatePoints() {
+  var btn = document.getElementById('recalc-points-btn');
+  if (!btn) return;
+  if (!confirm('Recalculate points, milestones, and challenges for ALL participants in this event? This might take a few seconds.')) return;
+  
+  btn.disabled = true;
+  var oldHtml = btn.innerHTML;
+  btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block"></span>Recalculating...</span>';
+  
+  try {
+    var res = await fetch(_BU + '/admin/backfill-points', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
+      body: JSON.stringify({ event_id: EV_ID })
+    });
+    var result = await res.json();
+    if (result.success) {
+      alert('✓ Recalculation complete! Refreshing leaderboard scores.');
+      await doRefresh();
+    } else {
+      alert('❌ Recalculation failed: ' + (result.error || 'Server error'));
+    }
+  } catch(e) {
+    alert('❌ Recalculation error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = oldHtml;
+  }
+}
 
 async function doRefresh() {
   var btn = document.querySelector('.btn-refresh');
