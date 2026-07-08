@@ -3393,4 +3393,9 @@ body.employee-mode::after {
   color: #a7f3d0;
 }
 
-
+#tab-dashboard {
+  padding-top: 4px;
+}
+#tab-dashboard .hero-rings-block {
+  padding-top: 0;
+}
