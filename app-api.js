@@ -1122,7 +1122,7 @@ async function load(isBackgroundRefresh) {
             bonusPts: parseFloat(s.bonus_points || 0),
             challengePts: parseFloat(s.challenge_points || 0)
           };
-          LB_OLD_SCORES[aid] = parseFloat(s.old_total_points || s.total_points || 0);
+          LB_OLD_SCORES[aid] = parseFloat(s.total_points || s.old_total_points || 0);
         });
         
         _lbReady = true;
