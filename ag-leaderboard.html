@@ -1531,17 +1531,25 @@ async function doRecalculatePoints() {
       
       btn.innerHTML = '⏳ Recalculating: ' + percent + '% (' + (i + 1) + '/' + validAthletes.length + ') - ' + elapsed + 's';
       
-      var res = await fetch(_BU + '/admin/backfill-points', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
-        },
-        body: JSON.stringify({ event_id: evId, athlete_id: ath.strava_athlete_id })
-      });
-      var result = await res.json();
-      if (!result.success) {
-        console.warn('Recalculation failed for ' + ath.full_name + ': ' + (result.error || 'Server error'));
+      try {
+        var res = await fetch(_BU + '/admin/backfill-points', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+          },
+          body: JSON.stringify({ event_id: evId, athlete_id: ath.strava_athlete_id })
+        });
+        if (!res.ok) {
+          console.warn('Recalculation HTTP error for ' + ath.full_name + ': Status ' + res.status);
+          continue;
+        }
+        var result = await res.json();
+        if (!result.success) {
+          console.warn('Recalculation failed for ' + ath.full_name + ': ' + (result.error || 'Server error'));
+        }
+      } catch(innerErr) {
+        console.error('Recalculation exception for ' + ath.full_name + ':', innerErr);
       }
     }
     
