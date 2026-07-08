@@ -22,9 +22,23 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-// Network only - never serve from cache
+// Network only - never serve from cache (bypasses browser cache for HTML documents)
 self.addEventListener('fetch', function(event) {
-  event.respondWith(fetch(event.request));
+  if (event.request.mode === 'navigate' || (event.request.method === 'GET' && event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+    try {
+      var url = new URL(event.request.url);
+      url.searchParams.set('_cb', Date.now());
+      event.respondWith(
+        fetch(url.toString()).catch(function() {
+          return fetch(event.request);
+        })
+      );
+    } catch (e) {
+      event.respondWith(fetch(event.request));
+    }
+  } else {
+    event.respondWith(fetch(event.request));
+  }
 });
 
 self.addEventListener('push', function(event) {
