@@ -151,21 +151,21 @@ function logout() {
 // ── Maintenance Mode Gate ────────────────────────────────────────────────
 var _maintPollTimer = null;
 
-async function checkMaintenanceGate(athleteId) {
+async function checkMaintenanceGate(athleteId, empCode) {
   try {
-    var r = await fetch(BACKEND + '/maintenance-status?athlete_id=' + encodeURIComponent(athleteId));
+    var r = await fetch(BACKEND + '/maintenance-status?athlete_id=' + encodeURIComponent(athleteId) + '&emp_code=' + encodeURIComponent(empCode || ''));
     var d = await r.json();
     if (d.blocked) {
       showMaintenanceOverlay(d.message);
-      startMaintenancePolling(athleteId);
+      startMaintenancePolling(athleteId, empCode);
       return true;
     }
     hideMaintenanceOverlay();
-    startMaintenancePolling(athleteId);
+    startMaintenancePolling(athleteId, empCode);
     return false;
   } catch (e) {
     console.warn('[Maintenance] status check failed, failing open:', e);
-    startMaintenancePolling(athleteId);
+    startMaintenancePolling(athleteId, empCode);
     return false;
   }
 }
@@ -188,20 +188,20 @@ function hideMaintenanceOverlay() {
   document.body.style.overflow = '';
 }
 
-function startMaintenancePolling(athleteId) {
+function startMaintenancePolling(athleteId, empCode) {
   if (_maintPollTimer) return; // already polling, don't stack timers
   _maintPollTimer = setInterval(function () {
     if (document.hidden) return;
-    pollMaintenance(athleteId);
+    pollMaintenance(athleteId, empCode);
   }, 25000);
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) pollMaintenance(athleteId);
+    if (!document.hidden) pollMaintenance(athleteId, empCode);
   });
 }
 
-async function pollMaintenance(athleteId) {
+async function pollMaintenance(athleteId, empCode) {
   try {
-    var r = await fetch(BACKEND + '/maintenance-status?athlete_id=' + encodeURIComponent(athleteId));
+    var r = await fetch(BACKEND + '/maintenance-status?athlete_id=' + encodeURIComponent(athleteId) + '&emp_code=' + encodeURIComponent(empCode || ''));
     var d = await r.json();
     if (d.blocked) {
       showMaintenanceOverlay(d.message);
@@ -372,6 +372,9 @@ function checkChallengeSingle(act, c) {
 }
 
 function calcFullPts(myActs, gender, shift) {
+  if (typeof lbIsLegacyScoring === 'function' && !lbIsLegacyScoring()) {
+    return calcFullPtsAdaptive(myActs, gender, shift);
+  }
   var athleteId = myActs.length ? myActs[0].strava_athlete_id : null;
   var validActs = myActs.filter(function(a) { return !a.is_flagged; });
   validActs.forEach(function(a) {
@@ -852,41 +855,178 @@ function calcFullPtsAdaptive(myActs, gender, shift){
   var mode=lbScoringMode(), metric=lbScoringMetric();
   var comp=(_LB_EV_RULES&&_LB_EV_RULES.composite)||{};
   var rate=parseFloat(_LB_EV_RULES&&_LB_EV_RULES.rate); if(isNaN(rate))rate=1;
+  
+  var formula = (_LB_EV_RULES && _LB_EV_RULES.formula) || {};
+  var formulaAgg = formula.aggregation || 'daily_total';
+  var baseEnabled = formula.base_enabled !== false;
+  var milestoneEnabled = formula.milestone_enabled !== false;
+  var challengeEnabled = formula.challenge_enabled !== false;
+
   var validActs=myActs.filter(function(a){return !a.is_flagged;});
-  var byDay={};
-  validActs.forEach(function(a){var day=getActDate(a);if(!day)return;(byDay[day]=byDay[day]||[]).push(a);});
-  var dayBreakdown={},total=0,totalBase=0,totalBonus=0,totalKm=0;
-  Object.keys(byDay).forEach(function(day){
-    var dayVal=0,dayBase=0,dayKm=0;
-    byDay[day].forEach(function(a){
-      dayKm+=(parseFloat(a.distance_meters)||0)/1000;
-      if(mode==='composite'){
-        Object.keys(comp).forEach(function(m){
-          var v=lbActMetricValue(a,m),cap=parseFloat(comp[m].cap)||0;
-          if(cap>0)v=Math.min(v,cap);
-          dayBase+=v*(parseFloat(comp[m].rate)||0);
+
+  var totalKm=0, totalMovingTime=0;
+  validActs.forEach(function(a){
+    totalKm += (parseFloat(a.distance_meters)||0)/1000;
+    totalMovingTime += parseInt(a.moving_time_seconds||0);
+  });
+
+  // Raw metric
+  if (mode === 'raw') {
+    var rawSum = 0;
+    var dayBreakdown = {};
+    var byDay = {};
+    validActs.forEach(function(a){
+      var day = getActDate(a);
+      if(!day)return;
+      var v = lbActMetricValue(a, metric);
+      rawSum += v;
+      if (!byDay[day]) byDay[day] = [];
+      byDay[day].push(a);
+    });
+
+    Object.keys(byDay).forEach(function(day){
+      var dayKm = 0, dayVal = 0;
+      byDay[day].forEach(function(a){
+        dayKm += (parseFloat(a.distance_meters)||0)/1000;
+        dayVal += lbActMetricValue(a, metric);
+      });
+      dayBreakdown[day] = {
+        km: dayKm, distPts: dayVal, bonusPts: 0, challenges: [], capped: false, inRangeKm: 0
+      };
+    });
+
+    return {
+      km: totalKm, distPts: rawSum, bonusPts: 0, challengePts: 0, total: rawSum,
+      byDay: byDay, dayBreakdown: dayBreakdown, actBreakdown: {},
+      earnedPts: {}, earnedChallenges: {}, adaptive: {mode:mode, metric:metric}
+    };
+  }
+
+  function getActVal(a) {
+    return lbActMetricValue(a, metric);
+  }
+
+  var dayBreakdown = {};
+  var actBreakdown = {};
+  var totalBase = 0, totalBonus = 0;
+  var byDay = {};
+  validActs.forEach(function(a){
+    var day = getActDate(a);
+    if(!day)return;
+    (byDay[day] = byDay[day] || []).push(a);
+  });
+
+  var bonusConfig = [];
+  if (CONFIG_LB && Array.isArray(CONFIG_LB.bonus)) {
+    bonusConfig = CONFIG_LB.bonus;
+  }
+
+  if (formulaAgg === 'daily_total') {
+    Object.keys(byDay).forEach(function(day){
+      var dayVal = 0, dayKm = 0;
+      byDay[day].forEach(function(a){
+        dayKm += (parseFloat(a.distance_meters)||0)/1000;
+        dayVal += getActVal(a);
+      });
+
+      var base = baseEnabled ? (dayVal * rate) : 0;
+      var bonus = 0;
+      if (milestoneEnabled) {
+        bonusConfig.forEach(function(b){
+          if (dayVal >= b.km) {
+            bonus = Math.max(bonus, b.points);
+          }
         });
-      } else {
-        dayVal+=lbActMetricValue(a,metric);
+      }
+
+      totalBase += base;
+      totalBonus += bonus;
+
+      dayBreakdown[day] = {
+        km: dayKm, distPts: base, bonusPts: bonus, challenges: [], capped: false, inRangeKm: 0
+      };
+    });
+  } else {
+    // Per activity aggregation
+    validActs.forEach(function(a){
+      var actVal = getActVal(a);
+      var base = baseEnabled ? (actVal * rate) : 0;
+      var bonus = 0;
+      if (milestoneEnabled) {
+        bonusConfig.forEach(function(b){
+          if (actVal >= b.km) {
+            bonus = Math.max(bonus, b.points);
+          }
+        });
+      }
+      totalBase += base;
+      totalBonus += bonus;
+
+      var day = getActDate(a);
+      if (day) {
+        if (!dayBreakdown[day]) {
+          dayBreakdown[day] = { km: 0, distPts: 0, bonusPts: 0, challenges: [], capped: false, inRangeKm: 0 };
+        }
+        dayBreakdown[day].km += (parseFloat(a.distance_meters)||0)/1000;
+        dayBreakdown[day].distPts += base;
+        dayBreakdown[day].bonusPts += bonus;
       }
     });
-    var base = mode==='raw' ? 0 : (mode==='composite' ? dayBase : dayVal*rate);
-    var bonus=0;
-    if(mode!=='raw'&&CONFIG_LB&&Array.isArray(CONFIG_LB.bonus)){
-      var basis=(mode==='composite')?base:dayVal;
-      CONFIG_LB.bonus.forEach(function(b){ if(basis>=b.km) bonus=Math.max(bonus,b.points); });
-    }
-    var dayTotal=(mode==='raw')?dayVal:(base+bonus);
-    total+=dayTotal;totalBase+=base;totalBonus+=bonus;totalKm+=dayKm;
-    dayBreakdown[day]={km:(mode==='composite'?dayKm:dayVal),distPts:(mode==='raw'?dayVal:base),bonusPts:bonus,challenges:[]};
-  });
+  }
+
+  // Challenge points
+  var challengePts = 0;
+  var challengeNames = [];
+  if (challengeEnabled) {
+    validActs.forEach(function(a){
+      var val = parseFloat(a.manual_bonus || 0);
+      challengePts += val;
+      if (val > 0) {
+        var day = getActDate(a);
+        if (day && dayBreakdown[day]) {
+          var desc = a.description || 'Manual bonus';
+          dayBreakdown[day].challenges.push({ name: desc, pts: val });
+          if (challengeNames.indexOf(desc) === -1) challengeNames.push(desc);
+        }
+      }
+    });
+
+    var _shiftN = (shift || '').toLowerCase();
+    var _isNightShift = _shiftN.indexOf('night') > -1;
+    var myChallenges = (Array.isArray(CHALLENGES_LB) ? CHALLENGES_LB : []).filter(function(c) {
+      if (!c.is_active) return false;
+      var elig = (c.eligible || 'all').toLowerCase();
+      if (elig === 'all')        return true;
+      if (elig === 'male'      && (gender || '').toLowerCase() === 'male')   return true;
+      if (elig === 'female'    && (gender || '').toLowerCase() === 'female') return true;
+      if (elig === 'dayshift'  && !_isNightShift) return true;
+      if (elig === 'nightshift' && _isNightShift) return true;
+      return false;
+    });
+
+    myChallenges.forEach(function(c) {
+      Object.keys(byDay).forEach(function(day) {
+        if (day < c.start_date || day > c.end_date) return;
+        var qualifies = byDay[day].some(function(a) { return checkChallengeSingle(a, c); });
+        if (qualifies) {
+          var ptsAwarded = parseFloat(c.per_activity_points) || parseFloat(c.points) || 0;
+          challengePts += ptsAwarded;
+          if (dayBreakdown[day]) {
+            dayBreakdown[day].challenges.push({ name: c.name, pts: ptsAwarded });
+          }
+          if (challengeNames.indexOf(c.name) === -1) challengeNames.push(c.name);
+        }
+      });
+    });
+  }
+
+  var total = totalBase + totalBonus + challengePts;
+
   return {
-    km: totalKm, distPts: parseFloat(totalBase.toFixed(2)), bonusPts: totalBonus,
-    challengePts: 0,
-    total: parseFloat(total.toFixed(2)),
-    dayBreakdown: dayBreakdown, actBreakdown: [],
-    earnedPts: [], earnedChallenges: [],
-    adaptive: { mode: mode, metric: metric }
+    km: totalKm, distPts: parseFloat(totalBase.toFixed(2)), bonusPts: parseFloat(totalBonus.toFixed(2)),
+    challengePts: parseFloat(challengePts.toFixed(2)), total: parseFloat(total.toFixed(2)),
+    byDay: byDay, dayBreakdown: dayBreakdown, actBreakdown: actBreakdown,
+    earnedPts: {}, earnedChallenges: {}, adaptive: {mode:mode, metric:metric}
   };
 }
 // Trigger rebuild: config features fix v2
