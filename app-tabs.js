@@ -2755,7 +2755,7 @@ function clearPWACache(btn) {
 // ── Service Worker & Push Notifications ──────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
       .then(function(reg) { 
         console.log('[SW] Registered:', reg.scope); 
         setTimeout(checkPushSubscriptionState, 1000);
