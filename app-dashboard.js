@@ -84,6 +84,11 @@
     else if (c === '#e8622a') brightColor = '#ff5a00';
     else if (c === '#d3e92b') brightColor = '#c6ff00';
 
+    var needed = Math.max(0, goal - value);
+    var done = value >= goal;
+    var needText = done ? '✓ Achieved' : fmt(needed) + ' ' + unit + ' remaining';
+    var needColor = done ? 'var(--green)' : '#ffffff';
+
     box.innerHTML =
       '<div class="ring-svg-wrap">' +
         '<svg viewBox="0 0 100 100">' +
@@ -96,7 +101,8 @@
         '<div class="ring-inner"><span class="ring-pct">' + Math.round(pct) + '%</span></div>' +
       '</div>' +
       '<div class="ring-name" style="color:' + brightColor + '">' + (ring.label || ring.metric) + '</div>' +
-      '<div class="ring-need">' + fmt(value) + ' / ' + fmt(goal) + ' ' + unit + '</div>';
+      '<div class="ring-need" style="color:' + needColor + '; font-weight: 600; font-size: 11.5px; margin-top: 4px; margin-bottom: 2px;">' + needText + '</div>' +
+      '<div style="font-size: 10px; color: var(--text-muted); opacity: 0.85;">' + fmt(value) + ' / ' + fmt(goal) + ' ' + unit + '</div>';
     return box;
   }
 
