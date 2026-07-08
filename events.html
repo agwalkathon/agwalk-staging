@@ -425,47 +425,63 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <!-- Tab Panel 5: App Layout -->
   <div class="editor-tab-panel" id="editor-tab-panel-layout" style="display:none">
-  <!-- Group 3: Participant Dashboard Config -->
-  <div id="dashboard-config-block" class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-dashboard"></i> Dashboard Tab</h3>
-    <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>Event Logo (shown above rings)</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="f-logo-url" placeholder="https://… or upload →" style="flex:1">
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
-          <input type="file" id="logo-file" accept="image/*" style="display:none">
-        </div>
-      </div>
-      <div class="fld"><label>Event Display Name (shown if no logo)</label>
-        <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
+    
+    <!-- Section 1: Active Bottom Navigation Tabs -->
+    <div class="edit-group" style="border-left: 4px solid #10B981; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #10B981; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-menu-2"></i> Active Bottom Navigation Tabs</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 12px;">Toggle which tabs are visible at the bottom of the participant app.</p>
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-dashboard" checked> Dashboard</label>
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-leaderboard" checked> Leaderboard</label>
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-events" checked> Events</label>
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-celebrate" checked> Celebrate</label>
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-feed" checked> Announcements</label>
+        <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-you" checked> Profile/You</label>
       </div>
     </div>
-    
-    <div class="grid" style="margin-bottom:14px">
-      <div class="fld"><label>Stat Tiles</label><div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-      <div class="fld"><label>Activity Columns</label><div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div></div>
-      <div class="fld" style="grid-column: span 2;"><label>Dashboard Sections & Components (Show/Hide)</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:8px">
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Streak</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medals</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges</label>
-          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-mypoints" checked> My Points</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mystats" checked> My Stats</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-activities" checked> Stats: Activities</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-distance" checked> Stats: Distance</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-movingtime" checked> Stats: Moving Time</label>
-          <label style="font-size:12.5px;font-weight:500;border-left:1px solid #ddd;padding-left:10px"><input type="checkbox" id="sec-pacegoals" checked> Pace Goals</label>
+
+    <!-- Section 2: Dashboard Tab Layout -->
+    <div id="dashboard-config-block" class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-dashboard"></i> Dashboard Tab Layout</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 14px;">Customize what is displayed on the main Home Dashboard screen of the participant app.</p>
+      
+      <div class="grid" style="margin-bottom:18px">
+        <div class="fld"><label>Event Logo (shown above rings)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="f-logo-url" placeholder="https://... or upload →" style="flex:1">
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
+            <input type="file" id="logo-file" accept="image/*" style="display:none">
+          </div>
+        </div>
+        <div class="fld"><label>Event Display Name (shown if no logo)</label>
+          <input id="f-display-name" placeholder="Show Poppins text name instead of logo image">
         </div>
       </div>
-      <div class="fld" style="grid-column: span 2;"><label>Leaderboard Section Config (Show/Hide)</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap">
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-mystanding" checked> My Standing Grid</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-thisweek" checked> This Week Card</label>
-          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="lb-sec-nextrank" checked> Next Rank Card</label>
+
+      <div class="fld" style="margin-bottom:18px">
+        <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Show/Hide Dashboard Cards & Components (ordered top-to-bottom)</label>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-medals" checked> Medal Rings (Bronze/Silver/Gold)</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-streak" checked> Daily Streak Card</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-challenges" checked> Challenges Card</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mypoints" checked> My Points Summary</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-mystats" checked> My Stats Breakdown</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="sec-pacegoals" checked> Pace Goals Card</label>
         </div>
       </div>
-      <div class="fld" style="grid-column: span 2;"><label>Personal Bests Stats to Display</label>
-        <div style="display:flex;gap:14px;padding-top:8px;flex-wrap:wrap;row-gap:6px">
+
+      <div class="fld" style="margin-bottom:18px">
+        <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Stats Component Sub-metrics</label>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-activities" checked> Activities Count</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-distance" checked> Distance KM</label>
+          <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="stat-comp-movingtime" checked> Moving Time</label>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Personal Bests Card Sub-metrics</label>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; row-gap:8px; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
           <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_activity" checked> Longest Activity</label>
           <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-best_pace" checked> Best Pace</label>
           <label style="font-size:12.5px;font-weight:500"><input type="checkbox" id="pb-longest_session" checked> Longest Session</label>
@@ -478,39 +494,74 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Group 4e: Layout & UI Config -->
-  <div class="edit-group" style="border-left: 4px solid #3B82F6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #3B82F6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-palette"></i> Layout & Active Tabs</h3>
-    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px; max-width:600px;">
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer"><input type="checkbox" id="layout-hide-strava"> Hide Strava Connect Card under Profile tab</label>
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer"><input type="checkbox" id="layout-team-leaderboard" checked> Enable Team-based Leaderboard Filter</label>
-    </div>
-    
-    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Active Bottom Navigation Tabs</div>
-    <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-dashboard" checked> Dashboard</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-leaderboard" checked> Leaderboard</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-events" checked> Events</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-celebrate" checked> Celebrate</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-feed" checked> Announcements</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-you" checked> Profile/You</label>
+    <!-- Section 3: Leaderboard Tab Layout -->
+    <div class="edit-group" style="border-left: 4px solid #3B82F6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #3B82F6; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-trophy"></i> Leaderboard Tab Layout</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 14px;">Configure the layout, features, and columns displayed on the Leaderboard screen.</p>
+      
+      <div class="grid" style="margin-bottom:18px">
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Show/Hide Leaderboard Panels</label>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+            <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="lb-sec-mystanding" checked> My Standing Grid</label>
+            <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="lb-sec-thisweek" checked> This Week Card</label>
+            <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="lb-sec-nextrank" checked> Next Rank Card</label>
+          </div>
+        </div>
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Team Filter Options</label>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0; height:calc(100% - 24px); align-items:center;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer"><input type="checkbox" id="layout-team-leaderboard" checked> Enable Team-based Leaderboard Filter</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Points Table Breakdown Display Columns</label>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+          <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-base" checked> Base Points Column</label>
+          <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-bonus" checked> Bracket Bonus Column</label>
+          <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-challenge" checked> Challenge Points Column</label>
+          <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-total" checked> Total Points Column</label>
+        </div>
+      </div>
     </div>
 
-    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Points Breakdown Display Columns</div>
-    <div style="display:flex; gap:14px; flex-wrap:wrap;">
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-base" checked> Base Points</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-bonus" checked> Bracket Bonus</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-challenge" checked> Challenge Points</label>
-      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-total" checked> Total Points</label>
+    <!-- Section 4: Announcements & Feed settings -->
+    <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-speakerphone"></i> Announcements & Feed Settings</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 14px;">Configure behavior for post-event community engagement and feed visibility.</p>
+      <div style="background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer">
+          <input type="checkbox" id="f-feedopen"> Keep feed open for reactions & comments after event ends
+        </label>
+      </div>
     </div>
-  </div>
 
-  <!-- Group 6: Post-Event Actions -->
-  <div class="edit-group" style="border-left: 4px solid #6B7280; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #6B7280; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-settings"></i> Post-Event Settings</h3>
-    <div class="toggle-row"><input type="checkbox" id="f-feedopen"><label for="f-feedopen" style="cursor:pointer">Keep feed open for reactions & comments after event ends</label></div>
+    <!-- Section 5: Profile & Registration Tab Layout -->
+    <div class="edit-group" style="border-left: 4px solid #EC4899; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #EC4899; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-user"></i> Profile & Registration Layout</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 14px;">Customize what options and activity columns are displayed in the "You" / Profile tab.</p>
+      
+      <div class="grid" style="margin-bottom:18px">
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Stat Tiles (Dashboard Overview)</label>
+          <div id="tile-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div>
+        </div>
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Activity Columns (Registered Logs List)</label>
+          <div id="col-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:4px"></div>
+        </div>
+      </div>
+
+      <div style="background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer">
+          <input type="checkbox" id="layout-hide-strava"> Hide Strava Connect Card under Profile tab
+        </label>
+      </div>
+    </div>
+
   </div>
 
   </div>
