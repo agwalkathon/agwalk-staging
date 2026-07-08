@@ -554,14 +554,21 @@
   </div>
   
   <!-- Highlights Detail Modal -->
-  <div id="highlight-detail-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100dvh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; padding:24px;" onclick="this.style.display='none'">
-    <div class="modal-card" style="background:var(--surface); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; max-width:400px; width:100%; box-shadow:0 12px 40px rgba(0,0,0,0.5); text-align:center; transform:scale(0.9); transition:transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative;" onclick="event.stopPropagation()">
-      <button style="position:absolute; top:12px; right:12px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;" onclick="document.getElementById('highlight-detail-modal').style.display='none'">✕</button>
-      <div id="highlight-modal-emoji" style="font-size:54px; margin-bottom:12px; filter:drop-shadow(0 0 10px rgba(255,255,255,0.15));">🔥</div>
-      <div id="highlight-modal-title" style="font-size:18px; font-weight:800; color:#fff; margin-bottom:6px; letter-spacing:0.3px;">Streak Leader!</div>
-      <div id="highlight-modal-subtitle" style="font-size:11px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">12 Days Active</div>
-      <div id="highlight-modal-body" style="font-size:13.5px; color:rgba(255,255,255,0.7); line-height:1.5; margin-bottom:20px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
-      <button class="btn" style="width:100%; border:none; border-radius:10px; font-weight:700; padding:12px; background:linear-gradient(135deg, #FC6100 0%, #E8622A 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 12px rgba(232,98,42,0.3);" onclick="triggerHighlightCheer()">Clap Support 👏</button>
+  <div id="highlight-detail-modal" class="detail-modal">
+    <div class="detail-content" style="padding-top: max(20px, env(safe-area-inset-top));">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <button class="btn-back" onclick="closeHighlightDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:28px 20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:24px; position:relative; overflow:hidden;">
+        <div id="highlight-modal-emoji" style="font-size:72px; margin-bottom:16px; filter:drop-shadow(0 0 16px rgba(255,255,255,0.2));">🔥</div>
+        <div id="highlight-modal-title" style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px; letter-spacing:0.3px;">Streak Leader!</div>
+        <div id="highlight-modal-subtitle" style="font-size:12px; font-weight:800; color:var(--brand); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:20px;">12 Days Active</div>
+        <div id="highlight-modal-body" style="font-size:14.5px; color:rgba(255,255,255,0.75); line-height:1.6; margin-bottom:28px; max-width:480px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
+        <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight:800; padding:14px; background:linear-gradient(135deg, #FC6100 0%, #E8622A 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
+      </div>
     </div>
   </div>
   
@@ -836,12 +843,16 @@
 </div>
 
 <!-- Dashboard Details Modal -->
-<div id="dash-details-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100dvh; background:rgba(0,0,0,0.8); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:99999; align-items:center; justify-content:center; padding:20px;" onclick="closeDashModal()">
-  <div class="dash-modal-card" onclick="event.stopPropagation()">
-    <button class="dash-modal-close" onclick="closeDashModal()">✕</button>
-    <div id="dash-modal-header">
-      <div id="dash-modal-title">Details</div>
-      <div id="dash-modal-subtitle">Summary and charts</div>
+<div id="dash-details-modal" class="detail-modal">
+  <div class="detail-content" style="padding-top: max(20px, env(safe-area-inset-top));">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+      <button class="btn-back" onclick="closeDashModal()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </button>
+    </div>
+    <div id="dash-modal-header" style="margin-bottom:24px;">
+      <div id="dash-modal-title" style="font-size:24px; font-weight:800; color:#fff; line-height:1.2;">Details</div>
+      <div id="dash-modal-subtitle" style="font-size:13px; color:var(--muted); margin-top:4px;">Summary and charts</div>
     </div>
     <div id="dash-modal-body">
       <!-- Dynamically populated details content -->
