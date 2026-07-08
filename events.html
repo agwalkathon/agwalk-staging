@@ -334,6 +334,89 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
   </div>
 
+  <!-- Group 4a: Medal Milestones -->
+  <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Milestones</h3>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>🥇 Gold — Male</label><input type="number" id="gold-male" value="300"></div>
+      <div class="fld"><label>🥇 Gold — Female</label><input type="number" id="gold-female" value="250"></div>
+      <div class="fld"><label>🥈 Silver — Male</label><input type="number" id="silver-male" value="200"></div>
+      <div class="fld"><label>🥈 Silver — Female</label><input type="number" id="silver-female" value="150"></div>
+      <div class="fld"><label>🥉 Bronze — Male</label><input type="number" id="bronze-male" value="125"></div>
+      <div class="fld"><label>🥉 Bronze — Female</label><input type="number" id="bronze-female" value="100"></div>
+    </div>
+  </div>
+
+  <!-- Group 4b: Points Configuration -->
+  <div class="edit-group" style="border-left: 4px solid #10B981; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #10B981; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-award"></i> Daily Milestone Points</h3>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="fld"><label>Base points per km (Walkathon/Cyclothon)</label><input type="number" id="base-per-km" value="1" step="0.1"></div>
+    </div>
+    
+    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Daily Distance Milestone Bonuses</div>
+    <div id="bonus-milestones-list" style="margin-bottom:12px"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-milestone"><i class="ti ti-plus"></i> Add Milestone</button>
+  </div>
+
+  <!-- Locked Config Info message for new events -->
+  <div id="new-event-subconfig-lock" style="padding:14px; background:#EFF6FF; color:#1E40AF; border-radius:8px; border:1px solid #BFDBFE; font-size:12.5px; margin-bottom:20px;">
+    ℹ️ Special Days and Challenges can be configured after you save and create this event.
+  </div>
+
+  <!-- Group 4c: Special Days -->
+  <div class="edit-group" id="group-special-days" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-calendar"></i> Special Scoring Days</h3>
+    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; line-height:1.4;">
+      On configured special days, daily distance caps are lifted. Participants receive full points per km.
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-bottom:14px; align-items:flex-end;">
+      <div class="fld" style="flex:1; margin-bottom:0;"><label>Date</label><input type="date" id="new-special-date" style="width:100%;"></div>
+      <div class="fld" style="flex:2; margin-bottom:0;"><label>Label / Reason</label><input type="text" id="new-special-label" placeholder="e.g. World Health Day" style="width:100%;"></div>
+      <button type="button" class="btn btn-primary btn-sm" id="btn-add-special-day" style="height:36px; padding: 0 16px;">Add</button>
+    </div>
+    
+    <div id="special-days-box" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+
+  <!-- Group 4d: Challenges -->
+  <div class="edit-group" id="group-challenges" style="border-left: 4px solid #EF4444; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #EF4444; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-target-arrow"></i> Qualifying Challenges</h3>
+    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+      Set up active custom challenges, bonus rules, and time restrictions.
+    </div>
+    <div id="challenges-box" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="btn-add-challenge-card"><i class="ti ti-plus"></i> Add New Challenge</button>
+  </div>
+
+  <!-- Group 4e: Layout & UI Config -->
+  <div class="edit-group" style="border-left: 4px solid #3B82F6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #3B82F6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-palette"></i> Layout & Active Tabs</h3>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px; max-width:600px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer"><input type="checkbox" id="layout-hide-strava"> Hide Strava Connect Card under Profile tab</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer"><input type="checkbox" id="layout-team-leaderboard" checked> Enable Team-based Leaderboard Filter</label>
+    </div>
+    
+    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Active Bottom Navigation Tabs</div>
+    <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-dashboard" checked> Dashboard</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-leaderboard" checked> Leaderboard</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-events" checked> Events</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-celebrate" checked> Celebrate</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-feed" checked> Announcements</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="tab-opt-you" checked> Profile/You</label>
+    </div>
+
+    <div style="font-size:12.5px; font-weight:600; margin-bottom:8px; color: var(--text-secondary);">Points Breakdown Display Columns</div>
+    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-base" checked> Base Points</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-bonus" checked> Bracket Bonus</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-challenge" checked> Challenge Points</label>
+      <label style="font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" id="pts-opt-total" checked> Total Points</label>
+    </div>
+  </div>
+
   <!-- Group 5: Registration Questions -->
   <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-help-circle"></i> Registration Questions</h3>
@@ -681,7 +764,372 @@ function addFFRow(f){
 }
 document.getElementById('btn-addff').addEventListener('click',function(){addFFRow();});
 
-function openEditor(ev){
+var _milestonesData = [];
+var _specialDaysData = [];
+var _challengesData = [];
+var atypeOptions = ['one-time', 'per-act', 'range-split', 'two-challenges-same-day'];
+var atypeLabels = {
+  'one-time': 'One-time reward',
+  'per-act': 'Per activity reward',
+  'range-split': 'Range-split bonus',
+  'two-challenges-same-day': 'Two challenges same day'
+};
+
+function renderMilestonesUI() {
+  var box = document.getElementById('bonus-milestones-list');
+  box.textContent = '';
+  _milestonesData.forEach(function(m, idx) {
+    var row = document.createElement('div');
+    row.className = 'milestone-row-input';
+    row.style.cssText = 'display:grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items:center;';
+    
+    var kmInp = document.createElement('input');
+    kmInp.type = 'number';
+    kmInp.className = 'milestone-km';
+    kmInp.placeholder = 'Distance (km)';
+    kmInp.value = m.km;
+    kmInp.style.cssText = 'padding:8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px;';
+    
+    var ptsInp = document.createElement('input');
+    ptsInp.type = 'number';
+    ptsInp.className = 'milestone-pts';
+    ptsInp.placeholder = 'Bonus Points';
+    ptsInp.value = m.points;
+    ptsInp.style.cssText = 'padding:8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px;';
+    
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn-ghost btn-sm';
+    delBtn.innerHTML = '✕';
+    delBtn.addEventListener('click', function() {
+      row.remove();
+    });
+    
+    row.appendChild(kmInp);
+    row.appendChild(ptsInp);
+    row.appendChild(delBtn);
+    box.appendChild(row);
+  });
+}
+
+document.getElementById('btn-add-milestone').addEventListener('click', function() {
+  _milestonesData.push({ km: '', points: '' });
+  renderMilestonesUI();
+});
+
+function renderSpecialDaysUI() {
+  var box = document.getElementById('special-days-box');
+  box.textContent = '';
+  if (!_specialDaysData.length) {
+    box.innerHTML = '<div style="font-size:12.5px; color:var(--text-muted); font-style:italic;">No special dates configured yet.</div>';
+    return;
+  }
+  _specialDaysData.forEach(function(sd) {
+    var pill = document.createElement('div');
+    pill.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-bottom: 6px;';
+    
+    var left = document.createElement('div');
+    left.innerHTML = '<strong>' + esc(sd.special_date) + '</strong> — <span style="color:var(--text-secondary);">' + esc(sd.label || 'Special Day') + '</span>';
+    
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'btn btn-ghost btn-sm';
+    del.style.color = '#ff4d4d';
+    del.textContent = 'Remove';
+    del.addEventListener('click', async function() {
+      if (!confirm('Remove special date ' + sd.special_date + '?')) return;
+      try {
+        var r = await fetch(SB_URL + '/rest/v1/special_scoring_days?event_id=eq.' + editId + '&special_date=eq.' + sd.special_date, {
+          method: 'DELETE',
+          headers: HDR
+        });
+        if (!r.ok) throw new Error('Delete failed ' + r.status);
+        _specialDaysData = _specialDaysData.filter(function(x) { return x.special_date !== sd.special_date; });
+        renderSpecialDaysUI();
+      } catch(e) {
+        alert('Failed to delete special date: ' + e.message);
+      }
+    });
+    
+    pill.appendChild(left);
+    pill.appendChild(del);
+    box.appendChild(pill);
+  });
+}
+
+document.getElementById('btn-add-special-day').addEventListener('click', async function() {
+  var d = document.getElementById('new-special-date').value;
+  var lbl = document.getElementById('new-special-label').value.trim();
+  if (!d) { alert('Please select a date.'); return; }
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/special_scoring_days', {
+      method: 'POST',
+      headers: Object.assign({}, HDR, { Prefer: 'resolution=merge-duplicates' }),
+      body: JSON.stringify({ special_date: d, label: lbl || 'Special Day', event_id: editId })
+    });
+    if (!r.ok) throw new Error('Save failed ' + r.status);
+    document.getElementById('new-special-date').value = '';
+    document.getElementById('new-special-label').value = '';
+    _specialDaysData.push({ special_date: d, label: lbl || 'Special Day' });
+    renderSpecialDaysUI();
+  } catch(e) {
+    alert('Unable to save special day: ' + e.message);
+  }
+});
+
+function renderChallengesUI() {
+  var box = document.getElementById('challenges-box');
+  box.textContent = '';
+  if (!_challengesData.length) {
+    box.innerHTML = '<div style="font-size:12.5px; color:var(--text-muted); font-style:italic;">No challenges configured yet.</div>';
+    return;
+  }
+  _challengesData.forEach(function(c) {
+    var card = document.createElement('div');
+    card.className = 'ch-compact';
+    card.id = 'ch-' + c.id;
+    card.style.cssText = 'border:1px solid var(--border); border-radius:10px; background:#fff; overflow:hidden; margin-bottom: 10px; text-align: left;';
+    
+    var statusDot = c.is_active
+      ? '<span style="display:inline-block;width:8px;height:8px;background:#2e7d32;border-radius:50%;margin-right:6px"></span>'
+      : '<span style="display:inline-block;width:8px;height:8px;background:#bbb;border-radius:50%;margin-right:6px"></span>';
+      
+    card.innerHTML = 
+      '<div class="ch-summary" onclick="toggleChCard(' + c.id + ')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;cursor:pointer;user-select:none">' +
+        '<div style="flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+          statusDot +
+          '<strong style="font-size:13.5px">' + esc(c.name) + '</strong>' +
+          '<span style="font-size:11.5px;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px">' + c.start_date + (c.end_date !== c.start_date ? ' → ' + c.end_date : '') + '</span>' +
+          '<span style="font-size:11.5px;color:#666">📏 ' + c.distance_min + '–' + c.distance_max + ' km</span>' +
+          '<span style="font-size:11.5px;font-weight:700;color:#1565c0">+' + c.bonus_points + ' pts</span>' +
+        '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center">' +
+          '<button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleChallengeActive(' + c.id + ',' + c.is_active + ')">' + (c.is_active ? '⏸ Pause' : '▶️ Activate') + '</button>' +
+          '<span style="font-size:12px;color:#bbb">▼</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ch-detail" id="chd-' + c.id + '" style="display:none;padding:18px;border-top:1px solid #f0f0f0;background:#fafafa">' +
+        '<!-- Group 1: Basic Info -->' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">📋 Basic Info</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
+          chField('Challenge name', 'ch-name-' + c.id, 'text', c.name) +
+          chField('Start date', 'ch-start-' + c.id, 'date', c.start_date) +
+          chField('End date', 'ch-end-' + c.id, 'date', c.end_date) +
+          chField('Eligible Participants', 'ch-elig-' + c.id, 'select-elig', c.eligible) +
+        '</div>' +
+        
+        '<!-- Group 2: Qualifying Criteria -->' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎯 Qualifying Criteria</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
+          chField('Distance type', 'ch-dtype-' + c.id, 'select-dtype', c.distance_type) +
+          chField('Min distance (km)', 'ch-dmin-' + c.id, 'number', c.distance_min) +
+          chField('Max distance (km)', 'ch-dmax-' + c.id, 'number', c.distance_max) +
+          chField('Start time (HH:MM)', 'ch-time-' + c.id, 'text', c.start_time_criteria || '') +
+          chField('Elevation (m)', 'ch-elev-' + c.id, 'number', c.elevation_criteria || 0) +
+          '<div id="ch-scope-wrap-' + c.id + '" style="display:contents">' +
+            chField('Activity scope', 'ch-scope-' + c.id, 'select-scope', c.activity_scope) +
+          '</div>' +
+        '</div>' +
+        
+        '<!-- Group 3: Awards & Scoring -->' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎁 Awards & Scoring</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
+          '<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:8px">' +
+            chField('Award type', 'ch-atype-' + c.id, 'select-atype-dep', c.award_type || (c.range_split ? 'range-split' : c.per_activity_points > 0 ? 'per-act' : 'one-time')) +
+          '</div>' +
+          chField('Bonus points', 'ch-pts-' + c.id, 'number', c.bonus_points) +
+          '<div id="ch-nbt-wrap-' + c.id + '" style="display:contents">' +
+            chFieldSelect('Normal Bonus', 'ch-nbt-' + c.id, [['no-change', 'No Change'], ['exclude-all', 'No Normal Bonus on Day'], ['exclude-sum', 'Exclude Normal Bonus from Sum'], ['per-activity', 'Each Activity']], c.normal_bonus_type || 'no-change') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;border-top:1px solid #eee;padding-top:12px;margin-top:16px">' +
+          '<button type="button" class="btn btn-primary btn-sm" onclick="saveChallengeCard(' + c.id + ')">💾 Save</button>' +
+          '<button type="button" class="btn btn-ghost btn-sm" style="color: #ff4d4d; border-color: rgba(255,77,77,0.3);" onclick="deleteChallengeCard(' + c.id + ')">🗑️ Delete</button>' +
+        '</div>' +
+      '</div>';
+      
+    box.appendChild(card);
+    var atSel = document.getElementById('ch-atype-' + c.id);
+    if (atSel) updateChallengeFields(atSel);
+  });
+}
+
+function toggleChCard(id) {
+  var d = document.getElementById('chd-' + id);
+  if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function chFieldSelect(label, id, opts, val) {
+  return '<div class="fld" style="text-align:left;"><label style="font-size:11.5px;color:#666">' + label + '</label><select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px">' + opts.map(function(o) { return '<option value="' + o[0] + '"' + (val === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></div>';
+}
+
+function chField(label, id, type, val) {
+  var eligLabels = { 'all': 'All Participants', 'dayshift': 'Day Shift Only', 'nightshift': 'Night Shift Only', 'male': 'Male Only', 'female': 'Female Only' };
+  var input = '';
+  if (type === 'select-elig') {
+    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
+    ['all', 'dayshift', 'nightshift', 'male', 'female'].forEach(function(v) {
+      input += '<option value="' + v + '"' + (v === val ? ' selected' : '') + '>' + eligLabels[v] + '</option>';
+    });
+    input += '</select>';
+  } else if (type === 'select-scope') {
+    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="single"' + (val === 'single' ? ' selected' : '') + '>Single activity</option><option value="daily"' + (val === 'daily' ? ' selected' : '') + '>Entire day total</option></select>';
+  } else if (type === 'select-dtype') {
+    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="fixed"' + (val === 'fixed' ? ' selected' : '') + '>Fixed (±0.1 km)</option><option value="range"' + (val === 'range' ? ' selected' : '') + '>Range (strict)</option><option value="extended"' + (val === 'extended' ? ' selected' : '') + '>Extended (min km+)</option></select>';
+  } else if (type === 'select-atype-dep') {
+    var atypeDescs = {
+      'one-time': 'Award bonus_points ONCE if any qualifying activity meets criteria.',
+      'per-act': 'Award bonus_points for EACH qualifying activity that meets criteria.',
+      'range-split': 'In-range activities each earn a flat challenge bonus individually.',
+      'two-challenges-same-day': 'First qualifying activity on a day earns challenge pts + bracket bonus.'
+    };
+    input = '<select id="' + id + '" onchange="updateChallengeFields(this)" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
+    atypeOptions.forEach(function(v) {
+      input += '<option value="' + v + '"' + (v === val ? ' selected' : '') + '>' + atypeLabels[v] + '</option>';
+    });
+    input += '</select>';
+    var currentDesc = atypeDescs[val || 'one-time'] || '';
+    input += '<div class="atype-desc" id="adesc-' + id + '" style="margin-top:6px;padding:6px 8px;background:#f0f4ff;border-left:3px solid #1565c0;border-radius:4px;font-size:11px;color:#444;line-height:1.4;display:' + (currentDesc ? 'block' : 'none') + '">' + (currentDesc) + '</div>';
+  } else {
+    input = '<input type="' + type + '" id="' + id + '" value="' + esc(val || '') + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px">';
+  }
+  return '<div class="fld" style="text-align:left;"><label style="font-size:11.5px;color:#666">' + label + '</label>' + input + '</div>';
+}
+
+function updateChallengeFields(sel) {
+  var atype = sel.value;
+  var cid = sel.id.replace('ch-atype-', '');
+  var scopeWrap = document.getElementById('ch-scope-wrap-' + cid);
+  var nbtWrap = document.getElementById('ch-nbt-wrap-' + cid);
+  var descEl = document.getElementById('adesc-ch-atype-' + cid);
+  if (scopeWrap) scopeWrap.style.display = (atype === 'one-time') ? 'contents' : 'none';
+  if (nbtWrap) nbtWrap.style.display = (atype === 'range-split' || atype === 'two-challenges-same-day') ? 'none' : 'contents';
+  var descs = {
+    'one-time': 'Award bonus_points ONCE if any qualifying activity meets criteria.',
+    'per-act': 'Award bonus_points for EACH qualifying activity that meets criteria.',
+    'range-split': 'In-range activities each earn a flat challenge bonus individually.',
+    'two-challenges-same-day': 'First qualifying activity on a day earns challenge pts + bracket bonus.'
+  };
+  if (descEl) {
+    descEl.textContent = descs[atype] || '';
+    descEl.style.display = descs[atype] ? 'block' : 'none';
+  }
+}
+
+async function saveChallengeCard(id) {
+  var atype = document.getElementById('ch-atype-' + id).value || 'one-time';
+  var data = {
+    name: document.getElementById('ch-name-' + id).value,
+    start_date: document.getElementById('ch-start-' + id).value,
+    end_date: document.getElementById('ch-end-' + id).value,
+    bonus_points: +document.getElementById('ch-pts-' + id).value || 0,
+    eligible: document.getElementById('ch-elig-' + id).value,
+    activity_scope: document.getElementById('ch-scope-' + id) ? document.getElementById('ch-scope-' + id).value : 'single',
+    distance_type: document.getElementById('ch-dtype-' + id).value,
+    distance_min: +document.getElementById('ch-dmin-' + id).value || 0,
+    distance_max: +document.getElementById('ch-dmax-' + id).value || 0,
+    start_time_criteria: document.getElementById('ch-time-' + id).value || null,
+    elevation_criteria: +document.getElementById('ch-elev-' + id).value || 0,
+    award_type: atype,
+    per_activity_points: (atype === 'per-act' ? +document.getElementById('ch-pts-' + id).value || 1 : 0),
+    normal_bonus_type: (document.getElementById('ch-nbt-' + id) || {}).value || 'no-change',
+    exclude_normal_bonus: ((document.getElementById('ch-nbt-' + id) || {}).value === 'exclude-all'),
+    range_split: atype === 'range-split'
+  };
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/challenges?id=eq.' + id, {
+      method: 'PATCH',
+      headers: HDR,
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('Save failed ' + r.status);
+    alert('Challenge saved!');
+    var chRes = await fetch(SB_URL + '/rest/v1/challenges?event_id=eq.' + editId + '&select=*&order=start_date.asc', { headers: HDR });
+    _challengesData = await chRes.json();
+    renderChallengesUI();
+  } catch(e) {
+    alert('Failed to save challenge: ' + e.message);
+  }
+}
+
+async function toggleChallengeActive(id, current) {
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/challenges?id=eq.' + id, {
+      method: 'PATCH',
+      headers: HDR,
+      body: JSON.stringify({ is_active: !current })
+    });
+    if (!r.ok) throw new Error('Toggle failed ' + r.status);
+    var chRes = await fetch(SB_URL + '/rest/v1/challenges?event_id=eq.' + editId + '&select=*&order=start_date.asc', { headers: HDR });
+    _challengesData = await chRes.json();
+    renderChallengesUI();
+  } catch(e) {
+    alert('Failed to toggle challenge: ' + e.message);
+  }
+}
+
+async function deleteChallengeCard(id) {
+  if (!confirm('Delete this challenge?')) return;
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/challenges?id=eq.' + id, {
+      method: 'DELETE',
+      headers: HDR
+    });
+    if (!r.ok) throw new Error('Delete failed ' + r.status);
+    _challengesData = _challengesData.filter(function(x) { return x.id !== id; });
+    renderChallengesUI();
+  } catch(e) {
+    alert('Failed to delete challenge: ' + e.message);
+  }
+}
+
+document.getElementById('btn-add-challenge-card').addEventListener('click', async function() {
+  try {
+    var defaultStart = document.getElementById('f-start').value || '2026-06-01';
+    var defaultEnd = document.getElementById('f-end').value || '2026-06-30';
+    var r = await fetch(SB_URL + '/rest/v1/challenges', {
+      method: 'POST',
+      headers: Object.assign({}, HDR, { Prefer: 'return=representation' }),
+      body: JSON.stringify({
+        name: 'New Challenge',
+        start_date: defaultStart,
+        end_date: defaultEnd,
+        bonus_points: 1,
+        eligible: 'all',
+        activity_scope: 'single',
+        distance_type: 'fixed',
+        distance_min: 5,
+        distance_max: 5,
+        elevation_criteria: 0,
+        is_active: false,
+        range_split: false,
+        event_id: editId
+      })
+    });
+    if (!r.ok) throw new Error('Create failed ' + r.status);
+    var newCh = (await r.json())[0];
+    _challengesData.push(newCh);
+    renderChallengesUI();
+    toggleChCard(newCh.id);
+  } catch(e) {
+    alert('Failed to create new challenge: ' + e.message);
+  }
+});
+
+async function upsertConfigValue(key, value, eventId) {
+  await fetch(SB_URL + '/rest/v1/leaderboard_config?on_conflict=config_key,event_id', {
+    method: 'POST',
+    headers: Object.assign({}, HDR, { Prefer: 'resolution=merge-duplicates' }),
+    body: JSON.stringify({
+      config_key: key,
+      event_id: eventId,
+      config_value: value,
+      updated_at: new Date().toISOString()
+    })
+  });
+}
+
+async function openEditor(ev){
   editId=ev?ev.id:null;
   document.getElementById('editor-title').innerHTML='<i class="ti ti-calendar-'+(ev?'cog':'plus')+'"></i> '+(ev?'Edit: '+ev.name:'New Event');
   var rc=(ev&&ev.rules_config)||{};
@@ -707,7 +1155,6 @@ function openEditor(ev){
   document.getElementById('f-rate').value=(rc.rate!=null)?rc.rate:1;
   document.getElementById('f-bonusbase').value=rc.bonus_base||'composite_total';
   document.getElementById('f-feedopen').checked=!!rc.feed_open_after_end;
-  // composite rows
   var comp=rc.composite||{};
   document.querySelectorAll('.cm-on').forEach(function(cb){var m=cb.getAttribute('data-m');cb.checked=!!comp[m];});
   document.querySelectorAll('.cm-rate').forEach(function(inp){var m=inp.getAttribute('data-m');if(comp[m]&&comp[m].rate!=null)inp.value=comp[m].rate;});
@@ -716,6 +1163,126 @@ function openEditor(ev){
   document.getElementById('ff-list').textContent='';
   (rc.form_fields||[]).forEach(addFFRow);
   updateScoringUI();
+
+  // Clear sub-configs first
+  document.getElementById('bonus-milestones-list').textContent = '';
+  document.getElementById('special-days-box').textContent = '';
+  document.getElementById('challenges-box').textContent = '';
+  _milestonesData = [];
+  _specialDaysData = [];
+  _challengesData = [];
+
+  if (ev) {
+    document.getElementById('new-event-subconfig-lock').style.display = 'none';
+    document.getElementById('group-special-days').style.display = 'block';
+    document.getElementById('group-challenges').style.display = 'block';
+
+    try {
+      var [cfgData, sdData, chData] = await Promise.all([
+        fetch(SB_URL + '/rest/v1/leaderboard_config?event_id=eq.' + editId + '&select=config_key,config_value', { headers: HDR }).then(function(r){return r.json();}),
+        fetch(SB_URL + '/rest/v1/special_scoring_days?event_id=eq.' + editId + '&select=*&order=special_date.asc', { headers: HDR }).then(function(r){return r.json();}),
+        fetch(SB_URL + '/rest/v1/challenges?event_id=eq.' + editId + '&select=*&order=start_date.asc', { headers: HDR }).then(function(r){return r.json();})
+      ]);
+
+      var medalRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'medals'; }) : null;
+      if (medalRow && medalRow.config_value) {
+        var m = medalRow.config_value;
+        document.getElementById('gold-male').value = (m.gold && m.gold.male) || 300;
+        document.getElementById('gold-female').value = (m.gold && m.gold.female) || 250;
+        document.getElementById('silver-male').value = (m.silver && m.silver.male) || 200;
+        document.getElementById('silver-female').value = (m.silver && m.silver.female) || 150;
+        document.getElementById('bronze-male').value = (m.bronze && m.bronze.male) || 125;
+        document.getElementById('bronze-female').value = (m.bronze && m.bronze.female) || 100;
+      } else {
+        document.getElementById('gold-male').value = 300;
+        document.getElementById('gold-female').value = 250;
+        document.getElementById('silver-male').value = 200;
+        document.getElementById('silver-female').value = 150;
+        document.getElementById('bronze-male').value = 125;
+        document.getElementById('bronze-female').value = 100;
+      }
+
+      var basePointsRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'base_points'; }) : null;
+      document.getElementById('base-per-km').value = (basePointsRow && basePointsRow.config_value && basePointsRow.config_value.per_km) ? basePointsRow.config_value.per_km : 1;
+
+      var bonusPointsRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'bonus_points'; }) : null;
+      _milestonesData = (bonusPointsRow && Array.isArray(bonusPointsRow.config_value)) ? bonusPointsRow.config_value.map(function(x) { return { km: x.km, points: x.points || x.pts || 0 }; }) : [];
+      renderMilestonesUI();
+
+      _specialDaysData = Array.isArray(sdData) ? sdData : [];
+      renderSpecialDaysUI();
+
+      _challengesData = Array.isArray(chData) ? chData : [];
+      renderChallengesUI();
+
+      var hideStravaRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'hide_strava_connect'; }) : null;
+      document.getElementById('layout-hide-strava').checked = hideStravaRow ? (hideStravaRow.config_value === true || hideStravaRow.config_value === 'true') : false;
+
+      var teamLbRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'team_leaderboard_enabled'; }) : null;
+      document.getElementById('layout-team-leaderboard').checked = teamLbRow ? (teamLbRow.config_value === true || teamLbRow.config_value === 'true') : true;
+
+      var tabsCfgRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'tabs_config'; }) : null;
+      if (tabsCfgRow && tabsCfgRow.config_value) {
+        var t = tabsCfgRow.config_value;
+        ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(tabName) {
+          var el = document.getElementById('tab-opt-' + tabName);
+          if (el) el.checked = t[tabName] !== false;
+        });
+      } else {
+        ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(tabName) {
+          var el = document.getElementById('tab-opt-' + tabName);
+          if (el) el.checked = true;
+        });
+      }
+
+      var ptsCfgRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'activities_points_config'; }) : null;
+      if (ptsCfgRow && ptsCfgRow.config_value) {
+        var p = ptsCfgRow.config_value;
+        ['base', 'bonus', 'challenge', 'total'].forEach(function(colName) {
+          var el = document.getElementById('pts-opt-' + colName);
+          if (el) el.checked = p[colName] !== false;
+        });
+      } else {
+        ['base', 'bonus', 'challenge', 'total'].forEach(function(colName) {
+          var el = document.getElementById('pts-opt-' + colName);
+          if (el) el.checked = true;
+        });
+      }
+
+    } catch(err) {
+      console.warn('Failed to load sub-configurations:', err);
+    }
+  } else {
+    document.getElementById('new-event-subconfig-lock').style.display = 'block';
+    document.getElementById('group-special-days').style.display = 'none';
+    document.getElementById('group-challenges').style.display = 'none';
+
+    document.getElementById('gold-male').value = 300;
+    document.getElementById('gold-female').value = 250;
+    document.getElementById('silver-male').value = 200;
+    document.getElementById('silver-female').value = 150;
+    document.getElementById('bronze-male').value = 125;
+    document.getElementById('bronze-female').value = 100;
+    document.getElementById('base-per-km').value = 1;
+    _milestonesData = [];
+    _specialDaysData = [];
+    _challengesData = [];
+    renderMilestonesUI();
+    renderSpecialDaysUI();
+    renderChallengesUI();
+
+    document.getElementById('layout-hide-strava').checked = false;
+    document.getElementById('layout-team-leaderboard').checked = true;
+    ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(tabName) {
+      var el = document.getElementById('tab-opt-' + tabName);
+      if (el) el.checked = true;
+    });
+    ['base', 'bonus', 'challenge', 'total'].forEach(function(colName) {
+      var el = document.getElementById('pts-opt-' + colName);
+      if (el) el.checked = true;
+    });
+  }
+
   document.getElementById('editor').classList.add('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -777,6 +1344,7 @@ function collect(){
     rules_config:rc
   };
 }
+
 document.getElementById('btn-save').addEventListener('click',async function(){
   var err=document.getElementById('ed-err');err.textContent='';
   var btn=this;btn.disabled=true;
@@ -789,6 +1357,52 @@ document.getElementById('btn-save').addEventListener('click',async function(){
       r=await fetch(SB_URL+'/rest/v1/events',{method:'POST',headers:Object.assign({},HDR,{Prefer:'return=representation'}),body:JSON.stringify(data)});
     }
     if(!r.ok){var eb=await r.text();throw new Error('Save failed '+r.status+': '+eb.slice(0,140));}
+    
+    var returnedEvent = (await r.json())[0];
+    var savedEventId = returnedEvent ? returnedEvent.id : editId;
+    
+    if (savedEventId) {
+      var medalsVal = {
+        gold: { male: +document.getElementById('gold-male').value || 300, female: +document.getElementById('gold-female').value || 250 },
+        silver: { male: +document.getElementById('silver-male').value || 200, female: +document.getElementById('silver-female').value || 150 },
+        bronze: { male: +document.getElementById('bronze-male').value || 125, female: +document.getElementById('bronze-female').value || 100 }
+      };
+
+      var basePointsVal = { per_km: parseFloat(document.getElementById('base-per-km').value) || 1 };
+      
+      var bonusArr = [];
+      document.querySelectorAll('.milestone-row-input').forEach(function(row) {
+        var km = parseFloat(row.querySelector('.milestone-km').value) || 0;
+        var pts = parseFloat(row.querySelector('.milestone-pts').value) || 0;
+        if (km > 0) bonusArr.push({ km: km, points: pts });
+      });
+
+      var hideStrava = document.getElementById('layout-hide-strava').checked;
+      var teamLb = document.getElementById('layout-team-leaderboard').checked;
+      
+      var tabsCfg = {};
+      ['dashboard', 'leaderboard', 'events', 'celebrate', 'feed', 'you'].forEach(function(t) {
+        var el = document.getElementById('tab-opt-' + t);
+        tabsCfg[t] = el ? el.checked : true;
+      });
+
+      var ptsCfg = {};
+      ['base', 'bonus', 'challenge', 'total'].forEach(function(t) {
+        var el = document.getElementById('pts-opt-' + t);
+        ptsCfg[t] = el ? el.checked : true;
+      });
+
+      await Promise.all([
+        upsertConfigValue('medals', medalsVal, savedEventId),
+        upsertConfigValue('base_points', basePointsVal, savedEventId),
+        upsertConfigValue('bonus_points', bonusArr, savedEventId),
+        upsertConfigValue('hide_strava_connect', hideStrava, savedEventId),
+        upsertConfigValue('team_leaderboard_enabled', teamLb, savedEventId),
+        upsertConfigValue('tabs_config', tabsCfg, savedEventId),
+        upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
+      ]);
+    }
+
     document.getElementById('ed-saved').classList.add('show');
     setTimeout(function(){document.getElementById('ed-saved').classList.remove('show')},2200);
     document.getElementById('editor').classList.remove('open');editId=null;
