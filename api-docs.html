@@ -181,6 +181,8 @@
       <!-- Doc Navigation -->
       <nav class="doc-nav">
         <button class="doc-nav-item active" onclick="switchSection('overview')"><i class="ti ti-info-circle"></i> Overview</button>
+        <button class="doc-nav-item" onclick="switchSection('app-portal')"><i class="ti ti-device-mobile"></i> Participant Portal (app.html)</button>
+        <button class="doc-nav-item" onclick="switchSection('admin-portal')"><i class="ti ti-layout-dashboard"></i> Admin Panel (admin.html)</button>
         <button class="doc-nav-item" onclick="switchSection('registration-flow')"><i class="ti ti-user-plus"></i> Registration & Approvals</button>
         <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Engine</button>
         <button class="doc-nav-item" onclick="switchSection('strava-mappings')"><i class="ti ti-api"></i> Strava Payload Mappings</button>
@@ -206,6 +208,188 @@
               <br>3. <strong>Frontend Portal (HTML/JS)</strong>: Renders leaderboard statistics, user dashboards, and organizers' administrative controls.
             </p>
           </div>
+        </section>
+
+        <!-- Section: Participant Portal (app.html) -->
+        <section id="app-portal" class="doc-section">
+          <h2><i class="ti ti-device-mobile"></i> Participant Portal (app.html) Tabs Details</h2>
+          <p>The participant portal features five core views controlled dynamically by the user's tab navigation bar. Below is the technical breakdown of each tab, detailing where the data comes from and which configuration keys influence it.</p>
+
+          <h3>1. Dashboard / Stats Tab (<code>#tab-dashboard</code>)</h3>
+          <ul>
+            <li><strong>Content</strong>: Renders the logged-in user's personalized stats, including cumulative distance, daily progress bars, streaks, base/challenge/bonus points, and their personal activity history list.</li>
+            <li><strong>Data Source</strong>:
+              <br>• Profile details (Name, Shift, Team) fetched from the <code>registration</code> table.
+              <br>• Cached aggregated values (Total distance, total points, splits points) read from <code>athlete_points_summary</code>.
+              <br>• List of recent activities fetched from <code>activities?strava_athlete_id=eq.{athlete_id}&amp;is_deleted=eq.false</code>.
+            </li>
+            <li><strong>Required Admin Configurations</strong>:
+              <br>• <strong>Event Configuration</strong> (<code>event_config</code>): Sets start and end dates of the event, regulating which activities are displayed.
+              <br>• <strong>Scoring Base Metrics</strong> (<code>milestone_config</code>): Determines the threshold goals (5km, 8km, 10km, 15km, 21km) displayed in the progress tracker.
+            </li>
+          </ul>
+
+          <h3>2. Leaderboard Tab (<code>#tab-leaderboard</code>)</h3>
+          <ul>
+            <li><strong>Content</strong>: Dynamic rankings split into three categories: Shift Category, Team Standing, and global Hall of Fame (HOF).</li>
+            <li><strong>Data Source</strong>:
+              <br>• Queries the cached <code>athlete_points_summary</code> table. The rankings are sorted in descending order of <code>total_points</code> (falling back to <code>total_distance_km</code> in case of ties).
+            </li>
+            <li><strong>Required Admin Configurations</strong>:
+              <br>• <strong>Team Configuration</strong>: The lists of valid teams (e.g. "Team San Francisco", "Team Mumbai") are configured globally. Standings aggregate summaries group on the athlete's <code>leaderboard_team</code>.
+            </li>
+          </ul>
+
+          <h3>3. Challenges Tab (<code>#tab-events</code>)</h3>
+          <ul>
+            <li><strong>Content</strong>: A grid of active challenges (e.g., Walk 10km on Sunday) showing completions, progress percentages, and buttons for submitting manual/special entries.</li>
+            <li><strong>Data Source</strong>:
+              <br>• Active items are loaded from the <code>challenges</code> table where the current date falls between <code>start_date</code> and <code>end_date</code>.
+              <br>• Completions are computed by analyzing whether the user has one or more matching activities in the <code>activities</code> table that satisfy the distance target.
+            </li>
+            <li><strong>Required Admin Configurations</strong>:
+              <br>• <strong>Events Configuration</strong> (<code>events.html</code>): Organizers create challenges specifying whether they are <code>fixed</code> or <code>range</code> types, setting targets and points values.
+            </li>
+          </ul>
+
+          <h3>4. Celebrate Tab (<code>#tab-celebrate</code>)</h3>
+          <ul>
+            <li><strong>Content</strong>: A live timeline highlighting notable achievements (e.g., "John Doe achieved a 7-day walk streak" or "Sarah joined the 200km club!").</li>
+            <li><strong>Data Source</strong>:
+              <br>• Fetched from the <code>announcements</code> table where <code>type = 'milestone'</code> or <code>type = 'club'</code>.
+            </li>
+            <li><strong>Required Admin Configurations</strong>:
+              <br>• <strong>Celebrate Config</strong> (<code>celebrate_config</code>): Organizers set background theme assets, confetti particles, and custom sound clip paths.
+            </li>
+          </ul>
+
+          <h3>5. Social Activity Feed (<code>#tab-feed</code>)</h3>
+          <ul>
+            <li><strong>Content</strong>: A timeline of standard walking activities from all participants. Clicking an activity opens a detailed drawer rendering a Leaflet map using the activity's polyline data.</li>
+            <li><strong>Data Source</strong>:
+              <br>• Fetched from the <code>announcements</code> table where <code>type = 'activity'</code>, sorted in descending chronological order.
+            </li>
+            <li><strong>Required Admin Configurations</strong>:
+              <br>• <strong>Feed Settings</strong> (<code>feed_config</code>): Governs filters like <code>minimum_activity_distance_km</code> and toggles standard walks visibility globally.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Section: Admin Panel (admin.html) -->
+        <section id="admin-portal" class="doc-section">
+          <h2><i class="ti ti-layout-dashboard"></i> Admin Panel (admin.html) Page Breakdown</h2>
+          <p>Organizers manage the Walkathon using a collection of specific administrative dashboard pages. Below is the functionality and database operations playbook for each page.</p>
+
+          <h3>1. Dashboard (<code>admin.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Provides a high-level summary of walkathon progress, showing registrations status, total cumulative distance, and logs of recent activities.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Counts rows in `registration` where <code>status = 'pending'</code>.
+              <br>• Sums <code>total_distance_km</code> and <code>total_points</code> in `athlete_points_summary`.
+              <br>• Fetches the 10 most recent entries in `activities` (joining `registration` on `strava_athlete_id` to get names).
+            </li>
+          </ul>
+
+          <h3>2. Events Management (<code>events.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Interface for organizers to create, edit, or delete challenge events.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Reads, inserts, patches, and deletes rows from the <code>challenges</code> table.
+              <br>• Fields updated: <code>name</code>, <code>distance_type</code>, <code>distance</code>, <code>points</code>, <code>start_date</code>, <code>end_date</code>, <code>event_id</code>.
+            </li>
+          </ul>
+
+          <h3>3. Leaderboard Monitor (<code>ag-leaderboard.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: View overall participant standings, breakdown charts (daywise activity trends), and download complete walk logs to CSV.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Queries <code>athlete_points_summary</code> and filters by shift or team.
+              <br>• Queries raw <code>activities</code> to compile detailed daily distance records for the graphs.
+            </li>
+          </ul>
+
+          <h3>4. Participant Accounts (<code>athletedtl.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Manage participant lists, edit user details (Shifts, Teams, Roles, Project Leads), review whitelist statuses, and approve/reject pending registrations.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Reads and updates the <code>registration</code> table.
+              <br>• Fields updated: <code>shift</code>, <code>leaderboard_team</code>, <code>role</code>, <code>project_lead</code>, <code>status</code>.
+            </li>
+          </ul>
+
+          <h3>5. Reports (<code>reports.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Generates detailed reports (Shift averages, team standings, and compliance statistics) for export.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Runs aggregate sum queries on <code>athlete_points_summary</code> and <code>activities</code> grouped by shifts and teams.
+            </li>
+          </ul>
+
+          <h3>6. Feed Settings (<code>feed-config.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Toggles whether standard activities, medals, or rank changes are shown in the social feed. Sets distance thresholds and sport rules.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Patches <code>config_value</code> in the <code>leaderboard_config</code> table where <code>config_key = 'feed_config'</code>.
+            </li>
+          </ul>
+
+          <h3>7. Celebrate Theme (<code>celebrate-config.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Customizes styling themes, gradients, milestone sounds, and confetti effects for achievements.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Patches <code>config_value</code> in the <code>leaderboard_config</code> table where <code>config_key = 'celebrate_config'</code>.
+            </li>
+          </ul>
+
+          <h3>8. Notifications setup (<code>push-notifications.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Write push notification rules, manage templates, and inspect the list of active push subscribers.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Reads and updates rows in `push_notification_rules` (fields: <code>title</code>, <code>body</code>, <code>is_enabled</code>).
+              <br>• Queries and lists subscriber counts from `push_subscriptions`.
+            </li>
+          </ul>
+
+          <h3>9. Bulk Email System (<code>email-send.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Write and send bulk emails to all registered participants or selected cohorts.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Queries email addresses and names from the `registration` table.
+            </li>
+          </ul>
+
+          <h3>10. System Configuration (<code>config.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Set up general walkathon settings (base milestones, double point dates, and event timezone bounds).</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Patches <code>config_value</code> in <code>leaderboard_config</code> where <code>config_key = 'event_config'</code>.
+              <br>• Inserts and deletes rows in the <code>special_days</code> table.
+            </li>
+          </ul>
+
+          <h3>11. Activities Auditor (<code>activities.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Audit incoming activities, flag suspicious walks (excessive distance, speed limits violated), and restore deleted walks.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Updates `activities` setting <code>is_flagged</code>, <code>flag_reason</code>, and <code>is_deleted</code>.
+            </li>
+          </ul>
+
+          <h3>12. Data & Sync Actions (<code>data-upload.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: Manually trigger sync actions for a participant, force token refresh operations, or trigger points recalculations.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Triggers backend endpoints (<code>/admin/backfill-points</code>, <code>/admin/sync-athlete</code>) which compile statistics in the database.
+            </li>
+          </ul>
+
+          <h3>13. Audit logs viewer (<code>audit-log.html</code>)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: View history logs of administrator operations to maintain system tracking.</li>
+            <li><strong>DB Operations</strong>:
+              <br>• Reads records from the <code>audit_logs</code> table.
+            </li>
+          </ul>
         </section>
 
         <!-- Section: Registration & Approvals Flow -->
