@@ -1397,9 +1397,15 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     for (var i = 0; i < currentMedals.length; i++) {
       var mKey = currentMedals[i];
       var searchTitle = mKey === 'medal_bronze' ? 'Bronze Medal' : mKey === 'medal_silver' ? 'Silver Medal' : 'Gold Medal';
-      var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(searchTitle) || _notificationsList.some(function(n) {
-        return n.title && n.title.indexOf(searchTitle) !== -1;
-      });
+      var alreadyNotifiedDb = false;
+      for (var k in _alreadyAnnouncedMilestones) {
+        if (k.indexOf(searchTitle) !== -1) { alreadyNotifiedDb = true; break; }
+      }
+      if (!alreadyNotifiedDb) {
+        alreadyNotifiedDb = _notificationsList.some(function(n) {
+          return n.title && n.title.indexOf(searchTitle) !== -1;
+        });
+      }
       if (prevMedals.indexOf(mKey) === -1 && !alreadyNotifiedDb) {
         await triggerAchievement(mKey);
       }
@@ -1433,9 +1439,15 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
     for (var i = 0; i < clubsToCheck.length; i++) {
       var club = clubsToCheck[i];
       if (totalKm >= club.thresh) {
-        var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(club.title) || _notificationsList.some(function(n) {
-          return n.title && n.title.indexOf(club.title) !== -1;
-        });
+        var alreadyNotifiedDb = false;
+        for (var k in _alreadyAnnouncedMilestones) {
+          if (k.indexOf(club.title) !== -1) { alreadyNotifiedDb = true; break; }
+        }
+        if (!alreadyNotifiedDb) {
+          alreadyNotifiedDb = _notificationsList.some(function(n) {
+            return n.title && n.title.indexOf(club.title) !== -1;
+          });
+        }
         if (prevClubs.indexOf(club.key) === -1 && !alreadyNotifiedDb) {
           await triggerAchievement(club.key);
           prevClubs.push(club.key);
@@ -1451,9 +1463,15 @@ async function checkMilestoneNotifications(athleteId, currentRank, currentPoints
         var qualifies = myActs.some(function(act) { return checkChallengeSingle(act, c); });
         if (qualifies) {
           completedChallenges.push(c.id);
-          var alreadyNotifiedDb = _alreadyAnnouncedMilestones.hasOwnProperty(c.name) || _notificationsList.some(function(n) {
-            return n.title && n.title.indexOf(c.name) !== -1;
-          });
+          var alreadyNotifiedDb = false;
+          for (var k in _alreadyAnnouncedMilestones) {
+            if (k.indexOf(c.name) !== -1) { alreadyNotifiedDb = true; break; }
+          }
+          if (!alreadyNotifiedDb) {
+            alreadyNotifiedDb = _notificationsList.some(function(n) {
+              return n.title && n.title.indexOf(c.name) !== -1;
+            });
+          }
           if (prevChallenges.indexOf(c.id) === -1 && !alreadyNotifiedDb) {
             triggerAchievement('challenge_bonus', { name: c.name });
           }
