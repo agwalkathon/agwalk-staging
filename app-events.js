@@ -208,18 +208,6 @@ function buildEventCard(ev, group) {
   var sportType = detectEventSportType(ev);
   if (!ev.banner_url) {
     card.classList.add('has-badge');
-    if (sportType === 'walk') {
-      card.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.09) 0%, #171B24 100%)';
-    } else if (sportType === 'run') {
-      card.style.background = 'linear-gradient(135deg, rgba(232, 98, 42, 0.09) 0%, #171B24 100%)';
-    } else if (sportType === 'hike') {
-      card.style.background = 'linear-gradient(135deg, rgba(244, 63, 94, 0.09) 0%, #171B24 100%)';
-    } else if (sportType === 'ride') {
-      card.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.09) 0%, #171B24 100%)';
-    } else {
-      card.style.background = 'linear-gradient(135deg, rgba(167, 139, 250, 0.09) 0%, #171B24 100%)';
-    }
-
     var badge = document.createElement('div');
     badge.className = 'ev-card-sport-badge';
     badge.innerHTML = renderIcon(sportType === 'ride' ? 'Ride' : sportType === 'run' ? 'Run' : sportType === 'hike' ? 'Hike' : sportType === 'walk' ? 'Walk' : 'Mixed');
@@ -265,22 +253,18 @@ function buildEventCard(ev, group) {
   }
   body.appendChild(dates);
 
-
-
-
-
   var actions = document.createElement('div');
   actions.className = 'ev-card-actions';
 
   // Event Details Info Button (placed first, before other action buttons)
   var infoBtn = document.createElement('button');
-  infoBtn.className = 'ev-btn ev-btn-info';
+  infoBtn.className = 'ev-btn';
   infoBtn.style.height = '42px';
   infoBtn.style.display = 'inline-flex';
   infoBtn.style.alignItems = 'center';
   infoBtn.style.justifyContent = 'center';
   infoBtn.style.gap = '6px';
-  infoBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Event Info';
+  infoBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> <span style="color:#38bdf8;">Event Info</span>';
   infoBtn.addEventListener('click', function(e) { e.stopPropagation(); openEventDetailsModal(ev); });
   actions.appendChild(infoBtn);
 
@@ -290,13 +274,14 @@ function buildEventCard(ev, group) {
 
   // Leaderboard Button (always visible)
   var lb = document.createElement('button');
-  lb.className = 'ev-btn ev-btn-leaderboard';
+  lb.className = 'ev-btn';
   lb.style.height = '42px';
   lb.style.display = 'inline-flex';
   lb.style.alignItems = 'center';
   lb.style.justifyContent = 'center';
   lb.style.gap = '6px';
-  lb.innerHTML = (group === 'past' ? '🏆 Final Results' : '🏆 Leaderboard');
+  var lbIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"/><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"/></svg>';
+  lb.innerHTML = lbIcon + ' <span style="color:#fbbf24;">' + (group === 'past' ? 'Final Results' : 'Leaderboard') + '</span>';
   lb.addEventListener('click', function(){ openEventLeaderboard(ev); });
   actions.appendChild(lb);
 
@@ -309,25 +294,26 @@ function buildEventCard(ev, group) {
     regBtn.style.justifyContent = 'center';
     regBtn.style.gap = '6px';
     if (isApproved || enrolled) {
-      regBtn.className = 'ev-btn ev-btn-registered';
-      regBtn.textContent = '✓ Registered';
+      regBtn.className = 'ev-btn';
+      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E8622A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span style="color:#ffaa80;">Registered</span>';
       regBtn.style.cursor = 'default';
     } else if (isPending) {
-      regBtn.className = 'ev-btn ev-btn-registered';
-      regBtn.textContent = '⌛ Registered (Pending)';
+      regBtn.className = 'ev-btn';
+      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E8622A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span style="color:#ffaa80;">Pending</span>';
       regBtn.style.cursor = 'default';
     } else if (regOpenNow || group === 'upcoming') {
-      regBtn.className = 'ev-btn ev-btn-register';
-      regBtn.textContent = hasRegDraft(ev.id) ? '▶ Resume Registration' : 'Register Now';
+      regBtn.className = 'ev-btn';
+      var regIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>';
+      var regLabel = hasRegDraft(ev.id) ? 'Resume Reg' : 'Register Now';
+      regBtn.innerHTML = regIcon + ' <span style="color:#a7f3d0;">' + regLabel + '</span>';
       regBtn.addEventListener('click', function(){ openEventRegistration(ev); });
       regBtn.style.cursor = 'pointer';
     } else {
-      // Registration not open or closed
       regBtn.className = 'ev-btn';
       regBtn.style.opacity = '0.5';
       regBtn.style.cursor = 'not-allowed';
       regBtn.disabled = true;
-      regBtn.textContent = ev.registration_open_date ? 'Registration Opens ' + evFmtDate(ev.registration_open_date) : 'Registration Closed';
+      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span style="color:rgba(255,255,255,0.5);">Closed</span>';
     }
     actions.appendChild(regBtn);
   }
