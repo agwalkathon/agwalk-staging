@@ -327,6 +327,10 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
           <!-- Destination Channels -->
           <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; border-left: 1px solid #ddd; padding-left: 12px;">
             <span style="font-weight:600; color:#555">Channels:</span>
+            <select id="bulk-ch-mode" style="padding: 2px 4px; font-size: 11px; border: 1px solid #ddd; border-radius: 4px; background: #fff; outline: none; cursor: pointer; color: #555;">
+              <option value="enable">Enable</option>
+              <option value="disable">Disable</option>
+            </select>
             <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-push"> Push</label>
             <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-inapp"> In-App</label>
             <label style="cursor:pointer; display:inline-flex; align-items:center; gap:2px"><input type="checkbox" id="bulk-ch-feed"> Feed Tab</label>
@@ -579,12 +583,14 @@ async function autoSaveChannels(idx) {
   var inappVal = document.getElementById('chk-dest-inapp-' + idx).checked;
   var feedVal = document.getElementById('chk-dest-feed-' + idx).checked;
   
-  channelsData[rule.trigger_key] = {
-    push: pushVal,
-    inapp: inappVal,
-    feed: feedVal
-  };
+  if (!channelsData[rule.trigger_key]) {
+    channelsData[rule.trigger_key] = { push: true, inapp: true, feed: false, once: false };
+  }
+  channelsData[rule.trigger_key].push = pushVal;
+  channelsData[rule.trigger_key].inapp = inappVal;
+  channelsData[rule.trigger_key].feed = feedVal;
   
+  updateHeaderPills(idx);
   await executeAutoSave(idx);
 }
 
@@ -972,9 +978,17 @@ async function bulkSetStatus(enabled) {
 async function bulkSetChannels() {
   var checkedBoxes = document.querySelectorAll('.trigger-row-select:checked');
   if (!checkedBoxes.length) return;
-  var pushVal = document.getElementById('bulk-ch-push').checked;
-  var inappVal = document.getElementById('bulk-ch-inapp').checked;
-  var feedVal = document.getElementById('bulk-ch-feed').checked;
+  var mode = document.getElementById('bulk-ch-mode').value;
+  var pushChecked = document.getElementById('bulk-ch-push').checked;
+  var inappChecked = document.getElementById('bulk-ch-inapp').checked;
+  var feedChecked = document.getElementById('bulk-ch-feed').checked;
+  
+  if (!pushChecked && !inappChecked && !feedChecked) {
+    alert('Please check at least one channel checkbox in the bulk bar.');
+    return;
+  }
+  
+  var targetVal = (mode === 'enable');
   
   checkedBoxes.forEach(function(chk) {
     var idx = parseInt(chk.getAttribute('data-idx'));
@@ -982,9 +996,9 @@ async function bulkSetChannels() {
     if (!channelsData[rule.trigger_key]) {
       channelsData[rule.trigger_key] = { push: true, inapp: true, feed: false, once: false };
     }
-    channelsData[rule.trigger_key].push = pushVal;
-    channelsData[rule.trigger_key].inapp = inappVal;
-    channelsData[rule.trigger_key].feed = feedVal;
+    if (pushChecked) channelsData[rule.trigger_key].push = targetVal;
+    if (inappChecked) channelsData[rule.trigger_key].inapp = targetVal;
+    if (feedChecked) channelsData[rule.trigger_key].feed = targetVal;
   });
   await executeBulkSave();
 }
