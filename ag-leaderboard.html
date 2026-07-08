@@ -541,7 +541,7 @@ var CHALLENGES = [];
 var EV_ID = null; // null = default event (Walkathon 2026, original date-window queries)
 var EV_RULES = null; // selected event's rules_config (null = legacy distance points)
 var EV_ALL = [];
-function evq(){ return EV_ID ? "&event_id=eq."+EV_ID : ""; }
+function evq(){ return "&event_id=eq." + (EV_ID || 1); }
 function scoringMode(){ return (EV_ID && EV_RULES && EV_RULES.scoring_mode) || 'single_metric'; }
 function scoringMetric(){ return (EV_ID && EV_RULES && EV_RULES.metric) || 'distance_km'; }
 function isLegacyScoring(){ return !EV_ID || EV_ID === 1; }
@@ -2091,13 +2091,29 @@ function exportActivitiesCSV() {
   URL.revokeObjectURL(url);
 }
 
-function exportAthleteDailyCSV(athleteId) {
+async function exportAthleteDailyCSV(athleteId) {
   var reg = allRegistrations.find(function(r) { return String(r.strava_athlete_id) === String(athleteId); });
   var athleteName = reg ? (reg.full_name || 'Athlete') : 'Athlete';
   var shift = reg ? (reg.shift || 'Dayshift') : 'Dayshift';
   var gender = reg ? (reg.gender || 'Male') : 'Male';
 
-  var ptsDetail = calcPointsAdaptive(allActivities, athleteId, gender, shift);
+  var athleteActs = [];
+  try {
+    var query = SB_URL + '/rest/v1/activities?strava_athlete_id=eq.' + athleteId + '&is_deleted=eq.false';
+    if (EV_ID) {
+      query += '&event_id=eq.' + EV_ID;
+    } else {
+      query += '&activity_date=gte.2026-06-01T00:00:00&activity_date=lte.2026-07-01T15:00:00';
+    }
+    query += '&select=strava_athlete_id,distance_meters,sport_type,activity_date,avg_speed,elevation_gain,strava_activity_id,is_flagged,manual_bonus,activity_name,start_time,description,activity_date_time_ist&order=id.asc';
+    var rActs = await fetch(query, { headers: HDR });
+    athleteActs = await rActs.json();
+    if (!Array.isArray(athleteActs)) athleteActs = [];
+  } catch(e) {
+    console.error('Failed to load dynamic athlete activities for export:', e);
+  }
+
+  var ptsDetail = calcPointsAdaptive(athleteActs, athleteId, gender, shift);
   var dayBreakdown = ptsDetail.dayBreakdown;
   var byDay = ptsDetail.byDay;
   var days = Object.keys(byDay).sort();
