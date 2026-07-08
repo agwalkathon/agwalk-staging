@@ -660,9 +660,29 @@ function ringRow(r){
   
   var sh=sel(RING_SHAPES,r.shape||'circle');sh.className='rr-shape';
   var cl=inp('color',r.color||'#E8622A');cl.className='rr-color';cl.style.padding='2px';cl.style.height='34px';
-  var del=document.createElement('button');del.type='button';del.className='btn btn-ghost btn-sm';del.innerHTML='<i class="ti ti-x"></i>';
+  var actionsWrap=document.createElement('div');
+  actionsWrap.style.cssText='display:flex;gap:2px;align-items:center';
+  
+  var upBtn=document.createElement('button');upBtn.type='button';upBtn.className='btn btn-ghost btn-sm';upBtn.style.padding='4px';upBtn.innerHTML='<i class="ti ti-arrow-up"></i>';
+  upBtn.addEventListener('click',function(){
+    var prev=row.previousElementSibling;
+    if(prev&&prev.classList.contains('ring-row')){row.parentNode.insertBefore(row,prev);}
+  });
+  
+  var downBtn=document.createElement('button');downBtn.type='button';downBtn.className='btn btn-ghost btn-sm';downBtn.style.padding='4px';downBtn.innerHTML='<i class="ti ti-arrow-down"></i>';
+  downBtn.addEventListener('click',function(){
+    var next=row.nextElementSibling;
+    if(next&&next.classList.contains('ring-row')){row.parentNode.insertBefore(next,row);}
+  });
+  
+  var del=document.createElement('button');del.type='button';del.className='btn btn-ghost btn-sm';del.style.padding='4px';del.style.color='var(--red)';del.innerHTML='<i class="ti ti-x"></i>';
   del.addEventListener('click',function(){row.remove();updateRingBtn();});
-  [m,lb,gt,gvm,gvf,sh,cl,del].forEach(function(x){row.appendChild(x);});
+  
+  actionsWrap.appendChild(upBtn);
+  actionsWrap.appendChild(downBtn);
+  actionsWrap.appendChild(del);
+  
+  [m,lb,gt,gvm,gvf,sh,cl,actionsWrap].forEach(function(x){row.appendChild(x);});
   return row;
 }
 function updateRingBtn(){
