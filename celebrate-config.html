@@ -270,14 +270,39 @@ input[type=checkbox].sw:checked::after{left:21px}
       <div class="fld"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
       <div class="fld"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
       
-      <div class="fld"><label>Font Family</label>
-        <select id="br-font">
-          <option value="Inter">Inter (Sleek sans-serif)</option>
-          <option value="Poppins">Poppins (Modern geometric)</option>
-          <option value="Roboto">Roboto (Clean neo-grotesque)</option>
-          <option value="Outfit">Outfit (Friendly sans)</option>
-          <option value="system-ui">System Default</option>
-        </select>
+      <div class="fld"><label>Font Family (Google Font)</label>
+        <input id="br-font" list="google-fonts" placeholder="Type or select any Google Font..." value="Inter">
+        <datalist id="google-fonts">
+          <option value="Inter">
+          <option value="Poppins">
+          <option value="Roboto">
+          <option value="Outfit">
+          <option value="Montserrat">
+          <option value="Lato">
+          <option value="Open Sans">
+          <option value="Oswald">
+          <option value="Raleway">
+          <option value="Playfair Display">
+          <option value="Merriweather">
+          <option value="Noto Sans">
+          <option value="Ubuntu">
+          <option value="Nunito">
+          <option value="Rubik">
+          <option value="Lora">
+          <option value="Fira Sans">
+          <option value="Quicksand">
+          <option value="Work Sans">
+          <option value="PT Sans">
+          <option value="Cabin">
+          <option value="Mukta">
+          <option value="Kanit">
+          <option value="Barlow">
+          <option value="Titillium Web">
+          <option value="Bebas Neue">
+          <option value="Lobster">
+          <option value="Pacifico">
+          <option value="system-ui">
+        </datalist>
       </div>
       <div class="fld"><label>Title Text Size (px)</label><input id="br-title-size" type="number" min="14" max="64" value="26"></div>
       <div class="fld"><label>Tagline Text Size (px)</label><input id="br-tag-size" type="number" min="10" max="32" value="14"></div>
