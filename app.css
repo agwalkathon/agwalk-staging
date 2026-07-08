@@ -10,8 +10,8 @@
       --gold:#FFD000; --gold-dim:rgba(255,208,0,0.15);
       --silver:#C8D8E8; --bronze:#F4A84A;
       --radius:16px; --radius-sm:12px; --radius-xs:8px;
-      --font:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-num:'Barlow Semi Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-num:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       /* Typography scale tokens (Instagram style, larger & readable) */
       --fs-xs: 12px;
       --fs-sm: 14px;
@@ -36,31 +36,6 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
       letter-spacing: -0.011em;
-    }
-
-    /* Numerical font targets for high readability stats */
-    .ring-pct,
-    .ring-need,
-    .standing-rank-big,
-    .ledger-val,
-    .detail-cell-val,
-    .detail-field-val,
-    .row-pts-num,
-    .rank-col,
-    .rank-delta,
-    .podium-pts,
-    .podium-badge,
-    .feed-act-val,
-    .ch-pts,
-    .stat-card-val,
-    .gold-stat-val,
-    .streak-num,
-    .streak-best-val,
-    .you-streak-val,
-    .pace-val,
-    .stat-val,
-    .modal-summary-val {
-      font-family: var(--font-num) !important;
     }
 
     /* ── Header ── */
@@ -3427,6 +3402,64 @@ body.employee-mode::after {
 #tab-dashboard {
   padding-top: 4px;
 }
+
 #tab-dashboard .hero-rings-block {
   padding-top: 0;
+}
+
+/* Pull to Refresh styles */
+.ptr-loader {
+  position: fixed;
+  top: 56px; /* below the header */
+  left: 50%;
+  transform: translate3d(-50%, -60px, 0);
+  width: 40px;
+  height: 40px;
+  background: rgba(22, 25, 30, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.ptr-loader.visible {
+  opacity: 1;
+}
+.ptr-loader.transitioning {
+  transition: transform 0.22s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.15s ease;
+}
+.ptr-spinner-svg {
+  width: 22px;
+  height: 22px;
+  transform: rotate(0deg);
+  transform-origin: center;
+  will-change: transform;
+}
+.ptr-spinner-circle {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  transform-origin: center;
+}
+.ptr-loader.loading .ptr-spinner-svg {
+  animation: ptr-spin 0.8s linear infinite;
+}
+.ptr-loader.loading .ptr-spinner-circle {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 15;
+  transition: stroke-dashoffset 0.15s ease;
+}
+@keyframes ptr-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
