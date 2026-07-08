@@ -324,11 +324,12 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   <div class="edit-group" style="border-left: 4px solid #8B5CF6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #8B5CF6; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-circle-dot"></i> Configure Dashboard Rings</h3>
     <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">Configure the circular progress indicators displayed at the top of the participant's dashboard (e.g., daily steps, overall distance). Each ring tracks progress towards a specific goal value. To display progress towards Medals, add a ring tracking Total Points with your Gold Medal threshold as the goal.</div>
-    <div style="display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.7fr 1fr 0.6fr auto;gap:8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;padding-right:24px;border-bottom:1px solid #eee;padding-bottom:4px;">
+    <div style="display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.6fr 0.6fr 0.8fr 0.5fr auto;gap:8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;padding-right:24px;border-bottom:1px solid #eee;padding-bottom:4px;">
       <span>Metric</span>
       <span>Label</span>
       <span>Goal Type</span>
-      <span>Target Goal</span>
+      <span>Male Goal</span>
+      <span>Female Goal</span>
       <span>Visual Shape</span>
       <span>Color</span>
       <span></span>
@@ -648,18 +649,24 @@ function ringRow(r){
   r=r||{};
   var row=document.createElement('div');
   row.className='ring-row';
-  row.style.cssText='display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.7fr 1fr 0.6fr auto;gap:8px;margin-bottom:8px;align-items:center';
+  row.style.cssText='display:grid;grid-template-columns:1.2fr 1fr 0.9fr 0.6fr 0.6fr 0.8fr 0.5fr auto;gap:8px;margin-bottom:8px;align-items:center';
   function sel(opts,val){var s=document.createElement('select');opts.forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];s.appendChild(op);});if(val)s.value=val;s.style.cssText='padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12.5px;width:100%';return s;}
   function inp(type,val,ph){var i=document.createElement('input');i.type=type;if(val!==undefined&&val!==null)i.value=val;if(ph)i.placeholder=ph;i.style.cssText='padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12.5px;width:100%';return i;}
   var m=sel(RING_METRICS,r.metric||'distance_km');m.className='rr-metric';
   var lb=inp('text',r.label||'','Label');lb.className='rr-label';
   var gt=sel([['daily','Daily goal'],['total','Event total'],['auto','Auto pace']],r.goal_type||'daily');gt.className='rr-gtype';
-  var gv=inp('text',r.goal!==undefined?r.goal:'5','Goal');gv.className='rr-goal';gv.setAttribute('list','ring-goal-options');
+  
+  var gValMale = r.goal_male !== undefined ? r.goal_male : (r.goal !== undefined ? r.goal : '5');
+  var gValFemale = r.goal_female !== undefined ? r.goal_female : (r.goal !== undefined ? r.goal : '5');
+  
+  var gvm=inp('text',gValMale,'Male');gvm.className='rr-goal-male';gvm.setAttribute('list','ring-goal-options');
+  var gvf=inp('text',gValFemale,'Female');gvf.className='rr-goal-female';gvf.setAttribute('list','ring-goal-options');
+  
   var sh=sel(RING_SHAPES,r.shape||'circle');sh.className='rr-shape';
   var cl=inp('color',r.color||'#E8622A');cl.className='rr-color';cl.style.padding='2px';cl.style.height='34px';
   var del=document.createElement('button');del.type='button';del.className='btn btn-ghost btn-sm';del.innerHTML='<i class="ti ti-x"></i>';
   del.addEventListener('click',function(){row.remove();updateRingBtn();});
-  [m,lb,gt,gv,sh,cl,del].forEach(function(x){row.appendChild(x);});
+  [m,lb,gt,gvm,gvf,sh,cl,del].forEach(function(x){row.appendChild(x);});
   return row;
 }
 function updateRingBtn(){
@@ -724,24 +731,24 @@ function loadDashboardCfg(rc){
 }
 function collectDashboardCfg(){
   var rings=Array.from(document.querySelectorAll('#rings-box .ring-row')).map(function(row){
-    var rawGoal = row.querySelector('.rr-goal').value.trim();
-    var goalVal = rawGoal.toLowerCase();
-    var goal;
-    if (goalVal === 'gold' || goalVal === 'silver' || goalVal === 'bronze') {
-      goal = goalVal;
-    } else {
-      goal = parseFloat(rawGoal) || 0;
-    }
+    var rawMale = row.querySelector('.rr-goal-male').value.trim();
+    var rawFemale = row.querySelector('.rr-goal-female').value.trim();
+    
+    var goalMale = (rawMale.toLowerCase() === 'gold' || rawMale.toLowerCase() === 'silver' || rawMale.toLowerCase() === 'bronze') ? rawMale.toLowerCase() : (parseFloat(rawMale) || 0);
+    var goalFemale = (rawFemale.toLowerCase() === 'gold' || rawFemale.toLowerCase() === 'silver' || rawFemale.toLowerCase() === 'bronze') ? rawFemale.toLowerCase() : (parseFloat(rawFemale) || 0);
+    
     return {
       metric:row.querySelector('.rr-metric').value,
       label:row.querySelector('.rr-label').value.trim(),
       goal_type:row.querySelector('.rr-gtype').value,
-      goal:goal,
+      goal_male:goalMale,
+      goal_female:goalFemale,
+      goal:goalMale, // legacy fallback
       shape:row.querySelector('.rr-shape').value,
       color:row.querySelector('.rr-color').value
     };
   }).filter(function(r){
-    return r.goal === 'gold' || r.goal === 'silver' || r.goal === 'bronze' || (typeof r.goal === 'number' && r.goal > 0);
+    return r.goal_male !== 0 || r.goal_female !== 0;
   });
   var db={};
   if(rings.length)db.rings=rings;
