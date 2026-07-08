@@ -1274,14 +1274,36 @@ async function load(isBackgroundRefresh) {
       if(myPts>=goldThresh){
         var daysElapsed=Math.max(1,(now-new Date((EVENT_ROW && EVENT_ROW.start_date || '2026-06-01') + 'T00:00:00+05:30'))/86400000);
         var avgKmDay=fullPts.km/daysElapsed;
-        var goldActsMap={};
-        allActs.forEach(function(a){if(!goldActsMap[a.strava_athlete_id])goldActsMap[a.strava_athlete_id]=[];goldActsMap[a.strava_athlete_id].push(a);});
         var myShiftN = (reg.shift || '').toLowerCase();
         var isNight = myShiftN.indexOf('night') > -1;
         var myGenderN = (reg.gender || '').toLowerCase();
         var isFemale = myGenderN === 'female' || myGenderN === 'f';
-        var shiftPeersG=allRegRes.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return(ps.indexOf('night')>-1)===isNight&&(pg==='female')===isFemale;});
-        var shiftScoredG=shiftPeersG.map(function(p){var km=0;(goldActsMap[p.strava_athlete_id]||[]).forEach(function(a){km+=(a.distance_meters||0)/1000;});return{id:p.strava_athlete_id,name:p.full_name,km:km};}).sort(function(a,b){return b.km-a.km;});
+
+        // Check if precomputed summaries are available
+        var summaries = cacheGet('ranking_summaries', CACHE_TTL.ranking) || cacheGet('ranking_summaries', 86400 * 365 * 1000);
+        var shiftScoredG = [];
+        if (summaries && summaries.length > 0) {
+          var shiftPeersG = summaries.filter(function(p) {
+            var pg = (p.gender || '').toLowerCase();
+            var ps = (p.shift || '').toLowerCase();
+            var pIsNight = ps.indexOf('night') > -1;
+            var pIsFemale = pg === 'female' || pg === 'f';
+            return pIsNight === isNight && pIsFemale === isFemale;
+          });
+          shiftScoredG = shiftPeersG.map(function(p) {
+            return {
+              id: p.athlete_id,
+              name: p.full_name,
+              km: p.total_distance_km || 0
+            };
+          }).sort(function(a, b) { return b.km - a.km; });
+        } else {
+          var goldActsMap={};
+          allActs.forEach(function(a){if(!goldActsMap[a.strava_athlete_id])goldActsMap[a.strava_athlete_id]=[];goldActsMap[a.strava_athlete_id].push(a);});
+          var shiftPeersG=allRegRes.filter(function(p){var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();return(ps.indexOf('night')>-1)===isNight&&(pg==='female')===isFemale;});
+          shiftScoredG=shiftPeersG.map(function(p){var km=0;(goldActsMap[p.strava_athlete_id]||[]).forEach(function(a){km+=(a.distance_meters||0)/1000;});return{id:p.strava_athlete_id,name:p.full_name,km:km};}).sort(function(a,b){return b.km-a.km;});
+        }
+
         var myRankG=shiftScoredG.findIndex(function(x){return String(x.id)===String(athleteId);})+1;
         var totalG=shiftScoredG.length;
         var pctRank=totalG>0?myRankG/totalG:0.5;
@@ -1295,7 +1317,7 @@ async function load(isBackgroundRefresh) {
           '<div class="gold-top">'+
             '<div class="gold-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.5 8.5 6 6l3-3h6l3 3-2.5 2.5"/></svg></div>'+
             '<div><div class="gold-title">Gold Achieved!</div>'+
-            '<div class="gold-sub">Rank #'+myRankG+' of '+totalG+' in your category</div></div>'+
+            '<div class="gold-sub">' + ((myRankG > 0 && totalG > 0) ? 'Rank #' + myRankG + ' of ' + totalG + ' in your category' : 'Gold Tier Secured!') + '</div></div>'+
           '</div>'+
           '<div class="gold-quote"><div class="gold-quote-text">&ldquo;'+quote+'&rdquo;</div></div>'+
           '<div class="gold-stats">'+
@@ -1305,15 +1327,25 @@ async function load(isBackgroundRefresh) {
           (personAbove?
             '<div class="gold-rival">'+
               '<div class="gold-rival-left">'+
-                '<div class="gold-rival-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Overtake #'+(myRankG-1)+': '+esc(personAbove.name)+'</div>'+
-                '<div class="gold-rival-sub">'+daysLeft+' days left · keep pushing</div>'+
+                (daysLeft === 0 ?
+                  '<div class="gold-rival-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Category Rank: #'+myRankG+'</div>'+
+                  '<div class="gold-rival-sub">Event has ended</div>'
+                :
+                  '<div class="gold-rival-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Overtake #'+(myRankG-1)+': '+esc(personAbove.name)+'</div>'+
+                  '<div class="gold-rival-sub">'+daysLeft+' days left · keep pushing</div>'
+                )+
               '</div>'+
             '</div>'
           :
             '<div class="gold-rival">'+
               '<div class="gold-rival-left">'+
-                '<div class="gold-rival-label">🏆 You\'re #1 — lead to the finish!</div>'+
-                '<div class="gold-rival-sub">Defend your spot for '+daysLeft+' more days</div>'+
+                (daysLeft === 0 ?
+                  '<div class="gold-rival-label">🏆 Category Rank: #'+(myRankG || 1)+'</div>'+
+                  '<div class="gold-rival-sub">Event has ended</div>'
+                :
+                  '<div class="gold-rival-label">🏆 You\'re #1 — lead to the finish!</div>'+
+                  '<div class="gold-rival-sub">Defend your spot for '+daysLeft+' more days</div>'
+                )+
               '</div>'+
             '</div>'
           );
@@ -1357,29 +1389,34 @@ async function load(isBackgroundRefresh) {
           paceCard.appendChild(bdiv);
         }
 
-        paceCard.appendChild(paceRow('rgba(96,165,250,0.12)',icoCalPace,daysLeft+' days remaining','Event ends July 1','Jul 1','var(--muted)'));
+        if (daysLeft > 0) {
+          paceCard.appendChild(paceRow('rgba(96,165,250,0.12)',icoCalPace,daysLeft+' days remaining','Event ends July 1','Jul 1','var(--muted)'));
 
-        if(myPts<bronzeThresh){
-          var brN=Math.max(0,bronzeThresh-myPts),brK=daysLeft>0?(brN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(244,168,74,0.12)',icoBronze,'Walk '+brK.toFixed(1)+' km/day for Bronze','Need '+brN.toFixed(1)+' pts in '+daysLeft+' days',brK.toFixed(1)+' km','#F4A84A'));
-          var siN=Math.max(0,silverThresh-myPts),siK=daysLeft>0?(siN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(200,216,232,0.12)',icoSilver,'Walk '+siK.toFixed(1)+' km/day for Silver','Need '+siN.toFixed(1)+' pts in '+daysLeft+' days',siK.toFixed(1)+' km','var(--silver)'));
-          var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
-        } else if(myPts<silverThresh){
-          var siN=Math.max(0,silverThresh-myPts),siK=daysLeft>0?(siN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(200,216,232,0.12)',icoSilver,'Walk '+siK.toFixed(1)+' km/day for Silver','Need '+siN.toFixed(1)+' pts in '+daysLeft+' days',siK.toFixed(1)+' km','var(--silver)'));
-          var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
-        } else {
-          var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
-          paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
-        }
+          if(myPts<bronzeThresh){
+            var brN=Math.max(0,bronzeThresh-myPts),brK=daysLeft>0?(brN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(244,168,74,0.12)',icoBronze,'Walk '+brK.toFixed(1)+' km/day for Bronze','Need '+brN.toFixed(1)+' pts in '+daysLeft+' days',brK.toFixed(1)+' km','#F4A84A'));
+            var siN=Math.max(0,silverThresh-myPts),siK=daysLeft>0?(siN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(200,216,232,0.12)',icoSilver,'Walk '+siK.toFixed(1)+' km/day for Silver','Need '+siN.toFixed(1)+' pts in '+daysLeft+' days',siK.toFixed(1)+' km','var(--silver)'));
+            var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
+          } else if(myPts<silverThresh){
+            var siN=Math.max(0,silverThresh-myPts),siK=daysLeft>0?(siN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(200,216,232,0.12)',icoSilver,'Walk '+siK.toFixed(1)+' km/day for Silver','Need '+siN.toFixed(1)+' pts in '+daysLeft+' days',siK.toFixed(1)+' km','var(--silver)'));
+            var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
+          } else {
+            var goN=Math.max(0,goldThresh-myPts),goK=daysLeft>0?(goN/daysLeft):0;
+            paceCard.appendChild(paceRow('rgba(255,208,0,0.12)',icoGold,'Walk '+goK.toFixed(1)+' km/day for Gold','Need '+goN.toFixed(1)+' pts in '+daysLeft+' days',goK.toFixed(1)+' km','var(--gold)'));
+          }
 
-        if(nextTier){
-          paceCard.appendChild(paceRow('rgba(96,165,250,0.12)',icoPaceBolt,'Walk '+(nextTier[0]-todayKm).toFixed(1)+' km more today for bonus','Today: '+todayKm.toFixed(1)+' km so far','+'+nextTier[1]+' pt','var(--blue)'));
+          if(nextTier){
+            paceCard.appendChild(paceRow('rgba(96,165,250,0.12)',icoPaceBolt,'Walk '+(nextTier[0]-todayKm).toFixed(1)+' km more today for bonus','Today: '+todayKm.toFixed(1)+' km so far','+'+nextTier[1]+' pt','var(--blue)'));
+          } else {
+            paceCard.appendChild(paceRow('rgba(34,197,94,0.12)',icoPaceChk,'Max daily bonus earned!',todayKm.toFixed(1)+' km today','+7 pts','var(--green)'));
+          }
         } else {
-          paceCard.appendChild(paceRow('rgba(34,197,94,0.12)',icoPaceChk,'Max daily bonus earned!',todayKm.toFixed(1)+' km today','+7 pts','var(--green)'));
+          var endDisplayStr = EVENT_ROW ? new Date(EVENT_ROW.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Jun 30';
+          paceCard.appendChild(paceRow('rgba(34,197,94,0.12)',icoPaceChk,'Event Completed','Final standings locked in',endDisplayStr,'var(--green)'));
         }
       }
     }
