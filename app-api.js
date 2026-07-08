@@ -1733,15 +1733,24 @@ async function loadPastEventsPerformance(reg, athleteId) {
   if (!sec || !card || !reg || !reg.email) return;
 
   try {
+    sec.style.display = 'block';
+    card.innerHTML = '<div style="text-align:center;padding:15px;color:var(--muted);font-size:13px;">Loading past events...</div>';
+
     var res = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(reg.email) + '&event_id=neq.' + reg.event_id + '&select=event_id,event_name,leaderboard_team,gender,shift,strava_athlete_id', { headers: HDR });
     var otherRegs = await res.json();
     if (!Array.isArray(otherRegs) || otherRegs.length === 0) {
-      sec.style.display = 'none';
+      card.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);font-size:13.5px;">No Past Event Performed</div>';
       return;
     }
 
-    sec.style.display = 'block';
-    card.innerHTML = '<div style="text-align:center;padding:15px;color:var(--muted);font-size:13px;">Loading past events...</div>';
+    var eventsRes = await fetch(SUPABASE_URL + '/rest/v1/events?select=id,name', { headers: HDR });
+    var eventsList = await eventsRes.json();
+    var eventMap = {};
+    if (Array.isArray(eventsList)) {
+      eventsList.forEach(function(e) {
+        eventMap[e.id] = e.name;
+      });
+    }
 
     var html = '';
     otherRegs.sort(function(a, b) { return a.event_id - b.event_id; });
@@ -1749,7 +1758,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
     for (var i = 0; i < otherRegs.length; i++) {
       var pReg = otherRegs[i];
       var pastEventId = pReg.event_id;
-      var pastEventName = pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId);
+      var pastEventName = eventMap[pastEventId] || pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId);
       var team = pReg.leaderboard_team || 'No Team';
       
       var scoreObj = null;
