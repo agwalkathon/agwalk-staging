@@ -41,10 +41,11 @@
     /* ── Header ── */
     .header{
       position:sticky;top:0;z-index:200;
-      background:rgba(31, 38, 45, 0.96);
+      background:rgba(9, 10, 14, 0.94);
       backdrop-filter:blur(20px);
       -webkit-backdrop-filter:blur(20px);
       padding:max(14px,env(safe-area-inset-top)) 16px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .hdr-inner{
       max-width:540px;margin:0 auto;width:100%;
@@ -2958,17 +2959,22 @@
 .ev-tab-head{font-size:22px;font-weight:700;color:#fff;margin:6px 0 16px}
 .ev-section-title{font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#fff;margin:20px 0 10px}
 .ev-card-p{background:rgba(26,29,32,0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;margin-bottom:14px;overflow:hidden;position:relative;box-shadow:0 4px 15px rgba(0,0,0,0.15);}
-.ev-card-p.has-badge::before {
-  content: "";
+.ev-card-watermark {
   position: absolute;
-  inset: 0;
-  background-image: url('event_card_doodle_bg.png');
-  background-size: 200px 200px;
-  background-repeat: repeat;
-  opacity: 0.25;
-  mix-blend-mode: screen;
+  bottom: -15px;
+  right: -15px;
+  width: 140px;
+  height: 140px;
   pointer-events: none;
   z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.045;
+}
+.ev-card-watermark svg {
+  width: 130px !important;
+  height: 130px !important;
 }
 .ev-card-sport-badge {
   position: absolute;
