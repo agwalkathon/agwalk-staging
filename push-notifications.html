@@ -1,6 +1,31 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Session Sync Block -->
+  <script>
+    (function() {
+      if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
+        sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
+        if (localStorage.getItem('wk_admin')) {
+          sessionStorage.setItem('wk_admin', localStorage.getItem('wk_admin'));
+        }
+      }
+      var origSet = sessionStorage.setItem;
+      sessionStorage.setItem = function(key, val) {
+        origSet.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.setItem(key, val);
+        }
+      };
+      var origRem = sessionStorage.removeItem;
+      sessionStorage.removeItem = function(key) {
+        origRem.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.removeItem(key);
+        }
+      };
+    })();
+  </script>
   <script>
     (function(){
       if ('serviceWorker' in navigator) {
@@ -133,7 +158,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   </style>
 </head>
 <body>
-          <aside class="sidebar">
+                <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
@@ -158,6 +183,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
     </div>
 
     <div class="sb-spacer"></div>
@@ -166,8 +192,12 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
   </aside>
 
 <div class="main">
-<header class="topbar">
-  <div><h1>Push Notifications</h1><p>Manage triggers, rules, and broadcast messages</p></div>
+<header class='topbar'>
+  <div class='topbar-left'><h1>Push Notifications</h1><p>Manage triggers, rules, and broadcast messages</p></div>
+
+  <div class='topbar-right' style='display:flex;align-items:center;gap:12px;'>
+    <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button>
+  </div>
 </header>
 <div class="content">
 
@@ -517,11 +547,11 @@ function renderRules() {
              '    <div class="rule-fields" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">' +
              '      <div class="fld" style="margin:0; display:flex; flex-direction:column; gap:4px;">' +
              '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Title</label>' +
-             '        <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; outline:none; background:#fff; color:var(--text);">' +
+             '        <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff; color:var(--text);">' +
              '      </div>' +
              '      <div class="fld" style="margin:0; display:flex; flex-direction:column; gap:4px;">' +
              '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Body — use {distance} {name} {rank} {medal}</label>' +
-             '        <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; outline:none; background:#fff; color:var(--text);">' +
+             '        <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff; color:var(--text);">' +
              '      </div>' +
              '    </div>' +
              '    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap; background: #f9fafb; padding: 12px 18px; border-radius: 8px; border: 1px solid #f3f4f6;">' +
