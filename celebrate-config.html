@@ -1,6 +1,31 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Session Sync Block -->
+  <script>
+    (function() {
+      if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
+        sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
+        if (localStorage.getItem('wk_admin')) {
+          sessionStorage.setItem('wk_admin', localStorage.getItem('wk_admin'));
+        }
+      }
+      var origSet = sessionStorage.setItem;
+      sessionStorage.setItem = function(key, val) {
+        origSet.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.setItem(key, val);
+        }
+      };
+      var origRem = sessionStorage.removeItem;
+      sessionStorage.removeItem = function(key) {
+        origRem.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.removeItem(key);
+        }
+      };
+    })();
+  </script>
   <script>
     (function(){
       if ('serviceWorker' in navigator) {
@@ -135,7 +160,7 @@ input[type=checkbox].sw:checked::after{left:21px}
 </style>
 </head>
 <body>
-          <aside class="sidebar">
+                <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
@@ -160,6 +185,7 @@ input[type=checkbox].sw:checked::after{left:21px}
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
     </div>
 
     <div class="sb-spacer"></div>
@@ -167,7 +193,11 @@ input[type=checkbox].sw:checked::after{left:21px}
     <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
   </aside>
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Celebrate</h1><p>Moderation, feed, and app configuration</p></div></header>
+<header class="topbar"><div class="topbar-left"><h1>Celebrate</h1><p>Moderation, feed, and app configuration</p></div>
+  <div class='topbar-right' style='display:flex;align-items:center;gap:12px;'>
+    <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button>
+  </div>
+</header>
 <div class="content">
 
 <div class="section-tabs">
@@ -420,8 +450,29 @@ async function loadConfig(){
   document.getElementById('br-title').value=br.login_title||'';
   document.getElementById('br-tag').value=br.tagline||'';
   document.getElementById('br-logo').value=br.logo_url||'';
-  document.getElementById('br-accent-hex').value=br.accent_color||'#E8622A';
-  document.getElementById('br-accent').value=br.accent_color||'#E8622A';
+  document.getElementById('br-font').value=br.font_family||'Inter';
+  document.getElementById('br-title-size').value=br.title_size||26;
+  document.getElementById('br-tag-size').value=br.tagline_size||14;
+
+  var accent=br.accent_color||'#E8622A';
+  document.getElementById('br-accent').value=accent;
+  document.getElementById('br-accent-hex').value=accent;
+
+  var titleCol=br.title_color||'#FFFFFF';
+  document.getElementById('br-title-color').value=titleCol;
+  document.getElementById('br-title-color-hex').value=titleCol;
+
+  var tagCol=br.tagline_color||'#9CA3AF';
+  document.getElementById('br-tag-color').value=tagCol;
+  document.getElementById('br-tag-color-hex').value=tagCol;
+
+  var footCol=br.footnote_color||'#6B7280';
+  document.getElementById('br-footnote-color').value=footCol;
+  document.getElementById('br-footnote-color-hex').value=footCol;
+
+  document.getElementById('br-logo-size').value=br.logo_width||120;
+  document.getElementById('br-logo-pos').value=br.logo_position||'top';
+
   updateLogoPreview(br.logo_url||'');
   var crm=CFG.crm||{};
   document.getElementById('crm-url').value=crm.url||'';
@@ -440,12 +491,29 @@ document.querySelectorAll('[data-save]').forEach(function(btn){
   btn.addEventListener('click',async function(){
     var which=this.getAttribute('data-save');this.disabled=true;
     var key,value;
-    if(which==='moderation'){key='moderation';value={};document.querySelectorAll('.seg').forEach(function(seg){var on=seg.querySelector('button.on');value[seg.getAttribute('data-cfg')]=on?on.getAttribute('data-v'):'manual';});}
+    if(which==='moderation'){key='moderation';value={};document.querySelectorAll('#panel-modrules .seg').forEach(function(seg){var on=seg.querySelector('button.on');value[seg.getAttribute('data-cfg')]=on?on.getAttribute('data-v'):'manual';});}
     if(which==='autoposts'){key='auto_posts';value={birthday:document.getElementById('ap-birthday').checked,anniversary:document.getElementById('ap-anniversary').checked,show_age:document.getElementById('ap-showage').checked,respect_opt_out:document.getElementById('ap-optout').checked,post_time:'00:01'};}
     if(which==='media'){key='media';value={photos:document.getElementById('md-photos').checked,videos:document.getElementById('md-videos').checked,max_photo_mb:parseInt(document.getElementById('md-photo-mb').value)||5,max_video_mb:parseInt(document.getElementById('md-video-mb').value)||25,provider:document.getElementById('md-provider').value};}
     if(which==='channels'){key='channels';value={inapp:document.getElementById('nt-inapp').checked,push:document.getElementById('nt-push').checked,whatsapp:document.getElementById('nt-wa').checked};}
     if(which==='wa'){key='whatsapp';value={provider:document.getElementById('wa-provider').value,api_key:document.getElementById('wa-key').value,phone_id:document.getElementById('wa-phone').value,tpl_birthday:document.getElementById('wa-tpl-bday').value,tpl_approved:document.getElementById('wa-tpl-approve').value};}
-    if(which==='branding'){key='branding';value={app_name:document.getElementById('br-name').value.trim(),login_title:document.getElementById('br-title').value.trim(),tagline:document.getElementById('br-tag').value.trim(),logo_url:document.getElementById('br-logo').value.trim(),accent_color:document.getElementById('br-accent-hex').value.trim()};}
+    if(which==='branding'){
+      key='branding';
+      value={
+        app_name:document.getElementById('br-name').value.trim(),
+        login_title:document.getElementById('br-title').value.trim(),
+        tagline:document.getElementById('br-tag').value.trim(),
+        logo_url:document.getElementById('br-logo').value.trim(),
+        accent_color:document.getElementById('br-accent-hex').value.trim(),
+        font_family:document.getElementById('br-font').value,
+        title_size:parseInt(document.getElementById('br-title-size').value)||26,
+        tagline_size:parseInt(document.getElementById('br-tag-size').value)||14,
+        title_color:document.getElementById('br-title-color-hex').value.trim(),
+        tagline_color:document.getElementById('br-tag-color-hex').value.trim(),
+        footnote_color:document.getElementById('br-footnote-color-hex').value.trim(),
+        logo_width:parseInt(document.getElementById('br-logo-size').value)||120,
+        logo_position:document.getElementById('br-logo-pos').value
+      };
+    }
     if(which==='crm'){key='crm';value={url:document.getElementById('crm-url').value,api_key:document.getElementById('crm-key').value,frequency:document.getElementById('crm-freq').value,enabled:document.getElementById('crm-enabled').checked};}
     var r=await api('/admin/celebrate/config',{method:'POST',body:JSON.stringify({config_key:key,config_value:value})});
     if(r.success)flashSaved('saved-'+which);else alert('Save failed: '+(r.error||''));
