@@ -1,6 +1,31 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Session Sync Block -->
+  <script>
+    (function() {
+      if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
+        sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
+        if (localStorage.getItem('wk_admin')) {
+          sessionStorage.setItem('wk_admin', localStorage.getItem('wk_admin'));
+        }
+      }
+      var origSet = sessionStorage.setItem;
+      sessionStorage.setItem = function(key, val) {
+        origSet.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.setItem(key, val);
+        }
+      };
+      var origRem = sessionStorage.removeItem;
+      sessionStorage.removeItem = function(key) {
+        origRem.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.removeItem(key);
+        }
+      };
+    })();
+  </script>
   <script>
     (function(){
       if ('serviceWorker' in navigator) {
@@ -183,7 +208,7 @@
 </head>
 <body>
   <!-- Sidebar -->
-            <aside class="sidebar">
+                  <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
@@ -208,6 +233,7 @@
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
     </div>
 
     <div class="sb-spacer"></div>
@@ -222,14 +248,14 @@
         <h1>Reports & Analytics</h1>
         <p>Exportable walkathon performance and engagement reports</p>
       </div>
-      <div class="topbar-right">
+      <div class='topbar-right' style='display:flex;align-items:center;gap:12px;'>
         <button class="btn btn-success" id="export-all-btn" onclick="exportAllReports()"><i class="ti ti-file-spreadsheet"></i> Export All to Excel</button>
-      </div>
+       <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button></div>
     </header>
 
     <div class="content">
       <!-- Event Selection inline toolbar -->
-      <div class="report-card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background:#fff; border-radius:var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+      <div style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background:#fff; border-radius:var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
         <div style="display:flex; align-items:center; gap:8px;">
           <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
           <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
