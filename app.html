@@ -415,23 +415,20 @@
     </div>
   </div>
 
-  <!-- My Activities Navigation Card -->
-  <div class="glass-card" onclick="openActivitiesDrawer();" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div style="width:38px; height:38px; border-radius:10px; background:rgba(232, 98, 42, 0.2); display:flex; align-items:center; justify-content:center; color:var(--brand);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
-      </div>
-      <div>
-        <div style="font-size:15px; font-weight:700; color:#fff;">My Activities</div>
-        <div style="font-size:12px; color:rgba(255, 255, 255, 0.55); margin-top:2px;">View your full synced workout history</div>
-      </div>
+  <!-- My Activities Card with Today's Activities -->
+  <div class="glass-card" style="margin-bottom:12px; padding:16px; background:linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%); border:1px solid rgba(255, 255, 255, 0.08); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); letter-spacing:1px; text-transform:uppercase;">ACTIVITIES</div>
+      <button onclick="openActivitiesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.5)'" title="View all activities">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      </button>
     </div>
-    <div style="color:rgba(255, 255, 255, 0.4);">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
+    <!-- List of today's activities -->
+    <div id="today-activities-list" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">
+        Loading today's activities...
+      </div>
     </div>
   </div>
 
