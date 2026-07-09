@@ -911,7 +911,7 @@ function setLogoFilter(on) {
   var img = document.getElementById('logo-preview-img');
   var btn = document.getElementById('btn-logo-filter');
   if (_logoFilterOn) {
-    img.style.filter = 'brightness(0) invert(1)';
+    img.style.filter = 'invert(1) hue-rotate(180deg)';
     img.style.background = '#333';
     btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
@@ -955,7 +955,7 @@ function setBannerFilter(on) {
   var img = document.getElementById('banner-preview-img');
   var btn = document.getElementById('btn-banner-filter');
   if (_bannerFilterOn) {
-    img.style.filter = 'brightness(0) invert(1)';
+    img.style.filter = 'invert(1) hue-rotate(180deg)';
     btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
