@@ -83,7 +83,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260709_v156">
+  <link rel="stylesheet" href="app.css?v=20260709_v157">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -879,7 +879,7 @@
   <script src="app-config.js?v=20260709_v150" defer></script>
   <script src="app-employee.js?v=20260709_v149" defer></script>
   <script src="app-api.js?v=20260709_v149" defer></script>
-  <script src="app-drawers.js?v=20260709_v156" defer></script>
+  <script src="app-drawers.js?v=20260709_v157" defer></script>
   <script src="app-events.js?v=20260709_v151" defer></script>
   <script src="app-dashboard.js?v=20260709_v152" defer></script>
   <script src="app-tabs.js?v=20260709_v149" defer></script>
@@ -992,7 +992,7 @@
       <!-- Pace/Effort Chart -->
       <div id="detail-chart-card" class="detail-chart-card" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <span class="detail-metrics-title" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">Pace per km</span>
+          <span id="detail-chart-title" class="detail-metrics-title" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">Pace per km</span>
           <span id="detail-chart-avg" style="color:var(--muted); font-size:10.5px;"></span>
         </div>
         <svg id="detail-chart-svg" viewBox="0 0 300 60" width="100%" height="60" preserveAspectRatio="none"></svg>

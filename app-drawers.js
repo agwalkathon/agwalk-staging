@@ -485,24 +485,36 @@ function openActivityDetail(id, event, isStravaId) {
 
               var hasHR = displaySplits.some(function(s) { return s.average_heartrate !== null && s.average_heartrate !== undefined && s.average_heartrate > 0; });
 
-              // Pace chart (skip for rides, which use speed instead)
+              // Pace/Speed chart — pace for walk/run, speed for rides
               var chartCard = document.getElementById('detail-chart-card');
-              if (!isRide && displaySplits.length >= 2 && chartCard) {
-                var paceSecs = displaySplits.map(function(s){
-                  var dKm = (s.distance_meters || 0) / 1000;
-                  var mSec = s.moving_time_seconds || 0;
-                  return (dKm > 0 && mSec > 0) ? (mSec / dKm) : null;
-                }).filter(function(v){ return v !== null; });
-                if (paceSecs.length >= 2) {
-                  var minPace = Math.min.apply(null, paceSecs);
-                  var maxPace = Math.max.apply(null, paceSecs);
-                  var range = Math.max(1, maxPace - minPace);
-                  var n = paceSecs.length;
+              var chartTitleEl = document.getElementById('detail-chart-title');
+              if (displaySplits.length >= 2 && chartCard) {
+                var chartVals, chartLabel, higherIsBetter;
+                if (isRide) {
+                  chartVals = displaySplits.map(function(s){ return (s.avg_speed_kmh || 0) > 0 ? s.avg_speed_kmh : null; }).filter(function(v){ return v !== null; });
+                  chartLabel = 'Speed per interval';
+                  higherIsBetter = true;
+                } else {
+                  chartVals = displaySplits.map(function(s){
+                    var dKm = (s.distance_meters || 0) / 1000;
+                    var mSec = s.moving_time_seconds || 0;
+                    return (dKm > 0 && mSec > 0) ? (mSec / dKm) : null;
+                  }).filter(function(v){ return v !== null; });
+                  chartLabel = 'Pace per km';
+                  higherIsBetter = false;
+                }
+                if (chartTitleEl) chartTitleEl.innerText = chartLabel;
+                if (chartVals.length >= 2) {
+                  var minV = Math.min.apply(null, chartVals);
+                  var maxV = Math.max.apply(null, chartVals);
+                  var range = Math.max(0.001, maxV - minV);
+                  var n = chartVals.length;
                   var stepX = 300 / (n - 1);
-                  var pts = paceSecs.map(function(p, i){
+                  var pts = chartVals.map(function(v, i){
                     var x = (i * stepX).toFixed(1);
-                    // Faster pace (lower seconds) draws higher on the chart
-                    var y = (10 + ((p - minPace) / range) * 40).toFixed(1);
+                    // Higher value draws higher on chart when higherIsBetter (speed), lower value draws higher otherwise (pace)
+                    var norm = (v - minV) / range;
+                    var y = higherIsBetter ? (50 - norm * 40).toFixed(1) : (10 + norm * 40).toFixed(1);
                     return x + ',' + y;
                   });
                   var linePath = 'M' + pts.join(' L');
@@ -511,11 +523,17 @@ function openActivityDetail(id, event, isStravaId) {
                   svgEl.innerHTML =
                     '<path d="' + areaPath + '" fill="var(--brand)" opacity="0.12"></path>' +
                     '<path d="' + linePath + '" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>';
-                  var avgPaceSec = paceSecs.reduce(function(a,b){return a+b;},0) / n;
-                  var avgMin = Math.floor(avgPaceSec / 60);
-                  var avgRem = Math.round(avgPaceSec % 60);
-                  if (avgRem < 10) avgRem = '0' + avgRem;
-                  document.getElementById('detail-chart-avg').innerText = 'avg ' + avgMin + ':' + avgRem + '/km';
+                  var avgChartEl = document.getElementById('detail-chart-avg');
+                  if (isRide) {
+                    var avgSpeedVal = chartVals.reduce(function(a,b){return a+b;},0) / n;
+                    avgChartEl.innerText = 'avg ' + avgSpeedVal.toFixed(1) + ' km/h';
+                  } else {
+                    var avgPaceSec = chartVals.reduce(function(a,b){return a+b;},0) / n;
+                    var avgMin = Math.floor(avgPaceSec / 60);
+                    var avgRem = Math.round(avgPaceSec % 60);
+                    if (avgRem < 10) avgRem = '0' + avgRem;
+                    avgChartEl.innerText = 'avg ' + avgMin + ':' + avgRem + '/km';
+                  }
                   chartCard.style.display = 'block';
                 }
               }
