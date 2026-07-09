@@ -1983,16 +1983,42 @@ function downloadFlagTemplate() {
   a.click();
 }
 
-function parseCSV(text) {
-  var lines = text.split('\n');
+function parseBulkCSV(text) {
+  // Strip UTF-8 BOM if present
+  text = text.replace(/^\uFEFF/, '');
+  var lines = text.split(/\r?\n/);
   if (lines.length === 0) return [];
-  var headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  
+  // Detect separator: count commas vs semicolons in the first line
+  var firstLine = lines[0];
+  var commaCount = (firstLine.match(/,/g) || []).length;
+  var semiCount = (firstLine.match(/;/g) || []).length;
+  var sep = commaCount >= semiCount ? ',' : ';';
+  
+  var headers = firstLine.split(sep).map(h => h.trim().toLowerCase());
   var result = [];
   
   for (var i = 1; i < lines.length; i++) {
     var line = lines[i].trim();
     if (!line) continue;
-    var values = line.split(',');
+    
+    // Split by separator, but handle quoted strings correctly
+    var values = [];
+    var current = '';
+    var inQuotes = false;
+    for (var charIdx = 0; charIdx < line.length; charIdx++) {
+      var c = line[charIdx];
+      if (c === '"') {
+        inQuotes = !inQuotes;
+      } else if (c === sep && !inQuotes) {
+        values.push(current);
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+    values.push(current);
+    
     var row = {};
     for (var j = 0; j < headers.length; j++) {
       row[headers[j]] = values[j] ? values[j].trim() : '';
@@ -2015,125 +2041,130 @@ async function handleDistBulkCSV(files) {
   
   var reader = new FileReader();
   reader.onload = async function(e) {
-    var text = e.target.result;
-    var rows = parseCSV(text);
-    if (rows.length === 0) {
-      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
-      alert('CSV is empty or invalid.');
-      return;
-    }
-    
-    if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('new_distance_km')) {
-      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
-      alert('Invalid CSV headers. Must contain: activity_id, new_distance_km');
-      return;
-    }
-    
-    var ids = rows.map(r => r.activity_id).filter(id => id);
-    if (ids.length === 0) {
-      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
-      alert('No activity IDs found in CSV.');
-      return;
-    }
-    
-    var dbActivities = {};
-    var chunkSize = 50;
-    for (var i = 0; i < ids.length; i += chunkSize) {
-      var chunk = ids.slice(i, i + chunkSize);
-      try {
-        var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
-        var acts = await res.json();
-        if (Array.isArray(acts)) {
-          acts.forEach(a => {
-            dbActivities[a.strava_activity_id.toString()] = a;
-          });
-        }
-      } catch(err) {
-        console.error('Error fetching activities chunk:', err);
+    try {
+      var text = e.target.result;
+      var rows = parseBulkCSV(text);
+      if (rows.length === 0) {
+        document.getElementById('dist-bulk-load-spinner').style.display = 'none';
+        alert('CSV is empty or invalid.');
+        return;
       }
-    }
-    
-    var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
-    var uniqueAthleteIds = [...new Set(athleteIds)];
-    var registrationNames = {};
-    if (uniqueAthleteIds.length > 0) {
-      for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
-        var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+      
+      if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('new_distance_km')) {
+        document.getElementById('dist-bulk-load-spinner').style.display = 'none';
+        alert('Invalid CSV headers. Must contain: activity_id, new_distance_km');
+        return;
+      }
+      
+      var ids = rows.map(r => r.activity_id).filter(id => id);
+      if (ids.length === 0) {
+        document.getElementById('dist-bulk-load-spinner').style.display = 'none';
+        alert('No activity IDs found in CSV.');
+        return;
+      }
+      
+      var dbActivities = {};
+      var chunkSize = 50;
+      for (var i = 0; i < ids.length; i += chunkSize) {
+        var chunk = ids.slice(i, i + chunkSize);
         try {
-          var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
-          var regs = await rReg.json();
-          if (Array.isArray(regs)) {
-            regs.forEach(r => {
-              registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+          var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
+          var acts = await res.json();
+          if (Array.isArray(acts)) {
+            acts.forEach(a => {
+              dbActivities[a.strava_activity_id.toString()] = a;
             });
           }
-        } catch(eReg) {
-          console.warn('Failed to load athlete names chunk:', eReg);
+        } catch(err) {
+          console.error('Error fetching activities chunk:', err);
         }
       }
-    }
-    
-    distBulkRows = [];
-    var tbody = document.getElementById('dist-bulk-preview-body');
-    tbody.innerHTML = '';
-    
-    rows.forEach((r, idx) => {
-      var actId = r.activity_id;
-      var newDistKm = parseFloat(r.new_distance_km);
-      var dbAct = dbActivities[actId];
       
-      var athleteName = '—';
-      var actName = '—';
-      var oldDistStr = '—';
-      var statusText = 'Ready';
-      var statusColor = '#059669';
-      var isValid = true;
-      
-      if (isNaN(newDistKm) || newDistKm <= 0) {
-        statusText = 'Invalid Distance';
-        statusColor = '#DC2626';
-        isValid = false;
+      var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
+      var uniqueAthleteIds = [...new Set(athleteIds)];
+      var registrationNames = {};
+      if (uniqueAthleteIds.length > 0) {
+        for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
+          var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+          try {
+            var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
+            var regs = await rReg.json();
+            if (Array.isArray(regs)) {
+              regs.forEach(r => {
+                registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+              });
+            }
+          } catch(eReg) {
+            console.warn('Failed to load athlete names chunk:', eReg);
+          }
+        }
       }
       
-      if (!dbAct) {
-        statusText = 'Not Found';
-        statusColor = '#DC2626';
-        isValid = false;
-      } else {
-        athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-        actName = dbAct.activity_name || '—';
-        oldDistStr = (dbAct.distance_meters / 1000).toFixed(2) + ' km';
-      }
+      distBulkRows = [];
+      var tbody = document.getElementById('dist-bulk-preview-body');
+      tbody.innerHTML = '';
       
-      var newDistStr = isNaN(newDistKm) ? '—' : newDistKm.toFixed(2) + ' km';
-      
-      var tr = document.createElement('tr');
-      tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td><strong>${actId}</strong></td>
-        <td>${athleteName}</td>
-        <td>${actName}</td>
-        <td>${oldDistStr}</td>
-        <td><strong style="color:#059669">${newDistStr}</strong></td>
-        <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
-      `;
-      tbody.appendChild(tr);
-      
-      distBulkRows.push({
-        rowIdx: idx,
-        activityId: actId,
-        newDistanceKm: newDistKm,
-        dbAct: dbAct,
-        isValid: isValid
+      rows.forEach((r, idx) => {
+        var actId = r.activity_id;
+        var newDistKm = parseFloat(r.new_distance_km);
+        var dbAct = dbActivities[actId];
+        
+        var athleteName = '—';
+        var actName = '—';
+        var oldDistStr = '—';
+        var statusText = 'Ready';
+        var statusColor = '#059669';
+        var isValid = true;
+        
+        if (isNaN(newDistKm) || newDistKm <= 0) {
+          statusText = 'Invalid Distance';
+          statusColor = '#DC2626';
+          isValid = false;
+        }
+        
+        if (!dbAct) {
+          statusText = 'Not Found';
+          statusColor = '#DC2626';
+          isValid = false;
+        } else {
+          athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
+          actName = dbAct.activity_name || '—';
+          oldDistStr = (dbAct.distance_meters / 1000).toFixed(2) + ' km';
+        }
+        
+        var newDistStr = isNaN(newDistKm) ? '—' : newDistKm.toFixed(2) + ' km';
+        
+        var tr = document.createElement('tr');
+        tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${actId}</strong></td>
+          <td>${athleteName}</td>
+          <td>${actName}</td>
+          <td>${oldDistStr}</td>
+          <td><strong style="color:#059669">${newDistStr}</strong></td>
+          <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
+        `;
+        tbody.appendChild(tr);
+        
+        distBulkRows.push({
+          rowIdx: idx,
+          activityId: actId,
+          newDistanceKm: newDistKm,
+          dbAct: dbAct,
+          isValid: isValid
+        });
       });
-    });
-    
-    // Hide spinner and show the preview wrap
-    document.getElementById('dist-bulk-load-spinner').style.display = 'none';
-    document.getElementById('dist-bulk-preview-wrap').style.display = 'block';
-    document.getElementById('dist-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
-  };
+      
+      // Hide spinner and show the preview wrap
+      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
+      document.getElementById('dist-bulk-preview-wrap').style.display = 'block';
+      document.getElementById('dist-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
+    } catch(err) {
+      console.error(err);
+      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
+      alert('Error loading distance preview: ' + err.message);
+    }
   reader.readAsText(file);
 }
 
@@ -2224,134 +2255,139 @@ async function handleFlagBulkCSV(files) {
   
   var reader = new FileReader();
   reader.onload = async function(e) {
-    var text = e.target.result;
-    var rows = parseCSV(text);
-    if (rows.length === 0) {
-      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
-      alert('CSV is empty or invalid.');
-      return;
-    }
-    
-    if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('action') || !rows[0].hasOwnProperty('reason')) {
-      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
-      alert('Invalid CSV headers. Must contain: activity_id, action, reason');
-      return;
-    }
-    
-    var ids = rows.map(r => r.activity_id).filter(id => id);
-    if (ids.length === 0) {
-      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
-      alert('No activity IDs found in CSV.');
-      return;
-    }
-    
-    var dbActivities = {};
-    var chunkSize = 50;
-    for (var i = 0; i < ids.length; i += chunkSize) {
-      var chunk = ids.slice(i, i + chunkSize);
-      try {
-        var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
-        var acts = await res.json();
-        if (Array.isArray(acts)) {
-          acts.forEach(a => {
-            dbActivities[a.strava_activity_id.toString()] = a;
-          });
-        }
-      } catch(err) {
-        console.error('Error fetching activities chunk:', err);
+    try {
+      var text = e.target.result;
+      var rows = parseBulkCSV(text);
+      if (rows.length === 0) {
+        document.getElementById('flag-bulk-load-spinner').style.display = 'none';
+        alert('CSV is empty or invalid.');
+        return;
       }
-    }
-    
-    var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
-    var uniqueAthleteIds = [...new Set(athleteIds)];
-    var registrationNames = {};
-    if (uniqueAthleteIds.length > 0) {
-      for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
-        var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+      
+      if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('action') || !rows[0].hasOwnProperty('reason')) {
+        document.getElementById('flag-bulk-load-spinner').style.display = 'none';
+        alert('Invalid CSV headers. Must contain: activity_id, action, reason');
+        return;
+      }
+      
+      var ids = rows.map(r => r.activity_id).filter(id => id);
+      if (ids.length === 0) {
+        document.getElementById('flag-bulk-load-spinner').style.display = 'none';
+        alert('No activity IDs found in CSV.');
+        return;
+      }
+      
+      var dbActivities = {};
+      var chunkSize = 50;
+      for (var i = 0; i < ids.length; i += chunkSize) {
+        var chunk = ids.slice(i, i + chunkSize);
         try {
-          var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
-          var regs = await rReg.json();
-          if (Array.isArray(regs)) {
-            regs.forEach(r => {
-              registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+          var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
+          var acts = await res.json();
+          if (Array.isArray(acts)) {
+            acts.forEach(a => {
+              dbActivities[a.strava_activity_id.toString()] = a;
             });
           }
-        } catch(eReg) {
-          console.warn('Failed to load athlete names chunk:', eReg);
+        } catch(err) {
+          console.error('Error fetching activities chunk:', err);
         }
       }
-    }
-    
-    flagBulkRows = [];
-    var tbody = document.getElementById('flag-bulk-preview-body');
-    tbody.innerHTML = '';
-    
-    rows.forEach((r, idx) => {
-      var actId = r.activity_id;
-      var csvAction = (r.action || '').trim().toLowerCase();
-      var csvReason = (r.reason || '').trim();
-      var dbAct = dbActivities[actId];
       
-      var athleteName = '—';
-      var actName = '—';
-      var oldStatusStr = '—';
-      var statusText = 'Ready';
-      var statusColor = '#059669';
-      var isValid = true;
-      
-      if (csvAction !== 'flag' && csvAction !== 'clear') {
-        statusText = 'Invalid Action';
-        statusColor = '#DC2626';
-        isValid = false;
+      var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
+      var uniqueAthleteIds = [...new Set(athleteIds)];
+      var registrationNames = {};
+      if (uniqueAthleteIds.length > 0) {
+        for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
+          var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+          try {
+            var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
+            var regs = await rReg.json();
+            if (Array.isArray(regs)) {
+              regs.forEach(r => {
+                registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+              });
+            }
+          } catch(eReg) {
+            console.warn('Failed to load athlete names chunk:', eReg);
+          }
+        }
       }
       
-      if (csvAction === 'flag' && !csvReason) {
-        statusText = 'Reason Required';
-        statusColor = '#DC2626';
-        isValid = false;
-      }
+      flagBulkRows = [];
+      var tbody = document.getElementById('flag-bulk-preview-body');
+      tbody.innerHTML = '';
       
-      if (!dbAct) {
-        statusText = 'Not Found';
-        statusColor = '#DC2626';
-        isValid = false;
-      } else {
-        athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-        actName = dbAct.activity_name || '—';
-        var wasFlagged = dbAct.is_flagged === true || dbAct.is_flagged === 'true';
-        oldStatusStr = wasFlagged ? `Flagged 🚩 (${dbAct.flag_reason || 'No Reason'})` : 'Clear ✓';
-      }
-      
-      var proposedStatusStr = (csvAction === 'flag') ? `Flagged 🚩 (${csvReason})` : 'Clear ✓';
-      
-      var tr = document.createElement('tr');
-      tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td><strong>${actId}</strong></td>
-        <td>${athleteName}</td>
-        <td>${actName}</td>
-        <td>${oldStatusStr}</td>
-        <td><strong style="color:${csvAction === 'flag' ? '#DC2626' : '#059669'}">${proposedStatusStr}</strong></td>
-        <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
-      `;
-      tbody.appendChild(tr);
-      
-      flagBulkRows.push({
-        rowIdx: idx,
-        activityId: actId,
-        action: csvAction,
-        reason: csvReason,
-        dbAct: dbAct,
-        isValid: isValid
+      rows.forEach((r, idx) => {
+        var actId = r.activity_id;
+        var csvAction = (r.action || '').trim().toLowerCase();
+        var csvReason = (r.reason || '').trim();
+        var dbAct = dbActivities[actId];
+        
+        var athleteName = '—';
+        var actName = '—';
+        var oldStatusStr = '—';
+        var statusText = 'Ready';
+        var statusColor = '#059669';
+        var isValid = true;
+        
+        if (csvAction !== 'flag' && csvAction !== 'clear') {
+          statusText = 'Invalid Action';
+          statusColor = '#DC2626';
+          isValid = false;
+        }
+        
+        if (csvAction === 'flag' && !csvReason) {
+          statusText = 'Reason Required';
+          statusColor = '#DC2626';
+          isValid = false;
+        }
+        
+        if (!dbAct) {
+          statusText = 'Not Found';
+          statusColor = '#DC2626';
+          isValid = false;
+        } else {
+          athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
+          actName = dbAct.activity_name || '—';
+          var wasFlagged = dbAct.is_flagged === true || dbAct.is_flagged === 'true';
+          oldStatusStr = wasFlagged ? `Flagged 🚩 (${dbAct.flag_reason || 'No Reason'})` : 'Clear ✓';
+        }
+        
+        var proposedStatusStr = (csvAction === 'flag') ? `Flagged 🚩 (${csvReason})` : 'Clear ✓';
+        
+        var tr = document.createElement('tr');
+        tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${actId}</strong></td>
+          <td>${athleteName}</td>
+          <td>${actName}</td>
+          <td>${oldStatusStr}</td>
+          <td><strong style="color:${csvAction === 'flag' ? '#DC2626' : '#059669'}">${proposedStatusStr}</strong></td>
+          <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
+        `;
+        tbody.appendChild(tr);
+        
+        flagBulkRows.push({
+          rowIdx: idx,
+          activityId: actId,
+          action: csvAction,
+          reason: csvReason,
+          dbAct: dbAct,
+          isValid: isValid
+        });
       });
-    });
-    
-    // Hide spinner and show the preview wrap
-    document.getElementById('flag-bulk-load-spinner').style.display = 'none';
-    document.getElementById('flag-bulk-preview-wrap').style.display = 'block';
-    document.getElementById('flag-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
-  };
+      
+      // Hide spinner and show the preview wrap
+      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
+      document.getElementById('flag-bulk-preview-wrap').style.display = 'block';
+      document.getElementById('flag-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
+    } catch(err) {
+      console.error(err);
+      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
+      alert('Error loading flag status preview: ' + err.message);
+    }
   reader.readAsText(file);
 }
 
