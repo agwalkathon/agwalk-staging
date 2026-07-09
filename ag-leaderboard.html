@@ -30,6 +30,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <title>AG Leaderboards — Arcgate Walkathon 2026</title>
+  <!-- Load SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -462,6 +464,7 @@ tr:hover td{background:#FAFAFA}
     <div class="filter-right">
       <div class="info-chips"></div>
       <div class="filter-actions" style="display:flex;align-items:center;gap:8px">
+        <button class="btn-refresh" id="export-leaderboard-btn" onclick="exportLeaderboardExcel()" style="background:#15803d;color:white;border:1px solid #15803d;"><i class="ti ti-file-spreadsheet"></i> Export Leaderboard</button>
         <button class="btn-refresh" id="recalc-points-btn" onclick="doRecalculatePoints()" style="background:#d97706;color:white;border:1px solid #d97706;">⚡ Recalculate Points</button>
         <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">📥 Export Activities</button>
       </div>
@@ -1981,6 +1984,139 @@ function updateStats(rows, board) {
   document.getElementById('stat-bronze').textContent = bronzes;
   document.getElementById('stat-medals').textContent = golds + silvers + bronzes;
   document.getElementById('stat-km').textContent     = fmtIndian(km)+' km';
+}
+
+function exportLeaderboardExcel() {
+  if (!allData || Object.keys(allData).length === 0) {
+    alert('No leaderboard data loaded yet.');
+    return;
+  }
+
+  var wb = XLSX.utils.book_new();
+
+  // Helper to extract data array for a standard board
+  function getBoardData(board) {
+    var rawRows = allData[board] || [];
+    var rows = rawRows.slice();
+
+    var isTeamBoard = board === 'team-male' || board === 'team-female';
+    if (isTeamBoard) {
+      var excludeSet = board === 'team-female' ? teamExcludedFemale : teamExcludedMale;
+      rows = rows.filter(function(row) {
+        return excludeSet.indexOf(String(row.p.strava_athlete_id)) === -1;
+      });
+    }
+
+    var data = [];
+
+    if (isTeamBoard) {
+      // Group by team, sort teams by total points sum
+      var teams = {};
+      rows.forEach(function(row) {
+        var t = row.p.leaderboard_team || 'No Team';
+        if (!teams[t]) teams[t] = [];
+        teams[t].push(row);
+      });
+      var teamNames = Object.keys(teams).sort(function(a,b) {
+        var sumA = teams[a].reduce(function(s,r){ return s+r.pts.totalPts; },0);
+        var sumB = teams[b].reduce(function(s,r){ return s+r.pts.totalPts; },0);
+        return sumB - sumA;
+      });
+
+      // Headers for team sheet
+      data.push([
+        "Team Name",
+        "Rank in Team",
+        "Athlete Name",
+        "Strava ID",
+        "Gender",
+        "Shift",
+        "Distance (KM)",
+        "Base Points",
+        "Bonus Points",
+        "Challenge Points",
+        "Total Points",
+        "Medal",
+        "Completed Challenges"
+      ]);
+
+      teamNames.forEach(function(teamName) {
+        teams[teamName].forEach(function(row, i) {
+          var p = row.p, pts = row.pts;
+          var medal = getMedal(pts.totalPts, p.gender);
+          data.push([
+            teamName,
+            i + 1,
+            p.full_name,
+            p.strava_athlete_id,
+            p.gender || '',
+            p.shift || '',
+            Number(pts.distKm.toFixed(2)),
+            Number(pts.basePts !== undefined ? pts.basePts : pts.distPts || 0),
+            Number(pts.bonusPts || 0),
+            Number(pts.challengePts || 0),
+            Number(pts.totalPts),
+            medal.label,
+            (pts.challenges || []).join(", ")
+          ]);
+        });
+      });
+    } else {
+      // Standard individual sheets
+      data.push([
+        "Rank",
+        "Athlete Name",
+        "Strava ID",
+        "Team",
+        "Gender",
+        "Shift",
+        "Distance (KM)",
+        "Base Points",
+        "Bonus Points",
+        "Challenge Points",
+        "Total Points",
+        "Medal",
+        "Completed Challenges"
+      ]);
+
+      rows.forEach(function(row, i) {
+        var p = row.p, pts = row.pts;
+        var medal = getMedal(pts.totalPts, p.gender);
+        data.push([
+          i + 1,
+          p.full_name,
+          p.strava_athlete_id,
+          p.leaderboard_team || '—',
+          p.gender || '',
+          p.shift || '',
+          Number(pts.distKm.toFixed(2)),
+          Number(pts.basePts !== undefined ? pts.basePts : pts.distPts || 0),
+          Number(pts.bonusPts || 0),
+          Number(pts.challengePts || 0),
+          Number(pts.totalPts),
+          medal.label,
+          (pts.challenges || []).join(", ")
+        ]);
+      });
+    }
+
+    return data;
+  }
+
+  // Add sheets
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(getBoardData('dayshift-male')), "Dayshift Male");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(getBoardData('dayshift-female')), "Dayshift Female");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(getBoardData('nightshift-all')), "Nightshift All");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(getBoardData('team-male')), "Team Male");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(getBoardData('team-female')), "Team Female");
+
+  // Get filename from event selector
+  var sel = document.getElementById('ev-select');
+  var eventName = sel ? sel.options[sel.selectedIndex].textContent : 'Arcgate_Walkathon';
+  eventName = eventName.replace(/🟢|🔴|🟡/g, '').trim().replace(/[^a-zA-Z0-9]/g, '_');
+  var filename = `Leaderboards_${eventName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
 }
 
 function exportActivitiesCSV() {
