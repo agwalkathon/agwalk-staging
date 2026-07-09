@@ -432,61 +432,16 @@ function renderTodayActivities(acts) {
   var list = document.getElementById('today-activities-list');
   if (!list) return;
 
-  var today = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().split('T')[0];
-  
-  var activeEvent = null;
-  try {
-    activeEvent = JSON.parse(localStorage.getItem('ag_active_event_cache'));
-  } catch(e){}
-
-  var targetDate = today;
-  var dateLabel = 'Today';
-
-  if (activeEvent && activeEvent.end_date) {
-    var endLocal = activeEvent.end_date.split('T')[0];
-    if (today > endLocal) {
-      targetDate = endLocal;
-      dateLabel = 'Event End Date';
-    }
-  }
-
-  // Filter activities for the target date
-  var filteredActs = (acts || []).filter(function(a) {
-    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
-    return d === targetDate;
+  // Filter unflagged and sort descending by date-time
+  var sortedActs = (acts || []).filter(function(a) {
+    return !a.is_flagged;
+  }).sort(function(x, y) {
+    var dx = x.activity_date_time_ist || x.activity_date || '';
+    var dy = y.activity_date_time_ist || y.activity_date || '';
+    return dy.localeCompare(dx);
   });
 
-  // Fallback: if no activities on today/end date, find the most recent activity day in acts
-  if (!filteredActs.length && acts && acts.length) {
-    var dates = acts.map(function(a) {
-      return typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
-    }).filter(Boolean);
-    
-    if (dates.length) {
-      dates.sort();
-      var lastDate = dates[dates.length - 1];
-      targetDate = lastDate;
-      
-      var todayObj = new Date(today + 'T00:00:00');
-      var lastObj = new Date(lastDate + 'T00:00:00');
-      var diffDays = Math.round((todayObj - lastObj) / 86400000);
-      
-      if (diffDays === 1) {
-        dateLabel = 'Yesterday';
-      } else {
-        var opt = { month: 'short', day: 'numeric' };
-        // Use standard date formatter to avoid timezone shifts
-        var parts = lastDate.split('-');
-        var fmtDate = new Date(parts[0], parts[1]-1, parts[2]);
-        dateLabel = fmtDate.toLocaleDateString('en-US', opt);
-      }
-      
-      filteredActs = acts.filter(function(a) {
-        var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
-        return d === targetDate;
-      });
-    }
-  }
+  var last5Acts = sortedActs.slice(0, 5);
 
   // Update date badge indicator in the card heading
   var headerContainer = list.previousElementSibling;
@@ -503,10 +458,10 @@ function renderTodayActivities(acts) {
         titleWrap.appendChild(subEl);
       }
     }
-    subEl.textContent = dateLabel;
+    subEl.textContent = 'Recent';
   }
 
-  if (!filteredActs.length) {
+  if (!last5Acts.length) {
     list.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No activities logged</div>';
     return;
   }
@@ -522,7 +477,7 @@ function renderTodayActivities(acts) {
   }
 
   var html = '';
-  filteredActs.forEach(function(a) {
+  last5Acts.forEach(function(a) {
     var kmVal = (a.distance_meters || 0) / 1000;
     var kmStr = kmVal.toFixed(1) + ' KM';
 
@@ -560,16 +515,17 @@ function renderTodayActivities(acts) {
       startTime = new Date(a.activity_date);
     }
 
-    var startStr = '—';
-    var endStr = '—';
+    var dateStr = '—';
+    var timeStr = '—';
     if (startTime && !isNaN(startTime.getTime())) {
-      startStr = formatTime12h(startTime);
-      if (a.moving_time_seconds) {
-        var endTime = new Date(startTime.getTime() + (a.moving_time_seconds * 1000));
-        endStr = formatTime12h(endTime);
+      var parts = (a.activity_date_time_ist || a.activity_date || '').split('T')[0].split('-');
+      if (parts.length === 3) {
+        var fmtDate = new Date(parts[0], parts[1]-1, parts[2]);
+        dateStr = fmtDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
       } else {
-        endStr = startStr;
+        dateStr = startTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
       }
+      timeStr = formatTime12h(startTime);
     }
 
     html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
@@ -584,8 +540,8 @@ function renderTodayActivities(acts) {
               '</div>' +
               '<div style="display:flex; align-items:center; gap:10px;">' +
                 '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:rgba(255,255,255,0.65); font-weight:600; line-height:1.3; font-family:var(--font);">' +
-                  '<div>' + startStr + '</div>' +
-                  '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + endStr + '</div>' +
+                  '<div>' + dateStr + '</div>' +
+                  '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + timeStr + '</div>' +
                 '</div>' +
                 '<div style="width:3px; height:26px; background:' + pillColor + '; border-radius:2px;"></div>' +
               '</div>' +
