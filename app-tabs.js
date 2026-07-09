@@ -428,12 +428,113 @@ var CURRENT_DAY_BREAKDOWN = {};
 var CURRENT_ACT_BREAKDOWN = {};
 var CURRENT_GENDER = '';
 
+function renderTodayActivities(acts) {
+  var list = document.getElementById('today-activities-list');
+  if (!list) return;
+
+  var today = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().split('T')[0];
+  var todayActs = (acts || []).filter(function(a) {
+    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+    return d === today;
+  });
+
+  if (!todayActs.length) {
+    list.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No activities logged today</div>';
+    return;
+  }
+
+  function formatTime12h(dateObj) {
+    var hours = dateObj.getHours();
+    var minutes = dateObj.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return hours + ':' + minutes + ' ' + ampm;
+  }
+
+  var html = '';
+  todayActs.forEach(function(a) {
+    var kmVal = (a.distance_meters || 0) / 1000;
+    var kmStr = kmVal.toFixed(1) + ' KM';
+
+    var sport = (a.sport_type || 'Walk').toLowerCase();
+    var pillColor = '#007aff';
+    var sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
+    var sportTitle = 'WALKING';
+
+    if (sport === 'run') {
+      pillColor = '#007aff';
+      sportIcon = '<i class="fa-solid fa-person-running" style="color:#fff; font-size:12px;"></i>';
+      sportTitle = 'RUNNING';
+    } else if (sport === 'walk') {
+      pillColor = '#10b981';
+      sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
+      sportTitle = 'WALKING';
+    } else if (sport === 'ride' || sport === 'cycling') {
+      pillColor = '#f97316';
+      sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:12px;"></i>';
+      sportTitle = 'CYCLING';
+    } else if (sport === 'hike') {
+      pillColor = '#8b5cf6';
+      sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:12px;"></i>';
+      sportTitle = 'HIKING';
+    } else {
+      pillColor = '#6366f1';
+      sportIcon = '<i class="fa-solid fa-heartbeat" style="color:#fff; font-size:12px;"></i>';
+      sportTitle = (a.sport_type || 'Workout').toUpperCase();
+    }
+
+    var startTime = null;
+    if (a.activity_date_time_ist) {
+      startTime = new Date(a.activity_date_time_ist);
+    } else if (a.activity_date) {
+      startTime = new Date(a.activity_date);
+    }
+
+    var startStr = '—';
+    var endStr = '—';
+    if (startTime && !isNaN(startTime.getTime())) {
+      startStr = formatTime12h(startTime);
+      if (a.moving_time_seconds) {
+        var endTime = new Date(startTime.getTime() + (a.moving_time_seconds * 1000));
+        endStr = formatTime12h(endTime);
+      } else {
+        endStr = startStr;
+      }
+    }
+
+    html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
+              '<div style="display:flex; align-items:center; gap:14px;">' +
+                '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:8px; min-width:84px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
+                  sportIcon +
+                  '<span>' + kmStr + '</span>' +
+                '</div>' +
+                '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.5px; text-transform:uppercase;">' +
+                  sportTitle +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex; align-items:center; gap:10px;">' +
+                '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:rgba(255,255,255,0.65); font-weight:600; line-height:1.3; font-family:var(--font);">' +
+                  '<div>' + startStr + '</div>' +
+                  '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + endStr + '</div>' +
+                '</div>' +
+                '<div style="width:3px; height:26px; background:' + pillColor + '; border-radius:2px;"></div>' +
+              '</div>' +
+            '</div>';
+  });
+  list.innerHTML = html;
+}
+
 function renderActivities(acts, dayBreakdown, actBreakdown, gender) {
   dayBreakdown = dayBreakdown || {}; actBreakdown = actBreakdown || {};
   CURRENT_ACTS = acts;
   CURRENT_DAY_BREAKDOWN = dayBreakdown;
   CURRENT_ACT_BREAKDOWN = actBreakdown;
   CURRENT_GENDER = gender;
+
+  // Render today's activities on the dashboard card
+  try { renderTodayActivities(acts); } catch(e) { console.error(e); }
 
   var list = document.getElementById('act-list');
   if (!list) return;
