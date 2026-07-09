@@ -433,13 +433,81 @@ function renderTodayActivities(acts) {
   if (!list) return;
 
   var today = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().split('T')[0];
-  var todayActs = (acts || []).filter(function(a) {
+  
+  var activeEvent = null;
+  try {
+    activeEvent = JSON.parse(localStorage.getItem('ag_active_event_cache'));
+  } catch(e){}
+
+  var targetDate = today;
+  var dateLabel = 'Today';
+
+  if (activeEvent && activeEvent.end_date) {
+    var endLocal = activeEvent.end_date.split('T')[0];
+    if (today > endLocal) {
+      targetDate = endLocal;
+      dateLabel = 'Event End Date';
+    }
+  }
+
+  // Filter activities for the target date
+  var filteredActs = (acts || []).filter(function(a) {
     var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
-    return d === today;
+    return d === targetDate;
   });
 
-  if (!todayActs.length) {
-    list.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No activities logged today</div>';
+  // Fallback: if no activities on today/end date, find the most recent activity day in acts
+  if (!filteredActs.length && acts && acts.length) {
+    var dates = acts.map(function(a) {
+      return typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+    }).filter(Boolean);
+    
+    if (dates.length) {
+      dates.sort();
+      var lastDate = dates[dates.length - 1];
+      targetDate = lastDate;
+      
+      var todayObj = new Date(today + 'T00:00:00');
+      var lastObj = new Date(lastDate + 'T00:00:00');
+      var diffDays = Math.round((todayObj - lastObj) / 86400000);
+      
+      if (diffDays === 1) {
+        dateLabel = 'Yesterday';
+      } else {
+        var opt = { month: 'short', day: 'numeric' };
+        // Use standard date formatter to avoid timezone shifts
+        var parts = lastDate.split('-');
+        var fmtDate = new Date(parts[0], parts[1]-1, parts[2]);
+        dateLabel = fmtDate.toLocaleDateString('en-US', opt);
+      }
+      
+      filteredActs = acts.filter(function(a) {
+        var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date || '').split('T')[0];
+        return d === targetDate;
+      });
+    }
+  }
+
+  // Update date badge indicator in the card heading
+  var headerContainer = list.previousElementSibling;
+  if (headerContainer) {
+    var subEl = headerContainer.querySelector('.activities-date-badge');
+    if (!subEl) {
+      subEl = document.createElement('span');
+      subEl.className = 'activities-date-badge';
+      subEl.style.cssText = 'font-size: 11px; font-weight: 700; color: var(--brand); background: rgba(232, 98, 42, 0.12); padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 8px; font-family: var(--font);';
+      var titleWrap = headerContainer.querySelector('.sec');
+      if (titleWrap) {
+        titleWrap.style.display = 'flex';
+        titleWrap.style.alignItems = 'center';
+        titleWrap.appendChild(subEl);
+      }
+    }
+    subEl.textContent = dateLabel;
+  }
+
+  if (!filteredActs.length) {
+    list.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No activities logged</div>';
     return;
   }
 
@@ -454,7 +522,7 @@ function renderTodayActivities(acts) {
   }
 
   var html = '';
-  todayActs.forEach(function(a) {
+  filteredActs.forEach(function(a) {
     var kmVal = (a.distance_meters || 0) / 1000;
     var kmStr = kmVal.toFixed(1) + ' KM';
 
