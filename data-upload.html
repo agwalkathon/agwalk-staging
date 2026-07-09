@@ -875,6 +875,11 @@ async function loadEventSelector(){
 document.addEventListener('DOMContentLoaded', loadEventSelector);
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
+var WRITE_HDR = { 
+  'apikey': SUPABASE_ANON, 
+  'Authorization': 'Bearer ' + SUPABASE_ANON,
+  'Content-Type': 'application/json'
+};
 var BACKEND_URL  = 'https://agwalk-backend.onrender.com';
       const ADMIN_SECRET = 'agwalk-admin-2026-xK9mPqR7';
 
@@ -1738,7 +1743,7 @@ async function applyDistanceOverride() {
   try {
     var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + loadedActivity.id, {
       method: 'PATCH',
-      headers: HDR,
+      headers: WRITE_HDR,
       body: JSON.stringify({
         distance_meters: afterM,
         raw_data: raw
@@ -1890,7 +1895,7 @@ async function applyFlagOverride() {
   try {
     var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + loadedActivity.id, {
       method: 'PATCH',
-      headers: HDR,
+      headers: WRITE_HDR,
       body: JSON.stringify({
         is_flagged: isFlagged,
         flag_reason: finalReason
@@ -2213,7 +2218,7 @@ async function applyDistBulk() {
     try {
       var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + row.dbAct.id, {
         method: 'PATCH',
-        headers: HDR,
+        headers: WRITE_HDR,
         body: JSON.stringify({
           distance_meters: afterM,
           raw_data: raw
@@ -2433,7 +2438,7 @@ async function applyFlagBulk() {
     try {
       var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + row.dbAct.id, {
         method: 'PATCH',
-        headers: HDR,
+        headers: WRITE_HDR,
         body: JSON.stringify({
           is_flagged: isFlagged,
           flag_reason: finalReason
