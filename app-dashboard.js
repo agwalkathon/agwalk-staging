@@ -43,9 +43,15 @@
     try {
       var s = JSON.parse(safeGetItem('wk_user') || '{}');
       if (!s.athleteId) return null;
-      var evs = await fetchJSON(SUPABASE_URL + '/rest/v1/events?select=id,name,start_date,end_date,status,rules_config,accent_color&status=in.(live,ended)&order=status.asc,start_date.desc');
+
+      // These two calls are independent of each other — run them in parallel instead of one-after-another
+      var results = await Promise.all([
+        fetchJSON(SUPABASE_URL + '/rest/v1/events?select=id,name,start_date,end_date,status,rules_config,accent_color&status=in.(live,ended)&order=status.asc,start_date.desc'),
+        fetchJSON(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=event_id')
+      ]);
+      var evs = results[0];
+      var regs = results[1];
       if (!Array.isArray(evs) || !evs.length) return null;
-      var regs = await fetchJSON(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=event_id');
       var myEvIds = (Array.isArray(regs)?regs:[]).map(function(r){ return r.event_id; });
       
       var pick = null;
@@ -323,12 +329,10 @@
       clearInterval(t);
       // avoid classic-rings flash for users we know get a dynamic dashboard
       try { if (localStorage.getItem('ag_dyn_dash') === '1') document.getElementById('medal-rings').style.opacity = '0'; } catch(e){}
-      setTimeout(function(){
-        applyDynamicDashboard().then(function(){
-          var h = document.getElementById('medal-rings');
-          if (h) h.style.opacity = '1';
-        });
-      }, 300);
-    } else if (tries > 40) clearInterval(t);
-  }, 250);
+      applyDynamicDashboard().then(function(){
+        var h = document.getElementById('medal-rings');
+        if (h) h.style.opacity = '1';
+      });
+    } else if (tries > 100) clearInterval(t);
+  }, 100);
 })();

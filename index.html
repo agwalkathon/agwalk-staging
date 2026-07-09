@@ -220,11 +220,17 @@
 <script src="app-config.js?v=20260709_v109" defer></script>
 <script src="app-employee.js?v=20260709_v108" defer></script>
 <script>
-  window.addEventListener('load', function() {
+  function _bootBranding() {
     if (typeof loadBranding === 'function') {
       loadBranding();
     }
-  });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _bootBranding);
+  } else {
+    // Deferred scripts execute after DOM parsing, so if we're here readyState is already past 'loading'
+    _bootBranding();
+  }
 </script>
 
 </body>
