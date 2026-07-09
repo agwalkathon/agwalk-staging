@@ -2803,20 +2803,18 @@
     50%{opacity:1;transform:scale(1.025);}
   }
   .splash-logo-wrap{
-    position:relative;
     display:flex;align-items:center;justify-content:center;
   }
-  .splash-pulse-ring{
-    position:absolute;
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    border:2px solid var(--brand);
-    animation:splashRingPulse 1.8s ease-out infinite;
+  .splash-step-bars{
+    display:flex;align-items:flex-end;gap:5px;height:28px;
   }
-  @keyframes splashRingPulse{
-    0%{transform:scale(0.6);opacity:0.9;}
-    100%{transform:scale(1.6);opacity:0;}
+  .splash-step-bar{
+    width:5px;height:28px;background:var(--brand);border-radius:3px;
+    animation:splashStepBar 1s ease-in-out infinite;
+  }
+  @keyframes splashStepBar{
+    0%,100%{transform:scaleY(0.4);}
+    50%{transform:scaleY(1);}
   }
 
   .athlete-profile-link, .activity-detail-link {
