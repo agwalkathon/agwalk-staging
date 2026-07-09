@@ -2384,6 +2384,7 @@ async function handleFlagBulkCSV(files) {
       document.getElementById('flag-bulk-load-spinner').style.display = 'none';
       alert('Error loading flag status preview: ' + err.message);
     }
+  };
   reader.readAsText(file);
 }
 
