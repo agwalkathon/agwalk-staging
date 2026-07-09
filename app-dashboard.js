@@ -4,6 +4,10 @@
    No config => leaves the classic Walkathon layout untouched.
    ============================================================ */
 (function(){
+  // Apply last-known accent color instantly (from cache), to avoid a default-color flash
+  // while the fresh event/branding fetches are still in flight.
+  try { if (typeof applyEffectiveAccentColor === 'function') applyEffectiveAccentColor(); } catch(e){}
+
   var SHAPES = {
     circle:  '<circle cx="50" cy="50" r="43" pathLength="100"/>',
     diamond: '<path d="M50 6 L94 50 L50 94 L6 50 Z" pathLength="100"/>',
@@ -39,7 +43,7 @@
     try {
       var s = JSON.parse(safeGetItem('wk_user') || '{}');
       if (!s.athleteId) return null;
-      var evs = await fetchJSON(SUPABASE_URL + '/rest/v1/events?select=id,name,start_date,end_date,status,rules_config&status=in.(live,ended)&order=status.asc,start_date.desc');
+      var evs = await fetchJSON(SUPABASE_URL + '/rest/v1/events?select=id,name,start_date,end_date,status,rules_config,accent_color&status=in.(live,ended)&order=status.asc,start_date.desc');
       if (!Array.isArray(evs) || !evs.length) return null;
       var regs = await fetchJSON(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + s.athleteId + '&select=event_id');
       var myEvIds = (Array.isArray(regs)?regs:[]).map(function(r){ return r.event_id; });
@@ -81,7 +85,7 @@
     var brightColor = ring.color || '#fff';
     var c = brightColor.toLowerCase();
     if (c === '#70f0db') brightColor = '#00ffd5';
-    else if (c === '#e8622a') brightColor = '#ff5a00';
+    else if (typeof DEFAULT_BRAND_COLOR === 'string' && c === DEFAULT_BRAND_COLOR.toLowerCase()) brightColor = '#ff5a00';
     else if (c === '#d3e92b') brightColor = '#c6ff00';
 
     var needed = Math.max(0, goal - value);
@@ -163,6 +167,7 @@
     }
     // Cache active event config for other modules
     try { localStorage.setItem('ag_active_event_cache', JSON.stringify(ev)); } catch(e){}
+    try { if (typeof applyEffectiveAccentColor === 'function') applyEffectiveAccentColor(); } catch(e){}
 
     // Apply sections show/hide toggles
     if (ev.rules_config && ev.rules_config.dashboard) {

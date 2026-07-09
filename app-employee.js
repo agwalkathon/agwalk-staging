@@ -136,6 +136,40 @@ async function verifyCode(){
   if (btn) { btn.disabled = false; btn.textContent = 'Verify & Login'; }
 }
 
+function formatRichText(text) {
+  if (!text) return '';
+  var esc = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+  
+  // Convert URLs to clickable links
+  var urlRegex = /(\bhttps?:\/\/[^\s<]+)/gi;
+  esc = esc.replace(urlRegex, function(url) {
+    var trailing = '';
+    var match;
+    while ((match = url.match(/(&(?:amp|lt|gt|quot|apos|#39);|[.,!?;:])$/i))) {
+      trailing = match[1] + trailing;
+      url = url.substring(0, url.length - match[1].length);
+    }
+    var cleanUrl = url.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer" style="color:var(--brand);text-decoration:underline;">' + url + '</a>' + trailing;
+  });
+
+  // Convert bold formatting: **text** to <strong>text</strong>
+  esc = esc.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Convert italic formatting: *text* to <em>text</em>
+  esc = esc.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // Convert line breaks: \n to <br>
+  esc = esc.replace(/\n/g, '<br>');
+  
+  return esc;
+}
+
 /* ---------- celebrate logic ---------- */
 function formatCelebDateTime(isoStr) {
   if (!isoStr) return '';
@@ -299,7 +333,7 @@ function buildCelebCard(c){
   if (c.message) {
     var msg = document.createElement('div');
     msg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;';
-    msg.textContent = c.message;
+    msg.innerHTML = formatRichText(c.message);
     card.appendChild(msg);
   }
   var mediaArr = Array.isArray(c.media) ? c.media : [];
@@ -373,7 +407,7 @@ function buildCelebCard(c){
       wnm.textContent = wEmpName;
       var wmsg = document.createElement('div');
       wmsg.style.cssText = 'font-size:12.5px;color:rgba(255,255,255,.85);margin-top:2px;line-height:1.45;';
-      wmsg.textContent = w.message;
+      wmsg.innerHTML = formatRichText(w.message);
       wright.appendChild(wnm); wright.appendChild(wmsg);
       if (w.media_url) {
         var wimg = document.createElement('img'); wimg.src = w.media_url;
@@ -401,17 +435,17 @@ function buildCelebCard(c){
   wsend.style.cssText = 'width:36px;height:36px;background:none;border:none;color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;';
   wsend.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
   var wcam = document.createElement('button');
-  wcam.style.cssText = 'padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:11px;font-size:15px;cursor:pointer;';
-  wcam.textContent = '📷';
+  wcam.style.cssText = 'padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);';
+  wcam.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
   var wfile = document.createElement('input');
   wfile.type = 'file'; wfile.accept = 'image/*'; wfile.style.display = 'none';
   wcam.addEventListener('click', function(){ wfile.click(); });
   var _wishPhotoUrl = '';
   wfile.addEventListener('change', async function(){
     var f = (this.files || [])[0]; if (!f) return;
-    wcam.disabled = true; wcam.textContent = '⏳';
-    try { _wishPhotoUrl = await uploadPhoto(f); wcam.textContent = '✔️'; wcam.style.borderColor = 'var(--brand)'; }
-    catch(e){ wcam.textContent = '📷'; alert(e.message); }
+    wcam.disabled = true; wcam.innerHTML = '⏳';
+    try { _wishPhotoUrl = await uploadPhoto(f); wcam.innerHTML = '✔️'; wcam.style.borderColor = 'var(--brand)'; }
+    catch(e){ wcam.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'; alert(e.message); }
     wcam.disabled = false;
   });
   wsend.addEventListener('click', async function(){
@@ -429,7 +463,7 @@ function buildCelebCard(c){
       c.wishes.unshift({ created_at: new Date().toISOString(), message: txt, media_url: _wishPhotoUrl, employee: getEmp() });
       c.wish_count = (c.wish_count || 0) + 1;
       wb.textContent = '💬 ' + c.wish_count;
-      winp.value = ''; _wishPhotoUrl = ''; wcam.textContent = '📷'; wcam.style.borderColor = 'var(--border)';
+      winp.value = ''; _wishPhotoUrl = ''; wcam.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'; wcam.style.borderColor = 'var(--border)';
       drawWishes();
     } catch(e){ alert(e.message); }
     wsend.disabled = false; winp.disabled = false;
@@ -528,7 +562,7 @@ function initEmployeeModeListeners() {
       this.value = '';
       var btn = document.getElementById('post-photo-btn');
       for (var i = 0; i < files.length; i++) {
-        if (btn) btn.textContent = '⏳ Uploading…';
+        if (btn) btn.innerHTML = '<span style="font-size:12px;margin-right:4px;">⏳</span> Uploading…';
         try {
           var url = await uploadPhoto(files[i]);
           _postPhotos.push(url);
@@ -545,7 +579,7 @@ function initEmployeeModeListeners() {
           if (previews) previews.appendChild(pv);
         } catch(e){ alert(e.message); }
       }
-      if (btn) btn.textContent = '📷 Add photos';
+      if (btn) btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Add photos';
     });
   }
   var postSubmit = document.getElementById('post-submit');
@@ -727,7 +761,7 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
   };
   
-  var accentColor = b.accent_color || '#E8622A';
+  var accentColor = b.accent_color || (typeof DEFAULT_BRAND_COLOR !== 'undefined' ? DEFAULT_BRAND_COLOR : '#E8622A');
   styleEl.textContent = `
     body, input, button, select {
       font-family: "${b.font_family || 'Inter'}", sans-serif !important;

@@ -1030,3 +1030,39 @@ function calcFullPtsAdaptive(myActs, gender, shift){
   };
 }
 // Trigger rebuild: config features fix v2
+
+// ============================================================
+// Shared brand/accent color resolution (single source of truth)
+// Priority: active event's accent_color > org branding accent_color > default
+// ============================================================
+var DEFAULT_BRAND_COLOR = '#E8622A';
+
+function getEffectiveAccentColor() {
+  try {
+    var ev = JSON.parse(localStorage.getItem('ag_active_event_cache') || 'null');
+    if (ev && ev.accent_color) return ev.accent_color;
+  } catch (e) {}
+  try {
+    var br = JSON.parse(localStorage.getItem('ag_branding_cache') || 'null');
+    if (br && br.accent_color) return br.accent_color;
+  } catch (e) {}
+  return DEFAULT_BRAND_COLOR;
+}
+
+function applyEffectiveAccentColor() {
+  var c = getEffectiveAccentColor();
+  try { document.documentElement.style.setProperty('--brand', c); } catch (e) {}
+  try {
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', c);
+  } catch (e) {}
+  window.CURRENT_ACCENT_COLOR = c;
+  return c;
+}
+
+function getFallbackAvatarStyle() {
+  return 'background:#282e36; border:2px solid ' + getEffectiveAccentColor() + '; color:#fff;';
+}
+
+// Apply immediately on script execution (uses cache; no need to wait for any network fetch)
+try { applyEffectiveAccentColor(); } catch (e) {}

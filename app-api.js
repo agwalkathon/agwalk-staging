@@ -424,7 +424,7 @@ async function load(isBackgroundRefresh) {
     var name=reg.full_name||s.name||'Participant';
 
     var initials = typeof get2Initials === 'function' ? get2Initials(name) : name.substring(0,2).toUpperCase();
-    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
+    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return (typeof getFallbackAvatarStyle === 'function') ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
     
     var avatarEl = document.getElementById('hdr-avatar');
     if (avatarEl) {
@@ -1785,7 +1785,7 @@ async function bootAppUnified() {
     if (typeof initEmployeeModeListeners === 'function') initEmployeeModeListeners();
     
     var initials = typeof get2Initials === 'function' ? get2Initials(emp.full_name) : emp.full_name.substring(0,2).toUpperCase();
-    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
+    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return (typeof getFallbackAvatarStyle === 'function') ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
     
     var avatarEl = document.getElementById('hdr-avatar');
     if (avatarEl) {

@@ -1959,7 +1959,7 @@ function instantiateFeedMap(el) {
       }).addTo(map);
 
       var poly = L.polyline(coordinates, {
-        color: '#E8622A', // Brand orange matching detail map
+        color: (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'), // Follows event accent color
         weight: 4,
         opacity: 0.9,
         lineJoin: 'round'
@@ -2208,7 +2208,7 @@ function renderFeed() {
         var pName = (r.name && r.name !== 'Participant') ? r.name : (regMap[r.athlete_id] ? regMap[r.athlete_id].full_name : 'Participant');
         var uInitials = typeof get2Initials === 'function' ? get2Initials(pName) : pName.substring(0,2).toUpperCase();
         
-        var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;';
+        var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : (typeof getFallbackAvatarStyle === 'function' ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;');
         var style = `width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; border:1px solid; margin-left: ${index > 0 ? '-6px' : '0'}; z-index: ${10 - index}; transition: transform 0.2s; ${customStyle}`;
         avatarsHtml += `<div style="${style}">${uInitials}</div>`;
       });
@@ -2310,7 +2310,7 @@ function renderFeed() {
       html += `
         <div class="feed-card type-activity ${timeClass}" onclick="openActivityDetail('${act.activity_id || act.strava_activity_id}', event, true)">
           <div class="feed-card-header">
-            <div class="feed-card-avatar" style="${typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(athleteName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;'};">${typeof get2Initials === 'function' ? get2Initials(athleteName) : initials}</div>
+            <div class="feed-card-avatar" style="${typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(athleteName) : (typeof getFallbackAvatarStyle === 'function' ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;')};">${typeof get2Initials === 'function' ? get2Initials(athleteName) : initials}</div>
             <div class="feed-card-meta">
               <div class="feed-card-athlete-name">
                 <a href="#" onclick="openProfileDetail('${targetAthleteId}', event); event.stopPropagation(); return false;" class="athlete-profile-link">${esc(athleteName)}</a>
@@ -2587,7 +2587,7 @@ function triggerReactionConfetti(x, y, emoji) {
         particleCount: 20,
         spread: 40,
         origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-        colors: ['#E8622A', '#FC6100', '#FFD000'],
+        colors: [(typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'), '#FC6100', '#FFD000'],
         ticks: 120
       };
       confetti(options);
@@ -2973,7 +2973,7 @@ async function checkPushSubscriptionState() {
       btn.textContent = 'Enable';
       btn.style.background = 'rgba(232, 98, 42, 0.12)';
       btn.style.border = '1px solid rgba(232, 98, 42, 0.3)';
-      btn.style.color = '#E8622A';
+      btn.style.color = 'var(--brand)';
       btn.style.pointerEvents = 'auto';
       btn.style.boxShadow = 'none';
       btn.onclick = enablePushNotifications;
@@ -3273,7 +3273,7 @@ function openReactionsDetail(announcementId) {
     var pName = (r.name && r.name !== 'Participant') ? r.name : (regMap[r.athlete_id] ? regMap[r.athlete_id].full_name : 'Participant');
     var initials = typeof get2Initials === 'function' ? get2Initials(pName) : pName.substring(0,2).toUpperCase();
 
-    var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : 'background:#282e36; border:2px solid #E8622A; color:#fff;';
+    var customStyle = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle(pName) : (typeof getFallbackAvatarStyle === 'function' ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;');
 
     return `
       <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 14px;">
