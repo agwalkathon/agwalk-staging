@@ -1,7 +1,7 @@
 {
-  "name": "AG Walkathon 2026",
-  "short_name": "AG Walkathon",
-  "description": "Arcgate Walkathon 2026 — Track your steps, earn medals, climb the leaderboard.",
+  "name": "AG Celebrate",
+  "short_name": "AG Celebrate",
+  "description": "AG Celebrate — Track your steps, earn medals, climb the leaderboard.",
   "start_url": "/agwalk-staging/portal.html",
   "scope": "/agwalk-staging/",
   "display": "standalone",
