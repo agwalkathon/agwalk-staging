@@ -215,7 +215,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 <div class="content">
 
 <div class="panel" id="editor" style="padding: 24px; background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
-  <h2 id="editor-title" style="margin-bottom: 20px; font-size: 18px; font-weight: 700; color: var(--text-primary); border-bottom: 2px solid var(--border); padding-bottom: 12px;"><i class="ti ti-calendar-plus"></i> New Event</h2>
+  <h2 id="editor-title" style="margin-bottom: 20px; font-size: 18px; font-weight: 700; color: var(--text-primary); border-bottom: 2px solid var(--border); padding-bottom: 12px; display:flex; align-items:center; justify-content:space-between;">
+    <span><i class="ti ti-calendar-plus"></i> <span id="editor-title-text">New Event</span></span>
+    <button type="button" class="btn btn-primary btn-sm" id="btn-save-top" style="font-size:13px;"><i class="ti ti-device-floppy"></i> Save Event</button>
+  </h2>
   <div class="section-tabs" style="margin-bottom: 20px;">
     <button type="button" class="stab active" data-tab="basic" onclick="switchEditorTab('basic')"><i class="ti ti-info-circle"></i> Basic Info</button>
     <button type="button" class="stab" data-tab="registration" onclick="switchEditorTab('registration')"><i class="ti ti-users"></i> Registration</button>
@@ -585,8 +588,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
     <span class="saved-msg" id="ed-saved">✅ Saved</span>
-    <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
-    <button class="btn btn-primary" id="btn-save"><i class="ti ti-device-floppy"></i> Save Event</button>
+    <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+    <button type="button" class="btn btn-primary" id="btn-save"><i class="ti ti-device-floppy"></i> Save Event</button>
   </div>
 </div>
 
@@ -1469,7 +1472,23 @@ async function upsertConfigValue(key, value, eventId) {
 async function openEditor(ev){
   switchEditorTab('basic');
   editId=ev?ev.id:null;
-  document.getElementById('editor-title').innerHTML='<i class="ti ti-calendar-'+(ev?'cog':'plus')+'"></i> '+(ev?'Edit: '+ev.name:'New Event');
+  
+  // Re-enable save buttons in case they got stuck
+  var btnBottom = document.getElementById('btn-save');
+  var btnTop = document.getElementById('btn-save-top');
+  if (btnBottom) btnBottom.disabled = false;
+  if (btnTop) btnTop.disabled = false;
+
+  var titleText = ev ? 'Edit: ' + ev.name : 'New Event';
+  var iconClass = 'ti ti-calendar-' + (ev ? 'cog' : 'plus');
+  var titleSpan = document.querySelector('#editor-title > span');
+  if (titleSpan) {
+    titleSpan.innerHTML = '<i class="' + iconClass + '"></i> <span id="editor-title-text">' + titleText + '</span>';
+  } else {
+    document.getElementById('editor-title').innerHTML = '<span><i class="' + iconClass + '"></i> <span id="editor-title-text">' + titleText + '</span></span><button type="button" class="btn btn-primary btn-sm" id="btn-save-top" style="font-size:13px;"><i class="ti ti-device-floppy"></i> Save Event</button>';
+    document.getElementById('btn-save-top').addEventListener('click', saveEvent);
+  }
+
   var rc=(ev&&ev.rules_config)||{};
   document.getElementById('f-name').value=ev?ev.name:'';
   document.getElementById('f-slug').value=ev?ev.slug:'';
@@ -1706,9 +1725,14 @@ function collect(){
   };
 }
 
-document.getElementById('btn-save').addEventListener('click',async function(){
+document.getElementById('btn-save').addEventListener('click', saveEvent);
+document.getElementById('btn-save-top').addEventListener('click', saveEvent);
+
+async function saveEvent() {
   var err=document.getElementById('ed-err');err.textContent='';
-  var btn=this;btn.disabled=true;
+  var btnBottom=document.getElementById('btn-save');
+  var btnTop=document.getElementById('btn-save-top');
+  btnBottom.disabled=true; btnTop.disabled=true;
   try{
     var data=collect();
     var r;
@@ -1762,27 +1786,31 @@ document.getElementById('btn-save').addEventListener('click',async function(){
         upsertConfigValue('tabs_config', tabsCfg, savedEventId),
         upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
       ]);
-      try {
-        await fetch(BACKEND + '/admin/backfill-points', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
-          },
-          body: JSON.stringify({ event_id: savedEventId })
-        });
-      } catch(e) {
+      
+      // Trigger points backfill asynchronously so it doesn't block the frontend save UI/collapse action
+      fetch(BACKEND + '/admin/backfill-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+        },
+        body: JSON.stringify({ event_id: savedEventId })
+      }).catch(function(e) {
         console.warn('Auto backfill failed:', e.message);
-      }
+      });
     }
 
     document.getElementById('ed-saved').classList.add('show');
     setTimeout(function(){document.getElementById('ed-saved').classList.remove('show')},2200);
     document.getElementById('editor').classList.remove('open');editId=null;
     await loadEvents();
-  }catch(e){err.textContent='❌ '+e.message;}
-  btn.disabled=false;
-});
+  } catch(e) {
+    err.textContent='❌ '+e.message;
+  } finally {
+    btnBottom.disabled=false;
+    btnTop.disabled=false;
+  }
+}
 
 /* ---------- status cycle ---------- */
 async function cycleStatus(ev){
