@@ -957,6 +957,7 @@ WHERE strava_activity_id = 19055574519;</code></pre>
             <li><strong>Status Cycling</strong>: Clicking the status badge cycles the event through <code>draft → upcoming → live → ended → archived</code> sequentially (with confirmation).</li>
             <li><strong>Asynchronous Points Backfill</strong>: Saving changes automatically fires a background recalculation request to the Backend Server at <code>/admin/backfill-points</code>. This backfill operation is triggered asynchronously in the background so that Render's startup latency does not freeze the UI or disable buttons.</li>
             <li><strong>Save Button Fail-safes</strong>: Includes top and bottom Save buttons. Save actions use a <code>finally</code> block to guarantee that buttons are immediately re-enabled even if database operations fail.</li>
+            <li><strong>Manual Bonus Points Tab</strong>: Centralizes manual bonus points management per event. Organizers can directly award custom points to specific activities and view a log of the 50 most recent manual adjustments for that event.</li>
           </ul>
         </section>
 
@@ -978,6 +979,7 @@ WHERE strava_activity_id = 19055574519;</code></pre>
             <li><strong>Events Manager Save & UI Fixes</strong>:
               <br>• Refactored the events editor save handler to run the points backfill endpoint asynchronously.
               <br>• Added a top Save button next to the editor title, converted all save buttons to <code>type="button"</code>, and wrapped handlers in a <code>try-catch-finally</code> structure.
+              <br>• Integrated the **Manual Bonus Point by Activity** feature directly inside the event editor as a dedicated tab panel for clean event-scoped points management.
             </li>
             <li><strong>Branding Selective Logo Inversion Filter</strong>:
               <br>• Replaced brightness filters with <code>filter: invert(1) hue-rotate(180deg)</code>, allowing black elements in logos to invert to white while preserving the orange brand color.
