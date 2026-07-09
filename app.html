@@ -209,7 +209,7 @@
       <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
     </svg>
   </div>
-  <div style="font-size:20px;font-weight:800;color:#fff;font-family:var(--font);margin-bottom:10px;" id="maintenance-message">App is Under Maintenance</div>
+  <div style="font-size:20px;font-weight: 700;color:#fff;font-family:var(--font);margin-bottom:10px;" id="maintenance-message">App is Under Maintenance</div>
   <div style="font-size:14px;color:rgba(255,255,255,0.55);font-family:var(--font);max-width:320px;line-height:1.5;">
     We're making some improvements. Please check back shortly.
   </div>
@@ -245,7 +245,7 @@
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
-        <span class="notification-badge" id="notification-badge" style="position: absolute; top: 0px; right: 0px; background: #FC6100; color: white; border-radius: 50%; width: 15px; height: 15px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8.5px; font-weight: 800; font-family: sans-serif; line-height: 1;"></span>
+        <span class="notification-badge" id="notification-badge" style="position: absolute; top: 0px; right: 0px; background: #FC6100; color: white; border-radius: 50%; width: 15px; height: 15px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8.5px; font-weight: 700; font-family: sans-serif; line-height: 1;"></span>
       </button>
       
       <!-- Notification Dropdown -->
@@ -270,7 +270,7 @@
   </div>
   
   <div class="hdr-center">
-    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
+    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">
       <span id="hdr-today-date" style="color: #fff;">—</span>
     </div>
   </div>
@@ -297,7 +297,7 @@
 
   <!-- Medal Rings -->
   <div class="hero-rings-block">
-    <div style="display:flex; justify-content:center; margin-bottom:14px; margin-top:2px;">
+    <div style="display:flex; justify-content:center; margin-bottom:24px; margin-top:14px;">
       <img id="app-logo" src="logo-white.png" alt="Arcgate Walkathon" style="height:26px; width:auto;">
     </div>
     <div class="rings-row" id="medal-rings">
@@ -461,6 +461,24 @@
     <div class="streak-day-labels" id="streak-labels"></div>
   </div>
 
+  <!-- Challenges Navigation Card -->
+  <div class="glass-card" id="dashboard-challenges-card" onclick="openChallengesDrawer();" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:38px; height:38px; border-radius:10px; background:rgba(232, 98, 42, 0.2); display:flex; align-items:center; justify-content:center; color:var(--brand);">
+        <i class="fa-solid fa-bullseye" style="font-size:18px;"></i>
+      </div>
+      <div>
+        <div style="font-size:15px; font-weight:700; color:#fff;">Challenges</div>
+        <div style="font-size:12px; color:rgba(255, 255, 255, 0.55); margin-top:2px;">Track active event challenges and milestones</div>
+      </div>
+    </div>
+    <div style="color:rgba(255, 255, 255, 0.4);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </div>
+  </div>
+
   <div class="sec">PERSONAL BESTS</div>
   <div class="pb-grid" id="pb-grid-container">
     <!-- Rendered dynamically via javascript configuration -->
@@ -534,7 +552,7 @@
 <div class="content" id="tab-celebrate" style="padding:16px 16px 120px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
   <div class="max-w">
     <div style="margin-bottom:16px;">
-      <div id="celebrate-greeting" style="font-size:20px;font-weight:800;letter-spacing:-0.02em;">Hello! 👋</div>
+      <div id="celebrate-greeting" style="font-size:20px;font-weight: 700;letter-spacing:-0.02em;">Hello! 👋</div>
       <div style="font-size:12.5px;color:var(--muted);margin-top:3px;">Every day has something worth celebrating 🎉</div>
     </div>
     <button id="btn-new-post" style="width:100%;padding:13px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.15);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;margin-bottom:14px;text-align:left;padding-left:16px">➕ Share something to celebrate.</button>
@@ -563,11 +581,7 @@
 <!-- You tab -->
 <div class="content" id="tab-you">
 <div class="max-w">
-  <!-- Sub-tabs: Profile first -->
-  <div class="lb-tabs part-only" style="margin-bottom:14px;">
-    <button class="lb-tab active" id="you-tab-info" onclick="switchYouTab('info')">Profile</button>
-    <button class="lb-tab" id="you-tab-challenges" onclick="switchYouTab('challenges')">&#127919; Challenges</button>
-  </div>
+
 
   <!-- Info panel -->
   <div id="you-panel-info" style="display:block;">
@@ -763,12 +777,7 @@
   </div>
 </div>
 
-  <!-- Challenges panel -->
-  <div id="you-panel-challenges" style="display:none; padding-top:4px;">
-    <div id="challenges-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-      <div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>Loading challenges...</p></div></div>
-    </div>
-  </div>
+
 </div>
 
 
@@ -832,7 +841,7 @@
       </button>
     </div>
     <div id="dash-modal-header" style="margin-bottom:24px;">
-      <div id="dash-modal-title" style="font-size:24px; font-weight:800; color:#fff; line-height:1.2;">Details</div>
+      <div id="dash-modal-title" style="font-size:24px; font-weight: 700; color:#fff; line-height:1.2;">Details</div>
       <div id="dash-modal-subtitle" style="font-size:13px; color:var(--muted); margin-top:4px;">Summary and charts</div>
     </div>
     <div id="dash-modal-body">
@@ -868,10 +877,10 @@
       
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:28px 20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:24px; position:relative; overflow:hidden;">
         <div id="highlight-modal-emoji" style="font-size:72px; margin-bottom:16px; filter:drop-shadow(0 0 16px rgba(255,255,255,0.2));">🔥</div>
-        <div id="highlight-modal-title" style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px; letter-spacing:0.3px;">Streak Leader!</div>
-        <div id="highlight-modal-subtitle" style="font-size:12px; font-weight:800; color:var(--brand); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:20px;">12 Days Active</div>
+        <div id="highlight-modal-title" style="font-size:22px; font-weight: 700; color:#fff; margin-bottom:8px; letter-spacing:0.3px;">Streak Leader!</div>
+        <div id="highlight-modal-subtitle" style="font-size:12px; font-weight: 700; color:var(--brand); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:20px;">12 Days Active</div>
         <div id="highlight-modal-body" style="font-size:14.5px; color:rgba(255,255,255,0.75); line-height:1.6; margin-bottom:28px; max-width:480px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
-        <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight:800; padding:14px; background:linear-gradient(135deg, #FC6100 0%, #E8622A 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
+        <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight: 700; padding:14px; background:linear-gradient(135deg, #FC6100 0%, #E8622A 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
       </div>
     </div>
   </div>
@@ -906,7 +915,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
-      <div id="detail-top-date" style="font-size:16px; font-weight:800; color:#fff; text-align:center;">Activity</div>
+      <div id="detail-top-date" style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">Activity</div>
       <button id="detail-share-btn" onclick="showShareSheet()" style="width:50px;background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:flex-end;padding:0;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
     </div>
 
@@ -919,7 +928,7 @@
     <div class="detail-content" style="padding-top:16px;">
       <!-- Title & Started Info -->
       <div style="margin-bottom:18px;">
-        <div id="detail-title" style="font-size:18px; font-weight:800; color:#fff; line-height:1.35;">Evening Walk</div>
+        <div id="detail-title" style="font-size:18px; font-weight: 700; color:#fff; line-height:1.35;">Evening Walk</div>
         <div id="detail-started-info" style="font-size:12.5px; color:var(--muted); margin-top:4px;">Started Info</div>
       </div>
       
@@ -935,7 +944,7 @@
       <!-- Activity Status Row -->
       <div id="detail-status-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:16px;">
         <div style="font-size:10.5px; font-weight:700; color:var(--label); text-transform:uppercase; letter-spacing:0.8px;">Activity Status</div>
-        <div id="detail-status-badge" style="font-size:11px; font-weight:800; padding:3px 9px; border-radius:20px; background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25);">✓ Valid</div>
+        <div id="detail-status-badge" style="font-size:11px; font-weight: 700; padding:3px 9px; border-radius:20px; background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25);">✓ Valid</div>
       </div>
       
       <!-- Fields Grid -->
@@ -1031,7 +1040,7 @@
           <span style="margin-left:auto;color:var(--muted);font-size:16px;">&#8250;</span>
         </button>
         <div id="report-form-container" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:18px; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-          <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:14px;">Reason for Reporting</div>
+          <div style="font-size:11px; font-weight: 700; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:14px;">Reason for Reporting</div>
           <select id="report-reason-select" onchange="onReportReasonChange()" style="width:100%; padding:11px 12px; background:rgba(255,255,255,0.08); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; font-size:13px; margin-bottom:10px; cursor:pointer; box-sizing:border-box; font-family:inherit;">
             <option value="" style="background:#1a1d22;">Select a reason...</option>
             <option value="gps_manipulation" style="background:#1a1d22;">GPS manipulation / route editing</option>
@@ -1043,7 +1052,7 @@
           </select>
           <textarea id="report-comments" placeholder="Additional details (optional)..." style="width:100%; padding:11px 12px; background:rgba(255,255,255,0.08); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; font-size:13px; min-height:80px; resize:none; box-sizing:border-box; margin-bottom:14px; font-family:inherit;"></textarea>
           <div style="display:flex; gap:8px;">
-            <button id="btn-submit-report" onclick="submitActivityReport()" style="flex:1; padding:11px 16px; background:rgba(232,98,42,0.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(232,98,42,0.35); border-radius:10px; color:var(--brand); font-size:13px; font-weight:800; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(232,98,42,0.15);">Submit Report</button>
+            <button id="btn-submit-report" onclick="submitActivityReport()" style="flex:1; padding:11px 16px; background:rgba(232,98,42,0.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(232,98,42,0.35); border-radius:10px; color:var(--brand); font-size:13px; font-weight: 700; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(232,98,42,0.15);">Submit Report</button>
             <button onclick="toggleReportForm()" style="padding:11px 18px; background:rgba(255,255,255,0.06); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer;">Cancel</button>
           </div>
         </div>
@@ -1059,7 +1068,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
-      <div style="font-size:16px; font-weight:800; color:#fff; text-align:center;">Profile</div>
+      <div style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">Profile</div>
       <div style="width:50px;"></div>
     </div>
 
@@ -1103,17 +1112,17 @@
         <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; text-align:center; margin-top:8px;">
           <div>
             <div style="font-size:20px;">🏃</div>
-            <div style="font-size:14px; font-weight:800; color:#fff; margin-top:4px;" id="prof-split-run">0.0 km</div>
+            <div style="font-size:14px; font-weight: 700; color:#fff; margin-top:4px;" id="prof-split-run">0.0 km</div>
             <div style="font-size:9.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Run</div>
           </div>
           <div>
             <div style="font-size:20px;">🚶‍♂️</div>
-            <div style="font-size:14px; font-weight:800; color:#fff; margin-top:4px;" id="prof-split-walk">0.0 km</div>
+            <div style="font-size:14px; font-weight: 700; color:#fff; margin-top:4px;" id="prof-split-walk">0.0 km</div>
             <div style="font-size:9.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Walk/Hike</div>
           </div>
           <div>
             <div style="font-size:20px;">🚴</div>
-            <div style="font-size:14px; font-weight:800; color:#fff; margin-top:4px;" id="prof-split-ride">0.0 km</div>
+            <div style="font-size:14px; font-weight: 700; color:#fff; margin-top:4px;" id="prof-split-ride">0.0 km</div>
             <div style="font-size:9.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Ride</div>
           </div>
         </div>
@@ -1180,7 +1189,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
-      <div style="font-size:16px; font-weight:800; color:#fff; text-align:center;">My Activities</div>
+      <div style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">My Activities</div>
       <div style="width:50px;"></div>
     </div>
 
@@ -1197,6 +1206,28 @@
     </div>
   </div>
 
+  <!-- Challenges Detail Modal Drawer -->
+  <div id="you-panel-challenges" class="detail-modal">
+    <!-- Top Nav Bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
+      <button class="btn-back" onclick="closeChallengesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back
+      </button>
+      <div style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">Challenges</div>
+      <div style="width:50px;"></div>
+    </div>
+
+    <!-- Challenges content -->
+    <div class="detail-content" style="padding-top:20px; padding-bottom: 40px;">
+      <div class="max-w" style="padding:0 16px;">
+        <div id="challenges-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>Loading challenges...</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Reactions Detail Modal Drawer -->
   <div id="reactions-detail-modal" class="detail-modal" style="z-index:10300;">
     <!-- Top Nav Bar -->
@@ -1205,7 +1236,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
-      <div style="font-size:16px; font-weight:800; color:#fff; text-align:center;">Reactions</div>
+      <div style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">Reactions</div>
       <div style="width:50px;"></div>
     </div>
 
@@ -1222,7 +1253,7 @@
 <div id="share-sheet" style="display:none;position:fixed;inset:0;z-index:20001;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;" onclick="hideShareSheet()">
   <div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:540px;box-sizing:border-box;" onclick="event.stopPropagation()">
     <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 20px;"></div>
-    <div style="text-align:center;font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">Share Activity</div>
+    <div style="text-align:center;font-size:16px;font-weight: 700;color:#fff;margin-bottom:6px;">Share Activity</div>
     <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;">Choose a format to share or save</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <button onclick="shareActivityCard('whatsapp')" style="padding:16px 12px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:12px;color:#25D366;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
@@ -1239,3 +1270,4 @@
 </div>
 </body>
 </html>
+
