@@ -911,16 +911,16 @@ function setLogoFilter(on) {
   var img = document.getElementById('logo-preview-img');
   var btn = document.getElementById('btn-logo-filter');
   if (_logoFilterOn) {
-    img.style.filter = 'invert(1)';
+    img.style.filter = 'brightness(0) invert(1)';
     img.style.background = '#333';
-    btn.textContent = '⬜→⬛ Revert';
+    btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
     img.style.background = '#888';
-    btn.textContent = '⬛→⬜ Invert';
+    btn.textContent = '⬛ → ⬜ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
@@ -955,14 +955,14 @@ function setBannerFilter(on) {
   var img = document.getElementById('banner-preview-img');
   var btn = document.getElementById('btn-banner-filter');
   if (_bannerFilterOn) {
-    img.style.filter = 'invert(1)';
-    btn.textContent = '⬜→⬛ Revert';
+    img.style.filter = 'brightness(0) invert(1)';
+    btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
-    btn.textContent = '⬛→⬜ Invert';
+    btn.textContent = '⬛ → ⬜ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
