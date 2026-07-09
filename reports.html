@@ -228,6 +228,15 @@
     </header>
 
     <div class="content">
+      <!-- Event Selection inline toolbar -->
+      <div class="report-card" style="margin-bottom: 20px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background:#fff; border-radius:var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="ti ti-calendar-event" style="color:var(--brand); font-size:20px;"></i>
+          <span style="font-weight:600; font-size:14px; color:var(--text-secondary);">Active Event:</span>
+        </div>
+        <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
+      </div>
+
       <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-inputs" id="standard-filters">
@@ -359,6 +368,13 @@
     var SPECIAL_DAYS = [];
     var REGISTRATIONS = [];
     var ACTIVITIES = [];
+
+    var EV_ID = null; // selected event ID
+    var EV_RULES = null; // selected event rules_config
+    var EV_ALL = []; // all loaded events list
+    function evq() {
+      return "&event_id=eq." + (EV_ID || 1);
+    }
     
     // Calculated Leaderboard list of objects containing:
     // { reg, ptsDetail, medal: {label, cls}, isDayFemale, isDayMale, isNight }
@@ -423,7 +439,7 @@
       
       try {
         // 1. Fetch configs
-        var configRows = await fetchAllRows(SUPABASE_URL + '/rest/v1/leaderboard_config?select=config_key,config_value');
+        var configRows = await fetchAllRows(SUPABASE_URL + '/rest/v1/leaderboard_config?select=config_key,config_value' + evq());
         configRows.forEach(function(row) {
           if (row.config_key === 'medals') CONFIG.medals = row.config_value;
           if (row.config_key === 'bonus_points') {
@@ -435,14 +451,14 @@
         });
 
         // 2. Fetch challenges
-        CHALLENGES = await fetchAllRows(SUPABASE_URL + '/rest/v1/challenges?is_active=is.true&select=*');
+        CHALLENGES = await fetchAllRows(SUPABASE_URL + '/rest/v1/challenges?is_active=is.true&select=*' + evq());
 
         // 3. Fetch special scoring days
-        var specialRows = await fetchAllRows(SUPABASE_URL + '/rest/v1/special_scoring_days?select=special_date');
+        var specialRows = await fetchAllRows(SUPABASE_URL + '/rest/v1/special_scoring_days?select=special_date' + evq());
         SPECIAL_DAYS = specialRows.map(function(x){ return x.special_date; });
 
         // 4. Fetch registrations
-        REGISTRATIONS = await fetchAllRows(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team,project_lead');
+        REGISTRATIONS = await fetchAllRows(SUPABASE_URL + '/rest/v1/registration?select=strava_athlete_id,full_name,gender,shift,leaderboard_team,project_lead' + evq());
         if (Array.isArray(REGISTRATIONS)) {
           REGISTRATIONS.forEach(function(r) {
             r.team_lead = r.project_lead;
@@ -451,6 +467,9 @@
 
         // 5. Fetch activities in range (including dates)
         var actUrl = SUPABASE_URL + '/rest/v1/activities?is_deleted=eq.false';
+        if (EV_ID) {
+          actUrl += '&event_id=eq.' + EV_ID;
+        }
         if (df) {
           var startDt = new Date(df + 'T00:00:00+05:30');
           if (!isNaN(startDt.getTime())) actUrl += '&activity_date=gte.' + startDt.toISOString();
@@ -815,6 +834,176 @@
       };
     }
 
+    // ── Adaptive Scoring Engine & Helpers ─────────────────────────────
+    function scoringMode(){ return (EV_ID && EV_RULES && EV_RULES.scoring_mode) || 'single_metric'; }
+    function scoringMetric(){ return (EV_ID && EV_RULES && EV_RULES.metric) || 'distance_km'; }
+    function isLegacyScoring(){ return !EV_ID || EV_ID === 1; }
+    function actMetricValue(a, m){
+      if (m==='elevation_m')     return parseFloat(a.elevation_gain)||0;
+      if (m==='moving_time_min') return (parseFloat(a.moving_time_seconds)||0)/60;
+      if (m==='steps')           return parseFloat(a.steps)||0;
+      if (m==='activity_count')  return 1;
+      return (parseFloat(a.distance_meters)||0)/1000;
+    }
+
+    function calcPointsAdaptive(acts, athleteId, gender, shift){
+      if (isLegacyScoring()) return calcPoints(acts, athleteId, gender, shift);
+      var mode=scoringMode(), metric=scoringMetric();
+      var rate=parseFloat(EV_RULES&&EV_RULES.rate); if(isNaN(rate))rate=1;
+      
+      var formula = (EV_RULES && EV_RULES.formula) || {};
+      var formulaAgg = formula.aggregation || 'daily_total';
+      var baseEnabled = formula.base_enabled !== false;
+      var milestoneEnabled = formula.milestone_enabled !== false;
+      var challengeEnabled = formula.challenge_enabled !== false;
+
+      var myActs=acts.filter(function(a){return String(a.strava_athlete_id)===String(athleteId)&&!a.is_flagged;});
+      var byDay={};
+      myActs.forEach(function(a){var day=getActDate(a);if(!day)return;(byDay[day]=byDay[day]||[]).push(a);});
+
+      var totalKm=0;
+      myActs.forEach(function(a){ totalKm += (parseFloat(a.distance_meters)||0)/1000; });
+
+      // Raw metric mode
+      if (mode === 'raw') {
+        var rawSum = 0;
+        var dayBreakdown = {};
+        Object.keys(byDay).forEach(function(day){
+          var dayVal = 0, dayKm = 0;
+          byDay[day].forEach(function(a){
+            dayKm += (parseFloat(a.distance_meters)||0)/1000;
+            dayVal += actMetricValue(a, metric);
+          });
+          rawSum += dayVal;
+          dayBreakdown[day] = {
+            km: dayKm, distPts: dayVal, bonusPts: 0, challenges: [], capped: false, inRangeKm: 0
+          };
+        });
+        return {
+          distKm: totalKm,
+          distPts: rawSum,
+          bonusPts: 0,
+          challengePts: 0,
+          totalPts: rawSum,
+          dayBreakdown: dayBreakdown
+        };
+      }
+
+      function getActVal(a) {
+        return actMetricValue(a, metric);
+      }
+
+      var dayBreakdown = {};
+      var totalBase = 0, totalBonus = 0;
+
+      if (formulaAgg === 'daily_total') {
+        Object.keys(byDay).forEach(function(day){
+          var dayVal = 0, dayKm = 0;
+          byDay[day].forEach(function(a){
+            dayKm += (parseFloat(a.distance_meters)||0)/1000;
+            dayVal += getActVal(a);
+          });
+
+          var base = baseEnabled ? (dayVal * rate) : 0;
+          var bonus = 0;
+          if (milestoneEnabled && Array.isArray(CONFIG.bonus)) {
+            CONFIG.bonus.forEach(function(b){
+              if (dayVal >= b.km) {
+                bonus = Math.max(bonus, b.points);
+              }
+            });
+          }
+
+          totalBase += base;
+          totalBonus += bonus;
+
+          dayBreakdown[day] = {
+            km: dayKm, distPts: base, bonusPts: bonus, challenges: [], capped: false, inRangeKm: 0
+          };
+        });
+      } else {
+        // Per activity aggregation
+        myActs.forEach(function(a){
+          var actVal = getActVal(a);
+          var base = baseEnabled ? (actVal * rate) : 0;
+          var bonus = 0;
+          if (milestoneEnabled && Array.isArray(CONFIG.bonus)) {
+            CONFIG.bonus.forEach(function(b){
+              if (actVal >= b.km) {
+                bonus = Math.max(bonus, b.points);
+              }
+            });
+          }
+          totalBase += base;
+          totalBonus += bonus;
+
+          var day = getActDate(a);
+          if (day) {
+            if (!dayBreakdown[day]) {
+              dayBreakdown[day] = { km: 0, distPts: 0, bonusPts: 0, challenges: [], capped: false, inRangeKm: 0 };
+            }
+            dayBreakdown[day].km += (parseFloat(a.distance_meters)||0)/1000;
+            dayBreakdown[day].distPts += base;
+            dayBreakdown[day].bonusPts += bonus;
+          }
+        });
+      }
+
+      // Challenge points
+      var challengePts = 0;
+      if (challengeEnabled) {
+        myActs.forEach(function(a){
+          var val = parseFloat(a.manual_bonus || 0);
+          challengePts += val;
+          if (val > 0) {
+            var day = getActDate(a);
+            if (day && dayBreakdown[day]) {
+              var desc = a.description || 'Manual bonus';
+              dayBreakdown[day].challenges.push({ name: desc, pts: val });
+            }
+          }
+        });
+
+        var _shiftN = (shift || '').toLowerCase();
+        var _isNightShift = _shiftN.indexOf('night') > -1;
+        var myChallenges = (Array.isArray(CHALLENGES) ? CHALLENGES : []).filter(function(c) {
+          if (!c.is_active) return false;
+          var elig = (c.eligible || 'all').toLowerCase();
+          if (elig === 'all')        return true;
+          if (elig === 'male'      && (gender || '').toLowerCase() === 'male')   return true;
+          if (elig === 'female'    && (gender || '').toLowerCase() === 'female') return true;
+          if (elig === 'dayshift'  && !_isNightShift) return true;
+          if (elig === 'nightshift' && _isNightShift) return true;
+          return false;
+        });
+
+        myChallenges.forEach(function(c) {
+          Object.keys(byDay).forEach(function(day) {
+            if (day < c.start_date || day > c.end_date) return;
+            var qualifies = byDay[day].some(function(a) { return checkChallenge(a, c); });
+            if (qualifies) {
+              var ptsAwarded = parseFloat(c.per_activity_points) || parseFloat(c.points) || 0;
+              challengePts += ptsAwarded;
+              if (dayBreakdown[day]) {
+                dayBreakdown[day].challenges.push({ name: c.name, pts: ptsAwarded });
+              }
+            }
+          });
+        });
+      }
+
+      var total = totalBase + totalBonus + challengePts;
+
+      return {
+        distKm: totalKm,
+        distPts: totalBase,
+        bonusPts: totalBonus,
+        challengePts: challengePts,
+        totalPts: parseFloat(total.toFixed(2)),
+        dayBreakdown: dayBreakdown
+      };
+    }
+
     // Medal definition
     function getMedal(points, gender) {
       if (!CONFIG.medals) return { label: '—', cls: 'badge-none' };
@@ -833,7 +1022,7 @@
     function calculateLeaderboard() {
       LEADERBOARD = [];
       REGISTRATIONS.forEach(function(p) {
-        var pts = calcPoints(ACTIVITIES, p.strava_athlete_id, p.gender, p.shift);
+        var pts = calcPointsAdaptive(ACTIVITIES, p.strava_athlete_id, p.gender, p.shift);
         var medal = getMedal(pts.totalPts, p.gender);
         
         var g = (p.gender || '').toLowerCase();
@@ -1538,6 +1727,65 @@
       XLSX.writeFile(wb, filename + ".xlsx");
       showToast("Master reports workbook exported successfully!");
     }
+    async function loadEventSelector(){
+      try{
+        var r=await fetch(SUPABASE_URL+"/rest/v1/events?status=neq.draft&select=id,name,status,rules_config,start_date,end_date&order=start_date.desc",{headers:HDR});
+        var evs=await r.json(); var sel=document.getElementById("ev-select"); if(!sel||!Array.isArray(evs))return;
+        EV_ALL=evs;
+        sel.innerHTML="";
+        evs.forEach(function(e){
+          var o=document.createElement("option");
+          o.value=e.id;
+          if (e.status === "live") {
+            o.textContent = "🟢 " + e.name + " (LIVE)";
+            o.style.color = "#16a34a";
+            o.style.fontWeight = "bold";
+          } else {
+            o.textContent = e.name + " (" + e.status.toUpperCase() + ")";
+          }
+          sel.appendChild(o);
+        });
+        
+        var live = evs.find(function(e){ return e.status === 'live'; });
+        var defaultId = live ? String(live.id) : (localStorage.getItem('wk_selected_event_id') || "1");
+        
+        sel.value = defaultId;
+        EV_ID = (defaultId === "1") ? null : parseInt(defaultId);
+        localStorage.setItem('wk_selected_event_id', defaultId);
+        var _sel = EV_ALL.find(function(e){ return String(e.id) === defaultId; });
+        EV_RULES = (_sel && _sel.rules_config) || null;
+        if (_sel) {
+          if (_sel.start_date) document.getElementById('date-from').value = _sel.start_date;
+          if (_sel.end_date) document.getElementById('date-to').value = _sel.end_date;
+        } else {
+          // Fallback legacy range
+          document.getElementById('date-from').value = '2026-06-01';
+          document.getElementById('date-to').value = '2026-07-01';
+        }
+        
+        sel.addEventListener("change",async function(){
+          EV_ID=(this.value==="1")?null:parseInt(this.value);
+          localStorage.setItem('wk_selected_event_id', this.value);
+          var _sel=EV_ALL.find(function(e){return String(e.id)===this.value}.bind(this));
+          EV_RULES=(_sel&&_sel.rules_config)||null;
+          if (_sel) {
+            if (_sel.start_date) document.getElementById('date-from').value = _sel.start_date;
+            if (_sel.end_date) document.getElementById('date-to').value = _sel.end_date;
+          } else {
+            // Fallback legacy range
+            document.getElementById('date-from').value = '2026-06-01';
+            document.getElementById('date-to').value = '2026-07-01';
+          }
+          await loadDataAndCalculate();
+        });
+        
+        await loadDataAndCalculate();
+      }catch(e){
+        console.warn("event selector failed",e);
+        await loadDataAndCalculate();
+      }
+    }
+
     // Initialize Page Load
-    loadDataAndCalculate();
+    loadEventSelector();
   </script>
