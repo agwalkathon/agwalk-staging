@@ -556,55 +556,113 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           </div>
         </div>
         <div class="card-body">
-          <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
-            <input type="text" id="dist-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
-            <button class="btn btn-primary" onclick="searchActivityForDistance()"><i class="ti ti-search"></i> Load Activity</button>
-          </div>
-          
-          <div id="dist-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
-          
-          <!-- Activity details section -->
-          <div id="dist-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
-            <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
-              <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="dist-athlete-name">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="dist-act-name">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="dist-act-date">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Current Distance:</strong> <span id="dist-current-val" style="font-weight:700;color:var(--brand)">—</span></div>
-            </div>
-            <div id="dist-backup-note" style="display:none;margin-top:12px;padding:8px 12px;background:#EFF6FF;border-left:3px solid #3B82F6;border-radius:4px;font-size:11.5px;color:#1E40AF">
-              ℹ️ Original distance (backed up): <span id="dist-backup-val">0 km</span>
-            </div>
+          <!-- Mode Selector -->
+          <div style="display:flex;gap:16px;margin-bottom:20px;font-size:13px;color:var(--text-secondary)">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600">
+              <input type="radio" name="dist-mode" value="single" checked onchange="toggleDistMode('single')"> Single Activity Override
+            </label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600">
+              <input type="radio" name="dist-mode" value="bulk" onchange="toggleDistMode('bulk')"> Bulk Upload CSV
+            </label>
           </div>
 
-          <!-- New Distance Form -->
-          <div id="dist-form-section" style="display:none">
-            <div style="max-width:350px;margin-bottom:16px">
-              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">New Distance (in Kilometers)</label>
-              <input type="number" id="dist-new-val" step="0.01" min="0.01" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. 5.25">
+          <!-- Single Mode Area -->
+          <div id="dist-single-area">
+            <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
+              <input type="text" id="dist-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
+              <button class="btn btn-primary" onclick="searchActivityForDistance()"><i class="ti ti-search"></i> Load Activity</button>
             </div>
             
-            <button class="btn btn-primary" onclick="previewDistanceChange()"><i class="ti ti-eye"></i> Preview Distance Change</button>
+            <div id="dist-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
+            
+            <!-- Activity details section -->
+            <div id="dist-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
+              <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
+                <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="dist-athlete-name">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="dist-act-name">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="dist-act-date">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Current Distance:</strong> <span id="dist-current-val" style="font-weight:700;color:var(--brand)">—</span></div>
+              </div>
+              <div id="dist-backup-note" style="display:none;margin-top:12px;padding:8px 12px;background:#EFF6FF;border-left:3px solid #3B82F6;border-radius:4px;font-size:11.5px;color:#1E40AF">
+                ℹ️ Original distance (backed up): <span id="dist-backup-val">0 km</span>
+              </div>
+            </div>
+
+            <!-- New Distance Form -->
+            <div id="dist-form-section" style="display:none">
+              <div style="max-width:350px;margin-bottom:16px">
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">New Distance (in Kilometers)</label>
+                <input type="number" id="dist-new-val" step="0.01" min="0.01" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. 5.25">
+              </div>
+              
+              <button class="btn btn-primary" onclick="previewDistanceChange()"><i class="ti ti-eye"></i> Preview Distance Change</button>
+            </div>
+
+            <!-- Preview box -->
+            <div id="dist-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
+              <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Distance Override</h4>
+              <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Metric</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (meters)</td><td style="padding:8px 0" id="dist-prev-m-before">0 m</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-m-after">0 m</td></tr>
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (KM)</td><td style="padding:8px 0" id="dist-prev-km-before">0 km</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-km-after">0 km</td></tr>
+                </tbody>
+              </table>
+              <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:16px;">
+                ⚠️ Original distance will be safely preserved inside the <code>raw_data.original_distance_before_override</code> JSON field.
+              </div>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" id="dist-apply-btn" onclick="applyDistanceOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
+                <button class="btn btn-ghost" onclick="cancelDistancePreview()">Cancel</button>
+              </div>
+            </div>
           </div>
 
-          <!-- Preview box -->
-          <div id="dist-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
-            <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Distance Override</h4>
-            <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
-              <thead>
-                <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Metric</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (meters)</td><td style="padding:8px 0" id="dist-prev-m-before">0 m</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-m-after">0 m</td></tr>
-                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (KM)</td><td style="padding:8px 0" id="dist-prev-km-before">0 km</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-km-after">0 km</td></tr>
-              </tbody>
-            </table>
-            <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:16px;">
-              ⚠️ Original distance will be safely preserved inside the <code>raw_data.original_distance_before_override</code> JSON field.
+          <!-- Bulk Mode Area -->
+          <div id="dist-bulk-area" style="display:none">
+            <div style="margin-bottom:16px">
+              <button type="button" class="btn btn-ghost" onclick="downloadDistanceTemplate()"><i class="ti ti-download"></i> Download Distance Template CSV</button>
             </div>
-            <div style="display:flex;gap:10px">
-              <button class="btn btn-primary" id="dist-apply-btn" onclick="applyDistanceOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
-              <button class="btn btn-ghost" onclick="cancelDistancePreview()">Cancel</button>
+            
+            <div class="drop-zone" id="dist-dropzone" onclick="document.getElementById('dist-bulk-file').click()" style="margin-bottom:20px">
+              <div class="dz-icon">📄</div>
+              <div class="dz-text" id="dist-dz-text">Click to select Distance CSV or drag &amp; drop here</div>
+              <div class="dz-sub">Format: activity_id, new_distance_km</div>
+            </div>
+            <input type="file" id="dist-bulk-file" accept=".csv" style="display:none" onchange="handleDistBulkCSV(this.files)">
+
+            <!-- Bulk Preview wrap -->
+            <div id="dist-bulk-preview-wrap" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">🔍 Preview Proposed Bulk Distance Changes (No Pagination)</h4>
+                <div style="display:flex;gap:8px">
+                  <button type="button" class="btn btn-ghost" onclick="resetDistBulk()">🗑 Clear</button>
+                  <button type="button" class="btn btn-primary" id="dist-bulk-apply-btn" onclick="applyDistBulk()"><i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates</button>
+                </div>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div id="dist-bulk-progress" style="display:none;margin-bottom:16px;padding:12px;background:#F9FAFB;border:1px solid var(--border);border-radius:8px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:4px">
+                  <span id="dist-bulk-progress-label">Processing updates...</span>
+                  <span id="dist-bulk-progress-pct">0%</span>
+                </div>
+                <div style="height:6px;background:rgba(0,0,0,0.05);border-radius:3px;overflow:hidden">
+                  <div id="dist-bulk-progress-fill" style="width:0;height:100%;background:var(--brand);transition:width 0.15s"></div>
+                </div>
+              </div>
+
+              <div class="preview-wrap" style="max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;">
+                <table>
+                  <thead>
+                    <tr><th>#</th><th>Activity ID</th><th>Athlete Name</th><th>Activity Name</th><th>Old Status / Reason</th><th>New Status / Reason</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="flag-bulk-preview-body"></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -626,74 +684,132 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           </div>
         </div>
         <div class="card-body">
-          <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
-            <input type="text" id="flag-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
-            <button class="btn btn-primary" onclick="searchActivityForFlag()"><i class="ti ti-search"></i> Load Activity</button>
-          </div>
-          
-          <div id="flag-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
-
-          <!-- Activity details section -->
-          <div id="flag-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
-            <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
-              <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="flag-athlete-name">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="flag-act-name">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="flag-act-date">—</span></div>
-              <div><strong style="color:var(--text-secondary)">Current Status:</strong> <span id="flag-current-status" style="font-weight:700;">—</span></div>
-            </div>
-            <div style="margin-top:12px;font-size:13px;">
-              <strong style="color:var(--text-secondary)">Current Flag Reason:</strong> <span id="flag-current-reason" style="font-style:italic;color:#666;">None</span>
-            </div>
+          <!-- Mode Selector -->
+          <div style="display:flex;gap:16px;margin-bottom:20px;font-size:13px;color:var(--text-secondary)">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600">
+              <input type="radio" name="flag-mode" value="single" checked onchange="toggleFlagMode('single')"> Single Activity Moderation
+            </label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600">
+              <input type="radio" name="flag-mode" value="bulk" onchange="toggleFlagMode('bulk')"> Bulk Upload CSV
+            </label>
           </div>
 
-          <!-- Form section -->
-          <div id="flag-form-section" style="display:none">
-            <div style="max-width:350px;margin-bottom:14px">
-              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Status Action</label>
-              <select id="flag-action-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;">
-                <option value="flag">Flag Activity (Disable Points)</option>
-                <option value="clear">Clear / Unflag Activity (Enable Points)</option>
-              </select>
+          <!-- Single Mode Area -->
+          <div id="flag-single-area">
+            <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
+              <input type="text" id="flag-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
+              <button class="btn btn-primary" onclick="searchActivityForFlag()"><i class="ti ti-search"></i> Load Activity</button>
             </div>
             
-            <div style="max-width:550px;margin-bottom:16px">
-              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Flag / Status Reason</label>
-              <input type="text" id="flag-reason-val" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. Over-speed walk / suspected vehicle">
-            </div>
+            <div id="flag-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
 
-            <!-- Standard Flag Reasons Match -->
-            <div style="margin-bottom:20px">
-              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">📌 Match Standard Flag Reasons (Click to autofill):</label>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Walk (>7.5 km/h)', 'flag')">🏃 Over-speed Walk (>7.5 km/h)</button>
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Run (>25 km/h)', 'flag')">⚡ Over-speed Run (>25 km/h)</button>
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Overlapping activity intervals', 'flag')">⏱️ Overlapping activity intervals</button>
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Suspected vehicle / cycling', 'flag')">🚗 Suspected vehicle / cycling</button>
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Distance mismatch / test activity', 'flag')">📏 Distance mismatch / test activity</button>
-                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Manual admin override / correction', 'flag')">🛠️ Manual override</button>
-                <button type="button" class="btn btn-success btn-xs" style="font-size:11px;padding:4px 8px;background:#ECFDF5;color:#059669;margin-bottom:4px;" onclick="autofillFlagReason('Resolved after administrative review', 'clear')">✓ Resolved / Reviewed</button>
+            <!-- Activity details section -->
+            <div id="flag-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
+              <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
+                <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="flag-athlete-name">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="flag-act-name">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="flag-act-date">—</span></div>
+                <div><strong style="color:var(--text-secondary)">Current Status:</strong> <span id="flag-current-status" style="font-weight:700;">—</span></div>
+              </div>
+              <div style="margin-top:12px;font-size:13px;">
+                <strong style="color:var(--text-secondary)">Current Flag Reason:</strong> <span id="flag-current-reason" style="font-style:italic;color:#666;">None</span>
               </div>
             </div>
-            
-            <button class="btn btn-primary" onclick="previewFlagChange()"><i class="ti ti-eye"></i> Preview Status Change</button>
+
+            <!-- Form section -->
+            <div id="flag-form-section" style="display:none">
+              <div style="max-width:350px;margin-bottom:14px">
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Status Action</label>
+                <select id="flag-action-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;">
+                  <option value="flag">Flag Activity (Disable Points)</option>
+                  <option value="clear">Clear / Unflag Activity (Enable Points)</option>
+                </select>
+              </div>
+              
+              <div style="max-width:550px;margin-bottom:16px">
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Flag / Status Reason</label>
+                <input type="text" id="flag-reason-val" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. Over-speed walk / suspected vehicle">
+              </div>
+
+              <!-- Standard Flag Reasons Match -->
+              <div style="margin-bottom:20px">
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">📌 Match Standard Flag Reasons (Click to autofill):</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Walk (>7.5 km/h)', 'flag')">🏃 Over-speed Walk (>7.5 km/h)</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Run (>25 km/h)', 'flag')">⚡ Over-speed Run (>25 km/h)</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Overlapping activity intervals', 'flag')">⏱️ Overlapping activity intervals</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Suspected vehicle / cycling', 'flag')">🚗 Suspected vehicle / cycling</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Distance mismatch / test activity', 'flag')">📏 Distance mismatch / test activity</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Manual admin override / correction', 'flag')">🛠️ Manual override</button>
+                  <button type="button" class="btn btn-success btn-xs" style="font-size:11px;padding:4px 8px;background:#ECFDF5;color:#059669;margin-bottom:4px;" onclick="autofillFlagReason('Resolved after administrative review', 'clear')">✓ Resolved / Reviewed</button>
+                </div>
+              </div>
+              
+              <button class="btn btn-primary" onclick="previewFlagChange()"><i class="ti ti-eye"></i> Preview Status Change</button>
+            </div>
+
+            <!-- Preview card -->
+            <div id="flag-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
+              <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Status Override</h4>
+              <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Field</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Status</td><td style="padding:8px 0" id="flag-prev-status-before">—</td><td style="padding:8px 0;font-weight:700;color:#DC2626" id="flag-prev-status-after">—</td></tr>
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Reason</td><td style="padding:8px 0;font-style:italic;" id="flag-prev-reason-before">—</td><td style="padding:8px 0;font-weight:700;color:var(--text-primary)" id="flag-prev-reason-after">—</td></tr>
+                </tbody>
+              </table>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" id="flag-apply-btn" onclick="applyFlagOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
+                <button class="btn btn-ghost" onclick="cancelFlagPreview()">Cancel</button>
+              </div>
+            </div>
           </div>
 
-          <!-- Preview card -->
-          <div id="flag-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
-            <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Status Override</h4>
-            <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
-              <thead>
-                <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Field</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Status</td><td style="padding:8px 0" id="flag-prev-status-before">—</td><td style="padding:8px 0;font-weight:700;color:#DC2626" id="flag-prev-status-after">—</td></tr>
-                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Reason</td><td style="padding:8px 0;font-style:italic;" id="flag-prev-reason-before">—</td><td style="padding:8px 0;font-weight:700;color:var(--text-primary)" id="flag-prev-reason-after">—</td></tr>
-              </tbody>
-            </table>
-            <div style="display:flex;gap:10px">
-              <button class="btn btn-primary" id="flag-apply-btn" onclick="applyFlagOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
-              <button class="btn btn-ghost" onclick="cancelFlagPreview()">Cancel</button>
+          <!-- Bulk Mode Area -->
+          <div id="flag-bulk-area" style="display:none">
+            <div style="margin-bottom:16px">
+              <button type="button" class="btn btn-ghost" onclick="downloadFlagTemplate()"><i class="ti ti-download"></i> Download Flag Status Template CSV</button>
+            </div>
+            
+            <div class="drop-zone" id="flag-dropzone" onclick="document.getElementById('flag-bulk-file').click()" style="margin-bottom:20px">
+              <div class="dz-icon">📄</div>
+              <div class="dz-text" id="flag-dz-text">Click to select Flag Status CSV or drag &amp; drop here</div>
+              <div class="dz-sub">Format: activity_id, action (flag/clear), reason</div>
+            </div>
+            <input type="file" id="flag-bulk-file" accept=".csv" style="display:none" onchange="handleFlagBulkCSV(this.files)">
+
+            <!-- Bulk Preview wrap -->
+            <div id="flag-bulk-preview-wrap" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">🔍 Preview Proposed Bulk Flag Changes (No Pagination)</h4>
+                <div style="display:flex;gap:8px">
+                  <button type="button" class="btn btn-ghost" onclick="resetFlagBulk()">🗑 Clear</button>
+                  <button type="button" class="btn btn-primary" id="flag-bulk-apply-btn" onclick="applyFlagBulk()"><i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates</button>
+                </div>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div id="flag-bulk-progress" style="display:none;margin-bottom:16px;padding:12px;background:#F9FAFB;border:1px solid var(--border);border-radius:8px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:4px">
+                  <span id="flag-bulk-progress-label">Processing updates...</span>
+                  <span id="flag-bulk-progress-pct">0%</span>
+                </div>
+                <div style="height:6px;background:rgba(0,0,0,0.05);border-radius:3px;overflow:hidden">
+                  <div id="flag-bulk-progress-fill" style="width:0;height:100%;background:var(--brand);transition:width 0.15s"></div>
+                </div>
+              </div>
+
+              <div class="preview-wrap" style="max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;">
+                <table>
+                  <thead>
+                    <tr><th>#</th><th>Activity ID</th><th>Athlete Name</th><th>Activity Name</th><th>Old Status / Reason</th><th>New Status / Reason</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="flag-bulk-preview-body"></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -1805,6 +1921,478 @@ async function triggerPointsRecalculation() {
     console.error('Recalculation failed:', e);
   }
 }
+
+// ── Bulk override logic ─────────────────────────────────────────
+function toggleDistMode(mode) {
+  if (mode === 'single') {
+    document.getElementById('dist-single-area').style.display = 'block';
+    document.getElementById('dist-bulk-area').style.display = 'none';
+  } else {
+    document.getElementById('dist-single-area').style.display = 'none';
+    document.getElementById('dist-bulk-area').style.display = 'block';
+  }
+}
+
+function toggleFlagMode(mode) {
+  if (mode === 'single') {
+    document.getElementById('flag-single-area').style.display = 'block';
+    document.getElementById('flag-bulk-area').style.display = 'none';
+  } else {
+    document.getElementById('flag-single-area').style.display = 'none';
+    document.getElementById('flag-bulk-area').style.display = 'block';
+  }
+}
+
+function downloadDistanceTemplate() {
+  var header = 'activity_id,new_distance_km';
+  var example = [
+    '19121094120,12.50',
+    '19121094121,5.25'
+  ];
+  var csv = header + '\n' + example.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'bulk_distance_override_template.csv';
+  a.click();
+}
+
+function downloadFlagTemplate() {
+  var header = 'activity_id,action,reason';
+  var example = [
+    '19121094120,flag,Over-speed Walk (>7.5 km/h)',
+    '19121094121,clear,Resolved after administrative review'
+  ];
+  var csv = header + '\n' + example.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'bulk_flag_moderation_template.csv';
+  a.click();
+}
+
+function parseCSV(text) {
+  var lines = text.split('\n');
+  if (lines.length === 0) return [];
+  var headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  var result = [];
+  
+  for (var i = 1; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    var values = line.split(',');
+    var row = {};
+    for (var j = 0; j < headers.length; j++) {
+      row[headers[j]] = values[j] ? values[j].trim() : '';
+    }
+    result.push(row);
+  }
+  return result;
+}
+
+var distBulkRows = [];
+
+async function handleDistBulkCSV(files) {
+  if (files.length === 0) return;
+  var file = files[0];
+  document.getElementById('dist-dz-text').textContent = file.name;
+  
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var text = e.target.result;
+    var rows = parseCSV(text);
+    if (rows.length === 0) {
+      alert('CSV is empty or invalid.');
+      return;
+    }
+    
+    if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('new_distance_km')) {
+      alert('Invalid CSV headers. Must contain: activity_id, new_distance_km');
+      return;
+    }
+    
+    var ids = rows.map(r => r.activity_id).filter(id => id);
+    if (ids.length === 0) {
+      alert('No activity IDs found in CSV.');
+      return;
+    }
+    
+    var dbActivities = {};
+    var chunkSize = 50;
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      var chunk = ids.slice(i, i + chunkSize);
+      try {
+        var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
+        var acts = await res.json();
+        if (Array.isArray(acts)) {
+          acts.forEach(a => {
+            dbActivities[a.strava_activity_id.toString()] = a;
+          });
+        }
+      } catch(err) {
+        console.error('Error fetching activities chunk:', err);
+      }
+    }
+    
+    var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
+    var uniqueAthleteIds = [...new Set(athleteIds)];
+    var registrationNames = {};
+    if (uniqueAthleteIds.length > 0) {
+      for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
+        var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+        try {
+          var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
+          var regs = await rReg.json();
+          if (Array.isArray(regs)) {
+            regs.forEach(r => {
+              registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+            });
+          }
+        } catch(eReg) {
+          console.warn('Failed to load athlete names chunk:', eReg);
+        }
+      }
+    }
+    
+    distBulkRows = [];
+    var tbody = document.getElementById('dist-bulk-preview-body');
+    tbody.innerHTML = '';
+    
+    rows.forEach((r, idx) => {
+      var actId = r.activity_id;
+      var newDistKm = parseFloat(r.new_distance_km);
+      var dbAct = dbActivities[actId];
+      
+      var athleteName = '—';
+      var actName = '—';
+      var oldDistStr = '—';
+      var statusText = 'Ready';
+      var statusColor = '#059669';
+      var isValid = true;
+      
+      if (isNaN(newDistKm) || newDistKm <= 0) {
+        statusText = 'Invalid Distance';
+        statusColor = '#DC2626';
+        isValid = false;
+      }
+      
+      if (!dbAct) {
+        statusText = 'Not Found';
+        statusColor = '#DC2626';
+        isValid = false;
+      } else {
+        athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
+        actName = dbAct.activity_name || '—';
+        oldDistStr = (dbAct.distance_meters / 1000).toFixed(2) + ' km';
+      }
+      
+      var newDistStr = isNaN(newDistKm) ? '—' : newDistKm.toFixed(2) + ' km';
+      
+      var tr = document.createElement('tr');
+      tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><strong>${actId}</strong></td>
+        <td>${athleteName}</td>
+        <td>${actName}</td>
+        <td>${oldDistStr}</td>
+        <td><strong style="color:#059669">${newDistStr}</strong></td>
+        <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
+      `;
+      tbody.appendChild(tr);
+      
+      distBulkRows.push({
+        rowIdx: idx,
+        activityId: actId,
+        newDistanceKm: newDistKm,
+        dbAct: dbAct,
+        isValid: isValid
+      });
+    });
+    
+    document.getElementById('dist-bulk-preview-wrap').style.display = 'block';
+    document.getElementById('dist-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
+  };
+  reader.readAsText(file);
+}
+
+function resetDistBulk() {
+  distBulkRows = [];
+  document.getElementById('dist-bulk-file').value = '';
+  document.getElementById('dist-dz-text').textContent = 'Click to select Distance CSV or drag & drop here';
+  document.getElementById('dist-bulk-preview-wrap').style.display = 'none';
+  document.getElementById('dist-bulk-preview-body').innerHTML = '';
+  document.getElementById('dist-bulk-progress').style.display = 'none';
+}
+
+async function applyDistBulk() {
+  var validRows = distBulkRows.filter(r => r.isValid);
+  if (validRows.length === 0) {
+    alert('No valid rows to import.');
+    return;
+  }
+  
+  if (!confirm('Are you sure you want to apply distance overrides to ' + validRows.length + ' activities?')) {
+    return;
+  }
+  
+  var btn = document.getElementById('dist-bulk-apply-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  
+  var progressDiv = document.getElementById('dist-bulk-progress');
+  var progressLabel = document.getElementById('dist-bulk-progress-label');
+  var progressFill = document.getElementById('dist-bulk-progress-fill');
+  var progressPct = document.getElementById('dist-bulk-progress-pct');
+  
+  progressDiv.style.display = 'block';
+  
+  var processed = 0;
+  var succeeded = 0;
+  var failed = 0;
+  
+  for (var i = 0; i < validRows.length; i++) {
+    var row = validRows[i];
+    var afterM = Math.round(row.newDistanceKm * 1000);
+    
+    var raw = row.dbAct.raw_data || {};
+    if (raw.original_distance_before_override == null) {
+      raw.original_distance_before_override = row.dbAct.distance_meters / 1000;
+    }
+    
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + row.dbAct.id, {
+        method: 'PATCH',
+        headers: HDR,
+        body: JSON.stringify({
+          distance_meters: afterM,
+          raw_data: raw
+        })
+      });
+      if (res.ok) succeeded++; else failed++;
+    } catch(err) {
+      failed++;
+    }
+    
+    processed++;
+    var pct = Math.round((processed / validRows.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+    progressLabel.textContent = 'Processing updates (' + processed + '/' + validRows.length + ')...';
+  }
+  
+  alert('Bulk distance updates finished!\nSucceeded: ' + succeeded + '\nFailed: ' + failed);
+  
+  triggerPointsRecalculation();
+  resetDistBulk();
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates';
+}
+
+var flagBulkRows = [];
+
+async function handleFlagBulkCSV(files) {
+  if (files.length === 0) return;
+  var file = files[0];
+  document.getElementById('flag-dz-text').textContent = file.name;
+  
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var text = e.target.result;
+    var rows = parseCSV(text);
+    if (rows.length === 0) {
+      alert('CSV is empty or invalid.');
+      return;
+    }
+    
+    if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('action') || !rows[0].hasOwnProperty('reason')) {
+      alert('Invalid CSV headers. Must contain: activity_id, action, reason');
+      return;
+    }
+    
+    var ids = rows.map(r => r.activity_id).filter(id => id);
+    if (ids.length === 0) {
+      alert('No activity IDs found in CSV.');
+      return;
+    }
+    
+    var dbActivities = {};
+    var chunkSize = 50;
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      var chunk = ids.slice(i, i + chunkSize);
+      try {
+        var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=in.(' + chunk.join(',') + ')&select=*', { headers: HDR });
+        var acts = await res.json();
+        if (Array.isArray(acts)) {
+          acts.forEach(a => {
+            dbActivities[a.strava_activity_id.toString()] = a;
+          });
+        }
+      } catch(err) {
+        console.error('Error fetching activities chunk:', err);
+      }
+    }
+    
+    var athleteIds = Object.values(dbActivities).map(a => a.strava_athlete_id);
+    var uniqueAthleteIds = [...new Set(athleteIds)];
+    var registrationNames = {};
+    if (uniqueAthleteIds.length > 0) {
+      for (var i = 0; i < uniqueAthleteIds.length; i += chunkSize) {
+        var chunk = uniqueAthleteIds.slice(i, i + chunkSize);
+        try {
+          var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=in.(' + chunk.join(',') + ')&select=strava_athlete_id,full_name', { headers: HDR });
+          var regs = await rReg.json();
+          if (Array.isArray(regs)) {
+            regs.forEach(r => {
+              registrationNames[r.strava_athlete_id.toString()] = r.full_name;
+            });
+          }
+        } catch(eReg) {
+          console.warn('Failed to load athlete names chunk:', eReg);
+        }
+      }
+    }
+    
+    flagBulkRows = [];
+    var tbody = document.getElementById('flag-bulk-preview-body');
+    tbody.innerHTML = '';
+    
+    rows.forEach((r, idx) => {
+      var actId = r.activity_id;
+      var csvAction = (r.action || '').trim().toLowerCase();
+      var csvReason = (r.reason || '').trim();
+      var dbAct = dbActivities[actId];
+      
+      var athleteName = '—';
+      var actName = '—';
+      var oldStatusStr = '—';
+      var statusText = 'Ready';
+      var statusColor = '#059669';
+      var isValid = true;
+      
+      if (csvAction !== 'flag' && csvAction !== 'clear') {
+        statusText = 'Invalid Action';
+        statusColor = '#DC2626';
+        isValid = false;
+      }
+      
+      if (csvAction === 'flag' && !csvReason) {
+        statusText = 'Reason Required';
+        statusColor = '#DC2626';
+        isValid = false;
+      }
+      
+      if (!dbAct) {
+        statusText = 'Not Found';
+        statusColor = '#DC2626';
+        isValid = false;
+      } else {
+        athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
+        actName = dbAct.activity_name || '—';
+        var wasFlagged = dbAct.is_flagged === true || dbAct.is_flagged === 'true';
+        oldStatusStr = wasFlagged ? `Flagged 🚩 (${dbAct.flag_reason || 'No Reason'})` : 'Clear ✓';
+      }
+      
+      var proposedStatusStr = (csvAction === 'flag') ? `Flagged 🚩 (${csvReason})` : 'Clear ✓';
+      
+      var tr = document.createElement('tr');
+      tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><strong>${actId}</strong></td>
+        <td>${athleteName}</td>
+        <td>${actName}</td>
+        <td>${oldStatusStr}</td>
+        <td><strong style="color:${csvAction === 'flag' ? '#DC2626' : '#059669'}">${proposedStatusStr}</strong></td>
+        <td><span style="font-weight:600;color:${statusColor}">${statusText}</span></td>
+      `;
+      tbody.appendChild(tr);
+      
+      flagBulkRows.push({
+        rowIdx: idx,
+        activityId: actId,
+        action: csvAction,
+        reason: csvReason,
+        dbAct: dbAct,
+        isValid: isValid
+      });
+    });
+    
+    document.getElementById('flag-bulk-preview-wrap').style.display = 'block';
+    document.getElementById('flag-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
+  };
+  reader.readAsText(file);
+}
+
+function resetFlagBulk() {
+  flagBulkRows = [];
+  document.getElementById('flag-bulk-file').value = '';
+  document.getElementById('flag-dz-text').textContent = 'Click to select Flag Status CSV or drag & drop here';
+  document.getElementById('flag-bulk-preview-wrap').style.display = 'none';
+  document.getElementById('flag-bulk-preview-body').innerHTML = '';
+  document.getElementById('flag-bulk-progress').style.display = 'none';
+}
+
+async function applyFlagBulk() {
+  var validRows = flagBulkRows.filter(r => r.isValid);
+  if (validRows.length === 0) {
+    alert('No valid rows to import.');
+    return;
+  }
+  
+  if (!confirm('Are you sure you want to apply status overrides to ' + validRows.length + ' activities?')) {
+    return;
+  }
+  
+  var btn = document.getElementById('flag-bulk-apply-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  
+  var progressDiv = document.getElementById('flag-bulk-progress');
+  var progressLabel = document.getElementById('flag-bulk-progress-label');
+  var progressFill = document.getElementById('flag-bulk-progress-fill');
+  var progressPct = document.getElementById('flag-bulk-progress-pct');
+  
+  progressDiv.style.display = 'block';
+  
+  var processed = 0;
+  var succeeded = 0;
+  var failed = 0;
+  
+  for (var i = 0; i < validRows.length; i++) {
+    var row = validRows[i];
+    var isFlagged = (row.action === 'flag');
+    var finalReason = isFlagged ? row.reason : (row.reason || null);
+    
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + row.dbAct.id, {
+        method: 'PATCH',
+        headers: HDR,
+        body: JSON.stringify({
+          is_flagged: isFlagged,
+          flag_reason: finalReason
+        })
+      });
+      if (res.ok) succeeded++; else failed++;
+    } catch(err) {
+      failed++;
+    }
+    
+    processed++;
+    var pct = Math.round((processed / validRows.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+    progressLabel.textContent = 'Processing updates (' + processed + '/' + validRows.length + ')...';
+  }
+  
+  alert('Bulk status updates finished!\nSucceeded: ' + succeeded + '\nFailed: ' + failed);
+  
+  triggerPointsRecalculation();
+  resetFlagBulk();
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates';
+}
+
 </script>
 </body>
 </html>
