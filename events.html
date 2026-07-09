@@ -225,6 +225,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <button type="button" class="stab" data-tab="scoring" onclick="switchEditorTab('scoring')"><i class="ti ti-medal"></i> Scoring & Medals</button>
     <button type="button" class="stab" data-tab="challenges" onclick="switchEditorTab('challenges')"><i class="ti ti-target-arrow"></i> Challenges</button>
     <button type="button" class="stab" data-tab="layout" onclick="switchEditorTab('layout')"><i class="ti ti-palette"></i> App Layout</button>
+    <button type="button" class="stab" data-tab="manual-bonus" id="tab-btn-manual-bonus" style="display:none" onclick="switchEditorTab('manual-bonus')"><i class="ti ti-gift"></i> Manual Bonuses</button>
   </div>
 
   <!-- Tab Panel 1: Basic Info -->
@@ -582,7 +583,46 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         </label>
       </div>
     </div>
+  </div>
 
+  <!-- Tab Panel 6: Manual Bonuses -->
+  <div class="editor-tab-panel" id="editor-tab-panel-manual-bonus" style="display:none">
+    <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-gift"></i> Apply Manual Bonus Points</h3>
+      <p style="font-size: 12px; color: #666; margin-bottom: 14px;">Award direct bonus points to specific Strava activities for this event.</p>
+      
+      <div class="grid" style="margin-bottom:18px">
+        <div class="fld" style="grid-column: 1 / -1;">
+          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Activity ID(s) (comma, space, or newline separated)</label>
+          <textarea id="manual-ids" rows="3" style="width:100%; padding:10px; border:1px solid #e8e8e8; border-radius:8px; font-size:13px; font-family:monospace; resize:vertical" placeholder="e.g. 12055574519, 12055574520"></textarea>
+        </div>
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Bonus Points</label>
+          <input type="number" id="manual-pts" value="5" min="1" style="width:100%; padding:10px; border:1px solid #e8e8e8; border-radius:8px; font-size:13px;">
+        </div>
+        <div class="fld">
+          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Effective Date</label>
+          <input type="date" id="manual-date" style="width:100%; padding:10px; border:1px solid #e8e8e8; border-radius:8px; font-size:13px;">
+        </div>
+        <div class="fld" style="grid-column: 1 / -1;">
+          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Description / Reason</label>
+          <input type="text" id="manual-reason" placeholder="e.g., Volunteer Marshalling Bonus" style="width:100%; padding:10px; border:1px solid #e8e8e8; border-radius:8px; font-size:13px;">
+        </div>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="btn btn-primary" onclick="saveManualBonus()"><i class="ti ti-check"></i> Apply Manual Bonus</button>
+        <span class="saved-msg" id="manual-saved" style="display:none; color: #10B981; font-weight: 600;">✅ Applied!</span>
+      </div>
+      <div id="manual-result" class="msg info" style="margin-top: 10px; font-size: 13px; color: #555;"></div>
+    </div>
+    
+    <div class="edit-group" style="border-left: 4px solid #3B82F6; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #3B82F6; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-list"></i> Applied Manual Bonuses (Recent 50)</h3>
+      <div id="manual-list">
+        <p style="color:#bbb; font-size:13px">Loading manual bonuses...</p>
+      </div>
+    </div>
   </div>
 
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
@@ -1653,6 +1693,14 @@ async function openEditor(ev){
     });
   }
 
+  var tabBtn = document.getElementById('tab-btn-manual-bonus');
+  if (ev) {
+    if (tabBtn) tabBtn.style.display = 'inline-flex';
+    loadManualBonuses();
+  } else {
+    if (tabBtn) tabBtn.style.display = 'none';
+  }
+
   document.getElementById('editor').classList.add('open');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1786,7 +1834,6 @@ async function saveEvent() {
         upsertConfigValue('tabs_config', tabsCfg, savedEventId),
         upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
       ]);
-      
       // Trigger points backfill asynchronously so it doesn't block the frontend save UI/collapse action
       fetch(BACKEND + '/admin/backfill-points', {
         method: 'POST',
@@ -1960,6 +2007,145 @@ async function loadActivityStatsForEvent(ev) {
     if (badgeErr) badgeErr.innerHTML = '<i class="ti ti-alert-triangle"></i> Error';
     var panelErr = document.getElementById('ev-act-panel-' + ev.id);
     if (panelErr) panelErr.innerHTML = '<span style="color:#c62828;font-size:12px;">Failed to load activity stats</span>';
+  }
+}
+
+async function saveManualBonus() {
+  var idsRaw = document.getElementById('manual-ids').value.trim();
+  var pts = parseInt(document.getElementById('manual-pts').value) || 0;
+  var date = document.getElementById('manual-date').value;
+  var reason = document.getElementById('manual-reason').value.trim() || 'Manual bonus';
+  
+  if (!idsRaw || !pts) {
+    alert('Please enter activity IDs and bonus points');
+    return;
+  }
+  if (!date) {
+    alert('Please enter an effective date for the manual bonus/challenge');
+    return;
+  }
+  if (!editId) {
+    alert('No event currently loaded to apply manual bonus to.');
+    return;
+  }
+  
+  var ids = idsRaw.split(/[\n,\s]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+  var resultEl = document.getElementById('manual-result');
+  resultEl.textContent = 'Processing ' + ids.length + ' activities...';
+  
+  var success = 0, failed = 0;
+  for (var i = 0; i < ids.length; i++) {
+    try {
+      var r = await fetch(SB_URL + '/rest/v1/activities?strava_activity_id=eq.' + ids[i] + '&select=id,manual_bonus,flag_reason', { headers: HDR });
+      var rows = await r.json();
+      if (!rows || rows.length === 0) {
+        failed++;
+        continue;
+      }
+      var row = rows[0];
+      await fetch(SB_URL + '/rest/v1/activities?id=eq.' + row.id, {
+        method: 'PATCH',
+        headers: HDR,
+        body: JSON.stringify({ manual_bonus: pts, description: reason })
+      });
+      success++;
+    } catch(e) {
+      failed++;
+    }
+  }
+  
+  if (success > 0) {
+    try {
+      await fetch(SB_URL + '/rest/v1/challenges', {
+        method: 'POST',
+        headers: Object.assign({}, HDR, { Prefer: 'return=representation' }),
+        body: JSON.stringify({
+          name: reason,
+          start_date: date,
+          end_date: date,
+          bonus_points: pts,
+          eligible: 'all',
+          activity_scope: 'single',
+          distance_type: 'fixed',
+          distance_min: 5,
+          distance_max: 5,
+          elevation_criteria: 0,
+          is_active: true,
+          range_split: false,
+          event_id: editId
+        })
+      });
+      
+      // Reload challenges tab in UI
+      var chRes = await fetch(SB_URL + '/rest/v1/challenges?event_id=eq.' + editId + '&select=*&order=start_date.asc', { headers: HDR });
+      var chData = await chRes.json();
+      _challengesData = Array.isArray(chData) ? chData : [];
+      renderChallengesUI();
+    } catch(e) {
+      console.error('Auto challenge creation failed:', e);
+    }
+  }
+  
+  resultEl.innerHTML = '✅ Applied to ' + success + ' activities and created challenge' + (failed ? ' | ❌ ' + failed + ' not found' : '');
+  
+  var el = document.getElementById('manual-saved');
+  if (el) {
+    el.style.display = 'inline';
+    setTimeout(function() { el.style.display = 'none'; }, 2000);
+  }
+  
+  document.getElementById('manual-ids').value = '';
+  loadManualBonuses();
+}
+
+async function loadManualBonuses() {
+  if (!editId) return;
+  var container = document.getElementById('manual-list');
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/activities?event_id=eq.' + editId + '&manual_bonus=gt.0&select=strava_activity_id,activity_name,manual_bonus&order=manual_bonus.desc&limit=50', { headers: HDR });
+    var rows = await r.json();
+    
+    if (!Array.isArray(rows) || rows.length === 0) {
+      container.innerHTML = '<p style="color:#bbb;font-size:13px">No manual bonuses applied yet for this event.</p>';
+      return;
+    }
+    
+    container.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
+      '<thead><tr style="background:#fafafa">' +
+        '<th style="padding:8px 12px;text-align:left;color:#888;font-size:11px">Activity ID</th>' +
+        '<th style="padding:8px 12px;text-align:left;color:#888;font-size:11px">Name</th>' +
+        '<th style="padding:8px 12px;text-align:left;color:#888;font-size:11px">Bonus Pts</th>' +
+        '<th style="padding:8px 12px;text-align:left;color:#888;font-size:11px">Action</th>' +
+      '</tr></thead><tbody>' +
+      rows.map(function(row) {
+        return '<tr style="border-bottom:1px solid #f5f5f5">' +
+          '<td style="padding:8px 12px"><a href="https://www.strava.com/activities/' + row.strava_activity_id + '" target="_blank" style="color:#E8622A;text-decoration:none;font-weight:500;">' + row.strava_activity_id + '</a></td>' +
+          '<td style="padding:8px 12px">' + esc(row.activity_name || '—') + '</td>' +
+          '<td style="padding:8px 12px;font-weight:700;color:#1565c0">+' + row.manual_bonus + '</td>' +
+          '<td style="padding:8px 12px"><button type="button" style="padding:4px 10px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;cursor:pointer" onclick="clearManualBonus(' + row.strava_activity_id + ')">Clear</button></td>' +
+        '</tr>';
+      }).join('') +
+      '</tbody></table>';
+  } catch(e) {
+    container.innerHTML = '<p style="color:#bbb;font-size:13px">Could not load manual bonuses.</p>';
+  }
+}
+
+async function clearManualBonus(activityId) {
+  if (!confirm('Clear manual bonus for activity ' + activityId + '?')) return;
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/activities?strava_activity_id=eq.' + activityId + '&select=id', { headers: HDR });
+    var rows = await r.json();
+    if (rows && rows[0]) {
+      await fetch(SB_URL + '/rest/v1/activities?id=eq.' + rows[0].id, {
+        method: 'PATCH',
+        headers: HDR,
+        body: JSON.stringify({ manual_bonus: 0, description: null })
+      });
+      loadManualBonuses();
+    }
+  } catch(e) {
+    alert('Failed to clear manual bonus: ' + e.message);
   }
 }
 
