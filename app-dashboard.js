@@ -131,6 +131,7 @@
         im.style.maxHeight = '34px';
         im.style.height = 'auto';
         im.style.width = 'auto';
+        im.style.filter = (ev.rules_config.logo_filter === 'invert') ? 'brightness(0) invert(1)' : '';
       }
     } else if (ev.rules_config && ev.rules_config.display_name) {
       if (im) im.style.display = 'none';
