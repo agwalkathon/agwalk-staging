@@ -2392,22 +2392,111 @@
   }
   .detail-desc-card {
     background: var(--surface);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
+    border-left: 3px solid var(--brand);
+    border-radius: 0 12px 12px 0;
+    padding: 12px 14px;
+    margin-bottom: 14px;
   }
   .detail-desc-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
     margin-bottom: 6px;
   }
   .detail-desc-text {
     font-size: 13.5px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
     line-height: 1.5;
     font-style: italic;
+  }
+  .detail-hero-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
+  }
+  .detail-hero-val {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+  .detail-hero-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 6px;
+  }
+  .detail-trend-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .detail-trend-pill.up {
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.25);
+    color: var(--green);
+  }
+  .detail-trend-pill.down {
+    background: rgba(226,75,74,0.12);
+    border: 1px solid rgba(226,75,74,0.25);
+    color: #E24B4A;
+  }
+  .detail-milestone-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
+  }
+  .detail-keystats-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    padding-bottom: 2px;
+  }
+  .detail-keystat-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 10px 12px;
+    min-width: 84px;
+    flex-shrink: 0;
+  }
+  .detail-keystat-val {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    margin-top: 6px;
+  }
+  .detail-keystat-label {
+    color: rgba(255,255,255,0.4);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 1px;
+  }
+  .detail-chart-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
   }
   .splits-table {
     width: 100%;

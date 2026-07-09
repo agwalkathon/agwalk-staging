@@ -71,6 +71,10 @@ function openActivityDetail(id, event, isStravaId) {
       if (el) el.innerText = '—';
     });
     document.getElementById('detail-desc-box').style.display = 'none';
+    document.getElementById('detail-hero-card').style.display = 'none';
+    document.getElementById('detail-milestone-card').style.display = 'none';
+    document.getElementById('detail-keystats-section').style.display = 'none';
+    document.getElementById('detail-chart-card').style.display = 'none';
     document.getElementById('detail-appreciation-box').innerHTML = '';
     
     // Hide best efforts and photos on load
@@ -186,11 +190,89 @@ function openActivityDetail(id, event, isStravaId) {
 
       var descBox = document.getElementById('detail-desc-box');
       if (act.description) {
-        document.getElementById('detail-desc-text').innerText = act.description;
+        document.getElementById('detail-desc-content').innerText = act.description;
         descBox.style.display = 'block';
       } else {
         descBox.style.display = 'none';
       }
+
+      // Hero distance card + trend vs this athlete's own average
+      var heroCard = document.getElementById('detail-hero-card');
+      var heroTrend = document.getElementById('detail-hero-trend');
+      if (distanceKmVal > 0) {
+        document.getElementById('detail-hero-dist').innerHTML = distanceKmVal.toFixed(2) + '<span style="font-size:14px;color:rgba(255,255,255,0.5);"> km</span>';
+        heroCard.style.display = 'flex';
+        try {
+          var athId = act.strava_athlete_id;
+          var myOtherActs = (Array.isArray(LB_ACTS) ? LB_ACTS : []).filter(function(a){
+            return String(a.strava_athlete_id) === String(athId) && String(a.id) !== String(act.id) && !a.is_deleted && !a.is_flagged;
+          });
+          if (myOtherActs.length >= 2) {
+            var avgKm = myOtherActs.reduce(function(s,a){ return s + (parseFloat(a.distance_meters)||0)/1000; }, 0) / myOtherActs.length;
+            if (avgKm > 0) {
+              var pct = Math.round(((distanceKmVal - avgKm) / avgKm) * 100);
+              heroTrend.className = 'detail-trend-pill ' + (pct >= 0 ? 'up' : 'down');
+              var arrow = pct >= 0
+                ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
+                : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+              heroTrend.innerHTML = arrow + '<span>' + Math.abs(pct) + '% vs avg</span>';
+              heroTrend.style.display = 'flex';
+            } else { heroTrend.style.display = 'none'; }
+          } else { heroTrend.style.display = 'none'; }
+        } catch(e) { heroTrend.style.display = 'none'; }
+      } else {
+        heroCard.style.display = 'none';
+      }
+
+      // Milestone card — next distance-club threshold for this athlete
+      var msCard = document.getElementById('detail-milestone-card');
+      try {
+        var athId2 = act.strava_athlete_id;
+        var allMine = (Array.isArray(LB_ACTS) ? LB_ACTS : []).filter(function(a){
+          return String(a.strava_athlete_id) === String(athId2) && !a.is_deleted && !a.is_flagged;
+        });
+        var totalKm = allMine.reduce(function(s,a){ return s + (parseFloat(a.distance_meters)||0)/1000; }, 0);
+        var clubThresholds = [50,100,150,200,250,300,350,400,450,500];
+        var nextClub = clubThresholds.find(function(t){ return t > totalKm; });
+        if (nextClub) {
+          var prevClub = clubThresholds[clubThresholds.indexOf(nextClub) - 1] || 0;
+          var span = nextClub - prevClub;
+          var progressed = totalKm - prevClub;
+          var pctDone = Math.max(0, Math.min(1, progressed / span));
+          var remainingKm = Math.max(0, nextClub - totalKm);
+          document.getElementById('detail-milestone-title').innerText = Math.round(totalKm) + ' / ' + nextClub + ' km';
+          document.getElementById('detail-milestone-sub').innerText = remainingKm.toFixed(1) + ' km to your next distance club';
+          var arcEl = document.getElementById('detail-milestone-arc');
+          var circumference = 2 * Math.PI * 10;
+          arcEl.setAttribute('stroke-dasharray', (pctDone * circumference).toFixed(1) + ' ' + circumference.toFixed(1));
+          msCard.style.display = 'flex';
+        } else {
+          msCard.style.display = 'none';
+        }
+      } catch(e) { msCard.style.display = 'none'; }
+
+      // Key stats scroll row (calories, avg HR, elevation, cadence)
+      var ksSection = document.getElementById('detail-keystats-section');
+      var ksRow = document.getElementById('detail-keystats-row');
+      ksRow.innerHTML = '';
+      var ksItems = [];
+      if (caloriesVal) ksItems.push({ icon:'<path d="M12 2s5 5.5 5 10a5 5 0 0 1-10 0c0-1.4.6-2.6 1.4-3.7.2 1 .9 1.7 1.6 1.7.9 0 1-1 .8-2C10.4 6.4 12 2 12 2z"/>', color:'#EF9F27', val: Math.round(caloriesVal), label:'Calories' });
+      if (avgHrVal) ksItems.push({ icon:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>', color:'#E24B4A', val: Math.round(avgHrVal), label:'Avg HR' });
+      if (elevVal) ksItems.push({ icon:'<path d="M3 20l6-11 4 7 3-5 5 9H3z"/>', color:'#639922', val: Math.round(elevVal) + ' m', label:'Elevation' });
+      if (cadenceVal) ksItems.push({ icon:'<path d="M8 2v4M16 2v4M4 8c2 2 4-2 6 0s4-2 6 0 4-2 4 0M4 14c2 2 4-2 6 0s4-2 6 0 4-2 4 0M4 20c2 2 4-2 6 0s4-2 6 0 4-2 4 0"/>', color:'#378ADD', val: Math.round(cadenceVal*2) + ' spm', label:'Cadence' });
+      if (ksItems.length) {
+        ksItems.forEach(function(it){
+          ksRow.innerHTML += '<div class="detail-keystat-card">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + it.color + '" stroke-width="2">' + it.icon + '</svg>' +
+            '<div class="detail-keystat-val">' + it.val + '</div>' +
+            '<div class="detail-keystat-label">' + it.label + '</div>' +
+          '</div>';
+        });
+        ksSection.style.display = 'block';
+      } else {
+        ksSection.style.display = 'none';
+      }
+
 
       // Best Efforts Grid rendering
       var bestEffSection = document.getElementById('detail-best-efforts-section');
@@ -402,7 +484,42 @@ function openActivityDetail(id, event, isStravaId) {
               }
 
               var hasHR = displaySplits.some(function(s) { return s.average_heartrate !== null && s.average_heartrate !== undefined && s.average_heartrate > 0; });
-              
+
+              // Pace chart (skip for rides, which use speed instead)
+              var chartCard = document.getElementById('detail-chart-card');
+              if (!isRide && displaySplits.length >= 2 && chartCard) {
+                var paceSecs = displaySplits.map(function(s){
+                  var dKm = (s.distance_meters || 0) / 1000;
+                  var mSec = s.moving_time_seconds || 0;
+                  return (dKm > 0 && mSec > 0) ? (mSec / dKm) : null;
+                }).filter(function(v){ return v !== null; });
+                if (paceSecs.length >= 2) {
+                  var minPace = Math.min.apply(null, paceSecs);
+                  var maxPace = Math.max.apply(null, paceSecs);
+                  var range = Math.max(1, maxPace - minPace);
+                  var n = paceSecs.length;
+                  var stepX = 300 / (n - 1);
+                  var pts = paceSecs.map(function(p, i){
+                    var x = (i * stepX).toFixed(1);
+                    // Faster pace (lower seconds) draws higher on the chart
+                    var y = (10 + ((p - minPace) / range) * 40).toFixed(1);
+                    return x + ',' + y;
+                  });
+                  var linePath = 'M' + pts.join(' L');
+                  var areaPath = linePath + ' L300,60 L0,60 Z';
+                  var svgEl = document.getElementById('detail-chart-svg');
+                  svgEl.innerHTML =
+                    '<path d="' + areaPath + '" fill="var(--brand)" opacity="0.12"></path>' +
+                    '<path d="' + linePath + '" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>';
+                  var avgPaceSec = paceSecs.reduce(function(a,b){return a+b;},0) / n;
+                  var avgMin = Math.floor(avgPaceSec / 60);
+                  var avgRem = Math.round(avgPaceSec % 60);
+                  if (avgRem < 10) avgRem = '0' + avgRem;
+                  document.getElementById('detail-chart-avg').innerText = 'avg ' + avgMin + ':' + avgRem + '/km';
+                  chartCard.style.display = 'block';
+                }
+              }
+
               var html = '<table class="splits-table"><thead><tr>' +
                 '<th style="text-align:left;">Split #</th>' +
                 '<th style="text-align:left;">Distance</th>';

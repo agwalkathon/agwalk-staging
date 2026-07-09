@@ -83,7 +83,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260709_v155">
+  <link rel="stylesheet" href="app.css?v=20260709_v156">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -879,7 +879,7 @@
   <script src="app-config.js?v=20260709_v150" defer></script>
   <script src="app-employee.js?v=20260709_v149" defer></script>
   <script src="app-api.js?v=20260709_v149" defer></script>
-  <script src="app-drawers.js?v=20260709_v149" defer></script>
+  <script src="app-drawers.js?v=20260709_v156" defer></script>
   <script src="app-events.js?v=20260709_v151" defer></script>
   <script src="app-dashboard.js?v=20260709_v152" defer></script>
   <script src="app-tabs.js?v=20260709_v149" defer></script>
@@ -955,16 +955,49 @@
         <div id="detail-title" style="font-size:18px; font-weight: 700; color:#fff; line-height:1.35;">Evening Walk</div>
         <div id="detail-started-info" style="font-size:12.5px; color:var(--muted); margin-top:4px;">Started Info</div>
       </div>
-      
-      <!-- Description/Notes (moved above Activity Status Row) -->
-      <div id="detail-desc-box" style="display:none; margin-bottom:16px;">
-        <div class="detail-metrics-title" style="margin-top:0;">Activity Notes</div>
-        <div class="detail-desc-card" style="margin-bottom:0;">
-          <div class="detail-desc-title" id="detail-desc-title">Evening Walk</div>
-          <div class="detail-desc-text" id="detail-desc-content">—</div>
+
+      <!-- Description/Notes (above the hero stat card) -->
+      <div id="detail-desc-box" class="detail-desc-card" style="display:none;">
+        <div class="detail-desc-title" id="detail-desc-title">Notes</div>
+        <div class="detail-desc-text" id="detail-desc-content">—</div>
+      </div>
+
+      <!-- Hero Distance Card -->
+      <div id="detail-hero-card" class="detail-hero-card" style="display:none;">
+        <div>
+          <div class="detail-hero-val" id="detail-hero-dist">—</div>
+          <div class="detail-hero-label">Distance</div>
+        </div>
+        <div id="detail-hero-trend" class="detail-trend-pill" style="display:none;"></div>
+      </div>
+
+      <!-- Milestone Card -->
+      <div id="detail-milestone-card" class="detail-milestone-card" style="display:none;">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10" stroke="var(--brand-dim)" stroke-width="2.5"/>
+          <path id="detail-milestone-arc" d="M12 2a10 10 0 0 1 7 17" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div style="flex:1;">
+          <div id="detail-milestone-title" style="color:#fff; font-size:14px; font-weight:800;">—</div>
+          <div id="detail-milestone-sub" style="color:var(--muted); font-size:11px; margin-top:2px;">—</div>
         </div>
       </div>
-      
+
+      <!-- Key Stats Scroll Row -->
+      <div id="detail-keystats-section" style="display:none;">
+        <div class="detail-metrics-title" style="border-bottom:none; margin-bottom:8px;">Key Stats</div>
+        <div id="detail-keystats-row" class="detail-keystats-row"></div>
+      </div>
+
+      <!-- Pace/Effort Chart -->
+      <div id="detail-chart-card" class="detail-chart-card" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="detail-metrics-title" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">Pace per km</span>
+          <span id="detail-chart-avg" style="color:var(--muted); font-size:10.5px;"></span>
+        </div>
+        <svg id="detail-chart-svg" viewBox="0 0 300 60" width="100%" height="60" preserveAspectRatio="none"></svg>
+      </div>
+
       <!-- Activity Status Row -->
       <div id="detail-status-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:16px;">
         <div style="font-size:10.5px; font-weight:700; color:var(--label); text-transform:uppercase; letter-spacing:0.8px;">Activity Status</div>
@@ -973,10 +1006,6 @@
       
       <!-- Fields Grid -->
       <div class="detail-fields-grid">
-        <div class="detail-field-item" id="det-dist-wrap">
-          <div class="detail-field-label">Distance</div>
-          <div class="detail-field-val" id="det-dist">—</div>
-        </div>
         <div class="detail-field-item" id="det-pace-wrap">
           <div class="detail-field-label">Pace</div>
           <div class="detail-field-val" id="det-pace">—</div>
@@ -989,17 +1018,9 @@
           <div class="detail-field-label">Elapsed Time</div>
           <div class="detail-field-val" id="det-elapsed">—</div>
         </div>
-        <div class="detail-field-item" id="det-hr-wrap">
-          <div class="detail-field-label">Avg Heart Rate</div>
-          <div class="detail-field-val" id="det-avghr">—</div>
-        </div>
         <div class="detail-field-item" id="det-maxhr-wrap">
           <div class="detail-field-label">Max Heart Rate</div>
           <div class="detail-field-val" id="det-maxhr">—</div>
-        </div>
-        <div class="detail-field-item" id="det-cadence-wrap">
-          <div class="detail-field-label">Avg Cadence</div>
-          <div class="detail-field-val" id="det-cadence">—</div>
         </div>
         <div class="detail-field-item" id="det-stravasteps-wrap">
           <div class="detail-field-label">Strava Steps</div>
@@ -1009,17 +1030,30 @@
           <div class="detail-field-label">Calculated Steps</div>
           <div class="detail-field-val" id="det-calcsteps">—</div>
         </div>
-        <div class="detail-field-item" id="det-elevation-wrap">
-          <div class="detail-field-label">Elevation</div>
-          <div class="detail-field-val" id="det-elevation">—</div>
-        </div>
-        <div class="detail-field-item" id="det-calories-wrap">
-          <div class="detail-field-label">Calories</div>
-          <div class="detail-field-val" id="det-calories">—</div>
-        </div>
         <div class="detail-field-item" id="det-device-wrap">
           <div class="detail-field-label">Device</div>
           <div class="detail-field-val" id="det-device">—</div>
+        </div>
+        <!-- Kept hidden, values still populated for share-card/back-compat -->
+        <div class="detail-field-item" id="det-dist-wrap" style="display:none;">
+          <div class="detail-field-label">Distance</div>
+          <div class="detail-field-val" id="det-dist">—</div>
+        </div>
+        <div class="detail-field-item" id="det-hr-wrap" style="display:none;">
+          <div class="detail-field-label">Avg Heart Rate</div>
+          <div class="detail-field-val" id="det-avghr">—</div>
+        </div>
+        <div class="detail-field-item" id="det-cadence-wrap" style="display:none;">
+          <div class="detail-field-label">Avg Cadence</div>
+          <div class="detail-field-val" id="det-cadence">—</div>
+        </div>
+        <div class="detail-field-item" id="det-elevation-wrap" style="display:none;">
+          <div class="detail-field-label">Elevation</div>
+          <div class="detail-field-val" id="det-elevation">—</div>
+        </div>
+        <div class="detail-field-item" id="det-calories-wrap" style="display:none;">
+          <div class="detail-field-label">Calories</div>
+          <div class="detail-field-val" id="det-calories">—</div>
         </div>
       </div>
       
