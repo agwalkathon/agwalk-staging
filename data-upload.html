@@ -282,10 +282,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
 
     <div class="section-tabs">
-      <button class="stab active" onclick="switchTab('tab-upload')"><i class="ti ti-upload"></i> Upload to Database</button>
-      <button class="stab" onclick="switchTab('tab-sql')"><i class="ti ti-file-text"></i> Generate SQL File</button>
-      <button class="stab" onclick="switchTab('tab-distance')"><i class="ti ti-ruler-2"></i> Override Distance</button>
-      <button class="stab" onclick="switchTab('tab-flag')"><i class="ti ti-flag"></i> Flag / Status Override</button>
+      <button class="stab active" onclick="switchTab('tab-upload', this)"><i class="ti ti-upload"></i> Upload to Database</button>
+      <button class="stab" onclick="switchTab('tab-sql', this)"><i class="ti ti-file-text"></i> Generate SQL File</button>
+      <button class="stab" onclick="switchTab('tab-distance', this)"><i class="ti ti-ruler-2"></i> Override Distance</button>
+      <button class="stab" onclick="switchTab('tab-flag', this)"><i class="ti ti-flag"></i> Flag / Status Override</button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
@@ -890,11 +890,15 @@ var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=session
 authGuard();
 
 // ── Tab switching ────────────────────────────────────────────
-function switchTab(id) {
+function switchTab(id, btnEl) {
   document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+  if (btnEl) {
+    btnEl.classList.add('active');
+  } else if (typeof event !== 'undefined' && event.target) {
+    event.target.classList.add('active');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1597,15 +1601,7 @@ function downloadSQL() {
   a.click();
 }
 
-function switchTab(id) {
-  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  
-  // Find the button (or closest parent button with class .stab)
-  var btn = event.currentTarget || event.target.closest('.stab') || event.target;
-  btn.classList.add('active');
-}
+
 
 function resetSQL() {
   sqlRows = [];
