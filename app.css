@@ -2802,6 +2802,22 @@
     0%,100%{opacity:0.9;transform:scale(1);}
     50%{opacity:1;transform:scale(1.025);}
   }
+  .splash-logo-wrap{
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .splash-ring{
+    position:absolute;
+    width:calc(100% + 40px);
+    height:calc(100% + 40px);
+    border-radius:50%;
+    border:3px solid rgba(255,255,255,0.08);
+    border-top-color:var(--brand);
+    animation:splashRingSpin 1s linear infinite;
+  }
+  @keyframes splashRingSpin{
+    to{transform:rotate(360deg);}
+  }
   .splash-dot{
     width:8px;height:8px;border-radius:50%;
     background:var(--brand);
