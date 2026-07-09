@@ -183,6 +183,7 @@
         <button class="doc-nav-item active" onclick="switchSection('overview')"><i class="ti ti-info-circle"></i> Overview</button>
         <button class="doc-nav-item" onclick="switchSection('app-portal')"><i class="ti ti-device-mobile"></i> Participant Portal (app.html)</button>
         <button class="doc-nav-item" onclick="switchSection('admin-portal')"><i class="ti ti-layout-dashboard"></i> Admin Panel (admin.html)</button>
+        <button class="doc-nav-item" onclick="switchSection('events-mgmt')"><i class="ti ti-calendar-event"></i> Event Configuration (events.html)</button>
         <button class="doc-nav-item" onclick="switchSection('registration-flow')"><i class="ti ti-user-plus"></i> Registration & Approvals</button>
         <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Engine</button>
         <button class="doc-nav-item" onclick="switchSection('strava-mappings')"><i class="ti ti-api"></i> Strava Payload Mappings</button>
@@ -191,6 +192,7 @@
         <button class="doc-nav-item" onclick="switchSection('db-schema')"><i class="ti ti-database"></i> DB Schema & Fields</button>
         <button class="doc-nav-item" onclick="switchSection('endpoints')"><i class="ti ti-plug"></i> API Endpoints</button>
         <button class="doc-nav-item" onclick="switchSection('operations')"><i class="ti ti-tool"></i> Common Fixes</button>
+        <button class="doc-nav-item" onclick="switchSection('changelog')"><i class="ti ti-history"></i> Change History</button>
       </nav>
 
       <!-- Documentation body -->
@@ -868,6 +870,128 @@ SET activity_date_time_ist = '2026-06-25T05:03:42'
 WHERE strava_activity_id = 19055574519;</code></pre>
             After applying the change, run the <strong>Recalculate Summary</strong> operation to sync the leaderboard totals.
           </p>
+        </section>
+
+        <!-- Section: Event Configuration (events.html) -->
+        <section id="events-mgmt" class="doc-section">
+          <h2><i class="ti ti-calendar-event"></i> Event Configuration & Settings (events.html)</h2>
+          <p>The event manager (<code>events.html</code>) is the central dashboard where organizers configure event metadata, scoring systems, rules, layout settings, and challenges. These settings dictate how the frontend Participant Portal behaves and how activities are scored.</p>
+
+          <h3>1. Structure & DB Mappings</h3>
+          <p>When an organizer creates or saves an event, two main tables are updated in Supabase:
+            <br>• <strong><code>events</code></strong>: Contains metadata like <code>name</code>, <code>slug</code>, <code>event_type</code>, <code>status</code> (draft, upcoming, live, ended, archived), <code>start_date</code>, and <code>end_date</code>.
+            <br>• <strong><code>leaderboard_config</code></strong>: Stores detailed setting rules as JSON configurations associated with the event using <code>config_key</code> and <code>event_id</code> keys.
+          </p>
+
+          <h3>2. Tab Config Section Breakdown</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Tab Panel</th>
+                <th>UI Settings / Fields</th>
+                <th>Underlying `leaderboard_config` Key & Payload</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Basic Info</strong></td>
+                <td>
+                  Event Name, Slug, Event Type, Status, Start/End Date, Registration Dates, Theme Accent Color, Custom Banner URL, Custom Logo URL, Tracking Mode (Strava/Manual), and Media Filters.
+                </td>
+                <td>
+                  Direct columns in `events` table. Media filters and custom branding options are stored in <code>events.rules_config</code> column as a JSON object (e.g. <code>logo_filter: 'invert'</code>).
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Registration</strong></td>
+                <td>
+                  Rules regarding signup limits, email domains, and shift assignments (e.g. Day, Night).
+                </td>
+                <td>
+                  Updates registration validation configuration.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Scoring & Medals</strong></td>
+                <td>
+                  • Gold, Silver, Bronze points requirements for Male and Female participants.
+                  <br>• Base Scoring Rate (points rewarded per Kilometer).
+                  <br>• Milestone Rewards (Km milestones and matching bonus points).
+                </td>
+                <td>
+                  • <code>medals</code>: <code>{ gold: { male: 300, female: 250 }, ... }</code>
+                  <br>• <code>base_points</code>: <code>{ per_km: 1 }</code>
+                  <br>• <code>bonus_points</code>: Array of milestone targets <code>[ { km: 10, points: 5 }, ... ]</code>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Challenges</strong></td>
+                <td>
+                  Add individual challenges. Toggles range/fixed types, sets distance milestones, sets reward points, and determines challenge start/end dates.
+                </td>
+                <td>
+                  Inserts or updates rows directly in the <strong><code>challenges</code></strong> table associated with the active event ID.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>App Layout</strong></td>
+                <td>
+                  • Hide Strava Connect options.
+                  <br>• Team Leaderboard enabled/disabled.
+                  <br>• Tab visibility toggles (Dashboard, Leaderboard, Events, Celebrate, Feed, You).
+                  <br>• Points visibility toggles (Base, Bonus, Challenge, Total).
+                </td>
+                <td>
+                  • <code>hide_strava_connect</code>: Boolean
+                  <br>• <code>team_leaderboard_enabled</code>: Boolean
+                  <br>• <code>tabs_config</code>: <code>{ dashboard: true, leaderboard: true, ... }</code>
+                  <br>• <code>activities_points_config</code>: <code>{ base: true, bonus: true, ... }</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>3. Key Event Operations</h3>
+          <ul>
+            <li><strong>Cloning Events</strong>: Clicking the clone button copies the event details, challenge list, and custom configurations, creating a brand new <code>draft</code> event to reuse templates.</li>
+            <li><strong>Status Cycling</strong>: Clicking the status badge cycles the event through <code>draft → upcoming → live → ended → archived</code> sequentially (with confirmation).</li>
+            <li><strong>Asynchronous Points Backfill</strong>: Saving changes automatically fires a background recalculation request to the Backend Server at <code>/admin/backfill-points</code>. This backfill operation is triggered asynchronously in the background so that Render's startup latency does not freeze the UI or disable buttons.</li>
+            <li><strong>Save Button Fail-safes</strong>: Includes top and bottom Save buttons. Save actions use a <code>finally</code> block to guarantee that buttons are immediately re-enabled even if database operations fail.</li>
+          </ul>
+        </section>
+
+        <!-- Section: Change History -->
+        <section id="changelog" class="doc-section">
+          <h2><i class="ti ti-history"></i> Recent Changes & Updates</h2>
+          <p>Below is the timeline of notable technical updates, performance improvements, and feature rollouts implemented in the application.</p>
+
+          <h3>July 2026</h3>
+          <ul>
+            <li><strong>Whoop-Inspired Matte UI Theme</strong>:
+              <br>• Replaced transparent styling and backdrop blurs with a solid, high-contrast matte color scheme.
+              <br>• Updated root variables: Main background (<code>#12161A</code>), Primary Card (<code>#1E2328</code>), Secondary Surface (<code>#272D34</code>).
+              <br>• Eliminated borders and backdrop blurs on all participant portal cards (.card, .you-card, .date-group, .lb-row, .pb-card, etc.) for a clean, sharp look.
+            </li>
+            <li><strong>Leaderboard Excel Export</strong>:
+              <br>• Added a dedicated export utility to download any leaderboard view directly into an Excel (.xls) spreadsheet with a single click.
+            </li>
+            <li><strong>Events Manager Save & UI Fixes</strong>:
+              <br>• Refactored the events editor save handler to run the points backfill endpoint asynchronously.
+              <br>• Added a top Save button next to the editor title, converted all save buttons to <code>type="button"</code>, and wrapped handlers in a <code>try-catch-finally</code> structure.
+            </li>
+            <li><strong>Branding Selective Logo Inversion Filter</strong>:
+              <br>• Replaced brightness filters with <code>filter: invert(1) hue-rotate(180deg)</code>, allowing black elements in logos to invert to white while preserving the orange brand color.
+            </li>
+            <li><strong>JS/CSS Cache Busting</strong>:
+              <br>• Implemented cache-busting version rules for scripts and stylesheets loaded in <code>app.html</code> (e.g. <code>app-dashboard.js?v=NNN</code>) to ensure updates are served instantly.
+            </li>
+          </ul>
+
+          <h3>Prior Updates</h3>
+          <ul>
+            <li><strong>Progressive Web App (PWA) Support</strong>: Added full manifest, splash-screen icons, offline pages, and Service Worker integration to allow mobile install as a standalone app.</li>
+            <li><strong>Community Odometer & Pulse Feed</strong>: Realtime cumulative odometer and custom feeds showing participant milestones.</li>
+          </ul>
         </section>
 
       </main>
