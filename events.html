@@ -1,6 +1,31 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Session Sync Block -->
+  <script>
+    (function() {
+      if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
+        sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
+        if (localStorage.getItem('wk_admin')) {
+          sessionStorage.setItem('wk_admin', localStorage.getItem('wk_admin'));
+        }
+      }
+      var origSet = sessionStorage.setItem;
+      sessionStorage.setItem = function(key, val) {
+        origSet.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.setItem(key, val);
+        }
+      };
+      var origRem = sessionStorage.removeItem;
+      sessionStorage.removeItem = function(key) {
+        origRem.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.removeItem(key);
+        }
+      };
+    })();
+  </script>
   <script>
     (function(){
       if ('serviceWorker' in navigator) {
@@ -179,7 +204,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   </style>
 </head>
 <body>
-          <aside class="sidebar">
+                <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
@@ -204,6 +229,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
     </div>
 
     <div class="sb-spacer"></div>
@@ -211,7 +237,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
   </aside>
 <div class="main">
-<header class="topbar"><div class="topbar-left"><h1>Events</h1><p>Create, configure and manage all fitness events</p></div><div class="topbar-right"><button class="btn btn-primary" id="btn-new"><i class="ti ti-plus"></i> New Event</button></div></header>
+<header class="topbar"><div class="topbar-left"><h1>Events</h1><p>Create, configure and manage all fitness events</p></div><div class='topbar-right' style='display:flex;align-items:center;gap:12px;'><button class="btn btn-primary" id="btn-new"><i class="ti ti-plus"></i> New Event</button> <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button></div></header>
 <div class="content">
 
 <div class="panel" id="editor" style="padding: 24px; background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
