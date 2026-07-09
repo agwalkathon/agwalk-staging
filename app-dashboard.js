@@ -218,11 +218,15 @@
       }
       
       // 6. Classic challenges toggle
+      var chCard = document.getElementById('dashboard-challenges-card');
       if (sec.challenges === false) {
+        if (chCard) chCard.style.display = 'none';
         var ch = document.getElementById('you-panel-challenges');
         var chBtn = document.getElementById('you-tab-challenges');
         if (chBtn) chBtn.style.display = 'none';
         if (ch) ch.style.display = 'none';
+      } else {
+        if (chCard) chCard.style.display = 'flex';
       }
     }
 
@@ -236,7 +240,7 @@
     try {
       rows = await fetchJSON(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + ctx.athleteId +
         '&event_id=eq.' + ev.id + '&is_deleted=eq.false&is_flagged=eq.false' +
-        '&select=distance_meters,elevation_gain,moving_time_seconds,steps,activity_date,activity_date_time_ist');
+        '&select=distance_meters,elevation_gain,moving_time_seconds,steps,activity_date,activity_date_time_ist,sport_type,manual_bonus,description');
     } catch(e){ return; }
     var acts = Array.isArray(rows) ? rows : [];
     var today = todayIST();
@@ -294,11 +298,15 @@
       var st = document.getElementById('streak-section') || document.querySelector('[data-section="streak"]');
       if (st) st.style.display = 'none';
     }
+    var chCard = document.getElementById('dashboard-challenges-card');
     if (sec.challenges === false) {
+      if (chCard) chCard.style.display = 'none';
       var ch = document.getElementById('you-panel-challenges');
       var chBtn = document.getElementById('you-tab-challenges');
       if (chBtn) chBtn.style.display = 'none';
       if (ch) ch.style.display = 'none';
+    } else {
+      if (chCard) chCard.style.display = 'flex';
     }
   }
 
