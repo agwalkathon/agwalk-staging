@@ -1033,15 +1033,12 @@ function calcFullPtsAdaptive(myActs, gender, shift){
 
 // ============================================================
 // Shared brand/accent color resolution (single source of truth)
-// Priority: active event's accent_color > org branding accent_color > default
+// Priority: org-wide Global Accent Color (celebrate-config.html > Branding tab) > default
+// (Per-event accent_color is intentionally NOT used here anymore — see app-events.js note)
 // ============================================================
 var DEFAULT_BRAND_COLOR = '#E8622A';
 
 function getEffectiveAccentColor() {
-  try {
-    var ev = JSON.parse(localStorage.getItem('ag_active_event_cache') || 'null');
-    if (ev && ev.accent_color) return ev.accent_color;
-  } catch (e) {}
   try {
     var br = JSON.parse(localStorage.getItem('ag_branding_cache') || 'null');
     if (br && br.accent_color) return br.accent_color;
