@@ -482,28 +482,28 @@ function renderTodayActivities(acts) {
     var kmStr = kmVal.toFixed(1) + ' KM';
 
     var sport = (a.sport_type || 'Walk').toLowerCase();
-    var pillColor = '#007aff';
+    var pillColor = 'var(--brand)';
     var sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
     var sportTitle = 'WALKING';
 
     if (sport === 'run') {
-      pillColor = '#007aff';
+      pillColor = 'var(--brand)';
       sportIcon = '<i class="fa-solid fa-person-running" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'RUNNING';
     } else if (sport === 'walk') {
-      pillColor = '#10b981';
+      pillColor = 'var(--brand)';
       sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'WALKING';
     } else if (sport === 'ride' || sport === 'cycling') {
-      pillColor = '#f97316';
+      pillColor = 'var(--purple)';
       sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'CYCLING';
     } else if (sport === 'hike') {
-      pillColor = '#8b5cf6';
+      pillColor = 'var(--purple)';
       sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'HIKING';
     } else {
-      pillColor = '#6366f1';
+      pillColor = 'var(--brand)';
       sportIcon = '<i class="fa-solid fa-heartbeat" style="color:#fff; font-size:12px;"></i>';
       sportTitle = (a.sport_type || 'Workout').toUpperCase();
     }
