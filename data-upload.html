@@ -281,10 +281,11 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
     </div>
 
-    <!-- ── SECTION TABS ── -->
     <div class="section-tabs">
-      <button class="stab active" onclick="switchTab('tab-upload')">⬆️ Upload to Database</button>
-      <button class="stab" onclick="switchTab('tab-sql')">🗄️ Generate SQL File</button>
+      <button class="stab active" onclick="switchTab('tab-upload')"><i class="ti ti-upload"></i> Upload to Database</button>
+      <button class="stab" onclick="switchTab('tab-sql')"><i class="ti ti-file-text"></i> Generate SQL File</button>
+      <button class="stab" onclick="switchTab('tab-distance')"><i class="ti ti-ruler-2"></i> Override Distance</button>
+      <button class="stab" onclick="switchTab('tab-flag')"><i class="ti ti-flag"></i> Flag / Status Override</button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
@@ -539,6 +540,166 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         </div>
       </div>
     </div><!-- /tab-sql -->
+
+    <!-- ═══════════════════════════════════════════════════════════
+         TAB 3 — OVERRIDE DISTANCE
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="tab-distance" class="tab-panel" style="display:none">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-left">
+            <div class="card-head-icon" style="background:#FFF0EA;color:#E8622A"><i class="ti ti-ruler-2"></i></div>
+            <div>
+              <h2>Override Activity Distance</h2>
+              <p>Override the distance of a specific activity and backup the original value</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
+            <input type="text" id="dist-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
+            <button class="btn btn-primary" onclick="searchActivityForDistance()"><i class="ti ti-search"></i> Load Activity</button>
+          </div>
+          
+          <div id="dist-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
+          
+          <!-- Activity details section -->
+          <div id="dist-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
+            <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
+              <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="dist-athlete-name">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="dist-act-name">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="dist-act-date">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Current Distance:</strong> <span id="dist-current-val" style="font-weight:700;color:var(--brand)">—</span></div>
+            </div>
+            <div id="dist-backup-note" style="display:none;margin-top:12px;padding:8px 12px;background:#EFF6FF;border-left:3px solid #3B82F6;border-radius:4px;font-size:11.5px;color:#1E40AF">
+              ℹ️ Original distance (backed up): <span id="dist-backup-val">0 km</span>
+            </div>
+          </div>
+
+          <!-- New Distance Form -->
+          <div id="dist-form-section" style="display:none">
+            <div style="max-width:350px;margin-bottom:16px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">New Distance (in Kilometers)</label>
+              <input type="number" id="dist-new-val" step="0.01" min="0.01" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. 5.25">
+            </div>
+            
+            <button class="btn btn-primary" onclick="previewDistanceChange()"><i class="ti ti-eye"></i> Preview Distance Change</button>
+          </div>
+
+          <!-- Preview box -->
+          <div id="dist-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
+            <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Distance Override</h4>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Metric</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (meters)</td><td style="padding:8px 0" id="dist-prev-m-before">0 m</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-m-after">0 m</td></tr>
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Distance (KM)</td><td style="padding:8px 0" id="dist-prev-km-before">0 km</td><td style="padding:8px 0;font-weight:700;color:#059669" id="dist-prev-km-after">0 km</td></tr>
+              </tbody>
+            </table>
+            <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:16px;">
+              ⚠️ Original distance will be safely preserved inside the <code>raw_data.original_distance_before_override</code> JSON field.
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-primary" id="dist-apply-btn" onclick="applyDistanceOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
+              <button class="btn btn-ghost" onclick="cancelDistancePreview()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         TAB 4 — FLAG / STATUS OVERRIDE
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="tab-flag" class="tab-panel" style="display:none">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-left">
+            <div class="card-head-icon" style="background:#FEF2F2;color:#DC2626"><i class="ti ti-flag"></i></div>
+            <div>
+              <h2>Flag / Status Override</h2>
+              <p>Moderate activity eligibility, apply standard flag reasons, or unflag activities</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;margin-bottom:20px;max-width:600px">
+            <input type="text" id="flag-search-id" placeholder="Enter Strava Activity ID (e.g. 19121094120)" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">
+            <button class="btn btn-primary" onclick="searchActivityForFlag()"><i class="ti ti-search"></i> Load Activity</button>
+          </div>
+          
+          <div id="flag-loading" style="display:none;font-size:13px;color:var(--text-secondary);margin-bottom:20px;"><i class="ti ti-loader animate-spin" style="display:inline-block;animation:spin 1s linear infinite;"></i> Fetching activity details...</div>
+
+          <!-- Activity details section -->
+          <div id="flag-details-card" style="display:none;background:#F9FAFB;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
+            <h4 style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Activity Details Loaded</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:13px;">
+              <div><strong style="color:var(--text-secondary)">Participant:</strong> <span id="flag-athlete-name">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Activity:</strong> <span id="flag-act-name">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Date &amp; Time (IST):</strong> <span id="flag-act-date">—</span></div>
+              <div><strong style="color:var(--text-secondary)">Current Status:</strong> <span id="flag-current-status" style="font-weight:700;">—</span></div>
+            </div>
+            <div style="margin-top:12px;font-size:13px;">
+              <strong style="color:var(--text-secondary)">Current Flag Reason:</strong> <span id="flag-current-reason" style="font-style:italic;color:#666;">None</span>
+            </div>
+          </div>
+
+          <!-- Form section -->
+          <div id="flag-form-section" style="display:none">
+            <div style="max-width:350px;margin-bottom:14px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Status Action</label>
+              <select id="flag-action-select" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;">
+                <option value="flag">Flag Activity (Disable Points)</option>
+                <option value="clear">Clear / Unflag Activity (Enable Points)</option>
+              </select>
+            </div>
+            
+            <div style="max-width:550px;margin-bottom:16px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Flag / Status Reason</label>
+              <input type="text" id="flag-reason-val" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;" placeholder="e.g. Over-speed walk / suspected vehicle">
+            </div>
+
+            <!-- Standard Flag Reasons Match -->
+            <div style="margin-bottom:20px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">📌 Match Standard Flag Reasons (Click to autofill):</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Walk (>7.5 km/h)', 'flag')">🏃 Over-speed Walk (>7.5 km/h)</button>
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Over-speed Run (>25 km/h)', 'flag')">⚡ Over-speed Run (>25 km/h)</button>
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Overlapping activity intervals', 'flag')">⏱️ Overlapping activity intervals</button>
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Suspected vehicle / cycling', 'flag')">🚗 Suspected vehicle / cycling</button>
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Distance mismatch / test activity', 'flag')">📏 Distance mismatch / test activity</button>
+                <button type="button" class="btn btn-ghost btn-xs" style="font-size:11px;padding:4px 8px;margin-bottom:4px;" onclick="autofillFlagReason('Manual admin override / correction', 'flag')">🛠️ Manual override</button>
+                <button type="button" class="btn btn-success btn-xs" style="font-size:11px;padding:4px 8px;background:#ECFDF5;color:#059669;margin-bottom:4px;" onclick="autofillFlagReason('Resolved after administrative review', 'clear')">✓ Resolved / Reviewed</button>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="previewFlagChange()"><i class="ti ti-eye"></i> Preview Status Change</button>
+          </div>
+
+          <!-- Preview card -->
+          <div id="flag-preview-card" style="display:none;margin-top:20px;padding:20px;background:#FFFDFB;border:1.5px dashed var(--brand);border-radius:12px;">
+            <h4 style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="ti ti-alert-circle"></i> Preview Proposed Status Override</h4>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Field</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Current Value</th><th style="text-align:left;padding:6px 0;color:var(--text-secondary)">Proposed Value</th></tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Status</td><td style="padding:8px 0" id="flag-prev-status-before">—</td><td style="padding:8px 0;font-weight:700;color:#DC2626" id="flag-prev-status-after">—</td></tr>
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.03)"><td style="padding:8px 0;font-weight:500">Flag Reason</td><td style="padding:8px 0;font-style:italic;" id="flag-prev-reason-before">—</td><td style="padding:8px 0;font-weight:700;color:var(--text-primary)" id="flag-prev-reason-after">—</td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-primary" id="flag-apply-btn" onclick="applyFlagOverride()"><i class="ti ti-check"></i> Confirm &amp; Save Changes</button>
+              <button class="btn btn-ghost" onclick="cancelFlagPreview()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-sql -->
 
   </div><!-- /content -->
 
@@ -1309,6 +1470,16 @@ function downloadSQL() {
   a.click();
 }
 
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  
+  // Find the button (or closest parent button with class .stab)
+  var btn = event.currentTarget || event.target.closest('.stab') || event.target;
+  btn.classList.add('active');
+}
+
 function resetSQL() {
   sqlRows = [];
   generatedSQL = '';
@@ -1319,6 +1490,321 @@ function resetSQL() {
   document.getElementById('sql-result').style.display = 'none';
   document.getElementById('sql-preview-section').style.display = 'none';
   document.getElementById('sql-preview-body').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OVERRIDE DISTANCE / FLAG STATUS LOGIC
+// ═══════════════════════════════════════════════════════════════
+var loadedActivity = null;
+
+async function searchActivityForDistance() {
+  var searchId = document.getElementById('dist-search-id').value.trim();
+  if (!searchId) {
+    alert('Please enter a Strava Activity ID');
+    return;
+  }
+  
+  document.getElementById('dist-loading').style.display = 'block';
+  document.getElementById('dist-details-card').style.display = 'none';
+  document.getElementById('dist-form-section').style.display = 'none';
+  document.getElementById('dist-preview-card').style.display = 'none';
+  
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=eq.' + searchId + '&select=*', { headers: HDR });
+    var rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      alert('Activity not found in database. Check the ID and try again.');
+      document.getElementById('dist-loading').style.display = 'none';
+      return;
+    }
+    
+    loadedActivity = rows[0];
+    
+    // Fetch participant name
+    var name = 'Athlete #' + loadedActivity.strava_athlete_id;
+    try {
+      var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + loadedActivity.strava_athlete_id + '&select=full_name', { headers: HDR });
+      var regs = await rReg.json();
+      if (Array.isArray(regs) && regs.length > 0) {
+        name = regs[0].full_name;
+      }
+    } catch(eReg) {
+      console.warn('Failed to load athlete name:', eReg);
+    }
+    
+    // Fill fields
+    document.getElementById('dist-athlete-name').textContent = name;
+    document.getElementById('dist-act-name').textContent = loadedActivity.activity_name || '—';
+    
+    var dateStr = '—';
+    if (loadedActivity.activity_date_time_ist) {
+      var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
+      dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
+    }
+    document.getElementById('dist-act-date').textContent = dateStr;
+    
+    var curDistKm = (loadedActivity.distance_meters / 1000).toFixed(2);
+    document.getElementById('dist-current-val').textContent = curDistKm + ' km';
+    document.getElementById('dist-new-val').value = curDistKm;
+    
+    // Original distance backup note
+    var raw = loadedActivity.raw_data || {};
+    if (raw.original_distance_before_override != null) {
+      document.getElementById('dist-backup-val').textContent = parseFloat(raw.original_distance_before_override).toFixed(2) + ' km';
+      document.getElementById('dist-backup-note').style.display = 'block';
+    } else {
+      document.getElementById('dist-backup-note').style.display = 'none';
+    }
+    
+    document.getElementById('dist-details-card').style.display = 'block';
+    document.getElementById('dist-form-section').style.display = 'block';
+  } catch(e) {
+    alert('Error loading activity: ' + e.message);
+  } finally {
+    document.getElementById('dist-loading').style.display = 'none';
+  }
+}
+
+function previewDistanceChange() {
+  if (!loadedActivity) return;
+  var newVal = parseFloat(document.getElementById('dist-new-val').value);
+  if (isNaN(newVal) || newVal <= 0) {
+    alert('Please enter a valid distance greater than 0');
+    return;
+  }
+  
+  var beforeM = loadedActivity.distance_meters;
+  var beforeKm = beforeM / 1000;
+  
+  var afterKm = newVal;
+  var afterM = Math.round(afterKm * 1000);
+  
+  document.getElementById('dist-prev-m-before').textContent = beforeM.toLocaleString() + ' m';
+  document.getElementById('dist-prev-m-after').textContent = afterM.toLocaleString() + ' m';
+  document.getElementById('dist-prev-km-before').textContent = beforeKm.toFixed(2) + ' km';
+  document.getElementById('dist-prev-km-after').textContent = afterKm.toFixed(2) + ' km';
+  
+  document.getElementById('dist-preview-card').style.display = 'block';
+  document.getElementById('dist-preview-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelDistancePreview() {
+  document.getElementById('dist-preview-card').style.display = 'none';
+}
+
+async function applyDistanceOverride() {
+  if (!loadedActivity) return;
+  var newVal = parseFloat(document.getElementById('dist-new-val').value);
+  if (isNaN(newVal) || newVal <= 0) {
+    alert('Please enter a valid distance');
+    return;
+  }
+  
+  var btn = document.getElementById('dist-apply-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  
+  var afterKm = newVal;
+  var afterM = Math.round(afterKm * 1000);
+  
+  var raw = loadedActivity.raw_data || {};
+  if (raw.original_distance_before_override == null) {
+    raw.original_distance_before_override = loadedActivity.distance_meters / 1000;
+  }
+  
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + loadedActivity.id, {
+      method: 'PATCH',
+      headers: HDR,
+      body: JSON.stringify({
+        distance_meters: afterM,
+        raw_data: raw
+      })
+    });
+    
+    if (!res.ok) throw new Error('PATCH failed: ' + res.status);
+    
+    alert('Distance overridden successfully!');
+    document.getElementById('dist-preview-card').style.display = 'none';
+    
+    // Trigger background recalculation
+    triggerPointsRecalculation();
+    
+    // Reload details
+    await searchActivityForDistance();
+  } catch(e) {
+    alert('Failed to override distance: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Confirm &amp; Save Changes';
+  }
+}
+
+// ── Flag status logic ─────────────────────────────────────────
+async function searchActivityForFlag() {
+  var searchId = document.getElementById('flag-search-id').value.trim();
+  if (!searchId) {
+    alert('Please enter a Strava Activity ID');
+    return;
+  }
+  
+  document.getElementById('flag-loading').style.display = 'block';
+  document.getElementById('flag-details-card').style.display = 'none';
+  document.getElementById('flag-form-section').style.display = 'none';
+  document.getElementById('flag-preview-card').style.display = 'none';
+  
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_activity_id=eq.' + searchId + '&select=*', { headers: HDR });
+    var rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      alert('Activity not found in database. Check the ID and try again.');
+      document.getElementById('flag-loading').style.display = 'none';
+      return;
+    }
+    
+    loadedActivity = rows[0];
+    
+    // Fetch participant name
+    var name = 'Athlete #' + loadedActivity.strava_athlete_id;
+    try {
+      var rReg = await fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + loadedActivity.strava_athlete_id + '&select=full_name', { headers: HDR });
+      var regs = await rReg.json();
+      if (Array.isArray(regs) && regs.length > 0) {
+        name = regs[0].full_name;
+      }
+    } catch(eReg) {
+      console.warn('Failed to load athlete name:', eReg);
+    }
+    
+    // Fill fields
+    document.getElementById('flag-athlete-name').textContent = name;
+    document.getElementById('flag-act-name').textContent = loadedActivity.activity_name || '—';
+    
+    var dateStr = '—';
+    if (loadedActivity.activity_date_time_ist) {
+      var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
+      dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
+    }
+    document.getElementById('flag-act-date').textContent = dateStr;
+    
+    var isFlagged = loadedActivity.is_flagged === true || loadedActivity.is_flagged === 'true';
+    var statusEl = document.getElementById('flag-current-status');
+    statusEl.textContent = isFlagged ? 'Flagged 🚩' : 'Clear ✓';
+    statusEl.style.color = isFlagged ? '#DC2626' : '#059669';
+    
+    document.getElementById('flag-current-reason').textContent = loadedActivity.flag_reason || 'None';
+    
+    document.getElementById('flag-action-select').value = isFlagged ? 'flag' : 'clear';
+    document.getElementById('flag-reason-val').value = loadedActivity.flag_reason || '';
+    
+    document.getElementById('flag-details-card').style.display = 'block';
+    document.getElementById('flag-form-section').style.display = 'block';
+  } catch(e) {
+    alert('Error loading activity: ' + e.message);
+  } finally {
+    document.getElementById('flag-loading').style.display = 'none';
+  }
+}
+
+function autofillFlagReason(reason, action) {
+  document.getElementById('flag-reason-val').value = reason;
+  document.getElementById('flag-action-select').value = action;
+}
+
+function previewFlagChange() {
+  if (!loadedActivity) return;
+  var action = document.getElementById('flag-action-select').value;
+  var reasonText = document.getElementById('flag-reason-val').value.trim();
+  
+  if (action === 'flag' && !reasonText) {
+    alert('Please enter a reason for flagging this activity.');
+    return;
+  }
+  
+  var beforeStatus = loadedActivity.is_flagged ? 'Flagged 🚩' : 'Clear ✓';
+  var beforeReason = loadedActivity.flag_reason || 'None';
+  
+  var afterStatus = action === 'flag' ? 'Flagged 🚩' : 'Clear ✓';
+  var afterReason = action === 'flag' ? reasonText : (reasonText || 'Resolved after review');
+  
+  var statusBeforeEl = document.getElementById('flag-prev-status-before');
+  var statusAfterEl = document.getElementById('flag-prev-status-after');
+  
+  statusBeforeEl.textContent = beforeStatus;
+  statusBeforeEl.style.color = loadedActivity.is_flagged ? '#DC2626' : '#059669';
+  
+  statusAfterEl.textContent = afterStatus;
+  statusAfterEl.style.color = (action === 'flag') ? '#DC2626' : '#059669';
+  
+  document.getElementById('flag-prev-reason-before').textContent = beforeReason;
+  document.getElementById('flag-prev-reason-after').textContent = afterReason;
+  
+  document.getElementById('flag-preview-card').style.display = 'block';
+  document.getElementById('flag-preview-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelFlagPreview() {
+  document.getElementById('flag-preview-card').style.display = 'none';
+}
+
+async function applyFlagOverride() {
+  if (!loadedActivity) return;
+  var action = document.getElementById('flag-action-select').value;
+  var reasonText = document.getElementById('flag-reason-val').value.trim();
+  
+  if (action === 'flag' && !reasonText) {
+    alert('Please enter a reason for flagging');
+    return;
+  }
+  
+  var btn = document.getElementById('flag-apply-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  
+  var isFlagged = (action === 'flag');
+  var finalReason = isFlagged ? reasonText : (reasonText || null);
+  
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + loadedActivity.id, {
+      method: 'PATCH',
+      headers: HDR,
+      body: JSON.stringify({
+        is_flagged: isFlagged,
+        flag_reason: finalReason
+      })
+    });
+    
+    if (!res.ok) throw new Error('PATCH failed: ' + res.status);
+    
+    alert('Flag / Status overridden successfully!');
+    document.getElementById('flag-preview-card').style.display = 'none';
+    
+    // Trigger background recalculation
+    triggerPointsRecalculation();
+    
+    // Reload details
+    await searchActivityForFlag();
+  } catch(e) {
+    alert('Failed to override status: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Confirm &amp; Save Changes';
+  }
+}
+
+async function triggerPointsRecalculation() {
+  try {
+    await fetch(BACKEND_URL + '/admin/backfill-points', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+      },
+      body: JSON.stringify({ event_id: EV_ID })
+    });
+  } catch(e) {
+    console.error('Recalculation failed:', e);
+  }
 }
 </script>
 </body>
