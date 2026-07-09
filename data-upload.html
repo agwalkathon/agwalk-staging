@@ -634,6 +634,12 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             </div>
             <input type="file" id="dist-bulk-file" accept=".csv" style="display:none" onchange="handleDistBulkCSV(this.files)">
 
+            <!-- Loading Spinner before Preview -->
+            <div id="dist-bulk-load-spinner" style="display:none;margin-top:20px;padding:24px;text-align:center;background:#F9FAFB;border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--text-secondary)">
+              <i class="ti ti-loader animate-spin" style="font-size:24px;color:var(--brand);display:inline-block;animation:spin 1s linear infinite;margin-bottom:8px"></i>
+              <div>Checking records and matching activities from database...</div>
+            </div>
+
             <!-- Bulk Preview wrap -->
             <div id="dist-bulk-preview-wrap" style="display:none">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
@@ -780,6 +786,12 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
               <div class="dz-sub">Format: activity_id, action (flag/clear), reason</div>
             </div>
             <input type="file" id="flag-bulk-file" accept=".csv" style="display:none" onchange="handleFlagBulkCSV(this.files)">
+
+            <!-- Loading Spinner before Preview -->
+            <div id="flag-bulk-load-spinner" style="display:none;margin-top:20px;padding:24px;text-align:center;background:#F9FAFB;border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--text-secondary)">
+              <i class="ti ti-loader animate-spin" style="font-size:24px;color:var(--brand);display:inline-block;animation:spin 1s linear infinite;margin-bottom:8px"></i>
+              <div>Checking records and matching activities from database...</div>
+            </div>
 
             <!-- Bulk Preview wrap -->
             <div id="flag-bulk-preview-wrap" style="display:none">
@@ -1997,22 +2009,29 @@ async function handleDistBulkCSV(files) {
   var file = files[0];
   document.getElementById('dist-dz-text').textContent = file.name;
   
+  // Show spinner immediately on file selection
+  document.getElementById('dist-bulk-load-spinner').style.display = 'block';
+  document.getElementById('dist-bulk-preview-wrap').style.display = 'none';
+  
   var reader = new FileReader();
   reader.onload = async function(e) {
     var text = e.target.result;
     var rows = parseCSV(text);
     if (rows.length === 0) {
+      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
       alert('CSV is empty or invalid.');
       return;
     }
     
     if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('new_distance_km')) {
+      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
       alert('Invalid CSV headers. Must contain: activity_id, new_distance_km');
       return;
     }
     
     var ids = rows.map(r => r.activity_id).filter(id => id);
     if (ids.length === 0) {
+      document.getElementById('dist-bulk-load-spinner').style.display = 'none';
       alert('No activity IDs found in CSV.');
       return;
     }
@@ -2110,6 +2129,8 @@ async function handleDistBulkCSV(files) {
       });
     });
     
+    // Hide spinner and show the preview wrap
+    document.getElementById('dist-bulk-load-spinner').style.display = 'none';
     document.getElementById('dist-bulk-preview-wrap').style.display = 'block';
     document.getElementById('dist-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
   };
@@ -2120,6 +2141,7 @@ function resetDistBulk() {
   distBulkRows = [];
   document.getElementById('dist-bulk-file').value = '';
   document.getElementById('dist-dz-text').textContent = 'Click to select Distance CSV or drag & drop here';
+  document.getElementById('dist-bulk-load-spinner').style.display = 'none';
   document.getElementById('dist-bulk-preview-wrap').style.display = 'none';
   document.getElementById('dist-bulk-preview-body').innerHTML = '';
   document.getElementById('dist-bulk-progress').style.display = 'none';
@@ -2196,22 +2218,29 @@ async function handleFlagBulkCSV(files) {
   var file = files[0];
   document.getElementById('flag-dz-text').textContent = file.name;
   
+  // Show spinner immediately on file selection
+  document.getElementById('flag-bulk-load-spinner').style.display = 'block';
+  document.getElementById('flag-bulk-preview-wrap').style.display = 'none';
+  
   var reader = new FileReader();
   reader.onload = async function(e) {
     var text = e.target.result;
     var rows = parseCSV(text);
     if (rows.length === 0) {
+      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
       alert('CSV is empty or invalid.');
       return;
     }
     
     if (!rows[0].hasOwnProperty('activity_id') || !rows[0].hasOwnProperty('action') || !rows[0].hasOwnProperty('reason')) {
+      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
       alert('Invalid CSV headers. Must contain: activity_id, action, reason');
       return;
     }
     
     var ids = rows.map(r => r.activity_id).filter(id => id);
     if (ids.length === 0) {
+      document.getElementById('flag-bulk-load-spinner').style.display = 'none';
       alert('No activity IDs found in CSV.');
       return;
     }
@@ -2318,6 +2347,8 @@ async function handleFlagBulkCSV(files) {
       });
     });
     
+    // Hide spinner and show the preview wrap
+    document.getElementById('flag-bulk-load-spinner').style.display = 'none';
     document.getElementById('flag-bulk-preview-wrap').style.display = 'block';
     document.getElementById('flag-bulk-preview-wrap').scrollIntoView({ behavior: 'smooth' });
   };
@@ -2328,6 +2359,7 @@ function resetFlagBulk() {
   flagBulkRows = [];
   document.getElementById('flag-bulk-file').value = '';
   document.getElementById('flag-dz-text').textContent = 'Click to select Flag Status CSV or drag & drop here';
+  document.getElementById('flag-bulk-load-spinner').style.display = 'none';
   document.getElementById('flag-bulk-preview-wrap').style.display = 'none';
   document.getElementById('flag-bulk-preview-body').innerHTML = '';
   document.getElementById('flag-bulk-progress').style.display = 'none';
