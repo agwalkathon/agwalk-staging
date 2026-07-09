@@ -2731,6 +2731,21 @@ function closeActivitiesDrawer() {
 }
 window.closeActivitiesDrawer = closeActivitiesDrawer;
 
+function openChallengesDrawer() {
+  var el = document.getElementById('you-panel-challenges');
+  if (el) {
+    el.style.display = 'block';
+    el.classList.add('open');
+  }
+}
+window.openChallengesDrawer = openChallengesDrawer;
+
+function closeChallengesDrawer() {
+  var el = document.getElementById('you-panel-challenges');
+  if (el) el.classList.remove('open');
+}
+window.closeChallengesDrawer = closeChallengesDrawer;
+
 function clearPWACache(btn) {
   if (btn) {
     btn.style.color = '#10b981';
@@ -3159,6 +3174,7 @@ function closeReactionsDetail() {
 
 // Premium Pull-to-Refresh & Infinite Scroll Controller
 (function() {
+  var startX = 0;
   var startY = 0;
   var pullOffset = 0;
   var isPulling = false;
@@ -3192,6 +3208,7 @@ function closeReactionsDetail() {
     var container = getActiveScrollContainer();
     if (!container || container.scrollTop > 0) return;
     
+    startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     isPulling = true;
     
@@ -3204,8 +3221,21 @@ function closeReactionsDetail() {
   window.addEventListener('touchmove', function(e) {
     if (!isPulling || e.touches.length !== 1 || isRefreshing) return;
     
+    var currentX = e.touches[0].clientX;
     var currentY = e.touches[0].clientY;
+    var deltaX = Math.abs(currentX - startX);
     var deltaY = currentY - startY;
+    
+    // If swipe is primarily horizontal, cancel pull-to-refresh
+    if (deltaX > deltaY && deltaX > 8) {
+      isPulling = false;
+      if (indicator) {
+        indicator.style.transition = 'transform 0.2s ease-out';
+        indicator.style.transform = 'translate(-50%, -100px) scale(0.3)';
+        indicator.classList.remove('visible');
+      }
+      return;
+    }
     
     if (deltaY <= 0) {
       pullOffset = 0;
