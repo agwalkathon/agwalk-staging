@@ -2161,6 +2161,7 @@ async function handleDistBulkCSV(files) {
       document.getElementById('dist-bulk-load-spinner').style.display = 'none';
       alert('Error loading distance preview: ' + err.message);
     }
+  };
   reader.readAsText(file);
 }
 
