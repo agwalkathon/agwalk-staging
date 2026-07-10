@@ -758,7 +758,7 @@ async function load(isBackgroundRefresh) {
 
     var fullPts=calcFullPts(myActs,reg.gender,reg.shift);
     var validCount=myActs.filter(function(a){return !a.is_flagged;}).length;
-    safeSetText('s-dist', Math.round(fullPts.km));
+    safeSetHtml('s-dist', Math.round(fullPts.km) + '<span class="stat-unit-suffix">KM</span>');
     safeSetText('s-acts', validCount);
     safeSetText('s-pts-dist', fullPts.distPts.toFixed(1)+' pts');
     safeSetText('s-pts-milestone', fullPts.bonusPts.toFixed(1)+' pts');
@@ -771,9 +771,9 @@ async function load(isBackgroundRefresh) {
     var avgPaceStr='—';
     if(totalDistM>0){var psk=totalMovingSec/(totalDistM/1000),pmin=Math.floor(psk/60),psec=Math.round(psk%60);avgPaceStr=pmin+':'+(psec<10?'0':'')+psec;}
     safeSetText('s-pace', avgPaceStr);
-    var mts='—';if(totalMovingSec>0){var mh=Math.floor(totalMovingSec/3600),mm=Math.floor((totalMovingSec%3600)/60);mts=mh>0?mh+'h '+mm+'m':mm+'m';}
+    var mts='—';var mtsHtml='—';if(totalMovingSec>0){var mh=Math.floor(totalMovingSec/3600),mm=Math.floor((totalMovingSec%3600)/60);mts=mh>0?mh+'h '+mm+'m':mm+'m';mtsHtml=mh>0?(mh+'<span class="stat-unit-suffix">h</span> '+mm+'<span class="stat-unit-suffix">m</span>'):(mm+'<span class="stat-unit-suffix">m</span>');}
     safeSetText('s-movetime', mts);
-    safeSetText('s-movetime-dash', mts);
+    safeSetHtml('s-movetime-dash', mtsHtml);
 
     // Personal Bests
     (function(){
