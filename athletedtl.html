@@ -346,6 +346,19 @@
       .content { padding: 16px; }
       .stats-grid { grid-template-columns: 1fr; }
     }
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+  .modal-overlay.show{display:flex}
+  .modal{background:#fff;border-radius:var(--radius-lg);padding:32px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);margin:20px}
+  .modal h3{font-size:18px;font-weight:600;margin-bottom:4px;color:var(--text-primary)}
+  .modal .sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+  .modal label{display:block;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600}
+  .modal select,.modal input[type=text],.modal input[type=email],.modal input[type=date]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;margin-bottom:14px;background:var(--page-bg);font-family:var(--font);box-sizing:border-box}
+  .modal input:disabled{opacity:.6;cursor:not-allowed}
+  .modal-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+  .modal-actions button{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
+  .btn-confirm{background:var(--brand);color:#fff}
+  .btn-cancel{background:var(--page-bg);color:var(--text-secondary);border:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -448,7 +461,8 @@
         <div class="toolbar">
           <input type="text" id="emp-search" placeholder="Search code, name, email..." oninput="filterEmployees()" style="width:280px">
           <span id="emp-count" class="count-badge"></span>
-          <button class="btn btn-ghost btn-sm" onclick="downloadEmpTemplate()" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-download"></i> CSV Template</button>
+          <button class="btn btn-primary btn-sm" onclick="openEmployeeModal()" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-user-plus"></i> Add Employee</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadEmpTemplate()" style="display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-download"></i> CSV Template</button>
           <button class="btn btn-primary btn-sm" onclick="triggerEmpUpload()" style="display:inline-flex;align-items:center;gap:6px;"><i class="ti ti-upload"></i> Import CSV</button>
           <input type="file" id="emp-csv-input" accept=".csv" style="display:none" onchange="handleEmpCSVUpload(event)">
         </div>
@@ -482,6 +496,59 @@
           <button class="btn btn-ghost btn-sm" id="emp-prev" onclick="changeEmpPage(-1)">← Previous</button>
           <span id="emp-page-label" style="font-size:13px;color:var(--text-secondary);font-weight:600;">Page 1</span>
           <button class="btn btn-ghost btn-sm" id="emp-next" onclick="changeEmpPage(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Add/Edit Employee Modal -->
+      <div class="modal-overlay" id="employee-modal-overlay">
+        <div class="modal">
+          <h3 id="employee-modal-title">Add Employee</h3>
+          <div class="sub">Fill in the employee master record. Saving will also refresh their name/email/gender on any existing event registration.</div>
+          <label>Employee Code</label>
+          <input type="text" id="emp-form-code" placeholder="e.g. EMP-05-00817-PM">
+          <label>Full Name</label>
+          <input type="text" id="emp-form-name" placeholder="Full name">
+          <label>Email</label>
+          <input type="email" id="emp-form-email" placeholder="name@arcgate.com">
+          <div class="modal-row2">
+            <div>
+              <label>Gender</label>
+              <select id="emp-form-gender">
+                <option value="">—</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label>WhatsApp</label>
+              <input type="text" id="emp-form-whatsapp" placeholder="10-digit number">
+            </div>
+          </div>
+          <div class="modal-row2">
+            <div>
+              <label>Department</label>
+              <input type="text" id="emp-form-department" placeholder="e.g. UCC">
+            </div>
+            <div>
+              <label>Designation</label>
+              <input type="text" id="emp-form-designation" placeholder="e.g. Manager">
+            </div>
+          </div>
+          <div class="modal-row2">
+            <div>
+              <label>Date of Birth</label>
+              <input type="date" id="emp-form-dob">
+            </div>
+            <div>
+              <label>Joining Date</label>
+              <input type="date" id="emp-form-joining">
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeEmployeeModal()">Cancel</button>
+            <button class="btn-confirm" id="emp-form-save-btn" onclick="saveEmployeeForm()">Save Employee</button>
+          </div>
         </div>
       </div>
 
@@ -811,7 +878,7 @@
         const statusPill = e.is_active 
           ? '<span class="badge conn">Active</span>'
           : '<span class="badge danger">Inactive</span>';
-        const actionBtn = `<button class="btn btn-sm btn-ghost" onclick="toggleEmployeeActive('${e.emp_code}', ${e.is_active})">${e.is_active ? 'Deactivate' : 'Activate'}</button>`;
+        const actionBtn = `<button class="btn btn-sm btn-ghost" data-emp-code="${esc(e.emp_code)}" data-action="edit-employee" style="margin-right:6px;">Edit</button><button class="btn btn-sm btn-ghost" onclick="toggleEmployeeActive('${e.emp_code}', ${e.is_active})">${e.is_active ? 'Deactivate' : 'Activate'}</button>`;
         return `<tr style="border-bottom:1px solid var(--border)">
           <td>${(_empPage * 50) + idx + 1}</td>
           <td><strong>${esc(e.emp_code)}</strong></td>
@@ -859,6 +926,86 @@
         alert('Error: ' + e.message);
       }
     }
+
+    /* ---------- Add/Edit Employee Modal ---------- */
+    let _empEditMode = false;
+
+    function openEmployeeModal(empCode) {
+      const emp = empCode ? allEmployees.find(e => e.emp_code === empCode) : null;
+      _empEditMode = !!emp;
+      document.getElementById('employee-modal-title').textContent = _empEditMode ? 'Edit Employee' : 'Add Employee';
+      const codeInput = document.getElementById('emp-form-code');
+      codeInput.value = emp ? emp.emp_code : '';
+      codeInput.disabled = _empEditMode;
+      document.getElementById('emp-form-name').value = emp ? (emp.full_name || '') : '';
+      document.getElementById('emp-form-email').value = emp ? (emp.email || '') : '';
+      document.getElementById('emp-form-gender').value = emp ? (emp.gender || '') : '';
+      document.getElementById('emp-form-whatsapp').value = emp ? (emp.whatsapp || '') : '';
+      document.getElementById('emp-form-department').value = emp ? (emp.department || '') : '';
+      document.getElementById('emp-form-designation').value = emp ? (emp.designation || '') : '';
+      document.getElementById('emp-form-dob').value = emp ? (emp.dob || '') : '';
+      document.getElementById('emp-form-joining').value = emp ? (emp.joining_date || '') : '';
+      document.getElementById('employee-modal-overlay').classList.add('show');
+    }
+
+    function closeEmployeeModal() {
+      document.getElementById('employee-modal-overlay').classList.remove('show');
+    }
+
+    async function saveEmployeeForm() {
+      const token = sessionStorage.getItem('wk_admin_token');
+      if (!token) return;
+      const empCode = document.getElementById('emp-form-code').value.trim();
+      const fullName = document.getElementById('emp-form-name').value.trim();
+      const email = document.getElementById('emp-form-email').value.trim();
+      if (!empCode || !fullName || !email) {
+        alert('Employee Code, Full Name and Email are required.');
+        return;
+      }
+      const payload = {
+        emp_code: empCode,
+        full_name: fullName,
+        email: email,
+        gender: document.getElementById('emp-form-gender').value || null,
+        whatsapp: document.getElementById('emp-form-whatsapp').value.trim() || null,
+        department: document.getElementById('emp-form-department').value.trim() || null,
+        designation: document.getElementById('emp-form-designation').value.trim() || null,
+        dob: document.getElementById('emp-form-dob').value || null,
+        joining_date: document.getElementById('emp-form-joining').value || null
+      };
+      const saveBtn = document.getElementById('emp-form-save-btn');
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+      try {
+        const res = await fetch(_BU + '/admin/employees', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        if (d.success) {
+          closeEmployeeModal();
+          await loadEmployees();
+        } else {
+          alert('Error: ' + (d.error || 'Failed to save employee'));
+        }
+      } catch(e) {
+        alert('Error: ' + e.message);
+      } finally {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+      }
+    }
+
+    // Delegated click handler for per-row Edit buttons (data-action avoids inline-onclick quote-escaping issues)
+    document.addEventListener('click', function(ev) {
+      const btn = ev.target.closest('[data-action="edit-employee"]');
+      if (btn) openEmployeeModal(btn.getAttribute('data-emp-code'));
+    });
 
     /* ---------- CSV & Direct Connection Link Functions ---------- */
     function copyStravaDirectLink(empCode, eventId) {
