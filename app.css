@@ -349,7 +349,7 @@
     /* ── Medal rings row ── */
     .rings-row{display:flex;justify-content:space-around;align-items:flex-start;margin-bottom:14px;}
     .ring-box{display:flex;flex-direction:column;align-items:center;gap:0;}
-    .ring-svg-wrap{position:relative;width:min(90px,24vw);height:min(90px,24vw);flex-shrink:0;}
+    .ring-svg-wrap{position:relative;width:min(108px,29vw);height:min(108px,29vw);flex-shrink:0;}
     .ring-svg-wrap svg{width:100%;height:100%;transform:rotate(-90deg) translateZ(0);backface-visibility:hidden;shape-rendering:geometricPrecision;}
     .ring-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4.5;shape-rendering:geometricPrecision;}
     .ring-fill{fill:none;stroke-width:4.5;stroke-linecap:round;transition:stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1);shape-rendering:geometricPrecision;}
@@ -360,8 +360,7 @@
       position:absolute;inset:0;display:flex;flex-direction:column;
       align-items:center;justify-content:center;
     }
-    .ring-pct{font-size:20px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;}
-    .ring-pct-sm{font-size:15px;}
+    .ring-pct{font-size:18px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;}
     .ring-check{font-size:22px;line-height:1;}
     .ring-emoji{font-size:20px;margin-bottom:3px;}
     .ring-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-top:10px;color:#fff;}
