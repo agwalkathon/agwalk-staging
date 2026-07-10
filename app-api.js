@@ -1602,6 +1602,23 @@ async function load(isBackgroundRefresh) {
         return '🎯';
       }
 
+      function getChallengeIconClass(name) {
+        var n = (name || '').toLowerCase();
+        if (n.indexOf('strava') > -1) return 'fa-brands fa-strava';
+        if (n.indexOf('walk') > -1) return 'fa-solid fa-person-walking';
+        if (n.indexOf('run') > -1) return 'fa-solid fa-person-running';
+        if (n.indexOf('ride') > -1 || n.indexOf('cycle') > -1 || n.indexOf('bike') > -1) return 'fa-solid fa-bicycle';
+        if (n.indexOf('hike') > -1 || n.indexOf('climb') > -1) return 'fa-solid fa-mountain-sun';
+        if (n.indexOf('sunchaser') > -1 || n.indexOf('sun') > -1 || n.indexOf('morning') > -1) return 'fa-solid fa-sun';
+        if (n.indexOf('night') > -1 || n.indexOf('evening') > -1) return 'fa-solid fa-moon';
+        if (n.indexOf('environment') > -1 || n.indexOf('nature') > -1 || n.indexOf('green') > -1) return 'fa-solid fa-leaf';
+        if (n.indexOf('wednesday') > -1 || n.indexOf('friday') > -1 || n.indexOf('day') > -1) return 'fa-solid fa-calendar-day';
+        if (n.indexOf('weekend') > -1 || n.indexOf('saturday') > -1 || n.indexOf('sunday') > -1) return 'fa-solid fa-umbrella-beach';
+        if (n.indexOf('gold') > -1 || n.indexOf('silver') > -1 || n.indexOf('bronze') > -1) return 'fa-solid fa-medal';
+        if (n.indexOf('title') > -1 || n.indexOf('champion') > -1) return 'fa-solid fa-trophy';
+        return 'fa-solid fa-bullseye';
+      }
+
       function renderDashboardChallenges(items){
         var container = document.getElementById('dashboard-challenges-list');
         if(!container) return;
@@ -1616,7 +1633,7 @@ async function load(isBackgroundRefresh) {
           html += '<div class="today-act-row" onclick="openChallengesDrawer();" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
                     '<div style="display:flex; align-items:center; gap:14px; min-width:0;">' +
                       '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:8px; min-width:44px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
-                        ch.emoji +
+                        '<i class="' + ch.iconClass + '" style="font-size:14px;color:#fff;"></i>' +
                       '</div>' +
                       '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">' + esc(ch.name) + '</div>' +
                     '</div>' +
@@ -1646,7 +1663,7 @@ async function load(isBackgroundRefresh) {
         var missed=!earned&&ch.end_date&&ch.end_date<today2;
         var statusCls=earned?'won':missed?'missed':'avail';
         var statusIcon=earned?'\u2713':missed?'\u2715':'!';
-        dashItems.push({name:toTitleCase(ch.name), emoji:getChallengeEmoji(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
+        dashItems.push({name:toTitleCase(ch.name), iconClass:getChallengeIconClass(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
         
         var cardDiv=document.createElement('div');
         cardDiv.className='ch-card ' + statusCls;
