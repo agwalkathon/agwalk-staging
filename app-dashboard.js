@@ -115,6 +115,20 @@
     return box;
   }
 
+  function waitForFullPts(timeoutMs){
+    return new Promise(function(resolve){
+      if (window._myFullPtsGlobal && window._myFullPtsGlobal.total !== undefined) { resolve(); return; }
+      var waited = 0;
+      var iv = setInterval(function(){
+        waited += 100;
+        if ((window._myFullPtsGlobal && window._myFullPtsGlobal.total !== undefined) || waited >= timeoutMs) {
+          clearInterval(iv);
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
   async function applyDynamicDashboard(){
     var ctx = await getActiveEvent();
     if (!ctx) return;
@@ -251,11 +265,16 @@
     try {
       rows = await fetchJSON(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + ctx.athleteId +
         '&event_id=eq.' + ev.id + '&is_deleted=eq.false&is_flagged=eq.false' +
-        '&select=distance_meters,elevation_gain,moving_time_seconds,steps,activity_date,activity_date_time_ist,sport_type,manual_bonus,description');
+        '&select=strava_activity_id,distance_meters,elevation_gain,moving_time_seconds,steps,activity_date,activity_date_time_ist,sport_type,manual_bonus,description,is_flagged');
     } catch(e){ return; }
     var acts = Array.isArray(rows) ? rows : [];
     var today = todayIST();
     var evDays = Math.max(1, Math.round((new Date(ev.end_date) - new Date(ev.start_date))/86400000) + 1);
+
+    // If any ring shows points, wait briefly for app-api.js's authoritative total
+    // (window._myFullPtsGlobal) instead of racing ahead with an independent recompute.
+    var needsPoints = dash.rings.slice(0,5).some(function(r){ return r.metric === 'points'; });
+    if (needsPoints) { await waitForFullPts(5000); }
 
     if (!host) return;
     try { localStorage.setItem('ag_dyn_dash', '1'); } catch(e){}
