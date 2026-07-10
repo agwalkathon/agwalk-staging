@@ -658,7 +658,7 @@
     .fact-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 14px;}
     .fact-icon{font-size:20px;margin-bottom:8px;}
     .fact-val{font-size:17px;font-weight:800;color:#fff;line-height:1.2;}
-    .fact-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
+    .fact-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
     /* Milestones */
     .milestones-wrap{display:flex;flex-wrap:wrap;gap:8px;}
     .milestone{display:flex;align-items:center;gap:7px;background:var(--surface);border-radius:20px;padding:7px 12px;opacity:0.35;transition:opacity 0.3s;}
@@ -857,7 +857,7 @@
     .act-tile-meta{font-size:11px;color:var(--label);margin-top:2px;}
     .act-tile-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;}
     .act-tile-dist{font-size:20px;font-weight:600;color:#fff;line-height:1;letter-spacing:-0.3px;}
-    .act-tile-dist-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:1px;text-transform:uppercase;}
+    .act-tile-dist-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:1px;text-transform:uppercase;}
     .act-tile-flag{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;}
     .flag-valid{background:rgba(34,197,94,0.15);color:#22C55E;}
     .flag-bad{background:rgba(239,68,68,0.15);color:#EF4444;}
@@ -873,7 +873,7 @@
     .medal-current-block{display:flex;align-items:center;gap:10px;}
     .medal-emoji-big{font-size:30px;line-height:1;}
     .medal-current-info{}
-    .medal-current-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+    .medal-current-lbl{font-size:11.5px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.5px;}
     .medal-current-name{font-size:18px;font-weight:900;color:var(--text);}
     .medal-pts-right{text-align:right;}
     .medal-pts-big{font-size:30px;font-weight:600;color:var(--brand);line-height:1;letter-spacing:-0.5px;}
@@ -927,7 +927,7 @@
     .gold-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
     .gold-stat{background:var(--surface2);border-radius:var(--radius-xs);padding:10px 12px;}
     .gold-stat-val{font-size:22px;font-weight:600;color:var(--brand);line-height:1;}
-    .gold-stat-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
+    .gold-stat-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
     .gold-rival{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:var(--radius-xs);padding:10px 12px;}
     .gold-rival-left{flex:1;}
     .gold-rival-label{font-size:13px;font-weight:700;color:#fff;}
@@ -972,7 +972,7 @@
     .tod-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 6px;text-align:center;}
     .tod-icon{font-size:22px;margin-bottom:4px;}
     .tod-val{font-size:26px;font-weight:600;color:var(--brand);line-height:1;}
-    .tod-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
+    .tod-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
 
     /* ── Rivals ── */
     .rival-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);}
@@ -1255,7 +1255,7 @@
     .my-tag{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.95);font-size:8.5px;font-weight:600;padding:3px 8px;border-radius:20px;}
     .my-pts-block,.my-rank-block{text-align:center;flex-shrink:0;min-width:52px;}
     .my-pts-num,.my-rank-num{font-size:26px;font-weight:600;color:#fff;line-height:1;letter-spacing:-0.3px;}
-    .my-pts-lbl,.my-rank-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--label);margin-top:3px;font-weight:600;}
+    .my-pts-lbl,.my-rank-lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:rgba(255,255,255,0.8);margin-top:3px;font-weight:600;}
 
     /* ── Tabs ── */
     .lb-tabs {
@@ -1576,8 +1576,8 @@
       margin-bottom: 2px;
     }
     .podium-team {
-      font-size: 10px;
-      color: var(--label);
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
       text-transform: uppercase;
       letter-spacing: 0.3px;
       white-space: nowrap;
@@ -1651,7 +1651,7 @@
     /* ── Hall of Fame ── */
     .hof-grid{display:grid;grid-template-columns:1fr;gap:8px;padding:10px 12px 14px;}
     .hof-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:16px;}
-    .hof-title{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
+    .hof-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
     .hof-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .hof-val{font-size:20px;font-weight:600;color:var(--brand);line-height:1;margin-bottom:2px;}
 
@@ -2382,9 +2382,9 @@
     color: var(--brand);
   }
   .detail-metrics-title {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 12px;
@@ -2599,9 +2599,9 @@
     color: #fff;
   }
   .profile-stat-card .lbl {
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: 4px;
@@ -2815,9 +2815,9 @@
     flex-direction: column;
   }
   .detail-label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.8px;
   }
