@@ -17,7 +17,7 @@
     star:    '<path d="M96 50 L72.7 66.5 L64.2 93.7 L41.3 76.6 L12.8 77 L22 50 L12.8 23 L41.3 23.4 L64.2 6.3 L72.7 33.5 Z" pathLength="100"/>',
     pentagon: '<path d="M94 50 L64 92 L14 76 L14 24 L64 8 Z" pathLength="100"/>',
     octagon: '<path d="M94 50 L81 81 L50 94 L19 81 L6 50 L19 19 L50 6 L81 19 Z" pathLength="100"/>',
-    triangle: '<path d="M94 50 L20 94 L20 6 Z" pathLength="100"/>',
+    triangle: '<path d="M96 50 L6 94 L6 6 Z" pathLength="100"/>',
     heart: '<path d="M78 50 C88 50,95 58,95 68 C95 80,88 95,72 95 C55 95,35 80,12 50 C35 20,55 5,72 5 C88 5,95 20,95 32 C95 42,88 50,78 50 Z" pathLength="100"/>'
   };
   function todayIST(){
@@ -104,10 +104,8 @@
     var needText = done ? '✓ Achieved' : fmt(needed) + ' ' + unit + ' remaining';
     var needColor = done ? 'var(--green)' : '#ffffff';
 
-    var pctClass = 'ring-pct';
     var pctStyle = '';
-    if (ring.shape === 'star' || ring.shape === 'heart') { pctClass += ' ring-pct-sm'; }
-    if (ring.shape === 'triangle') { pctClass += ' ring-pct-sm'; pctStyle = ' style="transform:translateY(9px)"'; }
+    if (ring.shape === 'triangle') { pctStyle = ' style="transform:translateY(19px)"'; }
 
     box.innerHTML =
       '<div class="ring-svg-wrap">' +
@@ -117,7 +115,7 @@
             shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '"' + rot + '/>') +
           '</g>' +
         '</svg>' +
-        '<div class="ring-inner"><span class="' + pctClass + '"' + pctStyle + '>' + Math.round(pct) + '%</span></div>' +
+        '<div class="ring-inner"><span class="ring-pct"' + pctStyle + '>' + Math.round(pct) + '%</span></div>' +
       '</div>' +
       '<div class="ring-name" style="color:' + brightColor + '">' + (ring.label || ring.metric) + '</div>' +
       '<div class="ring-need" style="color:' + needColor + '; font-weight: 600; font-size: 11.5px; margin-top: 4px; margin-bottom: 2px;">' + needText + '</div>' +
