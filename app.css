@@ -9,7 +9,7 @@
       --purple:#A78BFA; --purple-dim:rgba(167,139,250,0.12);
       --gold:#FFD000; --gold-dim:rgba(255,208,0,0.15);
       --silver:#C8D8E8; --bronze:#F4A84A;
-      --radius:16px; --radius-sm:12px; --radius-xs:8px;
+      --radius:20px; --radius-sm:16px; --radius-xs:8px;
       --font:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-num:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       /* Typography scale tokens (Whoop-Style, Crisp & Legible on Mobile) */
