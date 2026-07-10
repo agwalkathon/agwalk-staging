@@ -1694,6 +1694,16 @@ async function bootAppUnified() {
   if (typeof loadBranding === 'function') {
     loadBranding();
   }
+
+  window._stravaSyncHeaderEnabled = false;
+  try {
+    var flagRes = await fetch(BACKEND + '/app-feature-flags');
+    var flagData = await flagRes.json();
+    window._stravaSyncHeaderEnabled = !!(flagData && flagData.strava_sync_header_enabled);
+  } catch (e) {}
+  var syncBtnEl = document.getElementById('strava-sync-btn');
+  if (syncBtnEl && !window._stravaSyncHeaderEnabled) syncBtnEl.style.display = 'none';
+
   var isParticipant = false;
   var s = null;
   try {
