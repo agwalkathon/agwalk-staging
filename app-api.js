@@ -1632,8 +1632,8 @@ async function load(isBackgroundRefresh) {
           var statusLabel = ch.earned ? 'EARNED' : ch.missed ? 'MISSED' : 'ACTIVE';
           html += '<div class="today-act-row" onclick="openChallengesDrawer();" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
                     '<div style="display:flex; align-items:center; gap:14px; min-width:0;">' +
-                      '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:8px; min-width:44px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
-                        '<i class="' + ch.iconClass + '" style="font-size:14px;color:#fff;"></i>' +
+                      '<div style="display:flex; align-items:center; justify-content:center; min-width:30px; height:30px;">' +
+                        '<i class="' + ch.iconClass + '" style="font-size:18px;color:' + pillColor + ';"></i>' +
                       '</div>' +
                       '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">' + esc(ch.name) + '</div>' +
                     '</div>' +
