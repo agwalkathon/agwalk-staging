@@ -403,47 +403,56 @@ function buildCelebCard(c){
     bodyWrap.appendChild(glass);
     card.appendChild(bodyWrap);
   } else {
-    card.style.padding = '16px';
-    card.style.borderLeft = '4px solid ' + meta[1];
-    if (c.type === 'announcement') card.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.10) 0%, var(--surface) 45%)';
+    var typeColor = meta[1];
+    var bodyWrap2 = document.createElement('div');
+    bodyWrap2.style.cssText = 'position:relative;padding:16px;';
+
+    var cblob1 = document.createElement('div');
+    cblob1.style.cssText = 'position:absolute;top:-35px;left:-25px;width:130px;height:130px;border-radius:50%;filter:blur(36px);opacity:0.35;background:' + typeColor + ';pointer-events:none;';
+    var cblob2 = document.createElement('div');
+    cblob2.style.cssText = 'position:absolute;bottom:-40px;right:-30px;width:110px;height:110px;border-radius:50%;filter:blur(36px);opacity:0.25;background:' + typeColor + ';pointer-events:none;';
+    bodyWrap2.appendChild(cblob1);
+    bodyWrap2.appendChild(cblob2);
+
+    var glass2 = document.createElement('div');
+    glass2.style.cssText = 'position:relative;z-index:1;background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);';
+
     var head = document.createElement('div');
     head.style.cssText = 'display:flex;align-items:center;gap:11px;';
     var av = document.createElement('div');
     av.className = 'grad-avatar';
-    av.style.cssText = 'width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0;';
+    av.style.cssText = 'width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);color:#fff;font-weight:800;';
     if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; im.style.cssText='width:100%;height:100%;object-fit:cover'; av.appendChild(im); }
     else {
       var celebEmpName = (c.employee && c.employee.full_name) || (c.title && c.title.split("'")[0]) || 'Announce';
       av.textContent = initials(celebEmpName);
-      av.setAttribute('style', getGlassmorphicAvatarStyle(celebEmpName) + '; width:42px; height:42px; border-radius:50%; font-size:19px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;');
     }
     var ht = document.createElement('div');
-    var t1 = document.createElement('div'); t1.style.cssText = 'font-size:14.5px;font-weight:600;line-height:1.35;'; t1.textContent = c.title;
-    var t2 = document.createElement('div'); t2.style.cssText = 'font-size:11.5px;color:var(--label);margin-top:2px;';
+    var t1 = document.createElement('div'); t1.style.cssText = 'font-size:14.5px;font-weight:700;color:#fff;line-height:1.35;'; t1.textContent = c.title;
+    var t2 = document.createElement('div'); t2.style.cssText = 'font-size:11.5px;color:rgba(255,255,255,0.55);margin-top:2px;';
     var timeString = formatCelebDateTime(c.created_at || c.celebrate_date);
     var empName = c.employee ? c.employee.full_name : '';
     var dept = c.employee && c.employee.department ? c.employee.department : '';
-    if (c.type === 'custom' || c.type === 'announcement') {
-      t2.textContent = 'By ' + (empName || 'Anonymous') + (dept ? ' (' + dept + ')' : '') + ' · ' + timeString;
-    } else {
-      t2.textContent = (empName ? 'Employee: ' + empName + (dept ? ' · ' : '') : '') + (dept ? 'Dept: ' + dept + ' · ' : '') + timeString;
-    }
+    t2.textContent = 'By ' + (empName || 'Anonymous') + (dept ? ' (' + dept + ')' : '') + ' · ' + timeString;
     ht.appendChild(t1); ht.appendChild(t2);
     head.appendChild(av); head.appendChild(ht);
-    card.appendChild(head);
+    glass2.appendChild(head);
 
     if (c.message) {
       var msg = document.createElement('div');
-      msg.style.cssText = 'font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;';
+      msg.style.cssText = 'font-size:13.5px;color:rgba(255,255,255,0.75);margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);line-height:1.5;';
       msg.innerHTML = formatRichText(c.message);
-      card.appendChild(msg);
+      glass2.appendChild(msg);
     }
+
+    bodyWrap2.appendChild(glass2);
+    card.appendChild(bodyWrap2);
   }
 
   var mediaArr = Array.isArray(c.media) ? c.media : [];
   if (mediaArr.length) {
     var mg = document.createElement('div');
-    mg.style.cssText = 'display:grid;grid-template-columns:' + (mediaArr.length > 1 ? '1fr 1fr' : '1fr') + ';gap:6px;margin-top:10px;' + (isOccasion ? 'padding:0 18px;' : '');
+    mg.style.cssText = 'display:grid;grid-template-columns:' + (mediaArr.length > 1 ? '1fr 1fr' : '1fr') + ';gap:6px;margin-top:10px;padding:0 18px;';
     mediaArr.forEach(function(u){
       var im = document.createElement('img');
       im.src = u; im.loading = 'lazy';
@@ -451,18 +460,15 @@ function buildCelebCard(c){
       im.addEventListener('click', function(){ window.open(u, '_blank'); });
       mg.appendChild(im);
     });
-    if (isOccasion) {
-      var mgWrap = document.createElement('div');
-      mgWrap.style.cssText = 'padding:0 18px 18px;';
-      mgWrap.appendChild(mg);
-      card.appendChild(mgWrap);
-    } else {
-      card.appendChild(mg);
-    }
+    var mgWrap = document.createElement('div');
+    mgWrap.style.cssText = 'padding:0 18px 18px;';
+    mgWrap.appendChild(mg);
+    card.appendChild(mgWrap);
   }
 
-  var innerPad = isOccasion ? document.createElement('div') : card;
-  if (isOccasion) { innerPad.style.cssText = 'padding:0 18px 18px;'; card.appendChild(innerPad); }
+  var innerPad = document.createElement('div');
+  innerPad.style.cssText = 'padding:0 18px 18px;';
+  card.appendChild(innerPad);
 
   var bar = document.createElement('div');
   bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:12px;';
