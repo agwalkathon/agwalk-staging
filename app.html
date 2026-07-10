@@ -84,7 +84,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260710_v172">
+  <link rel="stylesheet" href="app.css?v=20260709_v158">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -183,10 +183,12 @@
                animation:splashPulse 1.8s ease-in-out infinite;"
       >
     </div>
-    <div class="splash-dots">
-      <div class="splash-dot" style="animation-delay:0s"></div>
-      <div class="splash-dot" style="animation-delay:0.15s"></div>
-      <div class="splash-dot" style="animation-delay:0.3s"></div>
+    <div class="splash-step-bars">
+      <div class="splash-step-bar" style="animation-delay:0s"></div>
+      <div class="splash-step-bar" style="animation-delay:0.15s"></div>
+      <div class="splash-step-bar" style="animation-delay:0.3s"></div>
+      <div class="splash-step-bar" style="animation-delay:0.45s"></div>
+      <div class="splash-step-bar" style="animation-delay:0.6s"></div>
     </div>
     <div id="splash-text" style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;font-family:var(--font);margin-top:-8px;text-align:center;display:none;"></div>
   </div>
@@ -248,7 +250,7 @@
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
-        <span class="notification-badge" id="notification-badge" style="position: absolute; top: 0px; right: 0px; background: #FC6100; color: white; border-radius: 50%; width: 15px; height: 15px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8.5px; font-weight: 700; font-family: sans-serif; line-height: 1;"></span>
+        <span class="notification-badge" id="notification-badge" style="position: absolute; top: 0px; right: 0px; background: #FC6100; color: white; border-radius: 50%; width: 15px; height: 15px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8.5px; font-weight:600; font-family: sans-serif; line-height: 1;"></span>
       </button>
       
       <!-- Notification Dropdown -->
@@ -273,7 +275,7 @@
   </div>
   
   <div class="hdr-center">
-    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">
+    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight:600; letter-spacing: 0.8px; text-transform: uppercase;">
       <span id="hdr-today-date" style="color: #fff;">—</span>
     </div>
   </div>
@@ -370,7 +372,7 @@
     <!-- My Points -->
   <div class="card clickable-card" id="my-points-section" onclick="openDashPointsModal()" style="margin-bottom:12px; cursor:pointer;">
   <div class="sec">My Points</div>
-  <div class="gold-stats" style="padding:0 20px 20px;margin-bottom:0;">
+  <div class="gold-stats" style="padding:0 14px 14px;margin-bottom:0;">
     <div class="gold-stat">
       <div class="gold-stat-val" id="s-pts-dist" style="color:var(--blue)">—</div>
       <div class="gold-stat-lbl">Distance</div>
@@ -400,7 +402,7 @@
         </svg>
       </div>
     </div>
-    <div id="mystats-grid-container" style="padding:0 20px 20px;">
+    <div id="mystats-grid-container" style="padding:0 14px 14px;">
       <div class="stat-card-item" id="stat-item-activities">
         <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -484,22 +486,21 @@
     </div>
   </div>
 
-  <!-- Challenges Card with Recent Challenges -->
-  <div class="card" style="margin-bottom:8px; padding:0 0 12px 0;">
-    <!-- Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 12px 0; margin-bottom:10px;">
-      <div class="sec" style="margin:0; padding:0;">Challenges</div>
-      <button onclick="openChallengesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all challenges">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
-    </div>
-    <!-- List of last 3 challenges -->
-    <div id="dashboard-challenges-list" style="display:flex; flex-direction:column; gap:8px; padding:0 12px;">
-      <div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">
-        Loading challenges...
+  <!-- Challenges Navigation Card -->
+  <div class="glass-card" id="dashboard-challenges-card" onclick="openChallengesDrawer();" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:38px; height:38px; border-radius:10px; background:rgba(232, 98, 42, 0.2); display:flex; align-items:center; justify-content:center; color:var(--brand);">
+        <i class="fa-solid fa-bullseye" style="font-size:18px;"></i>
       </div>
+      <div>
+        <div style="font-size:15px; font-weight:700; color:#fff;">Challenges</div>
+        <div style="font-size:12px; color:rgba(255, 255, 255, 0.55); margin-top:2px;">Track active event challenges and milestones</div>
+      </div>
+    </div>
+    <div style="color:rgba(255, 255, 255, 0.4);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
     </div>
   </div>
 
@@ -535,7 +536,7 @@
   <div id="my-standing-section" style="padding:0 20px; margin-bottom:12px;">
   <div class="card">
   <div class="sec">My Standing</div>
-  <div style="padding:0 20px 20px;">
+  <div style="padding:0 14px 14px;">
     <div class="standing-grid" id="standing-grid-container">
       <div class="standing-card">
         <div class="standing-rank-big" id="standing-shift-rank">—</div>
@@ -627,7 +628,7 @@
         <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.55); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="push-status-desc">Stay updated. Enable push notifications...</span>
       </div>
     </div>
-    <button id="btn-enable-push" onclick="enablePushNotifications()" style="background:rgba(232, 98, 42, 0.12); border:1px solid rgba(232, 98, 42, 0.3); border-radius:6px; color:var(--brand); font-size:11px; font-weight:700; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(232, 98, 42, 0.2)'" onmouseleave="this.style.background='rgba(232, 98, 42, 0.12)'">Enable</button>
+    <button id="btn-enable-push" onclick="enablePushNotifications()" style="background:rgba(232, 98, 42, 0.12); border:1px solid rgba(232, 98, 42, 0.3); border-radius:6px; color:var(--brand); font-size:11px; font-weight:600; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(232, 98, 42, 0.2)'" onmouseleave="this.style.background='rgba(232, 98, 42, 0.12)'">Enable</button>
   </div>
 
   <div class="part-only">
@@ -655,7 +656,7 @@
           <span style="font-size:14px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="connected-account-name-label">—</span>
         </div>
       </div>
-      <button id="btn-strava-disconnect-action" style="background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.3); border-radius:6px; color:#ef4444; font-size:11px; font-weight:700; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseleave="this.style.background='rgba(239, 68, 68, 0.12)'">Disconnect</button>
+      <button id="btn-strava-disconnect-action" style="background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.3); border-radius:6px; color:#ef4444; font-size:11px; font-weight:600; padding:6px 12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseleave="this.style.background='rgba(239, 68, 68, 0.12)'">Disconnect</button>
     </div>
   </div>
 
@@ -797,7 +798,7 @@
   </div>
 
   <div style="margin-top:10px;padding:0 4px;">
-    <button onclick="logout()" style="width:100%; padding:14px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.2); border-radius:12px; color:#ef4444; font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; letter-spacing:0.5px; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.borderColor='rgba(239, 68, 68, 0.35)';" onmouseleave="this.style.background='rgba(239, 68, 68, 0.08)'; this.style.borderColor='rgba(239, 68, 68, 0.2)';">Sign Out</button>
+    <button onclick="logout()" style="width:100%; padding:14px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.2); border-radius:12px; color:#ef4444; font-size:14px; font-weight:600; font-family:var(--font); cursor:pointer; letter-spacing:0.5px; transition:all 0.2s;" onmouseenter="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.borderColor='rgba(239, 68, 68, 0.35)';" onmouseleave="this.style.background='rgba(239, 68, 68, 0.08)'; this.style.borderColor='rgba(239, 68, 68, 0.2)';">Sign Out</button>
   </div>
 </div>
 
@@ -860,7 +861,7 @@
 <div id="dash-details-modal" class="detail-modal">
   <div class="detail-content" style="padding-top: max(20px, env(safe-area-inset-top));">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-      <button class="btn-back" onclick="closeDashModal()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
+      <button class="btn-back" onclick="closeDashModal()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
         <i class="fa-solid fa-arrow-left"></i> Back
       </button>
     </div>
@@ -878,7 +879,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
   <script src="app-config.js?v=20260709_v150" defer></script>
   <script src="app-employee.js?v=20260710_v5" defer></script>
-  <script src="app-api.js?v=20260710_v163" defer></script>
+  <script src="app-api.js?v=20260709_v159" defer></script>
   <script src="app-drawers.js?v=20260709_v157" defer></script>
   <script src="app-events.js?v=20260709_v151" defer></script>
   <script src="app-dashboard.js?v=20260709_v152" defer></script>
@@ -894,7 +895,7 @@
   <div id="highlight-detail-modal" class="detail-modal">
     <div class="detail-content" style="padding-top: max(20px, env(safe-area-inset-top));">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-        <button class="btn-back" onclick="closeHighlightDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        <button class="btn-back" onclick="closeHighlightDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
           <i class="fa-solid fa-arrow-left"></i> Back
         </button>
       </div>
@@ -904,7 +905,7 @@
         <div id="highlight-modal-title" style="font-size:22px; font-weight: 700; color:#fff; margin-bottom:8px; letter-spacing:0.3px;">Streak Leader!</div>
         <div id="highlight-modal-subtitle" style="font-size:12px; font-weight: 700; color:var(--brand); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:20px;">12 Days Active</div>
         <div id="highlight-modal-body" style="font-size:14.5px; color:rgba(255,255,255,0.75); line-height:1.6; margin-bottom:28px; max-width:480px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
-        <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight: 700; padding:14px; background:linear-gradient(135deg, #FC6100 0%, var(--brand) 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
+        <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight:600; padding:14px; background:linear-gradient(135deg, #FC6100 0%, var(--brand) 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
       </div>
     </div>
   </div>
@@ -935,7 +936,7 @@
   <div id="activity-detail-modal" class="detail-modal" style="z-index:10200;">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeActivityDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+      <button class="btn-back" onclick="closeActivityDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
@@ -1001,7 +1002,7 @@
       <!-- Activity Status Row -->
       <div id="detail-status-row" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:16px;">
         <div style="font-size:10.5px; font-weight:700; color:var(--label); text-transform:uppercase; letter-spacing:0.8px;">Activity Status</div>
-        <div id="detail-status-badge" style="font-size:11px; font-weight: 700; padding:3px 9px; border-radius:20px; background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25);">✓ Valid</div>
+        <div id="detail-status-badge" style="font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25);">✓ Valid</div>
       </div>
       
       <!-- Fields Grid -->
@@ -1089,7 +1090,7 @@
 
       <!-- Report Suspicious Activity -->
       <div id="detail-report-section" style="margin-top:24px; display:none;">
-        <button id="btn-report-activity" onclick="toggleReportForm()" style="display:flex; align-items:center; gap:10px; width:100%; padding:14px 18px; background:rgba(255,255,255,0.06); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:14px; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer; text-align:left; transition:all 0.25s; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+        <button id="btn-report-activity" onclick="toggleReportForm()" style="display:flex; align-items:center; gap:10px; width:100%; padding:14px 18px; background:rgba(255,255,255,0.06); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:14px; color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:left; transition:all 0.25s; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
           <span style="width:30px;height:30px;border-radius:8px;background:rgba(232,98,42,0.15);border:1px solid rgba(232,98,42,0.25);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#9873;</span>
           <div>
             <div style="color:#fff;font-size:13px;font-weight:700;">Mark as Suspicious Activity</div>
@@ -1110,8 +1111,8 @@
           </select>
           <textarea id="report-comments" placeholder="Additional details (optional)..." style="width:100%; padding:11px 12px; background:rgba(255,255,255,0.08); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; font-size:13px; min-height:80px; resize:none; box-sizing:border-box; margin-bottom:14px; font-family:inherit;"></textarea>
           <div style="display:flex; gap:8px;">
-            <button id="btn-submit-report" onclick="submitActivityReport()" style="flex:1; padding:11px 16px; background:rgba(232,98,42,0.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(232,98,42,0.35); border-radius:10px; color:var(--brand); font-size:13px; font-weight: 700; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(232,98,42,0.15);">Submit Report</button>
-            <button onclick="toggleReportForm()" style="padding:11px 18px; background:rgba(255,255,255,0.06); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer;">Cancel</button>
+            <button id="btn-submit-report" onclick="submitActivityReport()" style="flex:1; padding:11px 16px; background:rgba(232,98,42,0.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(232,98,42,0.35); border-radius:10px; color:var(--brand); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(232,98,42,0.15);">Submit Report</button>
+            <button onclick="toggleReportForm()" style="padding:11px 18px; background:rgba(255,255,255,0.06); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:var(--muted); font-size:13px; font-weight:600; cursor:pointer;">Cancel</button>
           </div>
         </div>
       </div>
@@ -1122,7 +1123,7 @@
 <div id="profile-detail-modal" class="detail-modal">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeProfileDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+      <button class="btn-back" onclick="closeProfileDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
@@ -1218,8 +1219,8 @@
         
         <!-- Time Filter Tabs -->
         <div style="display:flex; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:3px; margin:0 0 16px 0;">
-          <button id="btn-stats-recent" onclick="toggleStatsTimeframe('recent')" style="flex:1; background:rgba(255,255,255,0.08); border:none; color:#fff; padding:6px; border-radius:6px; font-size:11px; font-weight:700; text-transform:uppercase; cursor:pointer; transition:all 0.2s;">Last 4 Weeks</button>
-          <button id="btn-stats-alltime" onclick="toggleStatsTimeframe('all')" style="flex:1; background:none; border:none; color:var(--muted); padding:6px; border-radius:6px; font-size:11px; font-weight:700; text-transform:uppercase; cursor:pointer; transition:all 0.2s;">All-Time</button>
+          <button id="btn-stats-recent" onclick="toggleStatsTimeframe('recent')" style="flex:1; background:rgba(255,255,255,0.08); border:none; color:#fff; padding:6px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; cursor:pointer; transition:all 0.2s;">Last 4 Weeks</button>
+          <button id="btn-stats-alltime" onclick="toggleStatsTimeframe('all')" style="flex:1; background:none; border:none; color:var(--muted); padding:6px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; cursor:pointer; transition:all 0.2s;">All-Time</button>
         </div>
         
         <!-- Sports Stats Container -->
@@ -1243,7 +1244,7 @@
   <div id="you-panel-activities" class="detail-modal">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeActivitiesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+      <button class="btn-back" onclick="closeActivitiesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
@@ -1268,7 +1269,7 @@
   <div id="you-panel-challenges" class="detail-modal">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeChallengesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+      <button class="btn-back" onclick="closeChallengesDrawer()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
@@ -1290,7 +1291,7 @@
   <div id="reactions-detail-modal" class="detail-modal" style="z-index:10300;">
     <!-- Top Nav Bar -->
     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
-      <button class="btn-back" onclick="closeReactionsDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+      <button class="btn-back" onclick="closeReactionsDetail()" style="background:none; border:none; color:var(--muted); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Back
       </button>
@@ -1314,16 +1315,16 @@
     <div style="text-align:center;font-size:16px;font-weight: 700;color:#fff;margin-bottom:6px;">Share Activity</div>
     <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;">Choose a format to share or save</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <button onclick="shareActivityCard('whatsapp')" style="padding:16px 12px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:12px;color:#25D366;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <button onclick="shareActivityCard('whatsapp')" style="padding:16px 12px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:12px;color:#25D366;font-size:14px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
         <span style="font-size:24px;">&#128241;</span>WhatsApp Card
         <span style="font-size:10px;color:var(--muted);font-weight:600;">4:3 &middot; 900&times;675px</span>
       </button>
-      <button onclick="shareActivityCard('story')" style="padding:16px 12px;background:rgba(232,98,42,0.1);border:1px solid rgba(232,98,42,0.25);border-radius:12px;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <button onclick="shareActivityCard('story')" style="padding:16px 12px;background:rgba(232,98,42,0.1);border:1px solid rgba(232,98,42,0.25);border-radius:12px;color:var(--brand);font-size:14px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
         <span style="font-size:24px;">&#128248;</span>Instagram Story
         <span style="font-size:10px;color:var(--muted);font-weight:600;">9:16 &middot; 540&times;960px</span>
       </button>
     </div>
-    <button onclick="hideShareSheet()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+    <button onclick="hideShareSheet()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
   </div>
 </div>
 </body>
