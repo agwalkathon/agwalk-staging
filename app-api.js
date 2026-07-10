@@ -987,7 +987,7 @@ async function load(isBackgroundRefresh) {
             var count = typeCounts[type];
             var bg = bgColors[type] || 'rgba(255,255,255,0.08)';
             var fg = textColors[type] || 'var(--muted)';
-            return '<span style="font-size:11px;font-weight:700;color:' + fg + ';background:' + bg + ';padding:5px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;margin-right:8px;margin-bottom:8px;">' + type + ' · ' + count + '</span>';
+            return '<span style="font-size:11px;font-weight:600;color:' + fg + ';background:' + bg + ';padding:5px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;margin-right:8px;margin-bottom:8px;">' + type + ' · ' + count + '</span>';
           }).join('');
         }
       }
@@ -1602,55 +1602,7 @@ async function load(isBackgroundRefresh) {
         return '🎯';
       }
 
-      function getChallengeIconClass(name) {
-        var n = (name || '').toLowerCase();
-        if (n.indexOf('strava') > -1) return 'fa-brands fa-strava';
-        if (n.indexOf('walk') > -1) return 'fa-solid fa-person-walking';
-        if (n.indexOf('run') > -1) return 'fa-solid fa-person-running';
-        if (n.indexOf('ride') > -1 || n.indexOf('cycle') > -1 || n.indexOf('bike') > -1) return 'fa-solid fa-bicycle';
-        if (n.indexOf('hike') > -1 || n.indexOf('climb') > -1) return 'fa-solid fa-mountain-sun';
-        if (n.indexOf('sunchaser') > -1 || n.indexOf('sun') > -1 || n.indexOf('morning') > -1) return 'fa-solid fa-sun';
-        if (n.indexOf('night') > -1 || n.indexOf('evening') > -1) return 'fa-solid fa-moon';
-        if (n.indexOf('environment') > -1 || n.indexOf('nature') > -1 || n.indexOf('green') > -1) return 'fa-solid fa-leaf';
-        if (n.indexOf('wednesday') > -1 || n.indexOf('friday') > -1 || n.indexOf('day') > -1) return 'fa-solid fa-calendar-day';
-        if (n.indexOf('weekend') > -1 || n.indexOf('saturday') > -1 || n.indexOf('sunday') > -1) return 'fa-solid fa-umbrella-beach';
-        if (n.indexOf('gold') > -1 || n.indexOf('silver') > -1 || n.indexOf('bronze') > -1) return 'fa-solid fa-medal';
-        if (n.indexOf('title') > -1 || n.indexOf('champion') > -1) return 'fa-solid fa-trophy';
-        return 'fa-solid fa-bullseye';
-      }
-
-      function renderDashboardChallenges(items){
-        var container = document.getElementById('dashboard-challenges-list');
-        if(!container) return;
-        if(!items.length){
-          container.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No challenges yet</div>';
-          return;
-        }
-        var html = '';
-        items.forEach(function(ch){
-          var pillColor = ch.earned ? 'var(--green)' : ch.missed ? 'rgba(255,255,255,0.15)' : 'var(--brand)';
-          var statusLabel = ch.earned ? 'EARNED' : ch.missed ? 'MISSED' : 'ACTIVE';
-          html += '<div class="today-act-row" onclick="openChallengesDrawer();" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
-                    '<div style="display:flex; align-items:center; gap:14px; min-width:0;">' +
-                      '<div style="display:flex; align-items:center; justify-content:center; min-width:30px; height:30px;">' +
-                        '<i class="' + ch.iconClass + '" style="font-size:18px;color:' + pillColor + ';"></i>' +
-                      '</div>' +
-                      '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">' + esc(ch.name) + '</div>' +
-                    '</div>' +
-                    '<div style="display:flex; align-items:center; gap:10px;">' +
-                      '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:rgba(255,255,255,0.65); font-weight:600; line-height:1.3; font-family:var(--font);">' +
-                        '<div>+' + ch.pts + ' PTS</div>' +
-                        '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + statusLabel + '</div>' +
-                      '</div>' +
-                      '<div style="width:3px; height:26px; background:' + pillColor + '; border-radius:2px;"></div>' +
-                    '</div>' +
-                  '</div>';
-        });
-        container.innerHTML = html;
-      }
-
       var sortedCh = combined.sort(function(a,b){return (b.start_date||'').localeCompare(a.start_date||'');});
-      var dashItems=[];
       sortedCh.forEach(function(ch,ci2){
         var key = ch.is_manual ? ch.id : 'ch_'+(ch.id||ci2);
         var ep=fullPts.earnedPts||{};
@@ -1663,12 +1615,11 @@ async function load(isBackgroundRefresh) {
         var missed=!earned&&ch.end_date&&ch.end_date<today2;
         var statusCls=earned?'won':missed?'missed':'avail';
         var statusIcon=earned?'\u2713':missed?'\u2715':'!';
-        dashItems.push({name:toTitleCase(ch.name), iconClass:getChallengeIconClass(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
         
         var cardDiv=document.createElement('div');
         cardDiv.className='ch-card ' + statusCls;
         
-        var titleIconHtml = '<i class="' + getChallengeIconClass(ch.name) + '" style="margin-right:7px;font-size:0.85em;color:inherit;"></i>';
+        var displayName = getChallengeEmoji(ch.name) + ' ' + toTitleCase(ch.name);
         var statusBarHtml = earned
           ? '<span>&#10003; Achieved</span><span>+' + Math.round(displayPts) + ' pts earned</span>'
           : missed
@@ -1678,7 +1629,7 @@ async function load(isBackgroundRefresh) {
           <div class="ch-card-header">
             <div class="ch-dot ${statusCls}">${statusIcon}</div>
             <div class="ch-card-title-wrap">
-              <div class="ch-title">${titleIconHtml}${esc(toTitleCase(ch.name))}</div>
+              <div class="ch-title">${esc(displayName)}</div>
               <div class="ch-sub">${ch.start_date === ch.end_date ? ch.start_date : ch.start_date + ' \u2013 ' + ch.end_date} &middot; <span class="ch-pts ${statusCls}">+${Math.round(earned ? displayPts : ch.bonus_points)} pts</span></div>
             </div>
           </div>
@@ -1686,7 +1637,6 @@ async function load(isBackgroundRefresh) {
         `;
         chList.appendChild(cardDiv);
       });
-      renderDashboardChallenges(dashItems.slice(0,3));
     })();
 
     var flaggedCount=myActs.filter(function(a){return a.is_flagged;}).length;
