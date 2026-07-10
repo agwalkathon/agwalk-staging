@@ -712,7 +712,6 @@ async function upsertConfig(key,value){
 }
 async function loadConfig(){
   loadPWARestrictions();
-  loadFeedConfig();
   loadBrandingConfig();
   var lm=document.getElementById('login-method-select'); if(lm) lm.value='';
   try {
