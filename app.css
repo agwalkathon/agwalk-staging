@@ -361,6 +361,7 @@
       align-items:center;justify-content:center;
     }
     .ring-pct{font-size:20px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;}
+    .ring-pct-sm{font-size:15px;}
     .ring-check{font-size:22px;line-height:1;}
     .ring-emoji{font-size:20px;margin-bottom:3px;}
     .ring-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-top:10px;color:#fff;}
