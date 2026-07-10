@@ -3605,7 +3605,7 @@ function setupAppLayout(isParticipant) {
   
   var syncBtn = document.getElementById('strava-sync-btn');
   if (syncBtn) {
-    syncBtn.style.display = isParticipant ? 'inline-flex' : 'none';
+    syncBtn.style.display = (isParticipant && window._stravaSyncHeaderEnabled) ? 'inline-flex' : 'none';
   }
   
   if (bnav) {
