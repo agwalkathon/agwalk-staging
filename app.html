@@ -486,21 +486,22 @@
     </div>
   </div>
 
-  <!-- Challenges Navigation Card -->
-  <div class="glass-card" id="dashboard-challenges-card" onclick="openChallengesDrawer();" style="margin-bottom:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%); border:1px solid rgba(252, 165, 128, 0.15); box-shadow:0 8px 32px 0 rgba(0, 0, 0, 0.2); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; transition:transform 0.2s, background 0.2s;" onmouseenter="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)'; this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='linear-gradient(135deg, rgba(232, 98, 42, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)'; this.style.transform='none'">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div style="width:38px; height:38px; border-radius:10px; background:rgba(232, 98, 42, 0.2); display:flex; align-items:center; justify-content:center; color:var(--brand);">
-        <i class="fa-solid fa-bullseye" style="font-size:18px;"></i>
-      </div>
-      <div>
-        <div style="font-size:15px; font-weight:700; color:#fff;">Challenges</div>
-        <div style="font-size:12px; color:rgba(255, 255, 255, 0.55); margin-top:2px;">Track active event challenges and milestones</div>
-      </div>
+  <!-- Challenges Card with Recent Challenges -->
+  <div class="card" style="margin-bottom:8px; padding:0 0 12px 0;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 12px 0; margin-bottom:10px;">
+      <div class="sec" style="margin:0; padding:0;">Challenges</div>
+      <button onclick="openChallengesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all challenges">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
-    <div style="color:rgba(255, 255, 255, 0.4);">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
+    <!-- List of last 3 challenges -->
+    <div id="dashboard-challenges-list" style="display:flex; flex-direction:column; gap:8px; padding:0 12px;">
+      <div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">
+        Loading challenges...
+      </div>
     </div>
   </div>
 
@@ -879,7 +880,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
   <script src="app-config.js?v=20260709_v150" defer></script>
   <script src="app-employee.js?v=20260710_v5" defer></script>
-  <script src="app-api.js?v=20260709_v159" defer></script>
+  <script src="app-api.js?v=20260710_v160" defer></script>
   <script src="app-drawers.js?v=20260709_v157" defer></script>
   <script src="app-events.js?v=20260709_v151" defer></script>
   <script src="app-dashboard.js?v=20260709_v152" defer></script>
