@@ -2626,9 +2626,9 @@
     transform: translateY(-2px);
   }
   .prof-pb-card .lbl {
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
