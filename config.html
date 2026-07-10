@@ -423,6 +423,13 @@ tr:hover td{background:#FAFAFA}
           </div>
         </div>
         <div class="field"><label>Logo Width (px)</label><input id="br-logo-size" type="number" min="30" max="400" value="120"></div>
+        <div class="field"><label>Logo Color</label>
+          <select id="br-logo-filter">
+            <option value="none">Original (no filter)</option>
+            <option value="white">Force White</option>
+            <option value="black">Force Black</option>
+          </select>
+        </div>
         <div class="field"><label>Logo Position</label>
           <select id="br-logo-pos">
             <option value="top">Top (above App Name)</option>
@@ -745,6 +752,7 @@ async function loadBrandingConfig(){
     document.getElementById('br-title').value = br.login_title || '';
     document.getElementById('br-tag').value = br.tagline || '';
     document.getElementById('br-logo').value = br.logo_url || '';
+    document.getElementById('br-logo-filter').value = br.logo_filter || 'none';
     document.getElementById('br-font').value = br.font_family || 'Inter';
     document.getElementById('br-title-size').value = br.title_size || 26;
     document.getElementById('br-tag-size').value = br.tagline_size || 14;
@@ -772,12 +780,20 @@ async function loadBrandingConfig(){
     console.warn('Failed to load branding config:', e);
   }
 }
+function logoFilterCss(mode){
+  if (mode === 'white') return 'brightness(0) invert(1)';
+  if (mode === 'black') return 'brightness(0)';
+  return 'none';
+}
 function updateLogoPreview(url){
   var img = document.getElementById('br-logo-preview'), empty = document.getElementById('br-logo-empty');
-  if (url) { img.src = url; img.style.display = 'block'; empty.style.display = 'none'; }
+  var filterSel = document.getElementById('br-logo-filter');
+  var filterMode = filterSel ? filterSel.value : 'none';
+  if (url) { img.src = url; img.style.display = 'block'; img.style.filter = logoFilterCss(filterMode); empty.style.display = 'none'; }
   else { img.style.display = 'none'; empty.style.display = 'block'; }
 }
 document.getElementById('br-logo').addEventListener('input', function(){ updateLogoPreview(this.value.trim()); });
+document.getElementById('br-logo-filter').addEventListener('change', function(){ updateLogoPreview(document.getElementById('br-logo').value.trim()); });
 document.getElementById('btn-brlogo-up').addEventListener('click', function(){ document.getElementById('brlogo-file').click(); });
 document.getElementById('brlogo-file').addEventListener('change', function(){
   var f = this.files[0]; this.value = ''; if (!f) return;
@@ -808,6 +824,7 @@ document.getElementById('btn-br-preview').addEventListener('click', function(){
     login_title: document.getElementById('br-title').value.trim(),
     tagline: document.getElementById('br-tag').value.trim(),
     logo_url: document.getElementById('br-logo').value.trim(),
+    logo_filter: document.getElementById('br-logo-filter').value,
     accent_color: document.getElementById('br-accent-hex').value.trim(),
     font_family: document.getElementById('br-font').value,
     title_size: parseInt(document.getElementById('br-title-size').value) || 26,
@@ -829,6 +846,7 @@ async function saveBranding(){
     login_title: document.getElementById('br-title').value.trim(),
     tagline: document.getElementById('br-tag').value.trim(),
     logo_url: document.getElementById('br-logo').value.trim(),
+    logo_filter: document.getElementById('br-logo-filter').value,
     accent_color: document.getElementById('br-accent-hex').value.trim(),
     font_family: document.getElementById('br-font').value,
     title_size: parseInt(document.getElementById('br-title-size').value) || 26,
