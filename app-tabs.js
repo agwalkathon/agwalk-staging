@@ -491,11 +491,11 @@ function renderTodayActivities(acts) {
       sportIcon = '<i class="fa-solid fa-person-running" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'RUNNING';
     } else if (sport === 'walk') {
-      pillColor = 'var(--brand)';
+      pillColor = 'var(--green)';
       sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'WALKING';
     } else if (sport === 'ride' || sport === 'cycling') {
-      pillColor = 'var(--purple)';
+      pillColor = 'var(--blue)';
       sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:12px;"></i>';
       sportTitle = 'CYCLING';
     } else if (sport === 'hike') {
