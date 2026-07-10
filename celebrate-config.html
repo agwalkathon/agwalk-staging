@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -397,7 +398,7 @@ input[type=checkbox].sw:checked::after{left:21px}
 </div>
 </div>
 <script>
-var BACKEND='https://agwalk-backend.onrender.com';
+var BACKEND= window.BACKEND_URL;
 function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){window.location.href='admin-login.html';}}
 function logout(){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}
 authGuard();

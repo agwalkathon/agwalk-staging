@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -758,7 +759,7 @@ var WRITE_HDR = {
   'Authorization': 'Bearer ' + SUPABASE_ANON,
   'Content-Type': 'application/json'
 };
-var BACKEND_URL  = 'https://agwalk-backend.onrender.com';
+var BACKEND_URL  = window.BACKEND_URL;
       const ADMIN_SECRET = 'agwalk-admin-2026-xK9mPqR7';
 
 function toggleFormatRef() {
@@ -769,7 +770,7 @@ function toggleFormatRef() {
   chev.textContent = open ? '▼ Show' : '▲ Hide';
 }
 
-var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+var _BU= window.BACKEND_URL;function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
 
 // ── Tab switching ────────────────────────────────────────────

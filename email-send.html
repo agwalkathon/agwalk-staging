@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -650,7 +651,7 @@ var SB = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
 
-var _BU='https://agwalk-backend.onrender.com';function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
+var _BU= window.BACKEND_URL;function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
 
 // ── Supabase helpers ───────────────────────────────────
@@ -741,7 +742,7 @@ function toggleProviderFields() {
 
 async function loadEmailStatus() {
   try {
-    var r = await fetch('https://agwalk-backend.onrender.com/email/status');
+    var r = await fetch(window.BACKEND_URL + '/email/status');
     var d = await r.json();
     var widget = document.getElementById('brevo-usage-widget');
     if (widget && d.success) {
@@ -796,7 +797,7 @@ async function loadEmailStatus() {
 
 async function loadSmtp() {
   try {
-    var r = await fetch('https://agwalk-backend.onrender.com/get-smtp');
+    var r = await fetch(window.BACKEND_URL + '/get-smtp');
     var d = await r.json();
     if (d.success && d.data && d.data.config) {
       var s = d.data.config;
@@ -823,7 +824,7 @@ async function saveSmtp() {
     if (el) cfg[k] = el.value.trim();
   });
   try {
-    var r = await fetch('https://agwalk-backend.onrender.com/save-smtp', {
+    var r = await fetch(window.BACKEND_URL + '/save-smtp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ config: cfg })
@@ -845,7 +846,7 @@ async function testSmtp() {
   setStatus('smtp-status', 'wait', '⏳ Saving & sending test email to ' + testTo + '...');
   await saveSmtp();
   try {
-    var r = await fetch('https://agwalk-backend.onrender.com/test-email', {
+    var r = await fetch(window.BACKEND_URL + '/test-email', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: testTo })
     });
@@ -1306,7 +1307,7 @@ async function startSend(testOnly) {
     if (!recips.length) { log('⚠️ No recipients with valid email addresses.', 'log-warn'); return; }
 
     log('🚀 Sending via backend...');
-    var r = await fetch('https://agwalk-backend.onrender.com/send-email', {
+    var r = await fetch(window.BACKEND_URL + '/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ recipients: recips, subject: tpls[0].subject, body_html: tpls[0].body_html, test_only: testOnly, test_email: testEmail })

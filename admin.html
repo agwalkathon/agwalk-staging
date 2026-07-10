@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -1060,7 +1061,7 @@ function toggleQuickAccess() {
   chev.textContent = open ? '▼' : '▲';
 }
 
-const _BACKEND_URL = 'https://agwalk-backend.onrender.com';
+const _BACKEND_URL = window.BACKEND_URL;
 function authGuard() {
   var token = sessionStorage.getItem('wk_admin_token');
   if (!token) { window.location.href = 'admin-login.html'; return; }

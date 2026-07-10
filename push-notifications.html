@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -398,7 +399,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 <script>
 authGuard();
 
-var BU = 'https://agwalk-backend.onrender.com';
+var BU = window.BACKEND_URL;
 
 var DEFAULT_RULES = [
   { trigger_key:'activity_synced',       title:'Activity Synced!',          body:'Your activity has been recorded - {distance} km!',               enabled:false },

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function(){
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -292,7 +293,7 @@
 </div>
 
 <script>
-  var BACKEND_URL = 'https://agwalk-backend.onrender.com';
+  var BACKEND_URL = window.BACKEND_URL;
 
   // Redirect if already logged in (valid JWT in sessionStorage)
   var existingToken = sessionStorage.getItem('wk_admin_token');

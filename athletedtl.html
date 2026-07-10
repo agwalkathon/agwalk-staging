@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function() {
       if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
         sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
@@ -726,7 +727,7 @@
     let allEmployees = [];
     let allRequestRows = [];
     let currentTab = 'employees';
-    var _BU = 'https://agwalk-backend.onrender.com';
+    var _BU = window.BACKEND_URL;
 
     var EV_ID = 1;
     var EV_ALL = [];

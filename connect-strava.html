@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
+  <script src="env-config.js?v=20260710_v1"></script>
+<script>
     (function(){
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -204,7 +205,7 @@ var SUPABASE_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR={'apikey':ANON,'Authorization':'Bearer '+ANON};
 var CLIENT_ID='29159';
-var BACKEND='https://agwalk-backend.onrender.com';
+var BACKEND= window.BACKEND_URL;
 var REDIRECT=window.location.origin+window.location.pathname;
 var AUTH_URL='https://www.strava.com/oauth/authorize?client_id='+CLIENT_ID+'&redirect_uri='+encodeURIComponent(REDIRECT)+'&response_type=code&scope=read,activity:read&state=walkathon2026';
 

@@ -165,9 +165,10 @@
   </div>
 </div>
 
+<script src="env-config.js?v=20260710_v1"></script>
 <script>
   var CLIENT_ID = '29159';
-  var BACKEND = 'https://agwalk-backend.onrender.com';
+  var BACKEND = window.BACKEND_URL;
   var REDIRECT = window.location.origin + window.location.pathname;
 
   function showState(state) {
