@@ -703,7 +703,7 @@ async function loadEventSelector(){
       EV_ID=parseInt(this.value)||1;
       localStorage.setItem('wk_admin_selected_event_id', EV_ID);
       updateEventLabels();
-      await loadConfig(); loadSpecialDates(); loadChallenges();
+      await loadConfig();
     });
   }catch(e){console.warn("event selector failed",e);}
 }
@@ -1044,17 +1044,11 @@ async function loadHeaderOptions(){try{var r=await fetch(_BU+'/admin/maintenance
 async function saveHeaderOptions(){var enabled=document.getElementById('strava-header-toggle').checked,errEl=document.getElementById('headeropts-msg-err');errEl.textContent='';try{var r=await fetch(_BU+'/admin/maintenance',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+sessionStorage.getItem('wk_admin_token')},body:JSON.stringify({strava_sync_header_enabled:enabled})});if(!r.ok){var e=await r.json().catch(function(){return{}});throw new Error(e.error||('Save failed '+r.status))}showSaved('headeropts-saved')}catch(e){errEl.textContent='? '+e.message}}
 loadEventSelector().then(() => {
   loadConfig();
-  loadSpecialDates();
-  loadChallenges();
-  loadManualBonuses();
   loadMaintenance();
   loadHeaderOptions();
 }).catch(err => {
   console.error('loadEventSelector error:', err);
   loadConfig();
-  loadSpecialDates();
-  loadChallenges();
-  loadManualBonuses();
   loadMaintenance();
   loadHeaderOptions();
 });
