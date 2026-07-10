@@ -1,6 +1,31 @@
 // app-employee.js
 // Handles non-participant employee specific logic, login flows, and native Celebrate tab loaders.
 
+function openImageLightbox(url) {
+  var existing = document.getElementById('img-lightbox-overlay');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'img-lightbox-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;';
+  var img = document.createElement('img');
+  img.src = url;
+  img.style.cssText = 'max-width:100%;max-height:100%;border-radius:8px;object-fit:contain;cursor:default;';
+  img.addEventListener('click', function(e){ e.stopPropagation(); });
+  var closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.style.cssText = 'position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:28px;width:40px;height:40px;border-radius:50%;cursor:pointer;line-height:1;';
+  function closeLightbox(){ overlay.remove(); document.removeEventListener('keydown', escHandler); }
+  function escHandler(e){ if (e.key === 'Escape') closeLightbox(); }
+  closeBtn.addEventListener('click', function(e){ e.stopPropagation(); closeLightbox(); });
+  overlay.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', escHandler);
+  overlay.appendChild(img);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
+window.openImageLightbox = openImageLightbox;
+
 var _loginEmail = '';
 var _postPhotos = [];
 
@@ -460,7 +485,7 @@ function buildCelebCard(c){
       var im = document.createElement('img');
       im.src = u; im.loading = 'lazy';
       im.style.cssText = 'width:100%;border-radius:10px;max-height:280px;object-fit:cover;cursor:pointer;';
-      im.addEventListener('click', function(){ window.open(u, '_blank'); });
+      im.addEventListener('click', function(){ openImageLightbox(u); });
       mg.appendChild(im);
     });
     glassPanel.appendChild(mg);
@@ -532,7 +557,7 @@ function buildCelebCard(c){
       if (w.media_url) {
         var wimg = document.createElement('img'); wimg.src = w.media_url;
         wimg.style.cssText = 'display:block;max-width:180px;border-radius:10px;margin-top:6px;cursor:pointer;';
-        wimg.addEventListener('click', function(){ window.open(w.media_url, '_blank'); });
+        wimg.addEventListener('click', function(){ openImageLightbox(w.media_url); });
         wright.appendChild(wimg);
       }
       wrow.appendChild(wav); wrow.appendChild(wright);
