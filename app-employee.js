@@ -346,6 +346,7 @@ function buildCelebCard(c){
   card.style.overflow = 'hidden';
 
   var isOccasion = ['welcome','birthday','anniversary'].indexOf(c.type) > -1;
+  var glassPanel;
 
   if (isOccasion) {
     var empNameOcc = (c.employee && c.employee.full_name) || '';
@@ -401,6 +402,7 @@ function buildCelebCard(c){
     glass.appendChild(msgEl);
 
     bodyWrap.appendChild(glass);
+    glassPanel = glass;
     card.appendChild(bodyWrap);
   } else {
     var typeColor = meta[1];
@@ -447,12 +449,13 @@ function buildCelebCard(c){
 
     bodyWrap2.appendChild(glass2);
     card.appendChild(bodyWrap2);
+    glassPanel = glass2;
   }
 
   var mediaArr = Array.isArray(c.media) ? c.media : [];
-  if (mediaArr.length) {
+  if (mediaArr.length && glassPanel) {
     var mg = document.createElement('div');
-    mg.style.cssText = 'display:grid;grid-template-columns:' + (mediaArr.length > 1 ? '1fr 1fr' : '1fr') + ';gap:6px;margin-top:10px;padding:0 18px;';
+    mg.style.cssText = 'display:grid;grid-template-columns:' + (mediaArr.length > 1 ? '1fr 1fr' : '1fr') + ';gap:6px;margin-top:12px;';
     mediaArr.forEach(function(u){
       var im = document.createElement('img');
       im.src = u; im.loading = 'lazy';
@@ -460,10 +463,7 @@ function buildCelebCard(c){
       im.addEventListener('click', function(){ window.open(u, '_blank'); });
       mg.appendChild(im);
     });
-    var mgWrap = document.createElement('div');
-    mgWrap.style.cssText = 'padding:0 18px 18px;';
-    mgWrap.appendChild(mg);
-    card.appendChild(mgWrap);
+    glassPanel.appendChild(mg);
   }
 
   var innerPad = document.createElement('div');
