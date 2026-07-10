@@ -14,10 +14,10 @@
     hexagon: '<path d="M50 5 L89 27 L89 73 L50 95 L11 73 L11 27 Z" pathLength="100"/>',
     square:  '<rect x="9" y="9" width="82" height="82" rx="18" pathLength="100"/>',
     shield:  '<path d="M14 10 L86 10 L86 48 C86 71 68 86 50 94 C32 86 14 71 14 48 Z" pathLength="100"/>',
-    star:    '<path d="M96 50 L65 61 L64 94 L44 68 L13 77 L31 50 L13 23 L44 32 L64 6 L65 39 Z" pathLength="100"/>',
+    star:    '<path d="M96 50 L72.7 66.5 L64.2 93.7 L41.3 76.6 L12.8 77 L22 50 L12.8 23 L41.3 23.4 L64.2 6.3 L72.7 33.5 Z" pathLength="100"/>',
     pentagon: '<path d="M94 50 L64 92 L14 76 L14 24 L64 8 Z" pathLength="100"/>',
     octagon: '<path d="M94 50 L81 81 L50 94 L19 81 L6 50 L19 19 L50 6 L81 19 Z" pathLength="100"/>',
-    triangle: '<path d="M96 50 L27 90 L27 10 Z" pathLength="100"/>',
+    triangle: '<path d="M94 50 L20 94 L20 6 Z" pathLength="100"/>',
     heart: '<path d="M78 50 C88 50,95 58,95 68 C95 80,88 95,72 95 C55 95,35 80,12 50 C35 20,55 5,72 5 C88 5,95 20,95 32 C95 42,88 50,78 50 Z" pathLength="100"/>'
   };
   function todayIST(){
@@ -104,6 +104,11 @@
     var needText = done ? '✓ Achieved' : fmt(needed) + ' ' + unit + ' remaining';
     var needColor = done ? 'var(--green)' : '#ffffff';
 
+    var pctClass = 'ring-pct';
+    var pctStyle = '';
+    if (ring.shape === 'star' || ring.shape === 'heart') { pctClass += ' ring-pct-sm'; }
+    if (ring.shape === 'triangle') { pctClass += ' ring-pct-sm'; pctStyle = ' style="transform:translateY(9px)"'; }
+
     box.innerHTML =
       '<div class="ring-svg-wrap">' +
         '<svg viewBox="0 0 100 100">' +
@@ -112,7 +117,7 @@
             shape.replace('/>', ' stroke-dasharray="100" stroke-dashoffset="' + (100 - pct).toFixed(1) + '"' + rot + '/>') +
           '</g>' +
         '</svg>' +
-        '<div class="ring-inner"><span class="ring-pct">' + Math.round(pct) + '%</span></div>' +
+        '<div class="ring-inner"><span class="' + pctClass + '"' + pctStyle + '>' + Math.round(pct) + '%</span></div>' +
       '</div>' +
       '<div class="ring-name" style="color:' + brightColor + '">' + (ring.label || ring.metric) + '</div>' +
       '<div class="ring-need" style="color:' + needColor + '; font-weight: 600; font-size: 11.5px; margin-top: 4px; margin-bottom: 2px;">' + needText + '</div>' +
