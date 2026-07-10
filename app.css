@@ -616,9 +616,9 @@
       transform: scale(1.08);
     }
     .pb-card-label {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
-      color: var(--card-accent, var(--label));
+      color: rgba(255,255,255,0.8);
       letter-spacing: 0.6px;
       text-transform: uppercase;
     }
