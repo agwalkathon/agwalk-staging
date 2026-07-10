@@ -14,11 +14,11 @@
     hexagon: '<path d="M50 5 L89 27 L89 73 L50 95 L11 73 L11 27 Z" pathLength="100"/>',
     square:  '<rect x="9" y="9" width="82" height="82" rx="18" pathLength="100"/>',
     shield:  '<path d="M14 10 L86 10 L86 48 C86 71 68 86 50 94 C32 86 14 71 14 48 Z" pathLength="100"/>',
-    star:    '<path d="M50 4 L61 35 L94 36 L68 56 L77 87 L50 69 L23 87 L32 56 L6 36 L39 35 Z" pathLength="100"/>',
-    pentagon: '<path d="M50 6 L92 36 L76 86 L24 86 L8 36 Z" pathLength="100"/>',
-    octagon: '<path d="M50 6 L81 19 L94 50 L81 81 L50 94 L19 81 L6 50 L19 19 Z" pathLength="100"/>',
-    triangle: '<path d="M50 4 L90 73 L10 73 Z" pathLength="100"/>',
-    heart: '<path d="M50 22 C50 12,58 5,68 5 C80 5,95 12,95 28 C95 45,80 65,50 88 C20 65,5 45,5 28 C5 12,20 5,32 5 C42 5,50 12,50 22 Z" pathLength="100"/>'
+    star:    '<path d="M96 50 L65 61 L64 94 L44 68 L13 77 L31 50 L13 23 L44 32 L64 6 L65 39 Z" pathLength="100"/>',
+    pentagon: '<path d="M94 50 L64 92 L14 76 L14 24 L64 8 Z" pathLength="100"/>',
+    octagon: '<path d="M94 50 L81 81 L50 94 L19 81 L6 50 L19 19 L50 6 L81 19 Z" pathLength="100"/>',
+    triangle: '<path d="M96 50 L27 90 L27 10 Z" pathLength="100"/>',
+    heart: '<path d="M78 50 C88 50,95 58,95 68 C95 80,88 95,72 95 C55 95,35 80,12 50 C35 20,55 5,72 5 C88 5,95 20,95 32 C95 42,88 50,78 50 Z" pathLength="100"/>'
   };
   function todayIST(){
     return new Date(Date.now() + 5.5*3600*1000).toISOString().split('T')[0];
