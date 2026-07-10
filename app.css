@@ -529,7 +529,7 @@
     .max-w{max-width:540px;margin:0 auto;}
 
     /* ── Section label ── */
-    .sec{font-size:13px;font-weight:800;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 14px;}
+    .sec{font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 14px;}
     .sec:first-child{margin-top:4px;}
     .card > .sec{padding:18px 20px 0;margin:0 0 12px;}
     .medal-pred > .sec,.heatmap-wrap > .sec{margin:0 0 14px;}
