@@ -816,7 +816,7 @@
     }
     .whoop-stat-val {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 600;
       color: #fff;
       line-height: 1.2;
     }
@@ -856,7 +856,7 @@
     .act-tile-name{font-size:12px;font-weight:500;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .act-tile-meta{font-size:11px;color:var(--label);margin-top:2px;}
     .act-tile-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;}
-    .act-tile-dist{font-size:18px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.3px;}
+    .act-tile-dist{font-size:18px;font-weight:600;color:#fff;line-height:1;letter-spacing:-0.3px;}
     .act-tile-dist-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:1px;text-transform:uppercase;}
     .act-tile-flag{font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;}
     .flag-valid{background:rgba(34,197,94,0.15);color:#22C55E;}
@@ -876,7 +876,7 @@
     .medal-current-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
     .medal-current-name{font-size:18px;font-weight:900;color:var(--text);}
     .medal-pts-right{text-align:right;}
-    .medal-pts-big{font-size:28px;font-weight:900;color:var(--brand);line-height:1;letter-spacing:-0.5px;}
+    .medal-pts-big{font-size:28px;font-weight:600;color:var(--brand);line-height:1;letter-spacing:-0.5px;}
     .medal-pts-lbl{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:3px;}
 
     .medal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 14px;}
@@ -885,7 +885,7 @@
     .mc-emoji{font-size:24px;margin-bottom:4px;}
     .mc-name{font-size:12px;font-weight:800;margin-bottom:5px;}
     .mc-name.br{color:var(--bronze);} .mc-name.si{color:var(--silver);} .mc-name.go{color:var(--gold);}
-    .mc-pct{font-size:20px;font-weight:900;color:#fff;line-height:1;margin-bottom:2px;}
+    .mc-pct{font-size:20px;font-weight:600;color:#fff;line-height:1;margin-bottom:2px;}
     .mc-pts-lbl{font-size:8.5px;color:var(--muted);margin-bottom:6px;}
     .mc-bar{background:rgba(255,255,255,0.12);border-radius:20px;height:4px;overflow:hidden;margin:0 4px;}
     .mc-fill{height:100%;border-radius:20px;transition:width 0.6s ease;}
@@ -932,11 +932,11 @@
     .gold-rival-left{flex:1;}
     .gold-rival-label{font-size:13px;font-weight:700;color:#fff;}
     .gold-rival-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
-    .gold-rival-pts{font-size:18px;font-weight:900;color:var(--green);flex-shrink:0;}
+    .gold-rival-pts{font-size:18px;font-weight:600;color:var(--green);flex-shrink:0;}
 
     /* ── Streak ── */
     .streak-top{display:flex;align-items:flex-end;justify-content:space-between;padding:14px 16px 10px;}
-    .streak-num{font-size:54px;font-weight:900;color:var(--brand);line-height:1;letter-spacing:-2px;}
+    .streak-num{font-size:54px;font-weight:600;color:var(--brand);line-height:1;letter-spacing:-2px;}
     .streak-num-lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;}
     .streak-right{text-align:right;}
     .streak-best-val{font-size:20px;font-weight:800;color:#fff;}
@@ -971,7 +971,7 @@
     .tod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
     .tod-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 6px;text-align:center;}
     .tod-icon{font-size:22px;margin-bottom:4px;}
-    .tod-val{font-size:24px;font-weight:900;color:var(--brand);line-height:1;}
+    .tod-val{font-size:24px;font-weight:600;color:var(--brand);line-height:1;}
     .tod-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
 
     /* ── Rivals ── */
@@ -1653,7 +1653,7 @@
     .hof-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:16px;}
     .hof-title{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
     .hof-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .hof-val{font-size:18px;font-weight:900;color:var(--brand);line-height:1;margin-bottom:2px;}
+    .hof-val{font-size:18px;font-weight:600;color:var(--brand);line-height:1;margin-bottom:2px;}
 
     /* ── Weekly tab ── */
     .week-note{font-size:11px;color:var(--label);padding:8px 16px;text-align:center;}
@@ -1910,7 +1910,7 @@
   }
   .pulse-stat-val {
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 600;
     color: #fff;
     line-height: 1.1;
   }
@@ -2482,7 +2482,7 @@
   .detail-keystat-val {
     color: #fff;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 600;
     margin-top: 6px;
   }
   .detail-keystat-label {
@@ -2549,7 +2549,7 @@
   }
   .feed-card-stats-grid .stat-val {
     font-size: 17px;
-    font-weight: 800;
+    font-weight: 600;
     color: #fff;
   }
   .feed-card-stats-grid .stat-unit {
@@ -2595,7 +2595,7 @@
   }
   .profile-stat-card .val {
     font-size: 16px;
-    font-weight: 900;
+    font-weight: 600;
     color: #fff;
   }
   .profile-stat-card .lbl {
