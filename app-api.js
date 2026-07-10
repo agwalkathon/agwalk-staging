@@ -1668,7 +1668,7 @@ async function load(isBackgroundRefresh) {
         var cardDiv=document.createElement('div');
         cardDiv.className='ch-card ' + statusCls;
         
-        var displayName = getChallengeEmoji(ch.name) + ' ' + toTitleCase(ch.name);
+        var titleIconHtml = '<i class="' + getChallengeIconClass(ch.name) + '" style="margin-right:7px;font-size:0.85em;color:inherit;"></i>';
         var statusBarHtml = earned
           ? '<span>&#10003; Achieved</span><span>+' + Math.round(displayPts) + ' pts earned</span>'
           : missed
@@ -1678,7 +1678,7 @@ async function load(isBackgroundRefresh) {
           <div class="ch-card-header">
             <div class="ch-dot ${statusCls}">${statusIcon}</div>
             <div class="ch-card-title-wrap">
-              <div class="ch-title">${esc(displayName)}</div>
+              <div class="ch-title">${titleIconHtml}${esc(toTitleCase(ch.name))}</div>
               <div class="ch-sub">${ch.start_date === ch.end_date ? ch.start_date : ch.start_date + ' \u2013 ' + ch.end_date} &middot; <span class="ch-pts ${statusCls}">+${Math.round(earned ? displayPts : ch.bonus_points)} pts</span></div>
             </div>
           </div>
