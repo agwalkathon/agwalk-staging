@@ -253,12 +253,7 @@ tr:hover td{background:#FAFAFA}
   text-align: left;
   line-height: 1.2;
 }
-.sec-subnav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-.sec-subtab{padding:8px 16px;font-size:12.5px;font-weight:600;color:var(--text-secondary);background:var(--page-bg);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-.sec-subtab:hover{background:#f0f0f0;}
-.sec-subtab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
-.sec-subtab-panel{display:none;}
-.sec-subtab-panel.active{display:block;}
+
 .ev-context-badge {
   background: var(--brand-light);
   color: var(--brand);
@@ -350,8 +345,10 @@ tr:hover td{background:#FAFAFA}
 <header class="topbar"><div class="topbar-left"><h1>Configuration</h1><p>Medal thresholds, bonus rules, flag settings</p></div><div class='topbar-right' style='display:flex;align-items:center;gap:12px;'> <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button></div></header>
   <div class="content">
   <div class="section-tabs">
-    <button class="stab active" data-target="security" onclick="switchConfigTab('security')"><i class="ti ti-key" style="margin-right:6px;"></i>Access & Security</button>
-    <button class="stab" data-target="branding" onclick="switchConfigTab('branding')"><i class="ti ti-palette" style="margin-right:6px;"></i>App Branding</button>
+    <button class="stab active" data-target="branding" onclick="switchConfigTab('branding')"><i class="ti ti-palette" style="margin-right:6px;"></i>App Branding</button>
+    <button class="stab" data-target="maintenance" onclick="switchConfigTab('maintenance')"><i class="ti ti-cone-2" style="margin-right:6px;"></i>Maintenance</button>
+    <button class="stab" data-target="loginmethod" onclick="switchConfigTab('loginmethod')"><i class="ti ti-shield-lock" style="margin-right:6px;"></i>Login Method</button>
+    <button class="stab" data-target="pwarules" onclick="switchConfigTab('pwarules')"><i class="ti ti-device-mobile-cog" style="margin-right:6px;"></i>PWA &amp; Push</button>
     <button class="stab" data-target="layout" onclick="switchConfigTab('layout')"><i class="ti ti-database-cog" style="margin-right:6px;"></i>Cache Management</button>
   </div>
 
@@ -364,70 +361,13 @@ tr:hover td{background:#FAFAFA}
 .stab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
 </style>
 
-<!-- Tab 1: Access & Security -->
-<div class="config-tab-panel" id="tab-panel-security">
-  <div class="sec-subnav">
-    <button class="sec-subtab active" data-secsub="maintenance" onclick="switchSecuritySubTab('maintenance')"><i class="ti ti-cone-2"></i> Maintenance</button>
-    <button class="sec-subtab" data-secsub="loginmethod" onclick="switchSecuritySubTab('loginmethod')"><i class="ti ti-shield-lock"></i> Login Method</button>
-    <button class="sec-subtab" data-secsub="pwarules" onclick="switchSecuritySubTab('pwarules')"><i class="ti ti-device-mobile-cog"></i> PWA &amp; Push</button>
-  </div>
-
-  <div class="sec-subtab-panel active" id="secsub-maintenance">
-  <div class="section"><div class="section-header" style="cursor:default;"><div class="section-header-left"><span class="section-icon icon-maint"><i class="ti ti-cone-2"></i></span><div><div class="section-title">App Maintenance Mode</div><div class="section-sub-inline">Instantly block all participants from using the app</div></div></div></div><div class="section-body open" id="body-maintenance"><div class="rule-box" style="border-color:#E8622A;background:#fff6f2"><strong>&#9888; Live impact:</strong><br>When enabled, every participant sees a full-screen "Under Maintenance" block within ~25 seconds  &mdash;  even if already logged in. Athlete IDs listed in the allow-list below stay in.</div><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:14px 0;gap:15px;max-width:600px"><div style="flex:1"><strong style="font-size:13.5px;display:block;margin-bottom:2px;color:var(--text-primary)">Maintenance Mode</strong><span style="font-size:11.5px;color:var(--text-secondary);line-height:1.4;display:block" id="maint-status-label">Loading current status...</span></div><label class="switch"><input type="checkbox" id="maint-enabled-toggle" onchange="updateMaintStatusLabel(this.checked)"><span class="slider"></span></label></div><div class="form-grid" style="max-width:700px;margin-top:16px"><div class="field" style="grid-column:1/-1"><label>Allowed athlete IDs (comma or newline separated  &mdash;  bypass the block for testing)</label><textarea id="maint-allowed-ids" rows="3" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="20507382"></textarea></div><div class="field" style="grid-column:1/-1"><label>Block screen message</label><input type="text" id="maint-message" placeholder="App is Under Maintenance"></div></div><button class="save-btn" onclick="saveMaintenance()">Save maintenance settings</button><span class="saved-msg" id="maint-saved">&#9989; Saved!</span><div id="maint-msg-err" class="msg err"></div></div></div>
-  </div>
-
-  <div class="sec-subtab-panel" id="secsub-loginmethod">
-  <div class="section"><div class="section-header" style="cursor:default;"><div class="section-header-left"><span class="section-icon icon-login"><i class="ti ti-shield-lock"></i></span><div><div class="section-title">Participant Login Method <span class="ev-context-badge"></span></div><div class="section-sub-inline">Choose the active login option for participants</div></div></div></div><div class="section-body open" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">&#9989; Saved!</span></div></div>
-  </div>
-
-  <div class="sec-subtab-panel" id="secsub-pwarules">
-  <div class="section">
-    <div class="section-header" style="cursor:default;">
-      <div class="section-header-left">
-        <span class="section-icon icon-pwa"><i class="ti ti-device-mobile-cog"></i></span>
-        <div>
-          <div class="section-title">PWA & Push Restrictions <span class="ev-context-badge"></span></div>
-          <div class="section-sub-inline">Configure installation and notification access requirements for mobile participants</div>
-        </div>
-      </div>
-      <span class="section-chevron" id="chev-pwarules">&#9660;</span>
-    </div>
-    <div class="section-body" id="body-pwarules" style="padding: 24px;">
-      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
-          <div style="flex: 1; text-align: left;">
-            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Push Notifications</strong>
-            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to enable push notifications before releasing the app dashboard.</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="rule-force-push">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; gap: 15px;">
-          <div style="flex: 1; text-align: left;">
-            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Add to Home Screen (PWA)</strong>
-            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to install the app on their Home Screen as a PWA to access the app.</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="rule-force-pwa">
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-      <button class="save-btn" onclick="savePWARestrictions()">Save restrictions</button>
-      <span class="saved-msg" id="pwa-saved">&#9989; Saved!</span>
-    </div>
-  </div>
-  </div>
-</div>
-
-<div class="config-tab-panel" id="tab-panel-branding" style="display: none;">
+<!-- Tab: App Branding (default active) -->
+<div class="config-tab-panel" id="tab-panel-branding">
   <div class="section">
     <div class="section-header" onclick="toggleSection('appbranding')">
       <div class="section-header-left">
         <span class="section-icon icon-branding"><i class="ti ti-palette"></i></span>
-        <div><div class="section-title">Employee App Branding &amp; Login Designer</div><div class="section-sub-inline">Customize the layout, colors, typography, and logo of the participant login page. Changes are live on next app load.</div></div>
+        <div><div class="section-title" style="text-align:left;justify-content:flex-start;">Employee App Branding &amp; Login Designer</div><div class="section-sub-inline" style="text-align:left;">Customize the layout, colors, typography, and logo of the participant login page. Changes are live on next app load.</div></div>
       </div>
       <span class="section-chevron" id="chev-appbranding">&#9660;</span>
     </div>
@@ -501,6 +441,58 @@ tr:hover td{background:#FAFAFA}
         <span class="saved-msg" id="branding-saved">&#9989; Saved!</span>
         <div id="branding-msg-err" class="msg err"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab: Maintenance -->
+<div class="config-tab-panel" id="tab-panel-maintenance" style="display: none;">
+  <div class="section"><div class="section-header" onclick="toggleSection('maintenance')"><div class="section-header-left"><span class="section-icon icon-maint"><i class="ti ti-cone-2"></i></span><div><div class="section-title" style="text-align:left;justify-content:flex-start;">App Maintenance Mode</div><div class="section-sub-inline" style="text-align:left;">Instantly block all participants from using the app</div></div></div><span class="section-chevron" id="chev-maintenance">&#9660;</span></div><div class="section-body" id="body-maintenance"><div class="rule-box" style="border-color:#E8622A;background:#fff6f2"><strong>&#9888; Live impact:</strong><br>When enabled, every participant sees a full-screen "Under Maintenance" block within ~25 seconds  &mdash;  even if already logged in. Athlete IDs listed in the allow-list below stay in.</div><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:14px 0;gap:15px;max-width:600px"><div style="flex:1"><strong style="font-size:13.5px;display:block;margin-bottom:2px;color:var(--text-primary)">Maintenance Mode</strong><span style="font-size:11.5px;color:var(--text-secondary);line-height:1.4;display:block" id="maint-status-label">Loading current status...</span></div><label class="switch"><input type="checkbox" id="maint-enabled-toggle" onchange="updateMaintStatusLabel(this.checked)"><span class="slider"></span></label></div><div class="form-grid" style="max-width:700px;margin-top:16px"><div class="field" style="grid-column:1/-1"><label>Allowed athlete IDs (comma or newline separated  &mdash;  bypass the block for testing)</label><textarea id="maint-allowed-ids" rows="3" style="width:100%;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;font-family:monospace;resize:vertical" placeholder="20507382"></textarea></div><div class="field" style="grid-column:1/-1"><label>Block screen message</label><input type="text" id="maint-message" placeholder="App is Under Maintenance"></div></div><button class="save-btn" onclick="saveMaintenance()">Save maintenance settings</button><span class="saved-msg" id="maint-saved">&#9989; Saved!</span><div id="maint-msg-err" class="msg err"></div></div></div>
+</div>
+
+<!-- Tab: Login Method -->
+<div class="config-tab-panel" id="tab-panel-loginmethod" style="display: none;">
+  <div class="section"><div class="section-header" onclick="toggleSection('loginmethod')"><div class="section-header-left"><span class="section-icon icon-login"><i class="ti ti-shield-lock"></i></span><div><div class="section-title" style="text-align:left;justify-content:flex-start;">Participant Login Method <span class="ev-context-badge"></span></div><div class="section-sub-inline" style="text-align:left;">Choose the active login option for participants</div></div></div><span class="section-chevron" id="chev-loginmethod">&#9660;</span></div><div class="section-body" id="body-loginmethod"><div class="form-grid" style="max-width:350px;margin-bottom:14px"><div class="field"><label>Login Page Mode</label><select id="login-method-select"><option value="emp_code">Login with Employee Code</option><option value="email_otp">Login with Email OTP</option></select></div></div><button class="save-btn" onclick="saveLoginMethod()">Save login config</button><span class="saved-msg" id="loginmethod-saved">&#9989; Saved!</span></div></div>
+</div>
+
+<!-- Tab: PWA & Push Restrictions -->
+<div class="config-tab-panel" id="tab-panel-pwarules" style="display: none;">
+  <div class="section">
+    <div class="section-header" onclick="toggleSection('pwarules')">
+      <div class="section-header-left">
+        <span class="section-icon icon-pwa"><i class="ti ti-device-mobile-cog"></i></span>
+        <div>
+          <div class="section-title" style="text-align:left;justify-content:flex-start;">PWA & Push Restrictions <span class="ev-context-badge"></span></div>
+          <div class="section-sub-inline" style="text-align:left;">Configure installation and notification access requirements for mobile participants</div>
+        </div>
+      </div>
+      <span class="section-chevron" id="chev-pwarules">&#9660;</span>
+    </div>
+    <div class="section-body" id="body-pwarules" style="padding: 24px;">
+      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px; max-width:600px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Push Notifications</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to enable push notifications before releasing the app dashboard.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="rule-force-push">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; gap: 15px;">
+          <div style="flex: 1; text-align: left;">
+            <strong style="font-size:13.5px; display:block; margin-bottom:2px; color: var(--text-primary);">Force Add to Home Screen (PWA)</strong>
+            <span style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; display:block;">Require mobile participants to install the app on their Home Screen as a PWA to access the app.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="rule-force-pwa">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <button class="save-btn" onclick="savePWARestrictions()">Save restrictions</button>
+      <span class="saved-msg" id="pwa-saved">&#9989; Saved!</span>
     </div>
   </div>
 </div>
@@ -581,7 +573,7 @@ window.switchConfigTab = function(tabName) {
 
 // Initialize active tab layout and expand sections on load
 setTimeout(function() {
-  switchConfigTab('security');
+  switchConfigTab('branding');
 }, 100);
 var BONUS_DEFAULT=[{km:5,pts:1},{km:8,pts:2},{km:10,pts:3},{km:15,pts:4},{km:21,pts:7}],bonusData=BONUS_DEFAULT.slice(),flagPreviewData=[];
 var atypeOptions = ['one-time', 'per-act', 'range-split', 'two-challenges-same-day'];
@@ -593,14 +585,6 @@ var atypeLabels = {
 };
 function toggleManualList(){var b=document.getElementById("body-manuallist"),c=document.getElementById("chev-manuallist");if(!b)return;var o=b.style.display==="block";b.style.display=o?"none":"block";if(c)c.style.transform=o?"":"rotate(180deg)"}
 function toggleSection(id){var b=document.getElementById('body-'+id),c=document.getElementById('chev-'+id);if(!b)return;var o=b.classList.contains('open');b.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o)}
-function switchSecuritySubTab(name){
-  document.querySelectorAll('.sec-subtab').forEach(function(btn){
-    btn.classList.toggle('active', btn.getAttribute('data-secsub') === name);
-  });
-  document.querySelectorAll('.sec-subtab-panel').forEach(function(panel){
-    panel.classList.toggle('active', panel.id === 'secsub-' + name);
-  });
-}
 function showSaved(id){var el=document.getElementById(id);if(el){el.style.display='inline';setTimeout(function(){el.style.display='none'},2500)}}
 function renderBonusRows(){document.getElementById('bonus-rows').innerHTML=bonusData.map(function(b,i){return '<tr><td>'+b.km+' km</td><td><input type="number" value="'+b.pts+'" id="bp-'+i+'" min="0"></td></tr>'}).join('')}
 async function loadPWARestrictions() {
