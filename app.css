@@ -2895,16 +2895,16 @@
   .splash-logo-wrap{
     display:flex;align-items:center;justify-content:center;
   }
-  .splash-step-bars{
-    display:flex;align-items:flex-end;gap:5px;height:28px;
+  .splash-dots{
+    display:flex;align-items:center;justify-content:center;gap:8px;height:28px;
   }
-  .splash-step-bar{
-    width:5px;height:28px;background:var(--brand);border-radius:3px;
-    animation:splashStepBar 1s ease-in-out infinite;
+  .splash-dot{
+    width:9px;height:9px;background:#fff;border-radius:50%;
+    animation:splashDotBounce 1s ease-in-out infinite;
   }
-  @keyframes splashStepBar{
-    0%,100%{transform:scaleY(0.4);}
-    50%{transform:scaleY(1);}
+  @keyframes splashDotBounce{
+    0%,80%,100%{transform:scale(0.6);opacity:0.4;}
+    40%{transform:scale(1);opacity:1;}
   }
 
   .athlete-profile-link, .activity-detail-link {
