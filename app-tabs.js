@@ -450,7 +450,7 @@ function renderTodayActivities(acts) {
     if (!subEl) {
       subEl = document.createElement('span');
       subEl.className = 'activities-date-badge';
-      subEl.style.cssText = 'font-size: 11px; font-weight: 700; color: var(--brand); background: rgba(232, 98, 42, 0.12); padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 8px; font-family: var(--font);';
+      subEl.style.cssText = 'font-size: 11px; font-weight:600; color: var(--brand); background: rgba(232, 98, 42, 0.12); padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 8px; font-family: var(--font);';
       var titleWrap = headerContainer.querySelector('.sec');
       if (titleWrap) {
         titleWrap.style.display = 'flex';
@@ -530,7 +530,7 @@ function renderTodayActivities(acts) {
 
     html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
               '<div style="display:flex; align-items:center; gap:14px;">' +
-                '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:8px; min-width:84px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
+                '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:8px; min-width:84px; height:30px; box-sizing:border-box; color:#fff; font-weight:600; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
                   sportIcon +
                   '<span>' + kmStr + '</span>' +
                 '</div>' +
