@@ -1602,7 +1602,38 @@ async function load(isBackgroundRefresh) {
         return '🎯';
       }
 
+      function renderDashboardChallenges(items){
+        var container = document.getElementById('dashboard-challenges-list');
+        if(!container) return;
+        if(!items.length){
+          container.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No challenges yet</div>';
+          return;
+        }
+        var html = '';
+        items.forEach(function(ch){
+          var pillColor = ch.earned ? 'var(--green)' : ch.missed ? 'rgba(255,255,255,0.15)' : 'var(--brand)';
+          var statusLabel = ch.earned ? 'EARNED' : ch.missed ? 'MISSED' : 'ACTIVE';
+          html += '<div class="today-act-row" onclick="openChallengesDrawer();" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
+                    '<div style="display:flex; align-items:center; gap:14px; min-width:0;">' +
+                      '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:8px; min-width:44px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
+                        ch.emoji +
+                      '</div>' +
+                      '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">' + esc(ch.name) + '</div>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; gap:10px;">' +
+                      '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:rgba(255,255,255,0.65); font-weight:600; line-height:1.3; font-family:var(--font);">' +
+                        '<div>+' + ch.pts + ' PTS</div>' +
+                        '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + statusLabel + '</div>' +
+                      '</div>' +
+                      '<div style="width:3px; height:26px; background:' + pillColor + '; border-radius:2px;"></div>' +
+                    '</div>' +
+                  '</div>';
+        });
+        container.innerHTML = html;
+      }
+
       var sortedCh = combined.sort(function(a,b){return (b.start_date||'').localeCompare(a.start_date||'');});
+      var dashItems=[];
       sortedCh.forEach(function(ch,ci2){
         var key = ch.is_manual ? ch.id : 'ch_'+(ch.id||ci2);
         var ep=fullPts.earnedPts||{};
@@ -1615,6 +1646,7 @@ async function load(isBackgroundRefresh) {
         var missed=!earned&&ch.end_date&&ch.end_date<today2;
         var statusCls=earned?'won':missed?'missed':'avail';
         var statusIcon=earned?'\u2713':missed?'\u2715':'!';
+        dashItems.push({name:toTitleCase(ch.name), emoji:getChallengeEmoji(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
         
         var cardDiv=document.createElement('div');
         cardDiv.className='ch-card ' + statusCls;
@@ -1637,6 +1669,7 @@ async function load(isBackgroundRefresh) {
         `;
         chList.appendChild(cardDiv);
       });
+      renderDashboardChallenges(dashItems.slice(0,3));
     })();
 
     var flaggedCount=myActs.filter(function(a){return a.is_flagged;}).length;
