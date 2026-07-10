@@ -841,6 +841,7 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     };
     lEl.src = logoSrc;
     lEl.style.opacity = '1';
+    lEl.style.filter = b.logo_filter === 'white' ? 'brightness(0) invert(1)' : (b.logo_filter === 'black' ? 'brightness(0)' : 'none');
   }
 
 
