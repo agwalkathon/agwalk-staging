@@ -659,7 +659,7 @@ async function submitEventRegistration(ev) {
   btn.disabled = true; btn.textContent = 'Submitting…';
   try {
     var payload = Object.assign({}, d, { event_name: ev.slug, event_id: ev.id, status: 'pending' });
-    var backendUrl = (typeof BACKEND !== 'undefined' ? BACKEND : 'https://agwalk-backend.onrender.com');
+    var backendUrl = (typeof BACKEND !== 'undefined' ? BACKEND : 'https://walkathon-backend-hv9j.onrender.com');
     var r = await fetch(backendUrl + '/register-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -733,12 +733,11 @@ function openEventDetailsModal(ev) {
 
   modal.innerHTML = 
     '<!-- Header -->' +
-    '<div style="height:60px; display:flex; align-items:center; padding:0 16px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(21,25,30,0.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:10; flex-shrink:0;">' +
-      '<button id="close-ev-details-btn" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:30px; transition:all 0.2s; outline:none; -webkit-tap-highlight-color:transparent;">' +
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
-        '<span>Back</span>' +
+    '<div style="height:calc(60px + env(safe-area-inset-top)); display:flex; align-items:center; padding:env(safe-area-inset-top) 16px 0; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(21,25,30,0.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:10; flex-shrink:0;">' +
+      '<button id="close-ev-details-btn" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; width:40px; height:40px; border-radius:50%; transition:all 0.2s; outline:none; -webkit-tap-highlight-color:transparent;" title="Back">' +
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
       '</button>' +
-      '<div style="flex:1; text-align:center; font-size:16px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:1px; margin-right:60px;">Event Details</div>' +
+      '<div style="flex:1; text-align:center; font-size:16px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:1px; margin-right:40px;">Event Details</div>' +
     '</div>' +
     
     '<!-- Scrollable Content -->' +
