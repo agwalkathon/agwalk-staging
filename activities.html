@@ -844,6 +844,8 @@ td button.btn:last-child { margin-right: 0; }
             <button class="btn btn-primary" onclick="openAddReasonModal()" style="padding:6px 14px; font-size:12.5px;">+ Add Reason</button>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="fr-event-select" onchange="onFlagReasonEventChange()" style="padding:6px 10px; border:1px solid var(--brand); border-radius:8px; font-size:12.5px; background:var(--brand-light); color:var(--brand); font-weight:600; max-width:220px;"></select>
+            <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">📋 Copy to event…</button>
             <select id="fr-type-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
               <option value="">All Types</option>
               <option value="auto">Auto</option>
@@ -4385,10 +4387,35 @@ var FR_RULE_CARD_MAP = {
 };
 var FR_ICONS = { exclude_rides:'🚴', exclude_workouts:'🏋️', min_distance:'📏', elapsed_time:'⏱️', speed_limits:'⚡', pace_limits:'🏃', pace_deviation_rule:'📈', steps_rule:'👣', shared_detect:'👥' };
 
+var FR_EVENT_ID = 1;
+var FR_EVENTS = [];
+
+async function loadFlagReasonEvents(){
+  try {
+    var r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc', { headers: HDR });
+    var evs = await r.json();
+    if (!Array.isArray(evs) || !evs.length) return;
+    FR_EVENTS = evs;
+    var live = evs.find(function(e){ return e.status === 'live'; });
+    FR_EVENT_ID = live ? live.id : evs[0].id;
+    var sel = document.getElementById('fr-event-select');
+    if (sel) {
+      sel.innerHTML = evs.map(function(e){
+        return '<option value="' + e.id + '"' + (e.id === FR_EVENT_ID ? ' selected' : '') + '>' + escFR(e.name) + ' (' + e.status.toUpperCase() + ')</option>';
+      }).join('');
+    }
+  } catch(e){ console.warn('flag reason event selector failed', e); }
+}
+function onFlagReasonEventChange(){
+  FR_EVENT_ID = parseInt(document.getElementById('fr-event-select').value) || 1;
+  loadFlagReasons();
+}
+
 async function loadFlagReasons(){
   var host = document.getElementById('flag-reason-cards');
+  if (!FR_EVENTS.length) await loadFlagReasonEvents();
   try {
-    var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons?event_id=' + FR_EVENT_ID, { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Load failed');
     FR_DATA = d.reasons || [];
@@ -4517,6 +4544,83 @@ function expandFlagReason(r, body){
     hint.textContent = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule.';
     body.appendChild(hint);
   }
+
+  // Delete — only offered when nothing is attached (server re-verifies too)
+  if (r.applied_count === 0 && !(r.is_engine_rule && FR_EVENT_ID === 1)) {
+    var delBar = document.createElement('div');
+    delBar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:10px;';
+    delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')">🗑️ Delete (no activities attached)</button>';
+    body.appendChild(delBar);
+  }
+}
+
+async function deleteFlagReason(id){
+  var row = FR_DATA.find(function(x){ return x.id === id; });
+  if (!row) return;
+  if (!confirm('Delete flag reason "' + row.reason + '"? This cannot be undone.')) return;
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons/' + id, { method:'DELETE',
+      headers:{ Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Delete failed');
+    loadFlagReasons();
+    populateFlagReasonDropdowns();
+  } catch(e){ alert('Failed: ' + e.message); }
+}
+
+function openCopyReasonsModal(){
+  if (!FR_LOADED || !FR_DATA.length) return alert('Load reasons first.');
+  var targets = FR_EVENTS.filter(function(e){ return e.id !== FR_EVENT_ID; });
+  if (!targets.length) return alert('No other events to copy to. Create the target event first in events.html.');
+
+  var overlay = document.createElement('div');
+  overlay.id = 'fr-copy-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var srcName = (FR_EVENTS.find(function(e){ return e.id === FR_EVENT_ID; }) || {}).name || 'current event';
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:16px;padding:24px;width:100%;max-width:460px;max-height:80vh;overflow-y:auto;';
+  modal.innerHTML =
+    '<h3 style="font-size:16px;font-weight:600;margin:0 0 4px;">Copy flag reasons</h3>' +
+    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">From <strong>' + escFR(srcName) + '</strong> — auto rule thresholds are copied too if the target has none yet.</p>' +
+    '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Target event</label>' +
+    '<select id="fr-copy-target" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin:4px 0 14px;">' +
+      targets.map(function(e){ return '<option value="' + e.id + '">' + escFR(e.name) + ' (' + e.status.toUpperCase() + ')</option>'; }).join('') +
+    '</select>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+      '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Reasons to copy</label>' +
+      '<a href="#" onclick="document.querySelectorAll(\'.fr-copy-chk\').forEach(function(c){c.checked=true});return false;" style="font-size:11px;color:var(--brand);">Select all</a>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;">' +
+      FR_DATA.map(function(r){
+        return '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;cursor:pointer;">' +
+          '<input type="checkbox" class="fr-copy-chk" value="' + r.id + '"' + (r.is_active ? ' checked' : '') + ' style="cursor:pointer;">' +
+          escFR(r.reason) + ' <span style="font-size:10px;color:var(--text-muted);">(' + r.flag_type + (r.is_active ? '' : ', inactive') + ')</span></label>';
+      }).join('') +
+    '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+      '<button class="btn btn-ghost" onclick="document.getElementById(\'fr-copy-overlay\').remove()" style="padding:8px 16px;font-size:13px;">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="executeCopyReasons()" style="padding:8px 16px;font-size:13px;">Copy</button>' +
+    '</div>';
+  overlay.appendChild(modal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+async function executeCopyReasons(){
+  var target = parseInt(document.getElementById('fr-copy-target').value);
+  var ids = Array.from(document.querySelectorAll('.fr-copy-chk:checked')).map(function(c){ return parseInt(c.value); });
+  if (!ids.length) return alert('Select at least one reason.');
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons/copy', { method:'POST',
+      headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
+      body: JSON.stringify({ from_event_id: FR_EVENT_ID, to_event_id: target, reason_ids: ids }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Copy failed');
+    document.getElementById('fr-copy-overlay').remove();
+    alert('✅ Copied ' + d.copied + ' reason' + (d.copied === 1 ? '' : 's') +
+      (d.skipped ? ' · ' + d.skipped + ' already existed on target' : '') +
+      (d.rules_copied ? ' · rule thresholds copied' : ''));
+  } catch(e){ alert('Failed: ' + e.message); }
 }
 
 function returnRuleCardsToPool(){
@@ -4575,7 +4679,7 @@ async function addFlagReason(name, ftype){
   try {
     var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { method:'POST',
       headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
-      body: JSON.stringify({ action:'add', reason:name, flag_type:ftype }) });
+      body: JSON.stringify({ action:'add', reason:name, flag_type:ftype, event_id: FR_EVENT_ID }) });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Add failed');
     loadFlagReasons();
@@ -4585,7 +4689,7 @@ async function addFlagReason(name, ftype){
 
 async function populateFlagReasonDropdowns(){
   try {
-    var r = await fetch(BACKEND_URL + '/flag-reasons');
+    var r = await fetch(BACKEND_URL + '/flag-reasons?event_id=' + (typeof FR_EVENT_ID !== 'undefined' ? FR_EVENT_ID : 1));
     var d = await r.json();
     if (!d.success) return;
     var reasons = d.reasons || [];
