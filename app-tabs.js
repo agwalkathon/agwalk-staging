@@ -178,12 +178,26 @@ function showTab(tab) {
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
         return;
       }
-      var targetModal = e.target.closest('.detail-modal');
+      var targetModal = e.target.closest('.detail-modal') || e.target.closest('#event-details-modal-container');
       var leafletTouch = e.target.closest('.leaflet-container');
       var actModalOpen = document.getElementById('activity-detail-modal');
       var profModalOpen = document.getElementById('profile-detail-modal');
+      var highModalOpen = document.getElementById('highlight-detail-modal');
+      var rxModalOpen = document.getElementById('reactions-detail-modal');
+      var dashModalOpen = document.getElementById('dash-details-modal');
+      var actDrawerOpen = document.getElementById('you-panel-activities');
+      var chalDrawerOpen = document.getElementById('you-panel-challenges');
+      var evModalOpen = document.getElementById('event-details-modal-container');
+
       var anyModalOpen = (actModalOpen && actModalOpen.classList.contains('open')) ||
-                         (profModalOpen && profModalOpen.classList.contains('open'));
+                         (profModalOpen && profModalOpen.classList.contains('open')) ||
+                         (highModalOpen && highModalOpen.classList.contains('open')) ||
+                         (rxModalOpen && rxModalOpen.classList.contains('open')) ||
+                         (dashModalOpen && dashModalOpen.classList.contains('open')) ||
+                         (actDrawerOpen && actDrawerOpen.classList.contains('open')) ||
+                         (chalDrawerOpen && chalDrawerOpen.classList.contains('open')) ||
+                         (evModalOpen && evModalOpen.style.display === 'flex');
+
       if (targetModal || leafletTouch || anyModalOpen) {
         return;
       }
@@ -199,8 +213,21 @@ function showTab(tab) {
     // Don't switch tabs if a detail modal is open
     var actModal = document.getElementById('activity-detail-modal');
     var profModal = document.getElementById('profile-detail-modal');
+    var highModal = document.getElementById('highlight-detail-modal');
+    var rxModal = document.getElementById('reactions-detail-modal');
+    var dashModal = document.getElementById('dash-details-modal');
+    var actDrawer = document.getElementById('you-panel-activities');
+    var chalDrawer = document.getElementById('you-panel-challenges');
+    var evModal = document.getElementById('event-details-modal-container');
+
     if ((actModal && actModal.classList.contains('open')) ||
-        (profModal && profModal.classList.contains('open'))) return;
+        (profModal && profModal.classList.contains('open')) ||
+        (highModal && highModal.classList.contains('open')) ||
+        (rxModal && rxModal.classList.contains('open')) ||
+        (dashModal && dashModal.classList.contains('open')) ||
+        (actDrawer && actDrawer.classList.contains('open')) ||
+        (chalDrawer && chalDrawer.classList.contains('open')) ||
+        (evModal && evModal.style.display === 'flex')) return;
 
     var curIdx = TAB_ORDER.indexOf(_currentTab);
     if (curIdx === -1) return;
