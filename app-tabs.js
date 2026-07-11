@@ -4069,4 +4069,84 @@ window.closeDashModal = closeDashModal;
       handleEnd();
     }
   });
+
+  // Generic Swipe-Back to previous screen handler
+  (function() {
+    var startX = 0;
+    var startY = 0;
+    var isSwipeGesture = false;
+
+    document.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isSwipeGesture = true;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      if (!isSwipeGesture || e.touches.length !== 1) return;
+      var dx = e.touches[0].clientX - startX;
+      var dy = e.touches[0].clientY - startY;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+        isSwipeGesture = false; // vertical scroll, not a back swipe
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+      if (!isSwipeGesture) return;
+      isSwipeGesture = false;
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+
+      if (Math.abs(dx) > 60 && Math.abs(dy) < 50) {
+        // Exclude swipe back inside swipe-insensitive elements (leaflet, photos slider, etc.)
+        var target = e.target;
+        if (target.closest('.leaflet-container') || target.closest('#detail-photos-container') || target.closest('.no-swipe-back')) {
+          return;
+        }
+        
+        // Attempt to close active overlay modal/drawer
+        closeTopModal();
+      }
+    }, { passive: true });
+
+    function closeTopModal() {
+      var actModal = document.getElementById('activity-detail-modal');
+      var profModal = document.getElementById('profile-detail-modal');
+      var highModal = document.getElementById('highlight-detail-modal');
+      var rxModal = document.getElementById('reactions-detail-modal');
+      var dashModal = document.getElementById('dash-details-modal');
+      var actDrawer = document.getElementById('you-panel-activities');
+      var chalDrawer = document.getElementById('you-panel-challenges');
+      var evModal = document.getElementById('event-details-modal-container');
+      
+      if (rxModal && rxModal.classList.contains('open')) {
+        if (typeof closeReactionsDetail === 'function') { closeReactionsDetail(); return true; }
+      }
+      if (actModal && actModal.classList.contains('open')) {
+        if (typeof closeActivityDetail === 'function') { closeActivityDetail(); return true; }
+      }
+      if (profModal && profModal.classList.contains('open')) {
+        if (typeof closeProfileDetail === 'function') { closeProfileDetail(); return true; }
+      }
+      if (highModal && highModal.classList.contains('open')) {
+        if (typeof closeHighlightDetail === 'function') { closeHighlightDetail(); return true; }
+      }
+      if (dashModal && dashModal.classList.contains('open')) {
+        if (typeof closeDashModal === 'function') { closeDashModal(); return true; }
+      }
+      if (actDrawer && actDrawer.classList.contains('open')) {
+        if (typeof closeActivitiesDrawer === 'function') { closeActivitiesDrawer(); return true; }
+      }
+      if (chalDrawer && chalDrawer.classList.contains('open')) {
+        if (typeof closeChallengesDrawer === 'function') { closeChallengesDrawer(); return true; }
+      }
+      if (evModal && evModal.style.display === 'flex') {
+        var closeBtn = document.getElementById('close-ev-details-btn');
+        if (closeBtn) { closeBtn.click(); return true; }
+      }
+      return false;
+    }
+    window.closeTopModal = closeTopModal;
+  })();
 })();
