@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -1010,13 +1010,13 @@
     });
 
     /* ---------- CSV & Direct Connection Link Functions ---------- */
-    function copyStravaDirectLink(empCode, eventId) {
-      if (!empCode || empCode === 'undefined') {
-        alert('This participant registration does not have a valid Employee Code.');
+    function copyStravaDirectLink(athleteId, eventId) {
+      if (!athleteId || athleteId === 'undefined') {
+        alert('This participant registration does not have a valid Athlete ID.');
         return;
       }
       var link = window.location.origin + window.location.pathname.replace('athletedtl.html', 'connect-strava-direct.html') + 
-                 '?emp_code=' + encodeURIComponent(empCode) + '&event_id=' + eventId;
+                 '?athlete_id=' + encodeURIComponent(athleteId) + '&event_id=' + eventId;
       navigator.clipboard.writeText(link).then(function() {
         alert('🔗 Strava Direct Link copied to clipboard:\n' + link);
       }).catch(function(err) {
@@ -1214,7 +1214,7 @@
                 </svg>
               </button>
               <div class="actions-dropdown">
-                <button class="actions-dropdown-item" onclick="copyStravaDirectLink('${esc(p.emp_code)}', ${p.event_id || 1})">
+                <button class="actions-dropdown-item" onclick="copyStravaDirectLink('${p.id}', ${p.event_id || 1})">
                   🔗 Copy Strava Link
                 </button>
                 <button class="actions-dropdown-item" ${p.connected ? '' : 'disabled'} onclick="syncActivities('${p.strava_athlete_id}','${esc(p.full_name)}')">
