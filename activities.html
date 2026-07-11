@@ -663,7 +663,7 @@ td button.btn:last-child { margin-right: 0; }
         <button class="stab active" id="tab-all" onclick="switchTab('all')">🏃 All Workouts</button>
         <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">🔍 Bulk Flag Scanner</button>
         <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">🗑️ Deleted</button>
-        <button class="stab" id="tab-rules" onclick="switchTab('rules')">⚙️ Auto-Flag Rules</button>
+        <button class="stab" id="tab-rules" onclick="switchTab('rules')">🚩 Flag Reasons</button>
       </div>
       <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()">🔍 Re-run Auto-flag</button>
     </div>
@@ -835,6 +835,34 @@ td button.btn:last-child { margin-right: 0; }
 
     <!-- Tab 3: Auto-Flag Rules Config -->
     <div id="rules-container" style="display:none">
+      <div class="section" style="max-width:800px; margin: 0 auto 16px;">
+        <div class="section-body" style="display:flex; flex-direction:column; gap:10px; padding:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 style="font-size:16px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; margin:0;">
+              <i class="ti ti-flag" style="color:var(--brand); font-size:20px;"></i> Flag Reasons
+            </h2>
+            <button class="btn btn-primary" onclick="openAddReasonModal()" style="padding:6px 14px; font-size:12.5px;">+ Add Reason</button>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="fr-type-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
+              <option value="">All Types</option>
+              <option value="auto">Auto</option>
+              <option value="manual">Manual</option>
+            </select>
+            <select id="fr-status-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
+              <option value="active" selected>Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="">All Status</option>
+            </select>
+            <input id="fr-search" oninput="renderFlagReasons()" placeholder="Search reasons..." style="flex:1; min-width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
+          </div>
+          <div id="fr-orphan-note" style="display:none; font-size:11.5px; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:8px 10px;"></div>
+          <div id="flag-reason-cards" style="display:flex; flex-direction:column; gap:6px;">
+            <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Loading flag reasons...</div>
+          </div>
+        </div>
+      </div>
+      <div id="legacy-rules-pool" style="display:none;">
       <div class="section" style="max-width:800px; margin: 0 auto 24px;">
         <div class="section-body" style="display:flex; flex-direction:column; gap:16px;">
           <div class="section-header" style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:4px;">
@@ -1129,6 +1157,7 @@ td button.btn:last-child { margin-right: 0; }
           </div>
         </div>
       </div>
+      </div><!-- /legacy-rules-pool -->
     </div>
 
     <!-- Tab 5: Bulk Flag Scanner -->
@@ -2218,13 +2247,14 @@ function switchTab(t){
   }
 
   if (t === 'rules') {
-    document.getElementById('page-title').textContent = 'Flagged Activities Rules';
-    document.getElementById('page-subtitle').textContent = 'Set dynamic rules to auto-flag activities';
+    document.getElementById('page-title').textContent = 'Flag Reasons';
+    document.getElementById('page-subtitle').textContent = 'Manage all flag reasons — auto rules and manual flags in one place';
     document.getElementById('all-workouts-container').style.display = 'none';
     document.getElementById('flagged-data-container').style.display = 'none';
     document.getElementById('rules-container').style.display = 'block';
     document.getElementById('scanner-container').style.display = 'none';
     document.getElementById('btn-recheck-outer').style.display = 'none';
+    loadFlagReasons();
   } else if (t === 'scanner') {
     document.getElementById('page-title').textContent = 'Bulk Flag Scanner';
     document.getElementById('page-subtitle').textContent = 'Scan existing database manually using configured thresholds';
@@ -4337,6 +4367,259 @@ function updateRowStatusLocally(id, action, reason) {
     }
   }
 }
+
+// ══════════════ FLAG REASONS MANAGEMENT (unified tab) ══════════════
+var FR_DATA = [];
+var FR_ORPHANS = [];
+var FR_LOADED = false;
+var FR_RULE_CARD_MAP = {
+  exclude_rides:       'card-exclude-rides',
+  exclude_workouts:    'card-exclude-workouts',
+  min_distance:        'card-min-distance',
+  elapsed_time:        'card-max-gap',
+  speed_limits:        'card-max-speed',
+  pace_limits:         'card-pace',
+  pace_deviation_rule: 'card-pace',
+  steps_rule:          'card-steps',
+  shared_detect:       null
+};
+var FR_ICONS = { exclude_rides:'🚴', exclude_workouts:'🏋️', min_distance:'📏', elapsed_time:'⏱️', speed_limits:'⚡', pace_limits:'🏃', pace_deviation_rule:'📈', steps_rule:'👣', shared_detect:'👥' };
+
+async function loadFlagReasons(){
+  var host = document.getElementById('flag-reason-cards');
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Load failed');
+    FR_DATA = d.reasons || [];
+    FR_ORPHANS = d.orphans || [];
+    FR_LOADED = true;
+    var orphanEl = document.getElementById('fr-orphan-note');
+    if (FR_ORPHANS.length) {
+      orphanEl.style.display = 'block';
+      orphanEl.innerHTML = '⚠️ <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
+        FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' · ');
+    } else { orphanEl.style.display = 'none'; }
+    renderFlagReasons();
+  } catch(e) {
+    host.innerHTML = '<div style="color:#c62828;font-size:13px;padding:16px;text-align:center;">Could not load flag reasons: ' + escFR(e.message) + '</div>';
+  }
+}
+
+function escFR(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+function renderFlagReasons(){
+  if (!FR_LOADED) return;
+  var typeF = document.getElementById('fr-type-filter').value;
+  var statusF = document.getElementById('fr-status-filter').value;
+  var q = (document.getElementById('fr-search').value || '').toLowerCase().trim();
+  var host = document.getElementById('flag-reason-cards');
+
+  returnRuleCardsToPool();
+
+  var rows = FR_DATA.filter(function(r){
+    if (typeF && r.flag_type !== typeF) return false;
+    if (statusF === 'active' && !r.is_active) return false;
+    if (statusF === 'inactive' && r.is_active) return false;
+    if (q && r.reason.toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+
+  if (!rows.length) { host.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px;">No reasons match the filters.</div>'; return; }
+
+  host.innerHTML = '';
+  rows.forEach(function(r){
+    var card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border);border-radius:10px;background:var(--card-bg);overflow:hidden;' + (r.is_active ? '' : 'opacity:0.55;');
+
+    var head = document.createElement('div');
+    head.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;user-select:none;';
+    var icon = FR_ICONS[r.rule_key] || (r.flag_type === 'auto' ? '🔄' : '✋');
+    var typeChip = r.flag_type === 'auto'
+      ? '<span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#2563EB;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;">Auto</span>'
+      : '<span style="font-size:10px;font-weight:600;background:#F5F3FF;color:#7C3AED;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;">Manual</span>';
+    head.innerHTML =
+      '<span style="font-size:15px;flex-shrink:0;">' + icon + '</span>' +
+      '<span style="font-size:13px;font-weight:600;color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escFR(r.reason) + '</span>' +
+      typeChip +
+      '<span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">' + r.applied_count + ' applied</span>' +
+      '<label class="toggle-switch" style="position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0;" onclick="event.stopPropagation();">' +
+        '<input type="checkbox" ' + (r.is_active ? 'checked' : '') + ' onchange="toggleFlagReason(' + r.id + ', this.checked)" style="opacity:0;width:0;height:0;">' +
+        '<span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:' + (r.is_active ? 'var(--brand)' : '#ccc') + ';transition:.2s;border-radius:18px;"></span>' +
+      '</label>' +
+      '<i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-secondary);transition:transform .2s;flex-shrink:0;"></i>';
+
+    var body = document.createElement('div');
+    body.style.cssText = 'display:none;border-top:1px solid var(--border);padding:12px;background:var(--page-bg);';
+    body.setAttribute('data-fr-body', r.id);
+
+    head.addEventListener('click', function(){
+      var open = body.style.display !== 'none';
+      returnRuleCardsToPool();
+      host.querySelectorAll('[data-fr-body]').forEach(function(b){ b.style.display = 'none'; });
+      host.querySelectorAll('.ti-chevron-down').forEach(function(ic){ ic.style.transform = ''; });
+      if (!open) {
+        body.style.display = 'block';
+        head.querySelector('.ti-chevron-down').style.transform = 'rotate(180deg)';
+        expandFlagReason(r, body);
+      }
+    });
+
+    card.appendChild(head);
+    card.appendChild(body);
+    host.appendChild(card);
+  });
+}
+
+function expandFlagReason(r, body){
+  body.innerHTML = '';
+  var meta = document.createElement('div');
+  meta.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-bottom:8px;';
+  meta.innerHTML = 'Type: <strong>' + (r.flag_type === 'auto' ? 'Auto (fraud engine)' : 'Manual') + '</strong>' +
+    (r.is_engine_rule ? ' · <span style="color:var(--text-muted)">engine rule — name locked</span>' : '');
+  body.appendChild(meta);
+
+  if (!r.is_engine_rule) {
+    var renameWrap = document.createElement('div');
+    renameWrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+    renameWrap.innerHTML = '<input type="text" value="' + escFR(r.reason) + '" id="fr-rename-' + r.id + '" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;">' +
+      '<button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="renameFlagReason(' + r.id + ')">Rename</button>';
+    body.appendChild(renameWrap);
+  }
+
+  if (r.flag_type === 'auto') {
+    var cardId = FR_RULE_CARD_MAP[r.rule_key];
+    if (cardId) {
+      var ruleCardBody = document.getElementById(cardId);
+      var ruleCard = ruleCardBody ? ruleCardBody.closest('.collapsible-card') : null;
+      if (ruleCard) {
+        var note = document.createElement('div');
+        note.style.cssText = 'font-size:11px;color:var(--text-muted);margin-bottom:6px;';
+        note.textContent = 'Rule configuration (changes apply on Save Rules):';
+        body.appendChild(note);
+        body.appendChild(ruleCard);
+        ruleCard.style.marginBottom = '8px';
+        if (ruleCardBody.style.display === 'none') toggleCollapse(cardId);
+        var saveBar = document.createElement('div');
+        saveBar.style.cssText = 'display:flex;justify-content:flex-end;';
+        saveBar.innerHTML = '<button class="btn btn-primary" style="padding:7px 18px;font-size:12.5px;" onclick="saveAutoFlagConfig()">Save Rules Configuration</button>';
+        body.appendChild(saveBar);
+      }
+    } else if (r.rule_key === 'shared_detect') {
+      var link = document.createElement('div');
+      link.style.cssText = 'font-size:12px;color:var(--text-secondary);';
+      link.innerHTML = 'This rule is configured in the <a href="#" onclick="switchTab(\'scanner\');return false;" style="color:var(--brand);font-weight:600;">Bulk Flag Scanner</a> tab (Shared Activity Detection).';
+      body.appendChild(link);
+    }
+  } else {
+    var hint = document.createElement('div');
+    hint.style.cssText = 'font-size:11.5px;color:var(--text-muted);';
+    hint.textContent = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule.';
+    body.appendChild(hint);
+  }
+}
+
+function returnRuleCardsToPool(){
+  var pool = document.getElementById('legacy-rules-pool');
+  if (!pool) return;
+  var anchor = pool.querySelector('.section-body');
+  Object.keys(FR_RULE_CARD_MAP).forEach(function(k){
+    var id = FR_RULE_CARD_MAP[k];
+    if (!id) return;
+    var bodyEl = document.getElementById(id);
+    var cardEl = bodyEl ? bodyEl.closest('.collapsible-card') : null;
+    if (cardEl && !pool.contains(cardEl) && anchor) anchor.appendChild(cardEl);
+  });
+}
+
+async function toggleFlagReason(id, checked){
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { method:'POST',
+      headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
+      body: JSON.stringify({ action:'toggle', id:id, is_active:checked }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Toggle failed');
+    var row = FR_DATA.find(function(x){ return x.id === id; });
+    if (row) row.is_active = checked;
+    if (row && !checked && row.applied_count > 0) {
+      alert('"' + row.reason + '" is applied on ' + row.applied_count + ' activities. They stay flagged — this reason just won\'t appear in dropdowns for new use.');
+    }
+    populateFlagReasonDropdowns();
+    renderFlagReasons();
+  } catch(e){ alert('Failed: ' + e.message); loadFlagReasons(); }
+}
+
+async function renameFlagReason(id){
+  var input = document.getElementById('fr-rename-' + id);
+  var name = input ? input.value.trim() : '';
+  if (!name) return alert('Name required');
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { method:'POST',
+      headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
+      body: JSON.stringify({ action:'rename', id:id, reason:name }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Rename failed');
+    loadFlagReasons();
+    populateFlagReasonDropdowns();
+  } catch(e){ alert('Failed: ' + e.message); }
+}
+
+function openAddReasonModal(){
+  var name = prompt('New flag reason name:');
+  if (!name || !name.trim()) return;
+  addFlagReason(name.trim(), 'manual');
+}
+function addOrphanReason(reason){ addFlagReason(reason, 'manual'); }
+
+async function addFlagReason(name, ftype){
+  try {
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { method:'POST',
+      headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
+      body: JSON.stringify({ action:'add', reason:name, flag_type:ftype }) });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Add failed');
+    loadFlagReasons();
+    populateFlagReasonDropdowns();
+  } catch(e){ alert('Failed: ' + e.message); }
+}
+
+async function populateFlagReasonDropdowns(){
+  try {
+    var r = await fetch(BACKEND_URL + '/flag-reasons');
+    var d = await r.json();
+    if (!d.success) return;
+    var reasons = d.reasons || [];
+    var autoOpts = reasons.filter(function(x){ return x.flag_type === 'auto'; });
+    var manualOpts = reasons.filter(function(x){ return x.flag_type === 'manual'; });
+
+    function fill(selId){
+      var sel = document.getElementById(selId);
+      if (!sel) return;
+      var current = sel.value;
+      var first = sel.querySelector('option') ? sel.querySelector('option').outerHTML : '<option value="">All reasons</option>';
+      var html = first;
+      if (autoOpts.length)   html += '<optgroup label="── Auto Flags ──">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (manualOpts.length) html += '<optgroup label="── Manual Flags ──">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      sel.innerHTML = html;
+      sel.value = current;
+    }
+    fill('flag-reason-filter');
+    fill('modal-flag-reason');
+    fill('flagged-reason-filter');
+    var editSel = document.getElementById('edit-flag-reason-select');
+    if (editSel) {
+      var cur = editSel.value;
+      var firstOpt = editSel.querySelector('option') ? editSel.querySelector('option').outerHTML : '<option value="">- None (Valid) -</option>';
+      var opts = firstOpt;
+      if (autoOpts.length)   opts += '<optgroup label="── Auto Flags ──">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (manualOpts.length) opts += '<optgroup label="── Manual Flags ──">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      opts += '<option value="custom">Custom...</option>';
+      editSel.innerHTML = opts;
+      editSel.value = cur;
+    }
+  } catch(e) { /* hardcoded options remain as fallback */ }
+}
+document.addEventListener('DOMContentLoaded', function(){ populateFlagReasonDropdowns(); });
 </script>
 </body>
 </html>
