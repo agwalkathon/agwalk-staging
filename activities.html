@@ -859,6 +859,7 @@ td button.btn:last-child { margin-right: 0; }
             <input id="fr-search" oninput="renderFlagReasons()" placeholder="Search reasons..." style="flex:1; min-width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
           </div>
           <div id="fr-orphan-note" style="display:none; font-size:11.5px; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:8px 10px;"></div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">💡 Header toggle = show/hide in flag dropdowns. For <span style="color:#2563EB;font-weight:600;">AUTO</span> reasons, the rule inside the card separately controls auto-flagging of new activities. Toggles never change already-flagged activities.</div>
           <div id="flag-reason-cards" style="display:flex; flex-direction:column; gap:6px;">
             <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Loading flag reasons...</div>
           </div>
@@ -4520,6 +4521,10 @@ function expandFlagReason(r, body){
       var ruleCardBody = document.getElementById(cardId);
       var ruleCard = ruleCardBody ? ruleCardBody.closest('.collapsible-card') : null;
       if (ruleCard) {
+        var help = document.createElement('div');
+        help.style.cssText = 'font-size:11.5px;color:#374151;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.55;';
+        help.innerHTML = '<strong>ℹ️ Two toggles, two jobs:</strong> The toggle on <em>this card\'s header</em> controls whether the reason appears in flag dropdowns. The toggle on the <em>rule card below</em> controls whether the fraud engine auto-flags new activities. Rule OFF + reason ON = no auto-flagging, but admins can still apply it manually. Existing flagged activities are never changed by either toggle.';
+        body.appendChild(help);
         var note = document.createElement('div');
         note.style.cssText = 'font-size:11px;color:var(--text-muted);margin-bottom:6px;';
         note.textContent = 'Rule configuration (changes apply on Save Rules):';
@@ -4540,8 +4545,8 @@ function expandFlagReason(r, body){
     }
   } else {
     var hint = document.createElement('div');
-    hint.style.cssText = 'font-size:11.5px;color:var(--text-muted);';
-    hint.textContent = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule.';
+    hint.style.cssText = 'font-size:11.5px;color:var(--text-muted);line-height:1.5;';
+    hint.innerHTML = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule. The header toggle controls whether it appears in dropdowns; turning it off never changes already-flagged activities.';
     body.appendChild(hint);
   }
 
