@@ -407,7 +407,8 @@ function openActivityDetail(id, event, isStravaId) {
 
       var loggedInUser = null;
       try { loggedInUser = JSON.parse(localStorage.getItem('wk_user') || '{}'); } catch(e) {}
-      var loggedInAthleteId = loggedInUser ? String(loggedInUser.athleteId) : '';
+      var loggedInAthleteId = loggedInUser ? String(loggedInUser.athleteId || '') : '';
+      var loggedInEmail = loggedInUser ? String(loggedInUser.email || '') : '';
       var ownerAthleteId = String(act.strava_athlete_id || act.athlete_id || '');
       
       window._currentReportActivityId = act.id;
@@ -415,7 +416,10 @@ function openActivityDetail(id, event, isStravaId) {
       
       var reportSec = document.getElementById('detail-report-section');
       if (reportSec) {
-        if (!loggedInAthleteId || loggedInAthleteId === ownerAthleteId) {
+        var isOwner = (loggedInAthleteId && loggedInAthleteId === ownerAthleteId);
+        var isLoggedIn = (loggedInAthleteId || loggedInEmail);
+        
+        if (isOwner || !isLoggedIn) {
           reportSec.style.display = 'none';
         } else {
           reportSec.style.display = 'block';
@@ -1302,7 +1306,8 @@ async function submitActivityReport() {
   
   var session = null;
   try { session = JSON.parse(localStorage.getItem('wk_user') || '{}'); } catch(e) {}
-  var reporterId = session ? String(session.athleteId) : '';
+  var reporterId = session ? (session.athleteId || session.email || session.empCode || '') : '';
+  reporterId = String(reporterId).trim();
   
   if (!reporterId) {
     alert('You must be logged in to report activities.');
