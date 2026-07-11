@@ -4176,4 +4176,16 @@ window.closeDashModal = closeDashModal;
     }
     window.closeTopModal = closeTopModal;
   })();
+
+  // Listen for PWA installation event to report shortcut installation
+  window.addEventListener('appinstalled', function() {
+    var sessionUuid = sessionStorage.getItem('wk_session_uuid');
+    if (sessionUuid) {
+      fetch(BACKEND + '/participant/session/pwa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_uuid: sessionUuid })
+      }).catch(function(e){});
+    }
+  });
 })();
