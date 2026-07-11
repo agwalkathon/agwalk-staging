@@ -1724,6 +1724,10 @@ async function loadNotifications() {
 }
 
 async function bootAppUnified() {
+  if (typeof initParticipantSessionTracking === 'function') {
+    initParticipantSessionTracking();
+  }
+
   if (typeof loadBranding === 'function') {
     loadBranding();
   }
