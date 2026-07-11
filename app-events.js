@@ -786,17 +786,23 @@ function openEventDetailsModal(ev) {
     '</div>';
     
   modal.style.display = 'flex';
+  setTimeout(function() {
+    modal.classList.add('open');
+  }, 10);
   document.body.style.overflow = 'hidden'; // Remove main page scrollbar
   
   var closeBtn = document.getElementById('close-ev-details-btn');
   closeBtn.onclick = function() {
-    modal.style.display = 'none';
+    modal.classList.remove('open');
+    setTimeout(function() {
+      modal.style.display = 'none';
+    }, 420);
     document.body.style.overflow = ''; // Restore main page scrollbar
   };
   closeBtn.onmouseenter = function() {
     closeBtn.style.background = 'rgba(255,255,255,0.08)';
   };
   closeBtn.onmouseleave = function() {
-    closeBtn.style.background = 'rgba(255,255,255,0.04)';
+    closeBtn.style.background = 'none';
   };
 }
