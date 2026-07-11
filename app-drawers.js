@@ -407,8 +407,14 @@ function openActivityDetail(id, event, isStravaId) {
 
       var loggedInUser = null;
       try { loggedInUser = JSON.parse(localStorage.getItem('wk_user') || '{}'); } catch(e) {}
+      var loggedInEmp = null;
+      try { loggedInEmp = JSON.parse(localStorage.getItem('ag_emp') || '{}'); } catch(e) {}
+
       var loggedInAthleteId = loggedInUser ? String(loggedInUser.athleteId || '') : '';
-      var loggedInEmail = loggedInUser ? String(loggedInUser.email || '') : '';
+      if (!loggedInAthleteId && loggedInEmp && loggedInEmp.emp_code && loggedInEmp.emp_code.startsWith('STRAVA_')) {
+        loggedInAthleteId = loggedInEmp.emp_code.substring(7);
+      }
+      var loggedInEmail = (loggedInUser && loggedInUser.email) || (loggedInEmp && loggedInEmp.email) || '';
       var ownerAthleteId = String(act.strava_athlete_id || act.athlete_id || '');
       
       window._currentReportActivityId = act.id;
@@ -417,7 +423,7 @@ function openActivityDetail(id, event, isStravaId) {
       var reportSec = document.getElementById('detail-report-section');
       if (reportSec) {
         var isOwner = (loggedInAthleteId && loggedInAthleteId === ownerAthleteId);
-        var isLoggedIn = (loggedInAthleteId || loggedInEmail);
+        var isLoggedIn = !!((loggedInUser && loggedInUser.loggedIn) || (loggedInEmp && loggedInEmp.emp_code) || localStorage.getItem('ag_emp_token'));
         
         if (isOwner || !isLoggedIn) {
           reportSec.style.display = 'none';
@@ -1306,7 +1312,11 @@ async function submitActivityReport() {
   
   var session = null;
   try { session = JSON.parse(localStorage.getItem('wk_user') || '{}'); } catch(e) {}
-  var reporterId = session ? (session.athleteId || session.email || session.empCode || '') : '';
+  var empSession = null;
+  try { empSession = JSON.parse(localStorage.getItem('ag_emp') || '{}'); } catch(e) {}
+  
+  var reporterId = (session && (session.athleteId || session.email || session.empCode)) || 
+                   (empSession && (empSession.emp_code || empSession.email)) || '';
   reporterId = String(reporterId).trim();
   
   if (!reporterId) {
