@@ -137,18 +137,7 @@
         <i class="ti ti-circle-check"></i>
       </div>
       <h1 style="color:#10B981">Connected Successfully!</h1>
-      <p>Your Strava account has been successfully linked. We will now auto-sync your daily activities for the leaderboard.</p>
-      
-      <div class="meta-box">
-        <div class="meta-item">
-          <span>Employee Code</span>
-          <span id="s-emp-code">-</span>
-        </div>
-        <div class="meta-item">
-          <span>Linked Athlete</span>
-          <span id="s-athlete-name">-</span>
-        </div>
-      </div>
+      <p>Your Strava account has been successfully linked.</p>
       
       <button class="btn" onclick="window.close()">Close Window</button>
     </div>
@@ -233,9 +222,6 @@
         
         var d = await res.json();
         if (d.success) {
-          document.getElementById('s-emp-code').textContent = savedEmp;
-          document.getElementById('s-athlete-name').textContent = d.name || 'Connected Athlete';
-          
           // Clear query params to prevent reload submission
           window.history.replaceState({}, '', window.location.pathname);
           showState('success');
