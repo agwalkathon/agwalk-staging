@@ -106,12 +106,11 @@
 
     .logo-badge {
       width: 56px; height: 56px;
-      background: #ffffff;
-      border: 1px solid rgba(255,255,255,0.15);
+      background: var(--brand);
       border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 16px rgba(232,98,42,0.4);
       position: relative;
     }
     .logo-badge img {
@@ -253,7 +252,10 @@
 
   <!-- Top dark header -->
   <div class="card-top">
-    <img src="logo-white.png" alt="ARCGATE" style="height: 38px; width: auto; object-fit: contain; margin: 0 auto; display: block;">
+    <div class="logo-badge">
+      <img src="logo-icon-white.png" alt="AW">
+    </div>
+    <h1>Admin Access</h1>
   </div>
 
   <!-- Form -->
