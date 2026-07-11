@@ -175,15 +175,22 @@
     var urlParams = new URLSearchParams(window.location.search);
     var code = urlParams.get('code');
     var empCode = urlParams.get('emp_code');
+    var athleteId = urlParams.get('athlete_id');
     var eventId = urlParams.get('event_id');
 
     // Scenario A: Initiating the authorization redirect
-    if (empCode && eventId) {
-      localStorage.setItem('wk_direct_emp_code', empCode);
+    if ((athleteId || empCode) && eventId) {
+      if (athleteId) {
+        localStorage.setItem('wk_direct_athlete_id', athleteId);
+        localStorage.removeItem('wk_direct_emp_code');
+      } else {
+        localStorage.setItem('wk_direct_emp_code', empCode);
+        localStorage.removeItem('wk_direct_athlete_id');
+      }
       localStorage.setItem('wk_direct_event_id', eventId);
       
       document.getElementById('loading-title').textContent = 'Redirecting to Strava...';
-      document.getElementById('loading-desc').textContent = 'Authorizing connection for Employee ' + empCode + '.';
+      document.getElementById('loading-desc').textContent = 'Authorizing secure connection for your profile...';
       
       setTimeout(function() {
         window.location.href = 'https://www.strava.com/oauth/authorize?client_id=' + CLIENT_ID + 
@@ -196,9 +203,10 @@
     // Scenario B: Callback from Strava with authorization code
     if (code) {
       var savedEmp = localStorage.getItem('wk_direct_emp_code');
+      var savedAthleteId = localStorage.getItem('wk_direct_athlete_id');
       var savedEvent = localStorage.getItem('wk_direct_event_id');
 
-      if (!savedEmp || !savedEvent) {
+      if (!savedEmp && !savedAthleteId) {
         showError('Missing registration context. Please click the custom link shared by your administrator again.');
         return;
       }
@@ -215,7 +223,8 @@
             code: code,
             event_code: activeEventId === 2 ? 'cycling2026' : 'walkathon2026',
             event_id: activeEventId,
-            emp_code: savedEmp,
+            emp_code: savedEmp || '',
+            athlete_id: savedAthleteId || '',
             email: ''
           })
         });
@@ -235,14 +244,18 @@
     }
 
     // Scenario C: Opened empty
-    showError('Invalid request. The connection link must contain your Employee Code and Event ID parameters.');
+    showError('Invalid request. The connection link must contain your Athlete ID/Employee Code and Event ID parameters.');
   }
 
   function retryConnection() {
     var savedEmp = localStorage.getItem('wk_direct_emp_code');
+    var savedAthleteId = localStorage.getItem('wk_direct_athlete_id');
     var savedEvent = localStorage.getItem('wk_direct_event_id');
-    if (savedEmp && savedEvent) {
-      window.location.href = window.location.pathname + '?emp_code=' + savedEmp + '&event_id=' + savedEvent;
+    if ((savedEmp || savedAthleteId) && savedEvent) {
+      var url = window.location.pathname + '?event_id=' + savedEvent;
+      if (savedAthleteId) url += '&athlete_id=' + savedAthleteId;
+      else if (savedEmp) url += '&emp_code=' + savedEmp;
+      window.location.href = url;
     } else {
       window.location.href = 'index.html';
     }
