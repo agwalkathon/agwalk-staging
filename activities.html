@@ -844,7 +844,6 @@ td button.btn:last-child { margin-right: 0; }
             <button class="btn btn-primary" onclick="openAddReasonModal()" style="padding:6px 14px; font-size:12.5px;">+ Add Reason</button>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <select id="fr-event-select" onchange="onFlagReasonEventChange()" style="padding:6px 10px; border:1px solid var(--brand); border-radius:8px; font-size:12.5px; background:var(--brand-light); color:var(--brand); font-weight:600; max-width:220px;"></select>
             <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">📋 Copy to event…</button>
             <select id="fr-type-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
               <option value="">All Types</option>
@@ -1540,6 +1539,12 @@ async function loadEventSelector() {
       if (flaggedBody) {
         flaggedBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:var(--text-muted);">Event changed. Please configure filters and search to load data.</td></tr>';
       }
+
+      // Refresh Flag Reasons tab + dropdowns for the newly selected event
+      if (typeof loadFlagReasons === 'function' && document.getElementById('rules-container') && document.getElementById('rules-container').style.display !== 'none') {
+        loadFlagReasons();
+      }
+      if (typeof populateFlagReasonDropdowns === 'function') populateFlagReasonDropdowns();
     });
   } catch (err) {
     console.error('Failed to load event selector:', err);
@@ -4388,35 +4393,14 @@ var FR_RULE_CARD_MAP = {
 };
 var FR_ICONS = { exclude_rides:'🚴', exclude_workouts:'🏋️', min_distance:'📏', elapsed_time:'⏱️', speed_limits:'⚡', pace_limits:'🏃', pace_deviation_rule:'📈', steps_rule:'👣', shared_detect:'👥' };
 
-var FR_EVENT_ID = 1;
-var FR_EVENTS = [];
-
-async function loadFlagReasonEvents(){
-  try {
-    var r = await fetch(SUPABASE_URL + '/rest/v1/events?status=neq.draft&select=id,name,status&order=start_date.desc', { headers: HDR });
-    var evs = await r.json();
-    if (!Array.isArray(evs) || !evs.length) return;
-    FR_EVENTS = evs;
-    var live = evs.find(function(e){ return e.status === 'live'; });
-    FR_EVENT_ID = live ? live.id : evs[0].id;
-    var sel = document.getElementById('fr-event-select');
-    if (sel) {
-      sel.innerHTML = evs.map(function(e){
-        return '<option value="' + e.id + '"' + (e.id === FR_EVENT_ID ? ' selected' : '') + '>' + escFR(e.name) + ' (' + e.status.toUpperCase() + ')</option>';
-      }).join('');
-    }
-  } catch(e){ console.warn('flag reason event selector failed', e); }
-}
-function onFlagReasonEventChange(){
-  FR_EVENT_ID = parseInt(document.getElementById('fr-event-select').value) || 1;
-  loadFlagReasons();
-}
+// Flag Reasons tab follows the page-level Active Event selector (EV_ID / EV_ALL).
+function frEventId(){ return (typeof EV_ID !== 'undefined' && EV_ID) ? EV_ID : 1; }
+function frEvents(){ return (typeof EV_ALL !== 'undefined' && EV_ALL.length) ? EV_ALL : []; }
 
 async function loadFlagReasons(){
   var host = document.getElementById('flag-reason-cards');
-  if (!FR_EVENTS.length) await loadFlagReasonEvents();
   try {
-    var r = await fetch(BACKEND_URL + '/admin/flag-reasons?event_id=' + FR_EVENT_ID, { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
+    var r = await fetch(BACKEND_URL + '/admin/flag-reasons?event_id=' + frEventId(), { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') } });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Load failed');
     FR_DATA = d.reasons || [];
@@ -4551,7 +4535,7 @@ function expandFlagReason(r, body){
   }
 
   // Delete — only offered when nothing is attached (server re-verifies too)
-  if (r.applied_count === 0 && !(r.is_engine_rule && FR_EVENT_ID === 1)) {
+  if (r.applied_count === 0 && !(r.is_engine_rule && frEventId() === 1)) {
     var delBar = document.createElement('div');
     delBar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:10px;';
     delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')">🗑️ Delete (no activities attached)</button>';
@@ -4575,13 +4559,13 @@ async function deleteFlagReason(id){
 
 function openCopyReasonsModal(){
   if (!FR_LOADED || !FR_DATA.length) return alert('Load reasons first.');
-  var targets = FR_EVENTS.filter(function(e){ return e.id !== FR_EVENT_ID; });
+  var targets = frEvents().filter(function(e){ return parseInt(e.id) !== frEventId(); });
   if (!targets.length) return alert('No other events to copy to. Create the target event first in events.html.');
 
   var overlay = document.createElement('div');
   overlay.id = 'fr-copy-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
-  var srcName = (FR_EVENTS.find(function(e){ return e.id === FR_EVENT_ID; }) || {}).name || 'current event';
+  var srcName = (frEvents().find(function(e){ return parseInt(e.id) === frEventId(); }) || {}).name || 'current event';
   var modal = document.createElement('div');
   modal.style.cssText = 'background:#fff;border-radius:16px;padding:24px;width:100%;max-width:460px;max-height:80vh;overflow-y:auto;';
   modal.innerHTML =
@@ -4618,7 +4602,7 @@ async function executeCopyReasons(){
   try {
     var r = await fetch(BACKEND_URL + '/admin/flag-reasons/copy', { method:'POST',
       headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
-      body: JSON.stringify({ from_event_id: FR_EVENT_ID, to_event_id: target, reason_ids: ids }) });
+      body: JSON.stringify({ from_event_id: frEventId(), to_event_id: target, reason_ids: ids }) });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Copy failed');
     document.getElementById('fr-copy-overlay').remove();
@@ -4684,7 +4668,7 @@ async function addFlagReason(name, ftype){
   try {
     var r = await fetch(BACKEND_URL + '/admin/flag-reasons', { method:'POST',
       headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + sessionStorage.getItem('wk_admin_token') },
-      body: JSON.stringify({ action:'add', reason:name, flag_type:ftype, event_id: FR_EVENT_ID }) });
+      body: JSON.stringify({ action:'add', reason:name, flag_type:ftype, event_id: frEventId() }) });
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Add failed');
     loadFlagReasons();
@@ -4694,7 +4678,7 @@ async function addFlagReason(name, ftype){
 
 async function populateFlagReasonDropdowns(){
   try {
-    var r = await fetch(BACKEND_URL + '/flag-reasons?event_id=' + (typeof FR_EVENT_ID !== 'undefined' ? FR_EVENT_ID : 1));
+    var r = await fetch(BACKEND_URL + '/flag-reasons?event_id=' + (typeof frEventId === 'function' ? frEventId() : 1));
     var d = await r.json();
     if (!d.success) return;
     var reasons = d.reasons || [];
