@@ -1,7 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Session Sync Block -->
   <script src="env-config.js?v=20260710_v1"></script>
+  <script>
+    (function() {
+      if (!sessionStorage.getItem('wk_admin_token') && localStorage.getItem('wk_admin_token')) {
+        sessionStorage.setItem('wk_admin_token', localStorage.getItem('wk_admin_token'));
+        if (localStorage.getItem('wk_admin')) {
+          sessionStorage.setItem('wk_admin', localStorage.getItem('wk_admin'));
+        }
+      }
+      var origSet = sessionStorage.setItem;
+      sessionStorage.setItem = function(key, val) {
+        origSet.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.setItem(key, val);
+        }
+      };
+      var origRem = sessionStorage.removeItem;
+      sessionStorage.removeItem = function(key) {
+        origRem.apply(this, arguments);
+        if (key === 'wk_admin_token' || key === 'wk_admin') {
+          localStorage.removeItem(key);
+        }
+      };
+    })();
+  </script>
 <script>
     (function(){
       if ('serviceWorker' in navigator) {
