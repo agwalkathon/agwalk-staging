@@ -702,6 +702,7 @@ function openEventDetailsModal(ev) {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = id;
+    modal.classList.add('detail-modal');
     document.body.appendChild(modal);
   }
   
