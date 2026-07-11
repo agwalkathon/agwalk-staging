@@ -1,7 +1,7 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     :root{
       --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
-      --bg:#12161A; --surface:#1E2328; --surface2:#272D34;
+      --bg:#181E23; --surface:#2E3337; --surface2:#363D43;
       --border:rgba(255,255,255,0.03);
       --text:#FFFFFF; --muted:rgba(255,255,255,0.65); --label:rgba(255,255,255,0.55); --dim:rgba(255,255,255,0.20);
       --green:#22C55E; --green-dim:rgba(34,197,94,0.12);
@@ -9,7 +9,7 @@
       --purple:#A78BFA; --purple-dim:rgba(167,139,250,0.12);
       --gold:#FFD000; --gold-dim:rgba(255,208,0,0.15);
       --silver:#C8D8E8; --bronze:#F4A84A;
-      --radius:16px; --radius-sm:12px; --radius-xs:8px;
+      --radius:20px; --radius-sm:16px; --radius-xs:8px;
       --font:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-num:'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       /* Typography scale tokens (Whoop-Style, Crisp & Legible on Mobile) */
@@ -285,7 +285,7 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
-    .recovery-card{background:var(--surface);border-radius:var(--radius-sm);border-left:3px solid var(--brand);padding:14px 14px;margin-bottom:4px;}
+    .recovery-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:4px;}
     .recovery-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .recovery-title{font-size:13px;font-weight:800;color:#fff;}
     .recovery-sub{font-size:11px;color:var(--muted);margin-top:1px;}
@@ -531,7 +531,7 @@
     /* ── Section label ── */
     .sec{font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 14px;}
     .sec:first-child{margin-top:4px;}
-    .card > .sec{padding:14px 16px 0;margin:0 0 12px;}
+    .card > .sec{padding:18px 20px 0;margin:0 0 12px;}
     .medal-pred > .sec,.heatmap-wrap > .sec{margin:0 0 14px;}
 
     /* ── Card ── */
@@ -616,9 +616,9 @@
       transform: scale(1.08);
     }
     .pb-card-label {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
-      color: var(--card-accent, var(--label));
+      color: rgba(255,255,255,0.8);
       letter-spacing: 0.6px;
       text-transform: uppercase;
     }
@@ -658,7 +658,7 @@
     .fact-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 14px;}
     .fact-icon{font-size:20px;margin-bottom:8px;}
     .fact-val{font-size:17px;font-weight:800;color:#fff;line-height:1.2;}
-    .fact-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
+    .fact-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.8px;margin-top:5px;}
     /* Milestones */
     .milestones-wrap{display:flex;flex-wrap:wrap;gap:8px;}
     .milestone{display:flex;align-items:center;gap:7px;background:var(--surface);border-radius:20px;padding:7px 12px;opacity:0.35;transition:opacity 0.3s;}
@@ -815,8 +815,8 @@
       align-items: flex-end;
     }
     .whoop-stat-val {
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 600;
       color: #fff;
       line-height: 1.2;
     }
@@ -856,8 +856,8 @@
     .act-tile-name{font-size:12px;font-weight:500;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .act-tile-meta{font-size:11px;color:var(--label);margin-top:2px;}
     .act-tile-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;}
-    .act-tile-dist{font-size:18px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.3px;}
-    .act-tile-dist-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:1px;text-transform:uppercase;}
+    .act-tile-dist{font-size:20px;font-weight:600;color:#fff;line-height:1;letter-spacing:-0.3px;}
+    .act-tile-dist-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);margin-top:1px;text-transform:uppercase;}
     .act-tile-flag{font-size:8.5px;font-weight:600;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;}
     .flag-valid{background:rgba(34,197,94,0.15);color:#22C55E;}
     .flag-bad{background:rgba(239,68,68,0.15);color:#EF4444;}
@@ -873,10 +873,10 @@
     .medal-current-block{display:flex;align-items:center;gap:10px;}
     .medal-emoji-big{font-size:30px;line-height:1;}
     .medal-current-info{}
-    .medal-current-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+    .medal-current-lbl{font-size:11.5px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.5px;}
     .medal-current-name{font-size:18px;font-weight:900;color:var(--text);}
     .medal-pts-right{text-align:right;}
-    .medal-pts-big{font-size:28px;font-weight:900;color:var(--brand);line-height:1;letter-spacing:-0.5px;}
+    .medal-pts-big{font-size:30px;font-weight:600;color:var(--brand);line-height:1;letter-spacing:-0.5px;}
     .medal-pts-lbl{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:3px;}
 
     .medal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 14px;}
@@ -885,7 +885,7 @@
     .mc-emoji{font-size:24px;margin-bottom:4px;}
     .mc-name{font-size:12px;font-weight:800;margin-bottom:5px;}
     .mc-name.br{color:var(--bronze);} .mc-name.si{color:var(--silver);} .mc-name.go{color:var(--gold);}
-    .mc-pct{font-size:20px;font-weight:900;color:#fff;line-height:1;margin-bottom:2px;}
+    .mc-pct{font-size:22px;font-weight:600;color:#fff;line-height:1;margin-bottom:2px;}
     .mc-pts-lbl{font-size:8.5px;color:var(--muted);margin-bottom:6px;}
     .mc-bar{background:rgba(255,255,255,0.12);border-radius:20px;height:4px;overflow:hidden;margin:0 4px;}
     .mc-fill{height:100%;border-radius:20px;transition:width 0.6s ease;}
@@ -926,17 +926,17 @@
     .gold-quote-text{font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5;font-style:italic;letter-spacing:0.1px;}
     .gold-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
     .gold-stat{background:var(--surface2);border-radius:var(--radius-xs);padding:10px 12px;}
-    .gold-stat-val{font-size:20px;font-weight:600;color:var(--brand);line-height:1;}
-    .gold-stat-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
+    .gold-stat-val{font-size:22px;font-weight:600;color:var(--brand);line-height:1;}
+    .gold-stat-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
     .gold-rival{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:var(--radius-xs);padding:10px 12px;}
     .gold-rival-left{flex:1;}
     .gold-rival-label{font-size:13px;font-weight:700;color:#fff;}
     .gold-rival-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
-    .gold-rival-pts{font-size:18px;font-weight:900;color:var(--green);flex-shrink:0;}
+    .gold-rival-pts{font-size:20px;font-weight:600;color:var(--green);flex-shrink:0;}
 
     /* ── Streak ── */
     .streak-top{display:flex;align-items:flex-end;justify-content:space-between;padding:14px 16px 10px;}
-    .streak-num{font-size:54px;font-weight:900;color:var(--brand);line-height:1;letter-spacing:-2px;}
+    .streak-num{font-size:58px;font-weight:600;color:var(--brand);line-height:1;letter-spacing:-2px;}
     .streak-num-lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;}
     .streak-right{text-align:right;}
     .streak-best-val{font-size:20px;font-weight:800;color:#fff;}
@@ -971,8 +971,8 @@
     .tod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
     .tod-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 6px;text-align:center;}
     .tod-icon{font-size:22px;margin-bottom:4px;}
-    .tod-val{font-size:24px;font-weight:900;color:var(--brand);line-height:1;}
-    .tod-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
+    .tod-val{font-size:26px;font-weight:600;color:var(--brand);line-height:1;}
+    .tod-lbl{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);margin-top:4px;text-transform:uppercase;letter-spacing:0.4px;}
 
     /* ── Rivals ── */
     .rival-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);}
@@ -1255,7 +1255,7 @@
     .my-tag{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.95);font-size:8.5px;font-weight:600;padding:3px 8px;border-radius:20px;}
     .my-pts-block,.my-rank-block{text-align:center;flex-shrink:0;min-width:52px;}
     .my-pts-num,.my-rank-num{font-size:26px;font-weight:600;color:#fff;line-height:1;letter-spacing:-0.3px;}
-    .my-pts-lbl,.my-rank-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--label);margin-top:3px;font-weight:600;}
+    .my-pts-lbl,.my-rank-lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:rgba(255,255,255,0.8);margin-top:3px;font-weight:600;}
 
     /* ── Tabs ── */
     .lb-tabs {
@@ -1576,8 +1576,8 @@
       margin-bottom: 2px;
     }
     .podium-team {
-      font-size: 10px;
-      color: var(--label);
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
       text-transform: uppercase;
       letter-spacing: 0.3px;
       white-space: nowrap;
@@ -1651,9 +1651,9 @@
     /* ── Hall of Fame ── */
     .hof-grid{display:grid;grid-template-columns:1fr;gap:8px;padding:10px 12px 14px;}
     .hof-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:16px;}
-    .hof-title{font-size:10px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
+    .hof-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
     .hof-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .hof-val{font-size:18px;font-weight:900;color:var(--brand);line-height:1;margin-bottom:2px;}
+    .hof-val{font-size:20px;font-weight:600;color:var(--brand);line-height:1;margin-bottom:2px;}
 
     /* ── Weekly tab ── */
     .week-note{font-size:11px;color:var(--label);padding:8px 16px;text-align:center;}
@@ -1909,8 +1909,8 @@
     text-align: left;
   }
   .pulse-stat-val {
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 600;
     color: #fff;
     line-height: 1.1;
   }
@@ -2382,9 +2382,9 @@
     color: var(--brand);
   }
   .detail-metrics-title {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 12px;
@@ -2481,7 +2481,7 @@
   }
   .detail-keystat-val {
     color: #fff;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     margin-top: 6px;
   }
@@ -2548,8 +2548,8 @@
     font-weight: 700;
   }
   .feed-card-stats-grid .stat-val {
-    font-size: 17px;
-    font-weight: 800;
+    font-size: 19px;
+    font-weight: 600;
     color: #fff;
   }
   .feed-card-stats-grid .stat-unit {
@@ -2594,14 +2594,14 @@
     transform: translateY(-2px);
   }
   .profile-stat-card .val {
-    font-size: 16px;
-    font-weight: 900;
+    font-size: 18px;
+    font-weight: 600;
     color: #fff;
   }
   .profile-stat-card .lbl {
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: 4px;
@@ -2626,9 +2626,9 @@
     transform: translateY(-2px);
   }
   .prof-pb-card .lbl {
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -2815,9 +2815,9 @@
     flex-direction: column;
   }
   .detail-label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--label);
+    color: rgba(255,255,255,0.8);
     text-transform: uppercase;
     letter-spacing: 0.8px;
   }
