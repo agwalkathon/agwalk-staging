@@ -1100,6 +1100,13 @@ async function load(isBackgroundRefresh) {
           { lbl: goldLabel, thresh: goldThresh, color: '#FFD000' }
         ], EVENT_ROW);
       }
+      if (typeof window.renderMedalShelf === 'function') {
+        window.renderMedalShelf(myPts, [
+          { lbl: bronzeLabel, thresh: bronzeThresh, ic: '🥉', color: '#F4A84A' },
+          { lbl: silverLabel, thresh: silverThresh, ic: '🥈', color: '#C8D8E8' },
+          { lbl: goldLabel, thresh: goldThresh, ic: '🥇', color: '#FFD000' }
+        ]);
+      }
     } catch(e) { try{console.error('[hero-arc]',e);}catch(e5){} }
 
     (function() {
@@ -2229,4 +2236,29 @@ window.renderDashHybridExtras = function(opts) {
     chip(opts.rank ? '#' + opts.rank : '\u2014', 'rank', '');
     chips.style.display = 'flex';
   }
+};
+
+/* ═══ Phase 4: You-tab medal shelf renderer (WHOOP hybrid) ═══ */
+window.renderMedalShelf = function(myPts, medals) {
+  try {
+    var shelf = document.getElementById('you-medal-shelf');
+    if (!shelf || !medals || !medals.length) return;
+    while (shelf.firstChild) shelf.removeChild(shelf.firstChild);
+    medals.forEach(function(m) {
+      var earned = myPts >= m.thresh;
+      var item = document.createElement('div');
+      item.className = 'yms-item ' + (earned ? 'earned' : 'locked');
+      var ic = document.createElement('div');
+      ic.className = 'yms-ic';
+      ic.style.borderColor = m.color;
+      ic.textContent = m.ic;
+      var lbl = document.createElement('div');
+      lbl.className = 'yms-lbl';
+      lbl.textContent = m.lbl;
+      item.appendChild(ic); item.appendChild(lbl);
+      item.title = earned ? (m.lbl + ' earned') : (m.lbl + ' at ' + Math.round(m.thresh).toLocaleString('en-IN') + ' pts');
+      shelf.appendChild(item);
+    });
+    shelf.style.display = 'flex';
+  } catch(e) { try{console.error('[medal-shelf]',e);}catch(e6){} }
 };
