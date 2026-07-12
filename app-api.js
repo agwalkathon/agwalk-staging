@@ -1100,7 +1100,7 @@ async function load(isBackgroundRefresh) {
           { lbl: goldLabel, thresh: goldThresh, color: '#FFD000' }
         ], EVENT_ROW);
       }
-    } catch(e) {}
+    } catch(e) { try{console.error('[hero-arc]',e);}catch(e5){} }
 
     (function() {
       var todayStr = new Date().toISOString().split('T')[0];
@@ -1585,7 +1585,17 @@ async function load(isBackgroundRefresh) {
           points:myPts,streak:streak,streakLive:streakIsLive,rank:_rankH
         });
       }
-    }catch(e){}
+      // Defensive: re-assert arc visibility in case a classic-dashboard event
+      // re-showed the rings host after our earlier render (belt & braces).
+      try{
+        if(localStorage.getItem('ag_dyn_dash')!=='1'){
+          var _arcW2=document.getElementById('hero-arc-wrap');
+          var _ringsH2=document.getElementById('medal-rings');
+          if(_arcW2 && _arcW2.style.display==='none') _arcW2.style.display='block';
+          if(_ringsH2) _ringsH2.style.display='none';
+        }
+      }catch(e2){}
+    }catch(e){try{console.error('[hybrid-dash]',e);}catch(e4){}}
 
     // Challenges list tab
     (function renderChallenges(){
