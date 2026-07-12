@@ -2160,6 +2160,10 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
   wrap.style.display = 'block';
   var host = document.getElementById('medal-rings');
   if (host) host.style.display = 'none';
+  try {
+    var bsArc = document.getElementById('build-stamp');
+    if (bsArc) bsArc.textContent += ' | arc:RENDERED';
+  } catch(e12){}
 
   // animate fill in
   requestAnimationFrame(function() {
