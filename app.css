@@ -3538,3 +3538,23 @@ body.employee-mode::after {
     .hero-next-t{font-size:13.5px;font-weight:700;color:var(--text);}
     .hero-next-s{font-size:11.5px;color:var(--muted);margin-top:2px;}
     .hero-next-pct{font-size:20px;font-weight:800;color:var(--silver);}
+
+    /* ═══ Phase 2b: day strip, stat chips, week-goal bars ═══ */
+    .day-strip{display:flex;gap:6px;margin:0 auto 14px;max-width:360px;justify-content:center;}
+    .day-cell{flex:1;max-width:48px;text-align:center;padding:7px 0 9px;border-radius:12px;}
+    .day-cell.today{background:var(--surface);}
+    .day-cell .dw{font-size:8.5px;letter-spacing:1.4px;color:rgba(255,255,255,0.3);text-transform:uppercase;font-weight:700;}
+    .day-cell .dn{font-size:15px;font-weight:700;margin:2px 0 5px;color:var(--text);}
+    .day-cell svg{width:20px;height:20px;display:block;margin:0 auto;}
+    .day-ring-bg{fill:none;stroke:rgba(255,255,255,0.10);stroke-width:2.5;}
+    .day-ring-fg{fill:none;stroke:var(--brand);stroke-width:2.5;stroke-linecap:round;}
+    .stat-chips{display:flex;gap:10px;margin:0 0 12px;}
+    .stat-chip{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 4px;text-align:center;}
+    .stat-chip .scv{font-size:21px;font-weight:800;line-height:1;color:var(--text);}
+    .stat-chip .scv.brand{color:var(--brand);}
+    .stat-chip .scv.green{color:var(--green);}
+    .stat-chip .sck{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px;}
+    .streak-bars-wrap.km-bars{align-items:flex-end;height:64px;}
+    .sbarw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;}
+    .sbarw em{font-style:normal;font-size:8.5px;color:var(--green);font-weight:800;line-height:1;height:9px;}
+    .sbarw .sbar{width:100%;flex:none;min-height:4px;}

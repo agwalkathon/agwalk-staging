@@ -1533,15 +1533,59 @@ async function load(isBackgroundRefresh) {
     safeSetText('streak-msg', streakIsLive?(streak>=7?'Amazing streak!':streak>=3?'Keep it going!':'Good start!'):(lastActiveDay?'Last active '+lastActiveDay:'Start today!'));
 
     var days7=[],labels7=[];
+    // per-day km for the last 7 days (Phase 2b)
+    var dayKm={};
+    myActs.filter(function(a){return !a.is_flagged;}).forEach(function(a){
+      var d=getActDate(a);
+      if(d)dayKm[d]=(dayKm[d]||0)+(a.distance_meters||0)/1000;
+    });
     for(var di=6;di>=0;di--){
       var dd=new Date(now);dd.setDate(dd.getDate()-di);dd.setHours(12,0,0,0);
       var dstr=localDateStr(dd);
       var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0});
+      days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0,km:dayKm[dstr]||0,label:dayNames[dd.getDay()].charAt(0),dayNum:dd.getDate()});
       labels7.push(di===0?'Today':dayNames[dd.getDay()]);
     }
-    safeSetHtml('streak-bars', days7.map(function(d){return'<div class="sbar '+(d.isToday?'dim':d.active?'on':'off')+'"></div>';}).join(''));
+    // daily km target: pace for next unearned medal, else keep current average
+    var _daysLeftH=Math.max(1,daysLeft||1);
+    var _nextThreshH=myPts<bronzeThresh?bronzeThresh:myPts<silverThresh?silverThresh:myPts<goldThresh?goldThresh:0;
+    var _daysElapsedH=Math.max(1,(now-new Date((EVENT_ROW&&EVENT_ROW.start_date||'2026-06-01')+'T00:00:00+05:30'))/86400000);
+    var _targetKmH=_nextThreshH>0?(_nextThreshH-myPts)/_daysLeftH:(fullPts.km/_daysElapsedH);
+    _targetKmH=Math.max(1,Math.min(25,_targetKmH));
+    // km-proportional week bars with goal checkmarks
+    (function(){
+      var maxKm=Math.max(_targetKmH,days7.reduce(function(m,d){return Math.max(m,d.km);},0),1);
+      safeSetHtml('streak-bars', days7.map(function(d){
+        var h=Math.max(6,Math.round((d.km/maxKm)*100));
+        var met=d.km>=_targetKmH;
+        var cls=d.isToday?'dim':d.active?'on':'off';
+        return '<div class="sbarw"><em>'+(met?'\u2713':'')+'</em><div class="sbar '+cls+'" style="height:'+h+'%" title="'+d.km.toFixed(1)+' km"></div></div>';
+      }).join(''));
+      var bw=document.getElementById('streak-bars');
+      if(bw)bw.classList.add('km-bars');
+    })();
     safeSetHtml('streak-labels', labels7.map(function(l){return'<span class="sdlbl">'+l+'</span>';}).join(''));
+    // day strip + stat chips (rank from ranking summaries cache when available)
+    try{
+      var _rankH=null;
+      var _sum=typeof cacheGet==='function'?(cacheGet('ranking_summaries',CACHE_TTL.ranking)||cacheGet('ranking_summaries',86400*365*1000)):null;
+      if(_sum&&_sum.length){
+        var _gN=(reg.gender||'').toLowerCase();var _isF=_gN==='female'||_gN==='f';
+        var _sN=(reg.shift||'').toLowerCase();var _isN=_sN.indexOf('night')>-1;
+        var _peers=_sum.filter(function(p){
+          var pg=(p.gender||'').toLowerCase(),ps=(p.shift||'').toLowerCase();
+          return (ps.indexOf('night')>-1)===_isN&&(pg==='female'||pg==='f')===_isF;
+        }).sort(function(a,b){return(b.total_points||0)-(a.total_points||0);});
+        var _ix=_peers.findIndex(function(p){return String(p.athlete_id)===String(athleteId);});
+        if(_ix>=0)_rankH=_ix+1;
+      }
+      if(typeof window.renderDashHybridExtras==='function'){
+        window.renderDashHybridExtras({
+          days:days7,targetKm:_targetKmH,todayKm:dayKm[todayLocal]||0,
+          points:myPts,streak:streak,streakLive:streakIsLive,rank:_rankH
+        });
+      }
+    }catch(e){}
 
     // Challenges list tab
     (function renderChallenges(){
@@ -2106,4 +2150,73 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
       fg.setAttribute('stroke-dashoffset', (ARCLEN * (1 - frac)).toFixed(1));
     });
   });
+};
+
+/* ═══ Phase 2b renderer: day strip + stat chips (WHOOP hybrid) ═══
+   Called from the streak section with per-day km data already computed. */
+window.renderDashHybridExtras = function(opts) {
+  var NS = 'http://www.w3.org/2000/svg';
+  var days = opts.days || [];          // [{str,label,dayNum,km,isToday}]
+  var targetKm = Math.max(0.5, opts.targetKm || 0);
+
+  // ── 7-day mini-ring strip ──
+  var strip = document.getElementById('day-strip');
+  if (strip) {
+    while (strip.firstChild) strip.removeChild(strip.firstChild);
+    var CIRC = 2 * Math.PI * 8; // r=8 → ≈50.3
+    days.forEach(function(d) {
+      var cell = document.createElement('div');
+      cell.className = 'day-cell' + (d.isToday ? ' today' : '');
+      var dw = document.createElement('div');
+      dw.className = 'dw';
+      dw.textContent = d.label;
+      var dn = document.createElement('div');
+      dn.className = 'dn';
+      dn.textContent = d.dayNum;
+      var svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 20 20');
+      var bg = document.createElementNS(NS, 'circle');
+      bg.setAttribute('class', 'day-ring-bg');
+      bg.setAttribute('cx', '10'); bg.setAttribute('cy', '10'); bg.setAttribute('r', '8');
+      svg.appendChild(bg);
+      var frac = Math.max(0, Math.min(1, d.km / targetKm));
+      if (frac > 0.005) {
+        var fgc = document.createElementNS(NS, 'circle');
+        fgc.setAttribute('class', 'day-ring-fg');
+        fgc.setAttribute('cx', '10'); fgc.setAttribute('cy', '10'); fgc.setAttribute('r', '8');
+        fgc.setAttribute('stroke-dasharray', CIRC.toFixed(1));
+        fgc.setAttribute('stroke-dashoffset', (CIRC * (1 - frac)).toFixed(1));
+        fgc.setAttribute('transform', 'rotate(-90 10 10)');
+        if (frac >= 1) fgc.style.filter = 'drop-shadow(0 0 4px rgba(232,98,42,0.6))';
+        svg.appendChild(fgc);
+      }
+      cell.appendChild(dw); cell.appendChild(dn); cell.appendChild(svg);
+      cell.title = d.km.toFixed(1) + ' / ' + targetKm.toFixed(1) + ' km';
+      strip.appendChild(cell);
+    });
+    strip.style.display = 'flex';
+  }
+
+  // ── stat chips: km today · points · streak · rank ──
+  var chips = document.getElementById('stat-chips');
+  if (chips) {
+    while (chips.firstChild) chips.removeChild(chips.firstChild);
+    function chip(val, label, cls) {
+      var c = document.createElement('div');
+      c.className = 'stat-chip';
+      var v = document.createElement('div');
+      v.className = 'scv' + (cls ? ' ' + cls : '');
+      v.textContent = val;
+      var k = document.createElement('div');
+      k.className = 'sck';
+      k.textContent = label;
+      c.appendChild(v); c.appendChild(k);
+      chips.appendChild(c);
+    }
+    chip(opts.todayKm.toFixed(1), 'km today', 'brand');
+    chip(Math.round(opts.points).toLocaleString('en-IN'), 'points', '');
+    chip(opts.streak + (opts.streakLive && opts.streak > 0 ? '\uD83D\uDD25' : ''), 'day streak', 'green');
+    chip(opts.rank ? '#' + opts.rank : '\u2014', 'rank', '');
+    chips.style.display = 'flex';
+  }
 };
