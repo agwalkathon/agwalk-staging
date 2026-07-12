@@ -1092,6 +1092,15 @@ async function load(isBackgroundRefresh) {
       }
     });
     triggerRingAnimation();
+    try {
+      if (typeof window.renderHeroArc === 'function') {
+        window.renderHeroArc(myPts, [
+          { lbl: bronzeLabel, thresh: bronzeThresh, color: '#F4A84A' },
+          { lbl: silverLabel, thresh: silverThresh, color: '#C8D8E8' },
+          { lbl: goldLabel, thresh: goldThresh, color: '#FFD000' }
+        ], EVENT_ROW);
+      }
+    } catch(e) {}
 
     (function() {
       var todayStr = new Date().toISOString().split('T')[0];
@@ -1968,3 +1977,133 @@ async function loadPastEventsPerformance(reg, athleteId) {
 }
 window.loadPastEventsPerformance = loadPastEventsPerformance;
 // Trigger rebuild: fix config fetches and call setupAppLayout after loading config
+
+/* ═══ Unified Medal Arc renderer (WHOOP hybrid redesign, Phase 2) ═══
+   Draws one 240° gauge arc with medal-threshold ticks from the same
+   points data that fills the classic rings. Classic rings stay in the
+   DOM (hidden) so app-drawers.js pct reads keep working. Skipped when
+   an event uses the dynamic dashboard (ag_dyn_dash). */
+window.renderHeroArc = function(myPts, medals, eventRow) {
+  try {
+    if (localStorage.getItem('ag_dyn_dash') === '1') return;
+  } catch(e) {}
+  var wrap = document.getElementById('hero-arc-wrap');
+  var svg = document.getElementById('hero-arc-svg');
+  var legend = document.getElementById('hero-arc-legend');
+  if (!wrap || !svg || !legend || !medals || !medals.length) return;
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var CX = 140, CY = 112, R = 100;
+  var START = 150, SWEEP = 240;          // degrees
+  var ARCLEN = 2 * Math.PI * R * (SWEEP / 360); // ≈ 418.9
+
+  function pt(frac, radius) {
+    var a = (START + SWEEP * frac) * Math.PI / 180;
+    return { x: CX + radius * Math.cos(a), y: CY + radius * Math.sin(a) };
+  }
+  var p0 = pt(0, R), p1 = pt(1, R);
+  var d = 'M ' + p0.x.toFixed(1) + ' ' + p0.y.toFixed(1) +
+          ' A ' + R + ' ' + R + ' 0 1 1 ' + p1.x.toFixed(1) + ' ' + p1.y.toFixed(1);
+
+  var goldThresh = medals[medals.length - 1].thresh || 1;
+  var frac = Math.max(0, Math.min(1, myPts / goldThresh));
+
+  // rebuild svg
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  var bg = document.createElementNS(NS, 'path');
+  bg.setAttribute('class', 'hero-arc-bg');
+  bg.setAttribute('d', d);
+  svg.appendChild(bg);
+
+  var fg = document.createElementNS(NS, 'path');
+  fg.setAttribute('class', 'hero-arc-fg');
+  fg.setAttribute('d', d);
+  fg.setAttribute('stroke-dasharray', ARCLEN.toFixed(1));
+  fg.setAttribute('stroke-dashoffset', ARCLEN.toFixed(1));
+  svg.appendChild(fg);
+
+  medals.forEach(function(m) {
+    var f = Math.max(0, Math.min(1, m.thresh / goldThresh));
+    var a = pt(f, R + 10), b = pt(f, R + 22);
+    var tick = document.createElementNS(NS, 'line');
+    tick.setAttribute('class', 'hero-arc-tick');
+    tick.setAttribute('x1', a.x.toFixed(1)); tick.setAttribute('y1', a.y.toFixed(1));
+    tick.setAttribute('x2', b.x.toFixed(1)); tick.setAttribute('y2', b.y.toFixed(1));
+    tick.setAttribute('stroke', m.color);
+    tick.setAttribute('opacity', myPts >= m.thresh ? '1' : '0.55');
+    svg.appendChild(tick);
+  });
+
+  // center value
+  var valEl = document.getElementById('hero-arc-value');
+  if (valEl) valEl.textContent = Math.round(myPts).toLocaleString('en-IN');
+
+  // legend
+  while (legend.firstChild) legend.removeChild(legend.firstChild);
+  medals.forEach(function(m) {
+    var done = myPts >= m.thresh;
+    var item = document.createElement('div');
+    item.className = 'hero-arc-ml';
+    var dot = document.createElement('i');
+    dot.style.background = m.color;
+    item.appendChild(dot);
+    var txt = document.createElement('span');
+    txt.textContent = done ? (m.lbl + ' \u2713') : (m.lbl + ' ' + Math.round(m.thresh).toLocaleString('en-IN'));
+    if (done) item.style.color = m.color;
+    item.appendChild(txt);
+    legend.appendChild(item);
+  });
+
+  // next-milestone banner
+  var banner = document.getElementById('hero-next-banner');
+  if (banner) {
+    var icons = ['\uD83E\uDD49', '\uD83E\uDD48', '\uD83E\uDD47']; // 🥉🥈🥇
+    var next = null, nextIdx = -1;
+    for (var i = 0; i < medals.length; i++) {
+      if (myPts < medals[i].thresh) { next = medals[i]; nextIdx = i; break; }
+    }
+    var icEl = document.getElementById('hero-next-ic');
+    var tEl = document.getElementById('hero-next-title');
+    var sEl = document.getElementById('hero-next-sub');
+    var pEl = document.getElementById('hero-next-pct');
+    if (next) {
+      var needed = next.thresh - myPts;
+      var pct = Math.min(99, Math.floor((myPts / next.thresh) * 100));
+      var sub = pct + '% of the way there';
+      // pace estimate from event elapsed days
+      try {
+        if (eventRow && eventRow.start_date) {
+          var elapsed = Math.max(1, Math.round((Date.now() - new Date(eventRow.start_date).getTime()) / 86400000));
+          var rate = myPts / elapsed;
+          if (rate > 0.01) {
+            var days = Math.ceil(needed / rate);
+            sub = 'About ' + days + ' day' + (days === 1 ? '' : 's') + ' at your current pace';
+          }
+        }
+      } catch(e) {}
+      if (icEl) icEl.textContent = icons[nextIdx] || '\uD83C\uDFC5';
+      if (tEl) tEl.textContent = next.lbl + ' is ' + Math.round(needed).toLocaleString('en-IN') + ' pts away';
+      if (sEl) sEl.textContent = sub;
+      if (pEl) { pEl.textContent = pct + '%'; pEl.style.color = next.color; }
+      banner.style.display = 'flex';
+    } else {
+      if (icEl) icEl.textContent = '\uD83C\uDFC6';
+      if (tEl) tEl.textContent = 'All medals earned!';
+      if (sEl) sEl.textContent = 'Incredible effort \u2014 you\u2019ve conquered every milestone';
+      if (pEl) { pEl.textContent = '\u2713'; pEl.style.color = 'var(--green)'; }
+      banner.style.display = 'flex';
+    }
+  }
+
+  // show arc, hide classic rings (they stay updated & readable by drawers)
+  wrap.style.display = 'block';
+  var host = document.getElementById('medal-rings');
+  if (host) host.style.display = 'none';
+
+  // animate fill in
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      fg.setAttribute('stroke-dashoffset', (ARCLEN * (1 - frac)).toFixed(1));
+    });
+  });
+};

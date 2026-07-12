@@ -286,6 +286,9 @@
 
     if (!host) return;
     try { localStorage.setItem('ag_dyn_dash', '1'); } catch(e){}
+    host.style.display = '';
+    var arcWrap = document.getElementById('hero-arc-wrap');
+    if (arcWrap) arcWrap.style.display = 'none';
     host.textContent = '';
     host.style.opacity = '1';
     

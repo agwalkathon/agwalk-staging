@@ -3514,3 +3514,27 @@ body.employee-mode::after {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+    /* ═══ Unified Medal Arc (WHOOP hybrid redesign, Phase 2) ═══ */
+    .hero-arc-svgbox{position:relative;width:280px;max-width:88vw;margin:0 auto;}
+    .hero-arc-svgbox svg{width:100%;height:auto;overflow:visible;display:block;}
+    .hero-arc-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:12;stroke-linecap:round;}
+    .hero-arc-fg{fill:none;stroke:var(--brand);stroke-width:12;stroke-linecap:round;
+      filter:drop-shadow(0 0 12px rgba(232,98,42,0.4));
+      transition:stroke-dashoffset 1.2s cubic-bezier(0.25,0.8,0.25,1);}
+    .hero-arc-tick{stroke-width:3;stroke-linecap:round;}
+    .hero-arc-center{position:absolute;left:0;right:0;bottom:4px;text-align:center;pointer-events:none;}
+    .hero-arc-big{font-size:52px;font-weight:800;line-height:.95;letter-spacing:-1px;color:var(--text);}
+    .hero-arc-big small{font-size:19px;font-weight:600;color:var(--muted);letter-spacing:0;}
+    .hero-arc-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:5px;}
+    .hero-arc-legend{display:flex;justify-content:center;gap:18px;margin-top:12px;flex-wrap:wrap;}
+    .hero-arc-ml{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:600;}
+    .hero-arc-ml i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+    .hero-next{margin:16px 0 4px;background:var(--surface);border:1px solid var(--border);border-radius:16px;
+      padding:14px 16px;display:flex;align-items:center;gap:13px;}
+    .hero-next-ic{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:rgba(200,216,232,0.1);
+      display:flex;align-items:center;justify-content:center;font-size:19px;}
+    .hero-next-txt{flex:1;min-width:0;}
+    .hero-next-t{font-size:13.5px;font-weight:700;color:var(--text);}
+    .hero-next-s{font-size:11.5px;color:var(--muted);margin-top:2px;}
+    .hero-next-pct{font-size:20px;font-weight:800;color:var(--silver);}

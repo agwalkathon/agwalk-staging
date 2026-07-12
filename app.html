@@ -84,7 +84,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260712_v1">
+  <link rel="stylesheet" href="app.css?v=20260712_v2">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -302,6 +302,25 @@
   <div class="hero-rings-block">
     <div style="display:flex; justify-content:center; margin-bottom:24px; margin-top:14px;">
       <img id="app-logo" src="logo-white.png" alt="Arcgate Walkathon" style="height:26px; width:auto;">
+    </div>
+    <!-- Unified Medal Arc (WHOOP hybrid redesign) -->
+    <div id="hero-arc-wrap" style="display:none;">
+      <div class="hero-arc-svgbox">
+        <svg id="hero-arc-svg" viewBox="0 0 280 175" aria-hidden="true"></svg>
+        <div class="hero-arc-center">
+          <div class="hero-arc-big"><span id="hero-arc-value">—</span><small> pts</small></div>
+          <div class="hero-arc-lbl">Total Points</div>
+        </div>
+      </div>
+      <div class="hero-arc-legend" id="hero-arc-legend"></div>
+      <div class="hero-next" id="hero-next-banner" style="display:none;">
+        <div class="hero-next-ic" id="hero-next-ic">🥈</div>
+        <div class="hero-next-txt">
+          <div class="hero-next-t" id="hero-next-title">—</div>
+          <div class="hero-next-s" id="hero-next-sub">—</div>
+        </div>
+        <div class="hero-next-pct" id="hero-next-pct">—</div>
+      </div>
     </div>
     <div class="rings-row" id="medal-rings">
       <!-- SVG Gradient Definitions -->
@@ -877,10 +896,10 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
   <script src="app-config.js?v=20260711_v1" defer></script>
   <script src="app-employee.js?v=20260711_v3" defer></script>
-  <script src="app-api.js?v=20260711_v1" defer></script>
+  <script src="app-api.js?v=20260712_v1" defer></script>
   <script src="app-drawers.js?v=20260711_v1" defer></script>
   <script src="app-events.js?v=20260711_v1" defer></script>
-  <script src="app-dashboard.js?v=20260711_v1" defer></script>
+  <script src="app-dashboard.js?v=20260712_v1" defer></script>
   <script src="app-tabs.js?v=20260711_v1" defer></script>
 
 
