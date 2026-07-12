@@ -3558,3 +3558,12 @@ body.employee-mode::after {
     .sbarw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;}
     .sbarw em{font-style:normal;font-size:8.5px;color:var(--green);font-weight:800;line-height:1;height:9px;}
     .sbarw .sbar{width:100%;flex:none;min-height:4px;}
+
+    /* ═══ Phase 3: rival/rank-movement card (activates existing computed data) ═══ */
+    .lb-rival-card{margin:0 20px 14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;
+      padding:14px 16px;display:flex;align-items:center;gap:13px;}
+    .lb-rival-ic{width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:rgba(232,98,42,0.12);
+      display:flex;align-items:center;justify-content:center;font-size:17px;}
+    .lb-rival-txt{flex:1;min-width:0;}
+    .lb-rival-t{font-size:13.5px;font-weight:700;color:var(--text);}
+    .lb-rival-s{font-size:11.5px;color:var(--muted);margin-top:2px;}

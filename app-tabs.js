@@ -1249,16 +1249,72 @@ function renderHallOfFame() {
   '</div>';
 }
 
+function initials(name) {
+  var parts = String(name || '').trim().split(/\s+/);
+  if (!parts.length || !parts[0]) return '—';
+  return parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
+}
+
+function renderPodium(rows) {
+  var pod = document.getElementById('lb-podium');
+  if (!pod) return;
+  if (!rows || rows.length < 3) { pod.style.display = 'none'; return; }
+
+  var s = JSON.parse(localStorage.getItem('wk_user') || '{}');
+  var meId = s.athleteId;
+  var top3 = [rows[1], rows[0], rows[2]]; // visual order: 2nd, 1st, 3rd
+  var ranks = [2, 1, 3];
+  var crowns = ['🥈', '👑', '🥉'];
+
+  pod.innerHTML = top3.map(function(r, idx) {
+    if (!r) return '';
+    var rank = ranks[idx];
+    var isMe = String(r.p.strava_athlete_id) === String(meId);
+    var teamName = (r.p.leaderboard_team || '').replace(/^Team\s+/i, '');
+    return (
+      '<div class="podium-card rank-' + rank + (isMe ? ' active' : '') + '" data-rank="' + rank + '">' +
+        '<div class="podium-badge">' + crowns[idx] + '</div>' +
+        '<div class="podium-avatar">' + esc(initials(r.p.full_name)) + '</div>' +
+        '<div class="podium-name">' + esc(r.p.full_name || '—') + (isMe ? ' (You)' : '') + '</div>' +
+        (teamName ? '<div class="podium-team">' + esc(teamName) + '</div>' : '') +
+        '<div class="podium-pts">' + r.pts.total.toFixed(lbScoringMode()==='raw'?lbMetricMeta().dec:1) + ' ' + (lbScoringMode()==='raw' ? lbMetricMeta().short.toLowerCase() : 'pts') + '</div>' +
+      '</div>'
+    );
+  }).join('');
+  pod.style.display = 'flex';
+
+  pod.querySelectorAll('.podium-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var rankNum = card.getAttribute('data-rank');
+      var listEl = document.getElementById('lb-list');
+      if (!listEl) return;
+      var rows2 = listEl.querySelectorAll('.lb-row');
+      var idx2 = parseInt(rankNum, 10) - 1;
+      if (rows2[idx2]) {
+        rows2[idx2].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rows2[idx2].classList.add('expanded');
+      }
+    });
+  });
+}
+
 function switchTab(mode) {
   LB_currentTab = mode;
   safeToggleClass('lb-tab-shift', 'active', mode === 'shift');
   safeToggleClass('lb-tab-team', 'active', mode === 'team');
   safeToggleClass('lb-tab-hof', 'active', mode === 'hof');
   if (mode === 'hof') {
+    var pod = document.getElementById('lb-podium');
+    if (pod) pod.style.display = 'none';
+    var riv = document.getElementById('lb-rival-card');
+    if (riv) riv.style.display = 'none';
     renderHallOfFame();
     return;
   }
   renderRows(getRows(mode));
+  renderPodium(getRows(mode));
+  var riv2 = document.getElementById('lb-rival-card');
+  if (riv2) riv2.style.display = 'flex';
 }
 window.switchTab = switchTab;
 
@@ -1289,6 +1345,11 @@ function lbRender() {
     
     buildTabs();
     renderRows(getRows(LB_currentTab));
+    renderPodium(getRows(LB_currentTab));
+
+    // reveal the rival/rank-movement card now that it has real data
+    var rivalCard = document.getElementById('lb-rival-card');
+    if (rivalCard) rivalCard.style.display = 'flex';
     
     var allRows = getRows(LB_currentTab);
     var myRow = allRows.find(function(r) { return String(r.p.strava_athlete_id) === String(s.athleteId); });
