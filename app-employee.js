@@ -229,7 +229,7 @@ function getGlassmorphicAvatarStyle(name) {
   var shadow = 'inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 15px rgba(0,0,0,0.25)';
   return 'background:' + bg + '; border:' + border + '; color:#ffffff; box-shadow:' + shadow + '; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); text-shadow:0 1px 2px rgba(0,0,0,0.3); font-weight:800; text-transform:uppercase;';
 }
-var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎉','#8B5CF6'], custom: ['📣','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'] };
+var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎉','#8B5CF6'], custom: ['📣','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'], medal: ['🏅','#F4A84A'] };
 var EMOJIS = ['🎉','❤️','👏'];
 
 // Occasion card cover + message treatment (welcome/birthday/anniversary only)
@@ -321,41 +321,66 @@ async function loadCelebrate(){
     // Today strip
     var todayStr = new Date(Date.now() + 5.5*3600*1000).toISOString().split('T')[0];
     var todays = d.items.filter(function(c){
-      return c.celebrate_date === todayStr && ['birthday','anniversary','welcome'].indexOf(c.type) > -1;
+      return c.celebrate_date === todayStr && ['birthday','anniversary','welcome','medal'].indexOf(c.type) > -1;
     });
     if (todays.length) {
       var stripWrap = document.createElement('div');
-      stripWrap.style.cssText = 'margin-bottom:16px;';
+      stripWrap.className = 'tcs-wrap';
       var sh = document.createElement('div');
-      sh.style.cssText = 'font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--label);margin-bottom:10px;';
+      sh.className = 'tcs-head';
       sh.textContent = "🎉 Today's Celebrations";
       stripWrap.appendChild(sh);
       var strip = document.createElement('div');
-      strip.style.cssText = 'display:flex;gap:14px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;';
+      strip.className = 'tcs-scroll';
+      var CTA_LABEL = { birthday: 'Send wishes', anniversary: 'Congratulate', welcome: 'Say hello', custom: 'Cheer', announcement: 'View', medal: 'Cheer' };
+      var SUB_LABEL = function(c){
+        if (c.type === 'birthday') return 'Birthday today';
+        if (c.type === 'anniversary') return (c.title || 'Work anniversary');
+        if (c.type === 'welcome') return 'New at Arcgate';
+        return c.title || 'Celebration';
+      };
       todays.forEach(function(c){
-        var it = document.createElement('div');
-        it.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;width:64px;';
+        var empName = (c.employee && c.employee.full_name) || '';
+        var card = document.createElement('div');
+        card.className = 'tcc-card';
+
         var av = document.createElement('div');
-        av.className = 'grad-avatar';
-        av.style.cssText += 'width:54px;height:54px;font-size:17px;position:relative;';
-        if (c.employee && c.employee.photo_url) { var im = document.createElement('img'); im.src = c.employee.photo_url; av.appendChild(im); }
-        else {
-          av.textContent = initials(c.employee && c.employee.full_name);
-          av.setAttribute('style', getGlassmorphicAvatarStyle(c.employee && c.employee.full_name) + '; width:54px; height:54px; border-radius:50%; font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center; position:relative;');
+        av.className = 'tcc-av';
+        if (c.employee && c.employee.photo_url) {
+          var im = document.createElement('img'); im.src = c.employee.photo_url; av.appendChild(im);
+        } else {
+          av.textContent = initials(empName);
+          av.style.cssText = getGlassmorphicAvatarStyle(empName) + ';width:44px;height:44px;border-radius:50%;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;position:relative;';
         }
         var badge = document.createElement('div');
-        badge.style.cssText = 'position:absolute;bottom:-3px;right:-3px;font-size:15px;';
+        badge.className = 'tcc-badge';
         badge.textContent = (TYPE_META[c.type]||['🎉'])[0];
         av.appendChild(badge);
+
         var nm = document.createElement('div');
-        nm.style.cssText = 'font-size:10.5px;font-weight:600;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;';
-        nm.textContent = ((c.employee && c.employee.full_name) || '').split(' ')[0];
-        it.appendChild(av); it.appendChild(nm);
-        it.addEventListener('click', function(){
+        nm.className = 'tcc-name';
+        nm.textContent = empName.split(' ')[0] + (empName.split(' ')[1] ? ' ' + empName.split(' ')[1][0] + '.' : '');
+
+        var sub = document.createElement('div');
+        sub.className = 'tcc-sub';
+        sub.textContent = SUB_LABEL(c);
+
+        var btn = document.createElement('button');
+        btn.className = 'tcc-btn';
+        btn.textContent = CTA_LABEL[c.type] || 'View';
+        btn.addEventListener('click', function(){
           var target = document.querySelector('[data-celeb-id="' + c.id + '"]');
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(function(){
+              var input = target.querySelector('input[placeholder]');
+              if (input) input.focus();
+            }, 350);
+          }
         });
-        strip.appendChild(it);
+
+        card.appendChild(av); card.appendChild(nm); card.appendChild(sub); card.appendChild(btn);
+        strip.appendChild(card);
       });
       stripWrap.appendChild(strip);
       box.appendChild(stripWrap);
