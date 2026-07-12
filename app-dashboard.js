@@ -272,10 +272,6 @@
       var arcW = document.getElementById('hero-arc-wrap');
       var ringsHost = document.getElementById('medal-rings');
       if (arcW && ringsHost && ringsHost.style.display === 'none') arcW.style.display = 'block';
-      try {
-        var bs1 = document.getElementById('build-stamp');
-        if (bs1) bs1.textContent += ' | dash:CLASSIC(hasDash=false)';
-      } catch(e9){}
       return;
     }
     
@@ -297,10 +293,6 @@
 
     if (!host) return;
     try { localStorage.setItem('ag_dyn_dash', '1'); } catch(e){}
-    try {
-      var bs2 = document.getElementById('build-stamp');
-      if (bs2) bs2.textContent += ' | dash:DYNAMIC(hasDash=true, ' + dash.rings.length + ' rings)';
-    } catch(e10){}
     host.style.display = '';
     var arcWrap = document.getElementById('hero-arc-wrap');
     if (arcWrap) arcWrap.style.display = 'none';
@@ -380,10 +372,6 @@
       });
     } else if (tries > 100) {
       clearInterval(t);
-      try {
-        var bs3 = document.getElementById('build-stamp');
-        if (bs3) bs3.textContent += ' | dash:TIMEOUT(never ran)';
-      } catch(e11){}
     }
   }, 100);
 })();
