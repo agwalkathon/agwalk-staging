@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -56,6 +56,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <title>Events — Arcgate Walkathon</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -207,7 +211,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 <body>
                   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
     </div>
     
@@ -253,6 +257,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <button type="button" class="stab" data-tab="scoring" onclick="switchEditorTab('scoring')"><i class="ti ti-medal"></i> Scoring & Medals</button>
     <button type="button" class="stab" data-tab="challenges" onclick="switchEditorTab('challenges')"><i class="ti ti-target-arrow"></i> Challenges</button>
     <button type="button" class="stab" data-tab="layout" onclick="switchEditorTab('layout')"><i class="ti ti-palette"></i> App Layout</button>
+    <button type="button" class="stab" data-tab="certificates" onclick="switchEditorTab('certificates')"><i class="ti ti-certificate"></i> Certificates</button>
     <button type="button" class="stab" data-tab="manual-bonus" id="tab-btn-manual-bonus" style="display:none" onclick="switchEditorTab('manual-bonus')"><i class="ti ti-gift"></i> Manual Bonuses</button>
   </div>
 
@@ -385,17 +390,50 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
   </div>
 
-  <!-- Group 4a: Medal Milestones (Hidden — resolved dynamically from rings config) -->
-  <div class="edit-group" style="display:none;">
-    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Milestones</h3>
-    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">Configure the overall event points thresholds required for participants to earn Gold, Silver, and Bronze medals. When an athlete hits these thresholds, they are automatically awarded the corresponding medal tier.</div>
-    <div class="grid" style="margin-bottom:14px">
-      <input type="number" id="gold-male" value="300">
-      <input type="number" id="gold-female" value="250">
-      <input type="number" id="silver-male" value="200">
-      <input type="number" id="silver-female" value="150">
-      <input type="number" id="bronze-male" value="125">
-      <input type="number" id="bronze-female" value="100">
+  <!-- Group 4a: Medal Milestones & Images Configuration -->
+  <div class="edit-group" style="border-left: 4px solid #F59E0B; background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+    <h3 style="font-size: 14px; font-weight: 700; color: #F59E0B; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-medal"></i> Medal Configuration</h3>
+    <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">Configure the points thresholds required to earn Gold, Silver, and Bronze medals, and upload custom medal badges/images for this event.</div>
+    
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <!-- Gold Medal Row -->
+      <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Male Goal)</label><input type="number" id="gold-male" value="300" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Female Goal)</label><input type="number" id="gold-female" value="250" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥇 Gold Badge Image</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="gold-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
+            <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('gold-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
+            <input type="file" id="gold-img-file" accept="image/*" style="display:none;" onchange="uploadMedalImage(event, 'gold')">
+          </div>
+        </div>
+      </div>
+
+      <!-- Silver Medal Row -->
+      <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Male Goal)</label><input type="number" id="silver-male" value="200" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Female Goal)</label><input type="number" id="silver-female" value="150" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥈 Silver Badge Image</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="silver-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
+            <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('silver-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
+            <input type="file" id="silver-img-file" accept="image/*" style="display:none;" onchange="uploadMedalImage(event, 'silver')">
+          </div>
+        </div>
+      </div>
+
+      <!-- Bronze Medal Row -->
+      <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Male Goal)</label><input type="number" id="bronze-male" value="125" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Female Goal)</label><input type="number" id="bronze-female" value="100" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥉 Bronze Badge Image</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="bronze-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
+            <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('bronze-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
+            <input type="file" id="bronze-img-file" accept="image/*" style="display:none;" onchange="uploadMedalImage(event, 'bronze')">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -416,6 +454,13 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
     <div id="rings-box" style="margin-bottom:12px"></div>
     <button type="button" class="btn btn-ghost btn-sm" id="btn-add-ring" style="margin-bottom:16px"><i class="ti ti-plus"></i> Add Ring</button>
+    
+    <!-- Dashboard Arc Toggle inside Scoring & Medals -->
+    <div style="background:#f4f6fa; padding:12px; border-radius:6px; border:1px solid #e2e8f0; margin-top:10px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer">
+        <input type="checkbox" id="sec-show-arc"> Enable Arc Chart on Dashboard instead of Three Rings
+      </label>
+    </div>
   </div>
 
   <!-- Group 4b: Points Configuration -->
@@ -653,6 +698,58 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
   </div>
 
+  <!-- Tab Panel 7: Certificates -->
+  <div class="editor-tab-panel" id="editor-tab-panel-certificates" style="display:none">
+    <div class="edit-group" style="border-left: 4px solid var(--brand); background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-certificate"></i> Certificate Configuration</h3>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">Configure dynamic certificate templates for the event. Participants can download certificates once the event has ended.</p>
+      
+      <div class="grid" style="margin-bottom: 20px;">
+        <div class="fld" style="grid-column: 1 / -1;">
+          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Certificate Template PDF</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf" style="flex:1;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload PDF</button>
+            <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+          </div>
+          <span style="font-size:11px; color:#64748b; margin-top:4px; display:block;">Enter a file path/URL or upload a local PDF template. Uploading large templates will convert them to Base64 in config.</span>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 20px;">
+        <div>
+          <h4 style="font-size:13px; font-weight:700; color:#333; margin-bottom:12px;">Placeholders Mapping</h4>
+          <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
+            <!-- Rendered list of placeholder config rows -->
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Add Placeholder</button>
+          
+          <div style="margin-top: 24px;">
+            <h4 style="font-size:13px; font-weight:700; color:#333; margin-bottom:12px;">Download Format Options</h4>
+            <div style="display:flex; gap:16px;">
+              <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> Photo (JPEG)</label>
+              <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF Document</label>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <h4 style="font-size:13px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between;">
+            <span>Live Interactive Preview</span>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas()"><i class="ti ti-refresh"></i> Refresh</button>
+          </h4>
+          <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:10px; display:flex; align-items:center; justify-content:center; min-height:280px; position:relative; overflow:hidden;">
+            <canvas id="cert-preview-canvas" style="max-width:100%; max-height:350px; border:1px solid #ccc; display:none; cursor:crosshair;" onclick="handleCertPreviewCanvasClick(event)"></canvas>
+            <div id="cert-preview-placeholder" style="font-size:12px; color:#64748b; text-align:center;">
+              <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
+            </div>
+          </div>
+          <span style="font-size:11px; color:#64748b; text-align:center;">Click on the preview canvas to set the X/Y coordinates of the active placeholder row.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
     <span class="saved-msg" id="ed-saved">✅ Saved</span>
@@ -665,8 +762,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 </div>
 </div>
 <script>
-var SB_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
-var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var SB_URL='https://jglvwxeaqiswpxzcofmy.supabase.co';
+var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
 var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON,'Content-Type':'application/json'};
 var BACKEND= window.BACKEND_URL;
 function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}
@@ -895,6 +992,7 @@ function loadDashboardCfg(rc){
   var sec=db.sections||{};
   document.getElementById('sec-streak').checked=sec.streak!==false;
   document.getElementById('sec-medals').checked=sec.medals!==false;
+  document.getElementById('sec-show-arc').checked=sec.show_arc_on_dashboard===true;
   document.getElementById('sec-challenges').checked=sec.challenges!==false;
   document.getElementById('sec-mypoints').checked=sec.my_points!==false;
   document.getElementById('sec-mystats').checked=sec.my_stats!==false;
@@ -950,7 +1048,8 @@ function collectDashboardCfg(){
     stat_activities:document.getElementById('stat-comp-activities').checked,
     stat_distance:document.getElementById('stat-comp-distance').checked,
     stat_movingtime:document.getElementById('stat-comp-movingtime').checked,
-    pace_goals:document.getElementById('sec-pacegoals').checked
+    pace_goals:document.getElementById('sec-pacegoals').checked,
+    show_arc_on_dashboard:document.getElementById('sec-show-arc').checked
   };
 
   var pb={};
@@ -1623,17 +1722,23 @@ async function openEditor(ev){
         var m = medalRow.config_value;
         document.getElementById('gold-male').value = (m.gold && m.gold.male) || 300;
         document.getElementById('gold-female').value = (m.gold && m.gold.female) || 250;
+        document.getElementById('gold-img-url').value = (m.gold && m.gold.image_url) || '';
         document.getElementById('silver-male').value = (m.silver && m.silver.male) || 200;
         document.getElementById('silver-female').value = (m.silver && m.silver.female) || 150;
+        document.getElementById('silver-img-url').value = (m.silver && m.silver.image_url) || '';
         document.getElementById('bronze-male').value = (m.bronze && m.bronze.male) || 125;
         document.getElementById('bronze-female').value = (m.bronze && m.bronze.female) || 100;
+        document.getElementById('bronze-img-url').value = (m.bronze && m.bronze.image_url) || '';
       } else {
         document.getElementById('gold-male').value = 300;
         document.getElementById('gold-female').value = 250;
+        document.getElementById('gold-img-url').value = '';
         document.getElementById('silver-male').value = 200;
         document.getElementById('silver-female').value = 150;
+        document.getElementById('silver-img-url').value = '';
         document.getElementById('bronze-male').value = 125;
         document.getElementById('bronze-female').value = 100;
+        document.getElementById('bronze-img-url').value = '';
       }
 
       var basePointsRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'base_points'; }) : null;
@@ -1687,6 +1792,30 @@ async function openEditor(ev){
         });
       }
 
+      var certCfgRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'certificate_config'; }) : null;
+      if (certCfgRow && certCfgRow.config_value) {
+        var c = certCfgRow.config_value;
+        document.getElementById('cert-template-url').value = c.template_url || '';
+        document.getElementById('cert-opt-image').checked = (c.download_options || []).indexOf('image') > -1;
+        document.getElementById('cert-opt-pdf').checked = (c.download_options || []).indexOf('pdf') > -1;
+        
+        var list = document.getElementById('cert-placeholders-list');
+        list.innerHTML = '';
+        if (Array.isArray(c.placeholders)) {
+          c.placeholders.forEach(function(p) {
+            addCertPlaceholderRow(p);
+          });
+        }
+      } else {
+        document.getElementById('cert-template-url').value = '';
+        document.getElementById('cert-opt-image').checked = true;
+        document.getElementById('cert-opt-pdf').checked = true;
+        document.getElementById('cert-placeholders-list').innerHTML = '';
+        addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
+        addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
+      }
+      setTimeout(updateCertPreviewCanvas, 200);
+
     } catch(err) {
       console.warn('Failed to load sub-configurations:', err);
     }
@@ -1702,6 +1831,9 @@ async function openEditor(ev){
     document.getElementById('bronze-male').value = 125;
     document.getElementById('bronze-female').value = 100;
     document.getElementById('base-per-km').value = 1;
+    document.getElementById('gold-img-url').value = '';
+    document.getElementById('silver-img-url').value = '';
+    document.getElementById('bronze-img-url').value = '';
     _milestonesData = [];
     _specialDaysData = [];
     _challengesData = [];
@@ -1719,6 +1851,14 @@ async function openEditor(ev){
       var el = document.getElementById('pts-opt-' + colName);
       if (el) el.checked = true;
     });
+
+    document.getElementById('cert-template-url').value = '';
+    document.getElementById('cert-opt-image').checked = true;
+    document.getElementById('cert-opt-pdf').checked = true;
+    document.getElementById('cert-placeholders-list').innerHTML = '';
+    addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
+    addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
+    setTimeout(updateCertPreviewCanvas, 200);
   }
 
   var tabBtn = document.getElementById('tab-btn-manual-bonus');
@@ -1824,9 +1964,21 @@ async function saveEvent() {
     
     if (savedEventId) {
       var medalsVal = {
-        gold: { male: +document.getElementById('gold-male').value || 300, female: +document.getElementById('gold-female').value || 250 },
-        silver: { male: +document.getElementById('silver-male').value || 200, female: +document.getElementById('silver-female').value || 150 },
-        bronze: { male: +document.getElementById('bronze-male').value || 125, female: +document.getElementById('bronze-female').value || 100 }
+        gold: { 
+          male: +document.getElementById('gold-male').value || 300, 
+          female: +document.getElementById('gold-female').value || 250,
+          image_url: document.getElementById('gold-img-url').value.trim() || null
+        },
+        silver: { 
+          male: +document.getElementById('silver-male').value || 200, 
+          female: +document.getElementById('silver-female').value || 150,
+          image_url: document.getElementById('silver-img-url').value.trim() || null
+        },
+        bronze: { 
+          male: +document.getElementById('bronze-male').value || 125, 
+          female: +document.getElementById('bronze-female').value || 100,
+          image_url: document.getElementById('bronze-img-url').value.trim() || null
+        }
       };
 
       var basePointsVal = { per_km: parseFloat(document.getElementById('f-rate').value) || 1 };
@@ -1853,6 +2005,44 @@ async function saveEvent() {
         ptsCfg[t] = el ? el.checked : true;
       });
 
+      var certPlaceholders = [];
+      document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+        var key = row.querySelector('.cert-p-key').value.trim();
+        var type = row.querySelector('.cert-p-type').value;
+        var customVal = row.querySelector('.cert-p-custom-val').value.trim();
+        var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+        var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+        var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
+        var color = row.querySelector('.cert-p-color').value;
+        var weight = row.querySelector('.cert-p-weight').value;
+        var align = row.querySelector('.cert-p-align').value;
+        var family = row.querySelector('.cert-p-font').value || 'Poppins';
+        if (key) {
+          certPlaceholders.push({
+            key: key,
+            type: type,
+            custom_val: customVal,
+            x: x,
+            y: y,
+            font_size: size,
+            color: color,
+            font_style: weight,
+            align: align,
+            font_family: family
+          });
+        }
+      });
+
+      var certDownloadOptions = [];
+      if (document.getElementById('cert-opt-image').checked) certDownloadOptions.push('image');
+      if (document.getElementById('cert-opt-pdf').checked) certDownloadOptions.push('pdf');
+
+      var certConfigVal = {
+        template_url: document.getElementById('cert-template-url').value.trim() || null,
+        placeholders: certPlaceholders,
+        download_options: certDownloadOptions
+      };
+
       await Promise.all([
         upsertConfigValue('medals', medalsVal, savedEventId),
         upsertConfigValue('base_points', basePointsVal, savedEventId),
@@ -1860,7 +2050,8 @@ async function saveEvent() {
         upsertConfigValue('hide_strava_connect', hideStrava, savedEventId),
         upsertConfigValue('team_leaderboard_enabled', teamLb, savedEventId),
         upsertConfigValue('tabs_config', tabsCfg, savedEventId),
-        upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
+        upsertConfigValue('activities_points_config', ptsCfg, savedEventId),
+        upsertConfigValue('certificate_config', certConfigVal, savedEventId)
       ]);
       // Trigger points backfill asynchronously so it doesn't block the frontend save UI/collapse action
       fetch(BACKEND + '/admin/backfill-points', {
@@ -1874,6 +2065,10 @@ async function saveEvent() {
         console.warn('Auto backfill failed:', e.message);
       });
     }
+
+    try {
+      localStorage.setItem('ag_clear_event_cache', '1');
+    } catch(e){}
 
     document.getElementById('ed-saved').classList.add('show');
     setTimeout(function(){document.getElementById('ed-saved').classList.remove('show')},2200);
@@ -2176,6 +2371,322 @@ async function clearManualBonus(activityId) {
     alert('Failed to clear manual bonus: ' + e.message);
   }
 }
+
+window.toggleCertCustomVal = function(select) {
+  var row = select.closest('.cert-placeholder-row');
+  var wrap = row.querySelector('.cert-custom-val-wrap');
+  if (wrap) {
+    wrap.style.display = select.value === 'custom' ? 'block' : 'none';
+  }
+};
+
+window.handleCertTemplateUpload = function(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function() {
+    document.getElementById('cert-template-url').value = reader.result;
+    updateCertPreviewCanvas();
+  };
+  reader.readAsDataURL(file);
+};
+
+window.addCertPlaceholderRow = function(data) {
+  var p = data || { key: '', type: 'participant_name', x: 0.1, y: 0.1, font_size: 24, color: '#000000', font_style: 'normal', align: 'left', custom_val: '', font_family: 'Poppins' };
+  var list = document.getElementById('cert-placeholders-list');
+  var rowId = 'cpr-' + Date.now() + '-' + Math.round(Math.random() * 1000);
+  
+  if (p.font_family) {
+    loadGoogleFont(p.font_family);
+  }
+
+  var row = document.createElement('div');
+  row.className = 'cert-placeholder-row';
+  row.id = rowId;
+  row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; position:relative; display:flex; flex-direction:column; gap:10px;';
+  
+  var isChecked = list.children.length === 0 ? 'checked' : '';
+  
+  row.innerHTML = 
+    '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+      '<label style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer;">' +
+        '<input type="radio" name="active-cert-placeholder" ' + isChecked + ' style="cursor:pointer;" onchange="updateCertPreviewCanvas()"> Active for click-mapping' +
+      '</label>' +
+      '<button type="button" class="btn btn-ghost btn-xs" style="color:#ef4444; padding:2px 6px; font-size:11px; cursor:pointer;" onclick="document.getElementById(\'' + rowId + '\').remove(); updateCertPreviewCanvas();"><i class="ti ti-trash"></i> Remove</button>' +
+    '</div>' +
+    '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:10px;">' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Placeholder Key</label><input type="text" class="cert-p-key" placeholder="e.g. <Participant Name>" value="' + esc(p.key || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Value Mapping</label>' +
+        '<select class="cert-p-type" onchange="toggleCertCustomVal(this); updateCertPreviewCanvas();">' +
+          '<option value="participant_name"' + (p.type === 'participant_name' ? ' selected' : '') + '>Participant\'s Full Name</option>' +
+          '<option value="medal_title"' + (p.type === 'medal_title' ? ' selected' : '') + '>Medal Achieved (e.g. Gold Medal)</option>' +
+          '<option value="distance"' + (p.type === 'distance' ? ' selected' : '') + '>Total Distance</option>' +
+          '<option value="points"' + (p.type === 'points' ? ' selected' : '') + '>Total Points</option>' +
+          '<option value="custom"' + (p.type === 'custom' ? ' selected' : '') + '>Custom Text Value</option>' +
+          '<option value="medal_image"' + (p.type === 'medal_image' ? ' selected' : '') + '>Earned Medal Image</option>' +
+        '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fld cert-custom-val-wrap" style="margin:0; display:' + (p.type === 'custom' ? 'block' : 'none') + ';"><label style="font-size:11px;">Custom Text Value</label><input type="text" class="cert-p-custom-val" placeholder="e.g. CEO Signature" value="' + esc(p.custom_val || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">X Pos (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Y Pos (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size (px)</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="400" oninput="updateCertPreviewCanvas()"></div>' +
+    '</div>' +
+    '<div style="display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:8px;">' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Weight</label>' +
+        '<select class="cert-p-weight" onchange="updateCertPreviewCanvas();">' +
+          '<option value="bold"' + (p.font_style === 'bold' ? ' selected' : '') + '>Bold</option>' +
+          '<option value="normal"' + (p.font_style !== 'bold' ? ' selected' : '') + '>Normal</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Alignment</label>' +
+        '<select class="cert-p-align" onchange="updateCertPreviewCanvas();">' +
+          '<option value="left"' + (p.align === 'left' ? ' selected' : '') + '>Left</option>' +
+          '<option value="center"' + (p.align === 'center' ? ' selected' : '') + '>Center</option>' +
+          '<option value="right"' + (p.align === 'right' ? ' selected' : '') + '>Right</option>' +
+        '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Family (Google Fonts)</label>' +
+      '<select class="cert-p-font" onchange="loadGoogleFont(this.value); updateCertPreviewCanvas();" style="width:100%;">' +
+        '<option value="Poppins"' + (p.font_family === 'Poppins' || !p.font_family ? ' selected' : '') + '>Poppins</option>' +
+        '<option value="Inter"' + (p.font_family === 'Inter' ? ' selected' : '') + '>Inter</option>' +
+        '<option value="Roboto"' + (p.font_family === 'Roboto' ? ' selected' : '') + '>Roboto</option>' +
+        '<option value="Playfair Display"' + (p.font_family === 'Playfair Display' ? ' selected' : '') + '>Playfair Display</option>' +
+        '<option value="Montserrat"' + (p.font_family === 'Montserrat' ? ' selected' : '') + '>Montserrat</option>' +
+        '<option value="Cinzel"' + (p.font_family === 'Cinzel' ? ' selected' : '') + '>Cinzel</option>' +
+        '<option value="Dancing Script"' + (p.font_family === 'Dancing Script' ? ' selected' : '') + '>Dancing Script</option>' +
+        '<option value="Great Vibes"' + (p.font_family === 'Great Vibes' ? ' selected' : '') + '>Great Vibes</option>' +
+        '<option value="Outfit"' + (p.font_family === 'Outfit' ? ' selected' : '') + '>Outfit</option>' +
+      '</select>' +
+    '</div>';
+    
+  list.appendChild(row);
+  updateCertPreviewCanvas();
+};
+
+var _activeCertPdfDoc = null;
+window.updateCertPreviewCanvas = function() {
+  var url = (document.getElementById('cert-template-url').value || '').trim();
+  var canvas = document.getElementById('cert-preview-canvas');
+  var placeholder = document.getElementById('cert-preview-placeholder');
+  
+  if (!url) {
+    if (canvas) canvas.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    return;
+  }
+
+  if (placeholder) placeholder.style.display = 'none';
+  if (canvas) canvas.style.display = 'block';
+
+  var renderPreview = function(pdfDoc) {
+    pdfDoc.getPage(1).then(function(page) {
+      var viewport = page.getViewport({ scale: 1.0 });
+      var containerWidth = canvas.parentElement.clientWidth - 20;
+      var scale = containerWidth / viewport.width;
+      if (scale > 1.5) scale = 1.5;
+      
+      var scaledViewport = page.getViewport({ scale: scale });
+      canvas.width = scaledViewport.width;
+      canvas.height = scaledViewport.height;
+      var ctx = canvas.getContext('2d');
+      
+      var renderContext = {
+        canvasContext: ctx,
+        viewport: scaledViewport
+      };
+      page.render(renderContext).promise.then(function() {
+        drawCertPlaceholdersOnCanvas(canvas, scale);
+      });
+    });
+  };
+
+  // Load PDF
+  pdfjsLib.getDocument(url).promise.then(function(pdf) {
+    _activeCertPdfDoc = pdf;
+    renderPreview(pdf);
+  }).catch(function(err) {
+    console.warn('PDF load direct failed, trying fallback:', err.message);
+    if (url.indexOf('data:') === -1 && url.indexOf('http') === -1) {
+      pdfjsLib.getDocument(url).promise.then(function(pdf) {
+        _activeCertPdfDoc = pdf;
+        renderPreview(pdf);
+      }).catch(function(e) {
+        if (placeholder) {
+          placeholder.style.display = 'block';
+          placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(e.message) + '</p>';
+        }
+        if (canvas) canvas.style.display = 'none';
+      });
+    } else {
+      if (placeholder) {
+        placeholder.style.display = 'block';
+        placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(err.message) + '</p>';
+      }
+      if (canvas) canvas.style.display = 'none';
+    }
+  });
+};
+
+function drawCertPlaceholdersOnCanvas(canvas, scale) {
+  var ctx = canvas.getContext('2d');
+  var w = canvas.width;
+  var h = canvas.height;
+  
+  document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+    var key = row.querySelector('.cert-p-key').value.trim() || 'Placeholder';
+    var type = row.querySelector('.cert-p-type').value;
+    var customVal = row.querySelector('.cert-p-custom-val').value.trim();
+    var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+    var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+    var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
+    var color = row.querySelector('.cert-p-color').value;
+    var weight = row.querySelector('.cert-p-weight').value;
+    var align = row.querySelector('.cert-p-align').value;
+    
+    var isChecked = row.querySelector('input[name="active-cert-placeholder"]').checked;
+    
+    if (type === 'medal_image') {
+      var boxSize = Math.round(size * scale * 0.5);
+      if (boxSize < 20) boxSize = 20;
+      
+      var textX = w * x;
+      var textY = h * y;
+      
+      ctx.save();
+      ctx.fillStyle = 'rgba(232, 98, 42, 0.12)';
+      ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+      ctx.lineWidth = isChecked ? 2 : 1;
+      ctx.setLineDash(isChecked ? [] : [2, 2]);
+      
+      ctx.beginPath();
+      ctx.arc(textX, textY, boxSize / 2, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.fillStyle = '#E8622A';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold ' + Math.round(boxSize * 0.55) + 'px "Poppins", sans-serif';
+      ctx.fillText('🏅', textX, textY);
+      ctx.restore();
+      return;
+    }
+
+    var previewText = key;
+    if (type === 'participant_name') previewText = 'Prakash Mali';
+    else if (type === 'medal_title') previewText = 'Gold Medal';
+    else if (type === 'distance') previewText = '300.5 km';
+    else if (type === 'points') previewText = '350 pts';
+    else if (type === 'custom') previewText = customVal || key;
+    
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    
+    var family = row.querySelector('.cert-p-font').value || 'Poppins';
+    var scaledSize = Math.round(size * scale * 0.5);
+    if (scaledSize < 6) scaledSize = 6;
+    ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
+    
+    var textX = w * x;
+    var textY = h * y;
+    
+    // Draw bounding box outline first
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    var valWidth = ctx.measureText(previewText).width;
+    var templateWidth = ctx.measureText(key).width;
+    var textWidth = Math.max(valWidth, templateWidth);
+    
+    var boxHeight = scaledSize * 1.5;
+    var textX = w * x;
+    var textY = h * y;
+    var boxX = textX;
+    if (align === 'center') boxX = textX - textWidth/2;
+    else if (align === 'right') boxX = textX - textWidth;
+    
+    var paddingX = 8;
+    ctx.fillRect(boxX - paddingX, textY - boxHeight/2, textWidth + (paddingX * 2), boxHeight);
+    
+    ctx.fillStyle = color;
+    ctx.fillText(previewText, textX, textY);
+    
+    ctx.lineWidth = isChecked ? 2 : 1;
+    ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+    ctx.setLineDash(isChecked ? [] : [2, 2]);
+    ctx.strokeRect(boxX - paddingX, textY - boxHeight/2, textWidth + (paddingX * 2), boxHeight);
+    
+    ctx.restore();
+  });
+}
+
+window.handleCertPreviewCanvasClick = function(event) {
+  var canvas = document.getElementById('cert-preview-canvas');
+  if (!canvas) return;
+  
+  var rect = canvas.getBoundingClientRect();
+  var clickX = event.clientX - rect.left;
+  var clickY = event.clientY - rect.top;
+  
+  var pctX = (clickX / rect.width).toFixed(3);
+  var pctY = (clickY / rect.height).toFixed(3);
+  
+  var activeRow = null;
+  document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+    if (row.querySelector('input[name="active-cert-placeholder"]').checked) {
+      activeRow = row;
+    }
+  });
+  
+  if (activeRow) {
+    activeRow.querySelector('.cert-p-x').value = pctX;
+    activeRow.querySelector('.cert-p-y').value = pctY;
+    updateCertPreviewCanvas();
+  }
+};
+
+window.uploadMedalImage = async function(event, tier) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var rd = new FileReader();
+  rd.onload = async function() {
+    try {
+      var r = await fetch(BACKEND + '/admin/upload-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+        },
+        body: JSON.stringify({ data: rd.result })
+      });
+      var d2 = await r.json();
+      if (d2.success) {
+        document.getElementById(tier + '-img-url').value = d2.url;
+      } else {
+        alert(d2.error || 'Upload failed');
+      }
+    } catch(err) {
+      alert('Upload failed: ' + err.message);
+    }
+  };
+  rd.readAsDataURL(file);
+};
+
+window.loadGoogleFont = function(fontName) {
+  if (!fontName) return;
+  var fontId = 'gf-' + fontName.toLowerCase().replace(/\s+/g, '-');
+  if (document.getElementById(fontId)) return;
+  
+  var link = document.createElement('link');
+  link.id = fontId;
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + fontName.replace(/\s+/g, '+') + ':wght@400;700&display=swap';
+  document.head.appendChild(link);
+};
 
 buildChips(['Walk','Run']);
 updateScoringUI();
