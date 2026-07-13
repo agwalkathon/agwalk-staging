@@ -704,14 +704,36 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <h3 style="font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-certificate"></i> Certificate Configuration</h3>
       <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">Configure dynamic certificate templates for the event. Participants can download certificates once the event has ended.</p>
       
-      <!-- Template row: URL + upload + download formats in one compact line -->
+      <!-- Template row: mode + source + download formats in one compact line -->
       <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px;">
-        <div class="fld" style="margin:0; flex:1; min-width:260px;">
-          <label style="font-size:11px; font-weight:600; color:#333;">Certificate Template PDF</label>
-          <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
+        <div class="fld" style="margin:0; width:190px;">
+          <label style="font-size:11px; font-weight:600; color:#333;">Design Mode</label>
+          <select id="cert-canvas-mode" onchange="toggleCertMode(); updateCertPreviewCanvas(true);">
+            <option value="pdf">PDF Template</option>
+            <option value="blank">Blank Canvas (full design)</option>
+          </select>
         </div>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
-        <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+        <div id="cert-pdf-wrap" style="display:flex; gap:8px; align-items:flex-end; flex:1; min-width:260px;">
+          <div class="fld" style="margin:0; flex:1;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Certificate Template PDF</label>
+            <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
+          <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+        </div>
+        <div id="cert-blank-wrap" style="display:none; gap:8px; align-items:flex-end;">
+          <div class="fld" style="margin:0; width:140px;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Orientation</label>
+            <select id="cert-canvas-orient" onchange="updateCertPreviewCanvas(true);">
+              <option value="landscape">Landscape</option>
+              <option value="portrait">Portrait</option>
+            </select>
+          </div>
+          <div class="fld" style="margin:0; width:120px;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Background</label>
+            <input type="color" id="cert-canvas-bg" value="#ffffff" style="height:38px; padding:3px; width:100%;" oninput="updateCertPreviewCanvas(true);">
+          </div>
+        </div>
         <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; height:38px;">
           <span style="font-size:11px; font-weight:600; color:#64748b;">Downloads:</span>
           <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> JPEG</label>
@@ -729,7 +751,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('rank')">+ Rank</button>
             <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('points')">+ Points</button>
             <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_image')">+ Medal Img</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px;" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Custom</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('static_image')">+ Image</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('custom')">+ Text</button>
           </div>
           <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:6px; max-height:62vh; overflow-y:auto; padding-right:4px;">
             <!-- Rendered list of placeholder config rows -->
@@ -1799,6 +1822,10 @@ async function openEditor(ev){
       if (certCfgRow && certCfgRow.config_value) {
         var c = certCfgRow.config_value;
         document.getElementById('cert-template-url').value = c.template_url || '';
+        document.getElementById('cert-canvas-mode').value = c.canvas_mode || 'pdf';
+        document.getElementById('cert-canvas-orient').value = c.canvas_orientation || 'landscape';
+        document.getElementById('cert-canvas-bg').value = c.canvas_bg || '#ffffff';
+        toggleCertMode();
         document.getElementById('cert-opt-image').checked = (c.download_options || []).indexOf('image') > -1;
         document.getElementById('cert-opt-pdf').checked = (c.download_options || []).indexOf('pdf') > -1;
         
@@ -1811,6 +1838,10 @@ async function openEditor(ev){
         }
       } else {
         document.getElementById('cert-template-url').value = '';
+        document.getElementById('cert-canvas-mode').value = 'pdf';
+        document.getElementById('cert-canvas-orient').value = 'landscape';
+        document.getElementById('cert-canvas-bg').value = '#ffffff';
+        toggleCertMode();
         document.getElementById('cert-opt-image').checked = true;
         document.getElementById('cert-opt-pdf').checked = true;
         document.getElementById('cert-placeholders-list').innerHTML = '';
@@ -1856,6 +1887,10 @@ async function openEditor(ev){
     });
 
     document.getElementById('cert-template-url').value = '';
+    document.getElementById('cert-canvas-mode').value = 'pdf';
+    document.getElementById('cert-canvas-orient').value = 'landscape';
+    document.getElementById('cert-canvas-bg').value = '#ffffff';
+    toggleCertMode();
     document.getElementById('cert-opt-image').checked = true;
     document.getElementById('cert-opt-pdf').checked = true;
     document.getElementById('cert-placeholders-list').innerHTML = '';
@@ -2020,11 +2055,13 @@ async function saveEvent() {
         var weight = row.querySelector('.cert-p-weight').value;
         var align = row.querySelector('.cert-p-align').value;
         var family = row.querySelector('.cert-p-font').value || 'Poppins';
+        var imgUrlEl = row.querySelector('.cert-p-imgurl');
         if (key) {
           certPlaceholders.push({
             key: key,
             type: type,
             custom_val: customVal,
+            image_url: imgUrlEl ? imgUrlEl.value.trim() : '',
             x: x,
             y: y,
             font_size: size,
@@ -2042,6 +2079,9 @@ async function saveEvent() {
 
       var certConfigVal = {
         template_url: document.getElementById('cert-template-url').value.trim() || null,
+        canvas_mode: document.getElementById('cert-canvas-mode').value || 'pdf',
+        canvas_orientation: document.getElementById('cert-canvas-orient').value || 'landscape',
+        canvas_bg: document.getElementById('cert-canvas-bg').value || '#ffffff',
         placeholders: certPlaceholders,
         download_options: certDownloadOptions
       };
@@ -2381,6 +2421,45 @@ window.toggleCertCustomVal = function(select) {
   if (wrap) {
     wrap.style.display = select.value === 'custom' ? 'block' : 'none';
   }
+  var imgWrap = row.querySelector('.cert-img-wrap');
+  if (imgWrap) {
+    imgWrap.style.display = select.value === 'static_image' ? 'flex' : 'none';
+  }
+};
+
+window.toggleCertMode = function() {
+  var mode = document.getElementById('cert-canvas-mode').value;
+  document.getElementById('cert-pdf-wrap').style.display = mode === 'pdf' ? 'flex' : 'none';
+  document.getElementById('cert-blank-wrap').style.display = mode === 'blank' ? 'flex' : 'none';
+};
+
+window.handleCertElementImageUpload = function(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var rowEl = event.target.closest('.cert-placeholder-row');
+  var urlInput = rowEl ? rowEl.querySelector('.cert-p-imgurl') : null;
+  var rd = new FileReader();
+  rd.onload = async function() {
+    try {
+      var r = await fetch(BACKEND + '/admin/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') },
+        body: JSON.stringify({ data: rd.result })
+      });
+      var d2 = await r.json();
+      if (d2.success && urlInput) {
+        urlInput.value = d2.url;
+        updateCertPreviewCanvas();
+      } else if (!d2.success) {
+        // Fall back to inline base64 if upload endpoint rejects
+        if (urlInput) { urlInput.value = rd.result; updateCertPreviewCanvas(); }
+      }
+    } catch(err) {
+      // Offline/endpoint failure: embed as base64 data URL directly
+      if (urlInput) { urlInput.value = rd.result; updateCertPreviewCanvas(); }
+    }
+  };
+  rd.readAsDataURL(file);
 };
 
 window.handleCertTemplateUpload = function(event) {
@@ -2409,7 +2488,7 @@ window.addCertPlaceholderRow = function(data) {
   row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; position:relative;';
   
   var isChecked = list.children.length === 0 ? 'checked' : '';
-  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Custom', medal_image: 'Medal Image' };
+  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
   var titleText = typeLabels[p.type] || 'Placeholder';
   
   row.innerHTML = 
@@ -2433,10 +2512,16 @@ window.addCertPlaceholderRow = function(data) {
           '<option value="rank"' + (p.type === 'rank' ? ' selected' : '') + '>Leaderboard Rank</option>' +
           '<option value="custom"' + (p.type === 'custom' ? ' selected' : '') + '>Custom Text Value</option>' +
           '<option value="medal_image"' + (p.type === 'medal_image' ? ' selected' : '') + '>Earned Medal Image</option>' +
+          '<option value="static_image"' + (p.type === 'static_image' ? ' selected' : '') + '>Image (logo / signature / art)</option>' +
         '</select>' +
       '</div>' +
     '</div>' +
     '<div class="fld cert-custom-val-wrap" style="margin:0; display:' + (p.type === 'custom' ? 'block' : 'none') + ';"><label style="font-size:11px;">Custom Text Value</label><input type="text" class="cert-p-custom-val" placeholder="e.g. CEO Signature" value="' + esc(p.custom_val || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+    '<div class="cert-img-wrap" style="display:' + (p.type === 'static_image' ? 'flex' : 'none') + '; gap:6px; align-items:flex-end;">' +
+      '<div class="fld" style="margin:0; flex:1;"><label style="font-size:11px;">Image URL</label><input type="text" class="cert-p-imgurl" placeholder="https://... or upload" value="' + esc(p.image_url || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+      '<button type="button" class="btn btn-ghost btn-xs" style="padding:6px 9px; font-size:11px;" onclick="this.nextElementSibling.click()"><i class="ti ti-upload"></i></button>' +
+      '<input type="file" accept="image/*" style="display:none;" onchange="handleCertElementImageUpload(event)">' +
+    '</div>' +
     '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">X (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Y (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
@@ -2480,7 +2565,7 @@ window.addCertPlaceholderRow = function(data) {
 
 // Keep the compact row title in sync with the selected value mapping
 window.certRowTitleSync = function(select) {
-  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Custom', medal_image: 'Medal Image' };
+  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
   var row = select.closest('.cert-placeholder-row');
   var title = row ? row.querySelector('.cert-row-title') : null;
   if (title) title.textContent = typeLabels[select.value] || 'Placeholder';
@@ -2512,10 +2597,42 @@ function queueCertRedraw() {
 }
 
 window.updateCertPreviewCanvas = function(forceReload) {
+  var mode = document.getElementById('cert-canvas-mode') ? document.getElementById('cert-canvas-mode').value : 'pdf';
   var url = (document.getElementById('cert-template-url').value || '').trim();
   var canvas = document.getElementById('cert-preview-canvas');
   var placeholder = document.getElementById('cert-preview-placeholder');
-  
+
+  // ---- Blank canvas mode: build background from color, no PDF involved ----
+  if (mode === 'blank') {
+    if (placeholder) placeholder.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    var orient = document.getElementById('cert-canvas-orient').value || 'landscape';
+    var bgColor = document.getElementById('cert-canvas-bg').value || '#ffffff';
+    var blankKey = 'blank:' + orient + ':' + bgColor;
+    if (!forceReload && _certBgCanvas && _certBgUrl === blankKey) {
+      queueCertRedraw();
+      return;
+    }
+    var cw = canvas.parentElement.clientWidth - 16;
+    if (cw < 300) cw = 300;
+    var bg = document.createElement('canvas');
+    if (orient === 'portrait') {
+      bg.width = cw; bg.height = Math.round(cw * 1.4142);
+    } else {
+      bg.width = cw; bg.height = Math.round(cw / 1.4142);
+    }
+    var bctx = bg.getContext('2d');
+    bctx.fillStyle = bgColor;
+    bctx.fillRect(0, 0, bg.width, bg.height);
+    _certBgCanvas = bg;
+    _certBgUrl = blankKey;
+    _certPreviewScale = cw / 1000;
+    canvas.width = bg.width;
+    canvas.height = bg.height;
+    window.redrawCertPreview();
+    return;
+  }
+
   if (!url) {
     if (canvas) canvas.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
@@ -2678,6 +2795,50 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       }
       ctx.restore();
       _certHitBoxes.push(hitEntry);
+      return;
+    }
+
+    if (type === 'static_image') {
+      var imgW = Math.round(size * scale * 0.5);
+      if (imgW < 20) imgW = 20;
+      var imgH = imgW;
+      var imgUrlEl = row.querySelector('.cert-p-imgurl');
+      var imgUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
+      var cx = w * x, cy = h * y;
+      var elImg = imgUrl ? getCertPreviewMedalImg(imgUrl) : null;
+      ctx.save();
+      if (elImg && elImg.complete && elImg.naturalWidth > 0) {
+        imgH = Math.round(imgW * (elImg.naturalHeight / elImg.naturalWidth));
+        ctx.drawImage(elImg, cx - imgW/2, cy - imgH/2, imgW, imgH);
+        if (isChecked) {
+          ctx.strokeStyle = '#E8622A'; ctx.lineWidth = 2; ctx.setLineDash([]);
+          ctx.strokeRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
+        }
+      } else {
+        ctx.fillStyle = 'rgba(148,163,184,0.15)';
+        ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+        ctx.lineWidth = isChecked ? 2 : 1;
+        ctx.setLineDash([4, 3]);
+        ctx.fillRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
+        ctx.strokeRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = 'bold ' + Math.max(10, Math.round(imgW * 0.14)) + 'px Poppins, sans-serif';
+        ctx.setLineDash([]);
+        ctx.fillText('IMAGE', cx, cy);
+      }
+      var imgHit = { row: row, x0: cx - imgW/2, y0: cy - imgH/2, x1: cx + imgW/2, y1: cy + imgH/2, anchorX: cx, anchorY: cy, isImage: true };
+      if (isChecked) {
+        var hs2 = 12;
+        var hx2 = cx + imgW/2, hy2 = cy + imgH/2;
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#E8622A'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.fillRect(hx2 - hs2/2, hy2 - hs2/2, hs2, hs2);
+        ctx.strokeRect(hx2 - hs2/2, hy2 - hs2/2, hs2, hs2);
+        imgHit.handle = { x0: hx2 - hs2, y0: hy2 - hs2, x1: hx2 + hs2, y1: hy2 + hs2 };
+      }
+      ctx.restore();
+      _certHitBoxes.push(imgHit);
       return;
     }
 
@@ -2910,7 +3071,9 @@ window.addCertPreset = function(type) {
     distance:         { key: '<Distance>', type: 'distance', x: 0.55, y: 0.48, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
     rank:             { key: '<Rank>', type: 'rank', x: 0.55, y: 0.55, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
     points:           { key: '<Points>', type: 'points', x: 0.55, y: 0.62, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
-    medal_image:      { key: '<Medal Image>', type: 'medal_image', x: 0.28, y: 0.75, font_size: 120, color: '#1A1D20', font_style: 'normal', align: 'center' }
+    medal_image:      { key: '<Medal Image>', type: 'medal_image', x: 0.28, y: 0.75, font_size: 120, color: '#1A1D20', font_style: 'normal', align: 'center' },
+    static_image:     { key: '<Image>', type: 'static_image', x: 0.5, y: 0.15, font_size: 200, color: '#1A1D20', font_style: 'normal', align: 'center', image_url: '' },
+    custom:           { key: 'Your text here', type: 'custom', x: 0.5, y: 0.5, font_size: 24, color: '#1A1D20', font_style: 'normal', align: 'center', custom_val: 'Your text here' }
   };
   var p = presets[type];
   if (!p) return;
