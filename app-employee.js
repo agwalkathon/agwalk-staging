@@ -151,7 +151,8 @@ async function verifyCode(){
     var path = window.location.pathname;
     if (path.includes("index.html") || path.endsWith("/") || path.endsWith("/agwalk-staging")) {
       var qs = window.location.search ? window.location.search : "";
-      window.location.replace("app.html" + qs);
+      var separator = qs ? (qs.indexOf('?') !== -1 ? '&' : '?') : '?';
+      window.location.replace("app.html" + qs + separator + "_cb=" + Date.now());
     } else if (window.bootAppUnified) {
       await window.bootAppUnified();
     } else {
@@ -858,11 +859,17 @@ function applyDefaultBrandingDOM(lEl, appNameEl) {
 function applyBrandingDOM(b, lEl, aEl, appNameEl) {
   if (b.login_title) {
     var tEl = document.getElementById('br-login-title');
-    if (tEl) tEl.textContent = b.login_title;
+    if (tEl) {
+      tEl.textContent = b.login_title;
+      tEl.style.display = b.show_login_title !== false ? '' : 'none';
+    }
   }
   if (b.tagline) {
     var sEl = document.getElementById('br-login-sub');
-    if (sEl) sEl.textContent = b.tagline;
+    if (sEl) {
+      sEl.textContent = b.tagline;
+      sEl.style.display = b.show_tagline !== false ? '' : 'none';
+    }
   }
   
   var logoSrc = b.logo_url || 'logo-white.png';
@@ -888,7 +895,8 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
     }
     if (appNameEl) {
       appNameEl.textContent = b.app_name;
-      appNameEl.style.opacity = '1';
+      appNameEl.style.opacity = b.show_app_name !== false ? '1' : '0';
+      appNameEl.style.display = b.show_app_name !== false ? '' : 'none';
     }
   }
 
@@ -898,7 +906,9 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
   var titleDiv = document.getElementById('br-login-title');
   if (logoDiv && appNameDiv && titleDiv) {
     var pos = b.logo_position || 'top';
-    if (pos === 'center') {
+    if (b.show_logo === false) {
+      logoDiv.style.display = 'none';
+    } else if (pos === 'center') {
       appNameDiv.parentNode.insertBefore(logoDiv, titleDiv);
       logoDiv.style.display = 'block';
     } else if (pos === 'hidden') {
@@ -943,25 +953,27 @@ function applyBrandingDOM(b, lEl, aEl, appNameEl) {
   };
   
   var accentColor = b.accent_color || (typeof DEFAULT_BRAND_COLOR !== 'undefined' ? DEFAULT_BRAND_COLOR : '#E8622A');
+  var loginAccentColor = b.login_accent_color || accentColor;
   styleEl.textContent = `
     body, input, button, select {
       font-family: "${b.font_family || 'Inter'}", sans-serif !important;
     }
     .login-btn {
-      background: ${accentColor} !important;
-      box-shadow: 0 4px 20px ${hexToRgba(accentColor, 0.28)} !important;
+      background: ${loginAccentColor} !important;
+      border: 1px solid ${loginAccentColor} !important;
+      box-shadow: 0 4px 20px ${hexToRgba(loginAccentColor, 0.28)} !important;
     }
     .login-btn:hover {
       opacity: 0.95;
     }
     .login-link, .login-terms a {
-      color: ${accentColor} !important;
+      color: ${loginAccentColor} !important;
     }
     #br-app-name {
       color: ${accentColor} !important;
     }
     input.login-field:focus {
-      border-color: ${accentColor} !important;
+      border-color: ${loginAccentColor} !important;
     }
     #br-login-title {
       font-size: ${b.title_size || 26}px !important;
