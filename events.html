@@ -2422,6 +2422,7 @@ window.addCertPlaceholderRow = function(data) {
           '<option value="medal_title"' + (p.type === 'medal_title' ? ' selected' : '') + '>Medal Achieved (e.g. Gold Medal)</option>' +
           '<option value="distance"' + (p.type === 'distance' ? ' selected' : '') + '>Total Distance</option>' +
           '<option value="points"' + (p.type === 'points' ? ' selected' : '') + '>Total Points</option>' +
+          '<option value="rank"' + (p.type === 'rank' ? ' selected' : '') + '>Leaderboard Rank</option>' +
           '<option value="custom"' + (p.type === 'custom' ? ' selected' : '') + '>Custom Text Value</option>' +
           '<option value="medal_image"' + (p.type === 'medal_image' ? ' selected' : '') + '>Earned Medal Image</option>' +
         '</select>' +
@@ -2581,6 +2582,7 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     else if (type === 'medal_title') previewText = 'Gold Medal';
     else if (type === 'distance') previewText = '300.5 km';
     else if (type === 'points') previewText = '350 pts';
+    else if (type === 'rank') previewText = '3rd';
     else if (type === 'custom') previewText = customVal || key;
     
     ctx.save();
