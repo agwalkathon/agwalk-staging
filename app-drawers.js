@@ -1459,7 +1459,7 @@ function _crr(ctx,x,y,w,h,r){
 }
 
 function _drawWACard(ctx,W,H,d){
-  var BR=(typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'),SFC='#1e2330',TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
+  var BR=(typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('cert_accent_color', 'accent_color') : '#E8622A'),SFC='#1e2330',TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
   ctx.fillStyle='#14181f';ctx.fillRect(0,0,W,H);
   ctx.fillStyle=SFC;_crr(ctx,32,24,W-64,80,12);ctx.fill();
   ctx.font='bold 15px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='left';
@@ -1505,7 +1505,7 @@ function _drawWACard(ctx,W,H,d){
 }
 
 function _drawStoryCard(ctx,W,H,d){
-  var BR=(typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'),TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
+  var BR=(typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('cert_accent_color', 'accent_color') : '#E8622A'),TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
   var grad=ctx.createLinearGradient(0,0,0,H);
   grad.addColorStop(0,'#1a2030');grad.addColorStop(1,'#0e1115');
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
