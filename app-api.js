@@ -149,6 +149,58 @@ function cacheClear(athleteId) {
 // Cache migrations
 safeRemoveItem('agwalk_ranking_acts');
 
+function getEventScoreUnit() {
+  var rules = EVENT_ROW && EVENT_ROW.rules_config;
+  if (rules && (rules.scoring_mode === 'raw' || rules.scoring_mode === 'raw_metric')) {
+    var m = rules.metric || 'distance';
+    if (m === 'distance' || m === 'distance_km') return 'km';
+    if (m === 'elevation' || m === 'elevation_m') return 'm';
+    if (m === 'steps') return 'steps';
+    return m;
+  }
+  return 'pts';
+}
+
+function getEventScoreLabel() {
+  var rules = EVENT_ROW && EVENT_ROW.rules_config;
+  if (rules && (rules.scoring_mode === 'raw' || rules.scoring_mode === 'raw_metric')) {
+    var m = rules.metric || 'distance';
+    if (m === 'distance' || m === 'distance_km') return 'Total Distance';
+    if (m === 'elevation' || m === 'elevation_m') return 'Total Elevation';
+    if (m === 'steps') return 'Total Steps';
+    return 'Total ' + m;
+  }
+  return 'Total Points';
+}
+
+function renderUserAvatar(name, photo, hdrId, youId) {
+  var initials = typeof get2Initials === 'function' ? get2Initials(name) : (name || 'Participant').substring(0, 2).toUpperCase();
+  var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
+  var hasPhoto = photo && photo !== 'null' && photo !== 'undefined' && !photo.includes('large.png') && !photo.includes('avatar/athlete');
+  
+  var hdrEl = document.getElementById(hdrId);
+  if (hdrEl) {
+    if (hasPhoto) {
+      hdrEl.textContent = '';
+      hdrEl.setAttribute('style', `background: url('${photo}') no-repeat center center; background-size: cover; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.08);`);
+    } else {
+      hdrEl.textContent = initials;
+      hdrEl.setAttribute('style', styleFunc(name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px;');
+    }
+  }
+
+  var youEl = document.getElementById(youId);
+  if (youEl) {
+    if (hasPhoto) {
+      youEl.textContent = '';
+      youEl.setAttribute('style', `background: url('${photo}') no-repeat center center; background-size: cover; width:84px; height:84px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);`);
+    } else {
+      youEl.textContent = initials;
+      youEl.setAttribute('style', styleFunc(name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:1px;');
+    }
+  }
+}
+
 function getRegistrationFetchUrl(s) {
   var cols = 'id,emp_code,full_name,email,mobile,gender,shift,project_lead,strava_profile_url,tshirt_size,leaderboard_team,event_name,created_at,role,is_private,is_flagged,event_id,strava_athlete_id,status,profile_photo';
   var queryObj = s || {};
@@ -261,6 +313,12 @@ async function load(isBackgroundRefresh) {
     if (!s) return;
   }
   currentSession = s;
+  if (s && s.loggedIn && !isBackgroundRefresh) {
+    renderUserAvatar(s.name || 'Participant', s.profilePhoto, 'hdr-avatar', 'you-avatar');
+    var yNameEl = document.getElementById('you-name');
+    if (yNameEl && s.name) yNameEl.textContent = s.name.toUpperCase();
+    if (typeof initParticipantSession === 'function') initParticipantSession(s);
+  }
   var athleteId = s.athleteId;
 
   // ── Maintenance mode gate — block immediately if enabled ────────────────
@@ -280,6 +338,25 @@ async function load(isBackgroundRefresh) {
     } catch(e) {
       console.warn('Failed to resolve live event at boot:', e);
     }
+
+    try {
+      if (localStorage.getItem('ag_clear_event_cache') === '1') {
+        localStorage.removeItem('ag_clear_event_cache');
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var key = localStorage.key(i);
+          if (key && (
+            key.indexOf('agwalk_event_row_') === 0 || 
+            key.indexOf('agwalk_config') === 0 || 
+            key.indexOf('agwalk_challenges') === 0 || 
+            key.indexOf('agwalk_special_days') === 0 || 
+            key.indexOf('agwalk_medals') === 0 || 
+            key.indexOf('agwalk_reg_') === 0
+          )) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    } catch(e){}
 
     var _cachedEv = cacheGet('event_row_'+athleteId, CACHE_TTL.reg);
     if (liveEvent) {
@@ -422,21 +499,8 @@ async function load(isBackgroundRefresh) {
     window._lbCurrentEventId = EVENT_ROW.id;
     window._lbRegisteredEventId = EVENT_ROW.id;
     var name=reg.full_name||s.name||'Participant';
-
-    var initials = typeof get2Initials === 'function' ? get2Initials(name) : name.substring(0,2).toUpperCase();
-    var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return (typeof getFallbackAvatarStyle === 'function') ? getFallbackAvatarStyle() : 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
-    
-    var avatarEl = document.getElementById('hdr-avatar');
-    if (avatarEl) {
-      avatarEl.textContent = initials;
-      avatarEl.setAttribute('style', styleFunc(name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px;');
-    }
-    
-    var youAvatarEl = document.getElementById('you-avatar');
-    if (youAvatarEl) {
-      youAvatarEl.textContent = initials;
-      youAvatarEl.setAttribute('style', styleFunc(name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:1px;');
-    }
+    var photo = reg.profile_photo || s.profilePhoto || '';
+    renderUserAvatar(name, photo, 'hdr-avatar', 'you-avatar');
     var youNameEl=document.getElementById('you-name');if(youNameEl)youNameEl.textContent=name.toUpperCase();
     if(document.getElementById('you-emp-code'))document.getElementById('you-emp-code').textContent=reg.emp_code||'—';
     if(document.getElementById('you-email'))document.getElementById('you-email').textContent=reg.email||'—';
@@ -1088,7 +1152,7 @@ async function load(isBackgroundRefresh) {
       
       if(needEl){
         if(done){needEl.textContent='✓ Achieved';needEl.style.color='var(--green)';}
-        else{needEl.textContent='Need '+needed.toFixed(0)+' pts';needEl.style.color='#ffffff';}
+        else{needEl.textContent='Need '+needed.toFixed(0)+' ' + getEventScoreUnit();needEl.style.color='#ffffff';}
       }
     });
     triggerRingAnimation();
@@ -1113,21 +1177,22 @@ async function load(isBackgroundRefresh) {
       var todayStr = new Date().toISOString().split('T')[0];
       var iKey = 'insight_' + todayStr;
       var emoji, title, body;
+      var unit = getEventScoreUnit();
       if (myPts >= goldThresh) {
         emoji = '🥇'; title = goldLabel + ' Achieved!';
-        body = 'Outstanding! You\'ve crossed the ' + goldLabel + ' threshold with ' + myPts.toFixed(0) + ' pts. Keep it up!';
+        body = 'Outstanding! You\'ve crossed the ' + goldLabel + ' threshold with ' + myPts.toFixed(0) + ' ' + unit + '. Keep it up!';
       } else if (myPts >= silverThresh) {
         var need = (goldThresh - myPts).toFixed(0);
         emoji = '🥈'; title = silverLabel + ' — ' + goldLabel + ' is close!';
-        body = 'You need just ' + need + ' more pts to unlock ' + goldLabel + '. Push a little harder!';
+        body = 'You need just ' + need + ' more ' + unit + ' to unlock ' + goldLabel + '. Push a little harder!';
       } else if (myPts >= bronzeThresh) {
         var need = (silverThresh - myPts).toFixed(0);
         emoji = '🥉'; title = bronzeLabel + ' Achieved!';
-        body = 'Great start! ' + need + ' pts more gets you ' + silverLabel + '. Keep walking!';
+        body = 'Great start! ' + need + ' ' + unit + ' more gets you ' + silverLabel + '. Keep walking!';
       } else {
         var need = (bronzeThresh - myPts).toFixed(0);
         emoji = '🏃'; title = 'On your way to ' + bronzeLabel + '!';
-        body = 'Walk ' + need + ' more pts to earn your ' + bronzeLabel + '. You can do it!';
+        body = 'Walk ' + need + ' more ' + unit + ' to earn your ' + bronzeLabel + '. You can do it!';
       }
       _activeInsight = { key: iKey, emoji: emoji, title: title, body: body };
       updateInAppNotificationBanner();
@@ -1539,6 +1604,14 @@ async function load(isBackgroundRefresh) {
     safeSetText('streak-best-val', best);
     safeSetText('streak-msg', streakIsLive?(streak>=7?'Amazing streak!':streak>=3?'Keep it going!':'Good start!'):(lastActiveDay?'Last active '+lastActiveDay:'Start today!'));
 
+    var baseDate = new Date(now);
+    var isEventEnded = false;
+    var evEnd = EVENT_ROW ? EVENT_ROW.end_date : null;
+    if (evEnd && todayLocal > evEnd) {
+      isEventEnded = true;
+      baseDate = new Date(evEnd + 'T12:00:00');
+    }
+
     var days7=[],labels7=[];
     // per-day km for the last 7 days (Phase 2b)
     var dayKm={};
@@ -1547,11 +1620,12 @@ async function load(isBackgroundRefresh) {
       if(d)dayKm[d]=(dayKm[d]||0)+(a.distance_meters||0)/1000;
     });
     for(var di=6;di>=0;di--){
-      var dd=new Date(now);dd.setDate(dd.getDate()-di);dd.setHours(12,0,0,0);
+      var dd=new Date(baseDate);dd.setDate(dd.getDate()-di);dd.setHours(12,0,0,0);
       var dstr=localDateStr(dd);
       var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      days7.push({str:dstr,active:!!activeDays[dstr],isToday:di===0,km:dayKm[dstr]||0,label:dayNames[dd.getDay()].charAt(0),dayNum:dd.getDate()});
-      labels7.push(di===0?'Today':dayNames[dd.getDay()]);
+      var isToday = !isEventEnded && di===0;
+      days7.push({str:dstr,active:!!activeDays[dstr],isToday:isToday,km:dayKm[dstr]||0,label:dayNames[dd.getDay()].charAt(0),dayNum:dd.getDate()});
+      labels7.push(isToday ? 'Today' : dayNames[dd.getDay()]);
     }
     // daily km target: pace for next unearned medal, else keep current average
     var _daysLeftH=Math.max(1,daysLeft||1);
@@ -1592,14 +1666,36 @@ async function load(isBackgroundRefresh) {
           points:myPts,streak:streak,streakLive:streakIsLive,rank:_rankH
         });
       }
-      // Defensive: re-assert arc visibility in case a classic-dashboard event
+      // Defensive: re-assert arc/rings visibility in case a classic-dashboard event
       // re-showed the rings host after our earlier render (belt & braces).
       try{
         if(localStorage.getItem('ag_dyn_dash')!=='1'){
+          var showArc = false;
+          if (EVENT_ROW && EVENT_ROW.rules_config && EVENT_ROW.rules_config.dashboard && EVENT_ROW.rules_config.dashboard.sections) {
+            var sec = EVENT_ROW.rules_config.dashboard.sections;
+            if (sec.show_arc_on_dashboard !== undefined) {
+              showArc = !!sec.show_arc_on_dashboard;
+            } else {
+              try {
+                var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+                showArc = !!brCache.show_arc_on_dashboard;
+              } catch(e) {}
+            }
+          } else {
+            try {
+              var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+              showArc = !!brCache.show_arc_on_dashboard;
+            } catch(e) {}
+          }
           var _arcW2=document.getElementById('hero-arc-wrap');
           var _ringsH2=document.getElementById('medal-rings');
-          if(_arcW2 && _arcW2.style.display==='none') _arcW2.style.display='block';
-          if(_ringsH2) _ringsH2.style.display='none';
+          if (showArc) {
+            if(_arcW2 && _arcW2.style.display==='none') _arcW2.style.display='block';
+            if(_ringsH2) _ringsH2.style.display='none';
+          } else {
+            if(_arcW2) _arcW2.style.display='none';
+            if(_ringsH2 && _ringsH2.style.display==='none') _ringsH2.style.display='flex';
+          }
         }
       }catch(e2){}
     }catch(e){try{console.error('[hybrid-dash]',e);}catch(e4){}}
@@ -1932,7 +2028,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
 
   try {
     sec.style.display = 'block';
-    card.innerHTML = '<div style="text-align:center;padding:15px;color:var(--muted);font-size:13px;">Loading past events...</div>';
+    card.innerHTML = '<div style="text-align:center;padding:15px;color:rgba(255,255,255,0.4);font-size:13px;">Loading past events...</div>';
 
     var res = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(reg.email) + '&event_id=neq.' + reg.event_id + '&select=event_id,event_name,leaderboard_team,gender,shift,strava_athlete_id', { headers: HDR });
     var otherRegs = await res.json();
@@ -1941,22 +2037,39 @@ async function loadPastEventsPerformance(reg, athleteId) {
       return;
     }
 
-    var eventsRes = await fetch(SUPABASE_URL + '/rest/v1/events?select=id,name', { headers: HDR });
+    var eventsRes = await fetch(SUPABASE_URL + '/rest/v1/events?select=id,name,status,end_date', { headers: HDR });
     var eventsList = await eventsRes.json();
     var eventMap = {};
     if (Array.isArray(eventsList)) {
       eventsList.forEach(function(e) {
-        eventMap[e.id] = e.name;
+        eventMap[e.id] = e;
       });
+    }
+
+    var pastEventIds = otherRegs.map(function(r) { return r.event_id; });
+    var configMap = {};
+    try {
+      var cfgRes = await fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=in.(' + pastEventIds.join(',') + ')&select=event_id,config_key,config_value', { headers: HDR });
+      var cfgRows = await cfgRes.json();
+      if (Array.isArray(cfgRows)) {
+        cfgRows.forEach(function(row) {
+          if (!configMap[row.event_id]) configMap[row.event_id] = {};
+          configMap[row.event_id][row.config_key] = row.config_value;
+        });
+      }
+    } catch(e) {
+      console.warn('Failed to load past event configs:', e);
     }
 
     var html = '';
     otherRegs.sort(function(a, b) { return a.event_id - b.event_id; });
+    window.pastCertDataMap = {};
 
     for (var i = 0; i < otherRegs.length; i++) {
       var pReg = otherRegs[i];
       var pastEventId = pReg.event_id;
-      var pastEventName = eventMap[pastEventId] || pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId);
+      var eventObj = eventMap[pastEventId] || null;
+      var pastEventName = eventObj ? eventObj.name : (pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId));
       var team = pReg.leaderboard_team || 'No Team';
       
       var scoreObj = null;
@@ -1994,10 +2107,27 @@ async function loadPastEventsPerformance(reg, athleteId) {
         }
       }
 
-      var isCycling = pastEventName.toLowerCase().indexOf('cycling') > -1 || pastEventName.toLowerCase().indexOf('cyclothon') > -1 || pastEventId === 2;
-      var goldThresh = isCycling ? 750 : 300;
-      var silverThresh = isCycling ? 500 : 200;
-      var bronzeThresh = isCycling ? 250 : 125;
+      var eventCfg = configMap[pastEventId] || {};
+      var certCfg = eventCfg['certificate_config'];
+      var medalsCfg = eventCfg['medals'];
+
+      var goldThresh = 300;
+      var silverThresh = 200;
+      var bronzeThresh = 125;
+      
+      if (medalsCfg) {
+        var gender = pReg.gender || 'male';
+        if (gender !== 'male' && gender !== 'female') gender = 'male';
+        
+        goldThresh = (medalsCfg.gold && medalsCfg.gold[gender]) || goldThresh;
+        silverThresh = (medalsCfg.silver && medalsCfg.silver[gender]) || silverThresh;
+        bronzeThresh = (medalsCfg.bronze && medalsCfg.bronze[gender]) || bronzeThresh;
+      } else {
+        var isCycling = pastEventName.toLowerCase().indexOf('cycling') > -1 || pastEventName.toLowerCase().indexOf('cyclothon') > -1 || pastEventId === 2;
+        if (isCycling) {
+          goldThresh = 750; silverThresh = 500; bronzeThresh = 250;
+        }
+      }
 
       var medalBadge = '🏅';
       var medalTitle = 'Participant';
@@ -2012,19 +2142,75 @@ async function loadPastEventsPerformance(reg, athleteId) {
         medalTitle = 'Bronze Medal';
       }
 
+      var medalImageUrl = '';
+      if (medalsCfg) {
+        var tier = '';
+        if (medalTitle === 'Gold Medal') tier = 'gold';
+        else if (medalTitle === 'Silver Medal') tier = 'silver';
+        else if (medalTitle === 'Bronze Medal') tier = 'bronze';
+        
+        if (tier && medalsCfg[tier] && medalsCfg[tier].image_url) {
+          medalImageUrl = medalsCfg[tier].image_url;
+        }
+      }
+
+      var medalBadgeHtml = '';
+      if (medalImageUrl) {
+        medalBadgeHtml = '<img src="' + medalImageUrl + '" style="width:28px;height:28px;object-fit:contain;border-radius:50%;" title="' + medalTitle + '">';
+      } else {
+        medalBadgeHtml = '<span style="font-size:22px;line-height:1;" title="' + medalTitle + '">' + medalBadge + '</span>';
+      }
+
+      // Check if event has ended and certificate config template is set
+      var hasEnded = eventObj ? (eventObj.status === 'ended') : false;
+      // Pre-2027 Walkathon 2026 fallback check if no db config exists
+      if (pastEventId === 1 && !certCfg) {
+        certCfg = {
+          template_url: 'certificate_template_walkathon_2026.pdf',
+          download_options: ['image', 'pdf'],
+          placeholders: [
+            { key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' },
+            { key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' }
+          ]
+        };
+        hasEnded = true; // Hardcoded true for 2026 historical event
+      }
+
+      var showDownloadBtn = hasEnded && certCfg && certCfg.template_url;
+
+      if (showDownloadBtn) {
+        window.pastCertDataMap[pastEventId] = {
+          name: reg.full_name || 'Participant',
+          medal: medalTitle,
+          distance: totalKm,
+          points: totalPts,
+          eventName: pastEventName,
+          config: certCfg
+        };
+      }
+
       var borderStyle = i === otherRegs.length - 1 ? 'border-bottom:none;' : '';
 
-      html += '<div class="tab-you-detail-row" style="' + borderStyle + 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);">' +
+      html += '<div class="tab-you-detail-row" style="' + borderStyle + 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);overflow:visible;">' +
         '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
           '<span style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + pastEventName + '</span>' +
           '<span style="font-size:11px;color:rgba(255,255,255,0.4);">' + team + ' &middot; ' + actsCount + ' workouts</span>' +
         '</div>' +
-        '<div style="text-align:right;display:flex;align-items:center;gap:10px;flex-shrink:0;">' +
+        '<div style="text-align:right;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;overflow:visible;">' +
           '<div style="display:flex;flex-direction:column;">' +
             '<span style="font-size:14px;font-weight:800;color:var(--brand);">' + totalKm.toFixed(1) + ' km</span>' +
             '<span style="font-size:10px;color:rgba(255,255,255,0.4);">' + totalPts.toFixed(0) + ' pts</span>' +
           '</div>' +
-          '<span style="font-size:22px;line-height:1;" title="' + medalTitle + '">' + medalBadge + '</span>' +
+          medalBadgeHtml +
+          (showDownloadBtn ? (
+            '<div style="position:relative;overflow:visible;">' +
+              '<button id="btn-download-' + pastEventId + '" class="btn btn-sm" onclick="togglePastCertMenu(event, ' + pastEventId + ')" style="font-size:10px;font-weight:700;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;background:var(--brand);color:#fff;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px;"><i class="ti ti-certificate"></i> Cert</button>' +
+              '<div id="cert-menu-' + pastEventId + '" class="past-cert-menu" style="display:none;position:absolute;right:0;top:28px;background:#1e222b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.3);z-index:100;min-width:120px;overflow:hidden;">' +
+                ((certCfg.download_options || []).indexOf('image') > -1 ? '<a href="javascript:void(0)" onclick="downloadPastCertAction(\'image\', ' + pastEventId + ')" style="display:block;padding:8px 12px;color:#fff;font-size:11px;text-align:left;text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);" onmouseenter="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseleave="this.style.background=\'none\'">Photo (JPEG)</a>' : '') +
+                ((certCfg.download_options || []).indexOf('pdf') > -1 ? '<a href="javascript:void(0)" onclick="downloadPastCertAction(\'pdf\', ' + pastEventId + ')" style="display:block;padding:8px 12px;color:#fff;font-size:11px;text-align:left;text-decoration:none;font-weight:600;" onmouseenter="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseleave="this.style.background=\'none\'">PDF Document</a>' : '') +
+              '</div>' +
+            '</div>'
+          ) : '') +
         '</div>' +
       '</div>';
     }
@@ -2049,6 +2235,32 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
     if (localStorage.getItem('ag_dyn_dash') === '1') return;
   } catch(e) {}
   var wrap = document.getElementById('hero-arc-wrap');
+  var host = document.getElementById('medal-rings');
+  
+  var showArc = false;
+  if (eventRow && eventRow.rules_config && eventRow.rules_config.dashboard && eventRow.rules_config.dashboard.sections) {
+    var sec = eventRow.rules_config.dashboard.sections;
+    if (sec.show_arc_on_dashboard !== undefined) {
+      showArc = !!sec.show_arc_on_dashboard;
+    } else {
+      try {
+        var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+        showArc = !!brCache.show_arc_on_dashboard;
+      } catch(e) {}
+    }
+  } else {
+    try {
+      var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+      showArc = !!brCache.show_arc_on_dashboard;
+    } catch(e) {}
+  }
+
+  if (!showArc) {
+    if (wrap) wrap.style.display = 'none';
+    if (host) host.style.display = 'flex';
+    return;
+  }
+
   var svg = document.getElementById('hero-arc-svg');
   var legend = document.getElementById('hero-arc-legend');
   if (!wrap || !svg || !legend || !medals || !medals.length) return;
@@ -2095,9 +2307,11 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
     svg.appendChild(tick);
   });
 
-  // center value
+  // center value & label
   var valEl = document.getElementById('hero-arc-value');
   if (valEl) valEl.textContent = Math.round(myPts).toLocaleString('en-IN');
+  var lblEl = document.querySelector('.hero-arc-lbl');
+  if (lblEl) lblEl.textContent = getEventScoreLabel();
 
   // legend
   while (legend.firstChild) legend.removeChild(legend.firstChild);
@@ -2143,7 +2357,7 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
         }
       } catch(e) {}
       if (icEl) icEl.textContent = icons[nextIdx] || '\uD83C\uDFC5';
-      if (tEl) tEl.textContent = next.lbl + ' is ' + Math.round(needed).toLocaleString('en-IN') + ' pts away';
+      if (tEl) tEl.textContent = next.lbl + ' is ' + Math.round(needed).toLocaleString('en-IN') + ' ' + getEventScoreUnit() + ' away';
       if (sEl) sEl.textContent = sub;
       if (pEl) { pEl.textContent = pct + '%'; pEl.style.color = next.color; }
       banner.style.display = 'flex';
@@ -2231,7 +2445,8 @@ window.renderDashHybridExtras = function(opts) {
       chips.appendChild(c);
     }
     chip(opts.todayKm.toFixed(1), 'km today', 'brand');
-    chip(Math.round(opts.points).toLocaleString('en-IN'), 'points', '');
+    var scoreUnit = typeof getEventScoreUnit === 'function' ? getEventScoreUnit() : 'points';
+    chip(Math.round(opts.points).toLocaleString('en-IN'), scoreUnit, '');
     chip(opts.streak + (opts.streakLive && opts.streak > 0 ? '\uD83D\uDD25' : ''), 'day streak', 'green');
     chip(opts.rank ? '#' + opts.rank : '\u2014', 'rank', '');
     chips.style.display = 'flex';
@@ -2256,9 +2471,322 @@ window.renderMedalShelf = function(myPts, medals) {
       lbl.className = 'yms-lbl';
       lbl.textContent = m.lbl;
       item.appendChild(ic); item.appendChild(lbl);
-      item.title = earned ? (m.lbl + ' earned') : (m.lbl + ' at ' + Math.round(m.thresh).toLocaleString('en-IN') + ' pts');
+      var unit = typeof getEventScoreUnit === 'function' ? getEventScoreUnit() : 'pts';
+      item.title = earned ? (m.lbl + ' earned') : (m.lbl + ' at ' + Math.round(m.thresh).toLocaleString('en-IN') + ' ' + unit);
       shelf.appendChild(item);
     });
     shelf.style.display = 'flex';
   } catch(e) { try{console.error('[medal-shelf]',e);}catch(e6){} }
 };
+
+window.initParticipantSession = function(user) {
+  if (!user || !user.loggedIn) return;
+  try {
+    var devUuid = localStorage.getItem('wk_device_uuid');
+    if (!devUuid) {
+      devUuid = 'dev_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now().toString(36);
+      localStorage.setItem('wk_device_uuid', devUuid);
+    }
+
+    var sessUuid = sessionStorage.getItem('wk_session_uuid');
+    var isNewSession = false;
+    if (!sessUuid) {
+      sessUuid = 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now().toString(36);
+      sessionStorage.setItem('wk_session_uuid', sessUuid);
+      isNewSession = true;
+    }
+
+    var isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var devType = isMobile ? 'Mobile' : 'Web';
+    
+    var ua = navigator.userAgent;
+    var browserName = "Generic Browser";
+    if (ua.indexOf("Firefox") > -1) browserName = "Firefox";
+    else if (ua.indexOf("SamsungBrowser") > -1) browserName = "Samsung Browser";
+    else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) browserName = "Opera";
+    else if (ua.indexOf("Trident") > -1) browserName = "Internet Explorer";
+    else if (ua.indexOf("Edge") > -1 || ua.indexOf("Edg") > -1) browserName = "Edge";
+    else if (ua.indexOf("Chrome") > -1) browserName = "Chrome";
+    else if (ua.indexOf("Safari") > -1) browserName = "Safari";
+
+    var payload = {
+      session_uuid: sessUuid,
+      device_uuid: devUuid,
+      emp_code: user.empCode || 'STRAVA_' + user.athleteId,
+      email: user.email || '',
+      athlete_name: user.name || 'Participant',
+      device_type: devType,
+      device_name: browserName,
+      pwa_installed: isPWA
+    };
+
+    var backendUrl = typeof BACKEND !== 'undefined' ? BACKEND : 'https://agwalk-backend.onrender.com';
+
+    if (isNewSession) {
+      fetch(backendUrl + '/participant/session/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function(e) {});
+    } else {
+      fetch(backendUrl + '/participant/session/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_uuid: sessUuid })
+      }).catch(function(e) {});
+    }
+
+    if (!window._sessHeartbeatInterval) {
+      window._sessHeartbeatInterval = setInterval(function() {
+        fetch(backendUrl + '/participant/session/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_uuid: sessUuid })
+        }).catch(function(e) {});
+      }, 120000);
+    }
+
+    // End session on tab/browser close
+    window.addEventListener('pagehide', function() {
+      if (sessUuid) {
+        fetch(backendUrl + '/participant/session/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_uuid: sessUuid }),
+          keepalive: true
+        }).catch(function(e){});
+      }
+    });
+  } catch(e) {
+    console.warn('Session init failed:', e);
+  }
+};
+
+window.togglePastCertMenu = function(e, pastEventId) {
+  e.stopPropagation();
+  document.querySelectorAll('.past-cert-menu').forEach(function(m) {
+    if (m.id !== 'cert-menu-' + pastEventId) {
+      m.style.display = 'none';
+    }
+  });
+  var menu = document.getElementById('cert-menu-' + pastEventId);
+  if (menu) {
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+document.addEventListener('click', function() {
+  document.querySelectorAll('.past-cert-menu').forEach(function(m) {
+    m.style.display = 'none';
+  });
+  var menu = document.getElementById('cert-menu');
+  if (menu) menu.style.display = 'none';
+});
+
+window.downloadPastCertAction = function(type, pastEventId) {
+  var certData = window.pastCertDataMap && window.pastCertDataMap[pastEventId];
+  if (!certData) {
+    alert('Certificate data not found for this event.');
+    return;
+  }
+
+  var btn = document.getElementById('btn-download-' + pastEventId);
+  var origText = btn ? btn.innerHTML : 'Cert';
+  if (btn) {
+    btn.textContent = 'Wait...';
+    btn.disabled = true;
+  }
+
+  var name = certData.name;
+  if (name && name === name.toUpperCase()) {
+    name = name.toLowerCase().split(' ').map(function(word) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+  }
+
+  var url = certData.config.template_url;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+  // Load Google Fonts first
+  var placeholders = certData.config.placeholders || [];
+  placeholders.forEach(function(p) {
+    if (p.font_family) {
+      window.loadGoogleFont(p.font_family);
+    }
+  });
+
+  pdfjsLib.getDocument(url).promise.then(function(pdf) {
+    return pdf.getPage(1);
+  }).then(function(page) {
+    var viewport = page.getViewport({ scale: 2.0 });
+    var canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    var ctx = canvas.getContext('2d');
+    
+    var renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    return page.render(renderContext).promise.then(function() {
+      return document.fonts.ready.then(function() {
+        return canvas;
+      });
+    });
+  }).then(function(canvas) {
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+
+    var placeholders = certData.config.placeholders || [];
+
+    // 1. Cover the placeholder region
+    placeholders.forEach(function(p) {
+      if (p.type === 'medal_image') return;
+      
+      var textVal = p.key;
+      if (p.type === 'participant_name') textVal = name;
+      else if (p.type === 'medal_title') textVal = certData.medal;
+      else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
+      else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
+      else if (p.type === 'custom') textVal = p.custom_val || '';
+
+      var templateText = p.key || '';
+
+      ctx.save();
+      var family = p.font_family || 'Poppins';
+      ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + Math.round(p.font_size * (w / 2000)) + 'px "' + family + '", "Georgia", sans-serif';
+      var valWidth = ctx.measureText(textVal).width;
+      var templateWidth = ctx.measureText(templateText).width;
+      var textWidth = Math.max(valWidth, templateWidth);
+      
+      var boxHeight = p.font_size * (w / 2000) * 1.5;
+      var textX = w * p.x;
+      var textY = h * p.y;
+      var boxX = textX;
+      
+      if (p.align === 'center') boxX = textX - textWidth / 2;
+      else if (p.align === 'right') boxX = textX - textWidth;
+      
+      ctx.fillStyle = '#ffffff';
+      var paddingX = Math.round(25 * (w / 2000));
+      ctx.fillRect(boxX - paddingX, textY - boxHeight / 2, textWidth + (paddingX * 2), boxHeight);
+      ctx.restore();
+    });
+
+    // 2. Draw actual text values
+    placeholders.forEach(function(p) {
+      if (p.type === 'medal_image') return;
+
+      var textVal = p.key;
+      if (p.type === 'participant_name') textVal = name;
+      else if (p.type === 'medal_title') textVal = certData.medal;
+      else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
+      else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
+      else if (p.type === 'custom') textVal = p.custom_val || '';
+
+      ctx.save();
+      var family = p.font_family || 'Poppins';
+      ctx.fillStyle = p.color || '#000000';
+      ctx.textAlign = p.align || 'left';
+      ctx.textBaseline = 'middle';
+      ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + Math.round(p.font_size * (w / 2000)) + 'px "' + family + '", "Georgia", sans-serif';
+      ctx.fillText(textVal, w * p.x, h * p.y);
+      ctx.restore();
+    });
+
+    // 3. Draw image values (asynchronous loader list)
+    var imagePromises = [];
+    placeholders.forEach(function(p) {
+      if (p.type === 'medal_image') {
+        var size = Math.round(p.font_size * (w / 2000));
+        var imgUrl = '';
+        var tier = '';
+        if (certData.medal === 'Gold Medal') tier = 'gold';
+        else if (certData.medal === 'Silver Medal') tier = 'silver';
+        else if (certData.medal === 'Bronze Medal') tier = 'bronze';
+        
+        var eventCfg = (window.pastCertDataMap[pastEventId] && window.pastCertDataMap[pastEventId].config) ? window.pastCertDataMap[pastEventId].config : null;
+        var medalsCfg = null;
+        
+        // Find medals configuration in configMap if available
+        if (configMap && configMap[pastEventId]) {
+          medalsCfg = configMap[pastEventId]['medals'];
+        }
+
+        if (tier && medalsCfg && medalsCfg[tier] && medalsCfg[tier].image_url) {
+          imgUrl = medalsCfg[tier].image_url;
+        } else if (tier) {
+          imgUrl = 'medal_' + tier + '_medal.png'; // local fallback
+        }
+
+        if (imgUrl) {
+          var pms = new Promise(function(resolve) {
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+              ctx.drawImage(img, w * p.x - size / 2, h * p.y - size / 2, size, size);
+              resolve();
+            };
+            img.onerror = function() {
+              console.warn('Failed to load medal image: ' + imgUrl);
+              resolve();
+            };
+            img.src = imgUrl;
+          });
+          imagePromises.push(pms);
+        }
+      }
+    });
+
+    return Promise.all(imagePromises).then(function() {
+      if (type === 'image') {
+        var link = document.createElement('a');
+        link.download = certData.eventName.replace(/\s+/g, '_') + '_Certificate_' + name.replace(/\s+/g, '_') + '.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+        if (btn) {
+          btn.innerHTML = origText;
+          btn.disabled = false;
+        }
+      } else {
+        var orientation = w > h ? 'l' : 'p';
+        var pdfDoc = new jspdf.jsPDF({
+          orientation: orientation,
+          unit: 'px',
+          format: [w, h]
+        });
+        pdfDoc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, h);
+        pdfDoc.save(certData.eventName.replace(/\s+/g, '_') + '_Certificate_' + name.replace(/\s+/g, '_') + '.pdf');
+        if (btn) {
+          btn.innerHTML = origText;
+          btn.disabled = false;
+        }
+      }
+    });
+  }).catch(function(err) {
+    console.error('Failed to generate certificate:', err);
+    alert('Failed to generate certificate: ' + err.message);
+    if (btn) {
+      btn.innerHTML = origText;
+      btn.disabled = false;
+    }
+  });
+};
+
+window.loadGoogleFont = function(fontName) {
+  if (!fontName) return;
+  var fontId = 'gf-' + fontName.toLowerCase().replace(/\s+/g, '-');
+  if (document.getElementById(fontId)) return;
+  
+  var link = document.createElement('link');
+  link.id = fontId;
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + fontName.replace(/\s+/g, '+') + ':wght@400;700&display=swap';
+  document.head.appendChild(link);
+};
+
+// Fallbacks for older references
+window.toggleCertMenu = function(e) { togglePastCertMenu(e, 1); };
+window.downloadCertAction = function(type, eventName) { downloadPastCertAction(type, 1); };
