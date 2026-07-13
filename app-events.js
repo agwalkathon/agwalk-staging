@@ -197,7 +197,7 @@ function buildEventCard(ev, group) {
 
   var card = document.createElement('div');
   card.className = 'ev-card-p';
-  card.style.borderLeft = '4px solid ' + (ev.accent_color || (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'));
+  card.style.borderLeft = '4px solid ' + (ev.accent_color || (typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('event_accent_color', 'accent_color') : '#E8622A'));
 
   /**
    * Event Card Premium Background & Badge Loader
@@ -210,7 +210,7 @@ function buildEventCard(ev, group) {
   // Clean, lightweight watermark representing the event's sport type, matching the card accent color
   var watermark = document.createElement('div');
   watermark.className = 'ev-card-watermark';
-  watermark.style.color = ev.accent_color || (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A');
+  watermark.style.color = ev.accent_color || (typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('event_accent_color', 'accent_color') : '#E8622A');
   var iconStr = renderIcon(sportType === 'ride' ? 'Ride' : sportType === 'run' ? 'Run' : sportType === 'hike' ? 'Hike' : sportType === 'walk' ? 'Walk' : 'Mixed');
   if (iconStr) {
     iconStr = iconStr.replace(/stroke="[^"]*"/g, 'stroke="currentColor"');
@@ -307,11 +307,11 @@ function buildEventCard(ev, group) {
     regBtn.style.gap = '6px';
     if (isApproved || enrolled) {
       regBtn.className = 'ev-btn';
-      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + (ev.accent_color || (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A')) + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span style="color:#ffaa80;">Registered</span>';
+      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + (ev.accent_color || (typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('event_accent_color', 'accent_color') : '#E8622A')) + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span style="color:#ffaa80;">Registered</span>';
       regBtn.style.cursor = 'default';
     } else if (isPending) {
       regBtn.className = 'ev-btn';
-      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + (ev.accent_color || (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A')) + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span style="color:#ffaa80;">Pending</span>';
+      regBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + (ev.accent_color || (typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('event_accent_color', 'accent_color') : '#E8622A')) + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span style="color:#ffaa80;">Pending</span>';
       regBtn.style.cursor = 'default';
     } else if (regOpenNow || group === 'upcoming') {
       regBtn.className = 'ev-btn';
@@ -659,7 +659,7 @@ async function submitEventRegistration(ev) {
   btn.disabled = true; btn.textContent = 'Submitting…';
   try {
     var payload = Object.assign({}, d, { event_name: ev.slug, event_id: ev.id, status: 'pending' });
-    var backendUrl = (typeof BACKEND !== 'undefined' ? BACKEND : 'https://walkathon-backend-hv9j.onrender.com');
+    var backendUrl = (typeof BACKEND !== 'undefined' ? BACKEND : 'https://agwalk-backend.onrender.com');
     var r = await fetch(backendUrl + '/register-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
