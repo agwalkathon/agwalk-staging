@@ -2185,7 +2185,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
           download_options: ['image', 'pdf'],
           placeholders: [
             { key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' },
-            { key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' }
+            { key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'normal', align: 'left' }
           ]
         };
         hasEnded = true; // Hardcoded true for 2026 historical event
