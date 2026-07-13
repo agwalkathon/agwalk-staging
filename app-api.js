@@ -2131,13 +2131,13 @@ async function loadPastEventsPerformance(reg, athleteId) {
 
       var medalBadge = '🏅';
       var medalTitle = 'Participant';
-      if (totalKm >= goldThresh) {
+      if (totalPts >= goldThresh) {
         medalBadge = '🥇';
         medalTitle = 'Gold Medal';
-      } else if (totalKm >= silverThresh) {
+      } else if (totalPts >= silverThresh) {
         medalBadge = '🥈';
         medalTitle = 'Silver Medal';
-      } else if (totalKm >= bronzeThresh) {
+      } else if (totalPts >= bronzeThresh) {
         medalBadge = '🥉';
         medalTitle = 'Bronze Medal';
       }
@@ -2617,25 +2617,49 @@ window.downloadPastCertAction = function(type, pastEventId) {
     }
   });
 
-  pdfjsLib.getDocument(url).promise.then(function(pdf) {
-    return pdf.getPage(1);
-  }).then(function(page) {
-    var viewport = page.getViewport({ scale: 2.0 });
-    var canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    var ctx = canvas.getContext('2d');
-    
-    var renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
-    };
-    return page.render(renderContext).promise.then(function() {
-      return document.fonts.ready.then(function() {
-        return canvas;
+  window._certBgCache = window._certBgCache || {};
+  var cacheKey = pastEventId;
+  var cachedBg = window._certBgCache[cacheKey];
+
+  var renderPipeline;
+  if (cachedBg) {
+    // Background PDF already fetched + rasterized this session - clone it and skip straight to overlay drawing
+    renderPipeline = document.fonts.ready.then(function() {
+      var clone = document.createElement('canvas');
+      clone.width = cachedBg.width;
+      clone.height = cachedBg.height;
+      clone.getContext('2d').drawImage(cachedBg, 0, 0);
+      return clone;
+    });
+  } else {
+    renderPipeline = pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      return pdf.getPage(1);
+    }).then(function(page) {
+      var viewport = page.getViewport({ scale: 1.5 });
+      var canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      var ctx = canvas.getContext('2d');
+
+      var renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      return page.render(renderContext).promise.then(function() {
+        return document.fonts.ready.then(function() {
+          // Cache a clone of the freshly-rendered background before any overlay is drawn on it
+          var bgClone = document.createElement('canvas');
+          bgClone.width = canvas.width;
+          bgClone.height = canvas.height;
+          bgClone.getContext('2d').drawImage(canvas, 0, 0);
+          window._certBgCache[cacheKey] = bgClone;
+          return canvas;
+        });
       });
     });
-  }).then(function(canvas) {
+  }
+
+  renderPipeline.then(function(canvas) {
     var ctx = canvas.getContext('2d');
     var w = canvas.width;
     var h = canvas.height;
