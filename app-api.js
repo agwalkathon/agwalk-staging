@@ -2186,7 +2186,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
         hasEnded = true; // Hardcoded true for 2026 historical event
       }
 
-      var showDownloadBtn = hasEnded && certCfg && certCfg.template_url;
+      var showDownloadBtn = hasEnded && certCfg && (certCfg.template_url || certCfg.canvas_mode === 'blank');
 
       var athleteRank = null;
       if (rankMap[pastEventId]) {
@@ -2624,7 +2624,9 @@ window.downloadPastCertAction = function(type, pastEventId) {
   }
 
   var url = certData.config.template_url;
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  }
 
   // Load Google Fonts first
   var placeholders = certData.config.placeholders || [];
@@ -2638,8 +2640,24 @@ window.downloadPastCertAction = function(type, pastEventId) {
   var cacheKey = pastEventId;
   var cachedBg = window._certBgCache[cacheKey];
 
+  var isBlankMode = certData.config.canvas_mode === 'blank';
+
   var renderPipeline;
-  if (cachedBg) {
+  if (isBlankMode) {
+    // Full-design mode: solid background canvas, no PDF fetch/render at all
+    renderPipeline = document.fonts.ready.then(function() {
+      var bc = document.createElement('canvas');
+      if ((certData.config.canvas_orientation || 'landscape') === 'portrait') {
+        bc.width = 1414; bc.height = 2000;
+      } else {
+        bc.width = 2000; bc.height = 1414;
+      }
+      var bcx = bc.getContext('2d');
+      bcx.fillStyle = certData.config.canvas_bg || '#ffffff';
+      bcx.fillRect(0, 0, bc.width, bc.height);
+      return bc;
+    });
+  } else if (cachedBg) {
     // Background PDF already fetched + rasterized this session - clone it and skip straight to overlay drawing
     renderPipeline = document.fonts.ready.then(function() {
       var clone = document.createElement('canvas');
@@ -2683,9 +2701,10 @@ window.downloadPastCertAction = function(type, pastEventId) {
 
     var placeholders = certData.config.placeholders || [];
 
-    // 1. Cover the placeholder region
+    // 1. Cover the placeholder region (PDF-template mode only; blank canvases have nothing to cover)
     placeholders.forEach(function(p) {
-      if (p.type === 'medal_image') return;
+      if (isBlankMode) return;
+      if (p.type === 'medal_image' || p.type === 'static_image') return;
       
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
@@ -2720,7 +2739,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
 
     // 2. Draw actual text values
     placeholders.forEach(function(p) {
-      if (p.type === 'medal_image') return;
+      if (p.type === 'medal_image' || p.type === 'static_image') return;
 
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
@@ -2743,6 +2762,27 @@ window.downloadPastCertAction = function(type, pastEventId) {
     // 3. Draw image values (asynchronous loader list)
     var imagePromises = [];
     placeholders.forEach(function(p) {
+      if (p.type === 'static_image') {
+        var sSize = Math.round(p.font_size * (w / 2000));
+        var sUrl = (p.image_url || '').trim();
+        if (!sUrl) return;
+        var sPms = new Promise(function(resolve) {
+          var sImg = new Image();
+          sImg.crossOrigin = 'anonymous';
+          sImg.onload = function() {
+            var sH = Math.round(sSize * (sImg.naturalHeight / sImg.naturalWidth));
+            ctx.drawImage(sImg, w * p.x - sSize / 2, h * p.y - sH / 2, sSize, sH);
+            resolve();
+          };
+          sImg.onerror = function() {
+            console.warn('Failed to load certificate image: ' + sUrl);
+            resolve();
+          };
+          sImg.src = sUrl;
+        });
+        imagePromises.push(sPms);
+        return;
+      }
       if (p.type === 'medal_image') {
         var size = Math.round(p.font_size * (w / 2000));
         var imgUrl = '';
