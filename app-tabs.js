@@ -1271,11 +1271,12 @@ function renderPodium(rows) {
     var rank = ranks[idx];
     var isMe = String(r.p.strava_athlete_id) === String(meId);
     var teamName = (r.p.leaderboard_team || '').replace(/^Team\s+/i, '');
+    var firstName = String(r.p.full_name || '').trim().split(/\s+/)[0];
     return (
       '<div class="podium-card rank-' + rank + (isMe ? ' active' : '') + '" data-rank="' + rank + '">' +
         '<div class="podium-badge">' + crowns[idx] + '</div>' +
         '<div class="podium-avatar">' + esc(initials(r.p.full_name)) + '</div>' +
-        '<div class="podium-name">' + esc(r.p.full_name || '—') + (isMe ? ' (You)' : '') + '</div>' +
+        '<div class="podium-name">' + esc(firstName || '—') + (isMe ? ' (You)' : '') + '</div>' +
         (teamName ? '<div class="podium-team">' + esc(teamName) + '</div>' : '') +
         '<div class="podium-pts">' + r.pts.total.toFixed(lbScoringMode()==='raw'?lbMetricMeta().dec:1) + ' ' + (lbScoringMode()==='raw' ? lbMetricMeta().short.toLowerCase() : 'pts') + '</div>' +
       '</div>'
@@ -2047,7 +2048,7 @@ function instantiateFeedMap(el) {
       }).addTo(map);
 
       var poly = L.polyline(coordinates, {
-        color: (typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'), // Follows event accent color
+        color: (typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('map_accent_color', 'accent_color') : '#E8622A'), // Follows event accent color
         weight: 4,
         opacity: 0.9,
         lineJoin: 'round'
@@ -2675,7 +2676,7 @@ function triggerReactionConfetti(x, y, emoji) {
         particleCount: 20,
         spread: 40,
         origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-        colors: [(typeof getEffectiveAccentColor === 'function' ? getEffectiveAccentColor() : '#E8622A'), '#FC6100', '#FFD000'],
+        colors: [(typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('progress_accent_color', 'accent_color') : '#E8622A'), '#FC6100', '#FFD000'],
         ticks: 120
       };
       confetti(options);
@@ -2746,12 +2747,14 @@ function updateInAppNotificationBanner() {
     }
   }
 
-  // Priority 2: Broadcast message from admin
+  // Priority 2: Broadcast message from admin (only if newer than 4 days)
   if (typeof _feedData !== 'undefined' && _feedData && _feedData.length > 0) {
     var latestBroadcast = _feedData.find(function(item) { return item.type === 'broadcast'; });
     if (latestBroadcast) {
       var bcKey = 'broadcast_' + latestBroadcast.id;
-      if (!dismissed[bcKey]) {
+      var bcAgeMs = latestBroadcast.created_at ? (Date.now() - new Date(latestBroadcast.created_at).getTime()) : 0;
+      var isRecent = bcAgeMs > 0 && bcAgeMs < (4 * 24 * 60 * 60 * 1000);
+      if (isRecent && !dismissed[bcKey]) {
         var html = renderInAppNotificationBanner(
           latestBroadcast.title || 'Walkathon Update',
           latestBroadcast.body,
