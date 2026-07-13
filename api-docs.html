@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -159,7 +159,7 @@
   <!-- Sidebar -->
           <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
     </div>
     
@@ -1012,6 +1012,18 @@ WHERE strava_activity_id = 19055574519;</code></pre>
             </li>
             <li><strong>JS/CSS Cache Busting</strong>:
               <br>• Implemented cache-busting version rules for scripts and stylesheets loaded in <code>app.html</code> (e.g. <code>app-dashboard.js?v=NNN</code>) to ensure updates are served instantly.
+            </li>
+            <li><strong>Dynamic Score Units and Labels (July 13, 2026)</strong>:
+              <br>• Added dynamic metric translation so that if an event has a <code>raw</code> scoring mode, all point trackers (arc chart title, next-milestone tracker, stat chips, You-tab medals) dynamically adjust to the metric unit (e.g. <code>km</code> for distance events) and label (e.g. <code>Total Distance</code>) instead of using hardcoded points/pts terminology.
+            </li>
+            <li><strong>Mini Date Strip Event Ended Rollback (July 13, 2026)</strong>:
+              <br>• If an event has ended, the 7-day mini-ring date strip rolls back to show the final 7 days of the completed event instead of the current system calendar dates.
+            </li>
+            <li><strong>Uncompromising Browser Cache-Busting Redirects (July 13, 2026)</strong>:
+              <br>• Appended dynamic timestamp cache-busters (<code>_cb=Date.now()</code>) to all redirects targeting <code>app.html</code> to completely bypass local browser disk/memory cache.
+            </li>
+            <li><strong>Asynchronous Service Worker Purging on Boot (July 13, 2026)</strong>:
+              <br>• Coordinated PWA cache cleaning script execution in <code>index.html</code> so it blocks login redirects until all Service Workers are fully unregistered and Cache Storage is deleted.
             </li>
           </ul>
 
