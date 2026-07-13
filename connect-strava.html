@@ -201,8 +201,8 @@
   </div>
 </div>
 <script>
-var SUPABASE_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
-var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var SUPABASE_URL='https://jglvwxeaqiswpxzcofmy.supabase.co';
+var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
 var HDR={'apikey':ANON,'Authorization':'Bearer '+ANON};
 var CLIENT_ID='29159';
 var BACKEND=window.BACKEND_URL;
@@ -407,7 +407,7 @@ async function verifyOTP(){
       empCode: d.emp_code || '',
       expires: Date.now() + (8 * 60 * 60 * 1000)
     }));
-    window.location.replace('app.html');
+    window.location.replace('app.html?_cb=' + Date.now());
   } catch (e) {
     showErr('❌ Connection error. Please try again.');
   }
@@ -475,7 +475,7 @@ async function doLogin(){
       email:d.email||'',
       expires:Date.now()+(8*60*60*1000)
     }));
-    window.location.replace('app.html');
+    window.location.replace('app.html?_cb=' + Date.now());
   }catch(e){
     showErr('❌ Connection error. Please try again.');
   }
@@ -512,7 +512,7 @@ if(oauthCode){
         expires:Date.now()+(8*60*60*1000)
       }));
       if(d.role==='admin'){sessionStorage.setItem('wk_admin',JSON.stringify({loggedIn:true,role:'admin',expires:Date.now()+(8*60*60*1000)}));window.location.replace('admin.html');}
-      else{window.location.replace('app.html');}
+      else{window.location.replace('app.html?_cb=' + Date.now());}
     } else if(d.error==='not_registered'){showErr('⛔ <strong>Not registered.</strong><br>Your Strava account is not in the participant list.<br><a href="index.html" style="color:#F97D4E;font-weight:600;">Not an event participant? Open the Employee App →</a>');}
     else{showErr('❌ <strong>Login failed.</strong><br>Please try again.');}
   })
