@@ -15,11 +15,11 @@
       var urlParams = new URLSearchParams(window.location.search);
       var v = urlParams.get('v');
       if (v && v.length === 13 && parseInt(v) < 1783480000000) {
-        window.location.replace('app.html');
+        window.location.replace('app.html?_cb=' + Date.now());
         return;
       }
 
-      var APP_VERSION = '20260711_v2';
+      var APP_VERSION = '20260713_v9';
       var lastSeen = localStorage.getItem('app_last_seen_version');
       if (lastSeen !== APP_VERSION) {
         // Clear LocalStorage cached keys prefix-matched with agwalk_
@@ -46,10 +46,10 @@
             
           Promise.all([psw, pcaches]).then(function() {
             localStorage.setItem('app_last_seen_version', APP_VERSION);
-            window.location.reload();
+            window.location.replace(window.location.pathname + '?_cb=' + Date.now());
           }).catch(function() {
             localStorage.setItem('app_last_seen_version', APP_VERSION);
-            window.location.reload();
+            window.location.replace(window.location.pathname + '?_cb=' + Date.now());
           });
         } else {
           localStorage.setItem('app_last_seen_version', APP_VERSION);
@@ -84,7 +84,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="app.css?v=20260712_v6">
+  <link rel="stylesheet" href="app.css?v=20260713_v2">
   <style>
     /* Prevent Flash of Unstyled Content (FOUC) and visual jumps */
     #app-screen { display: none !important; }
@@ -241,7 +241,7 @@
 <header class="header">
   <div class="hdr-inner">
   <div class="hdr-left" style="display: flex; align-items: center; gap: 8px;">
-    <div class="hdr-avatar" id="hdr-avatar" onclick="showTab('you');return false;">PM</div>
+    <div class="hdr-avatar" id="hdr-avatar" onclick="showTab('you');return false;"></div>
     
     <div style="position: relative; display: inline-block;">
       <button class="hdr-btn" id="notification-btn" onclick="toggleNotificationDropdown(event)" title="Notifications" style="position: relative;">
@@ -311,7 +311,7 @@
       <div class="hero-arc-svgbox">
         <svg id="hero-arc-svg" viewBox="0 0 280 175" aria-hidden="true"></svg>
         <div class="hero-arc-center">
-          <div class="hero-arc-big"><span id="hero-arc-value">—</span><small> pts</small></div>
+          <div class="hero-arc-big"><span id="hero-arc-value">—</span></div>
           <div class="hero-arc-lbl">Total Points</div>
         </div>
       </div>
@@ -645,7 +645,7 @@
 
   <!-- Avatar / name card - Profile tab only -->
   <div class="tab-you-profile">
-    <div class="tab-you-avatar" id="you-avatar">PM</div>
+    <div class="tab-you-avatar" id="you-avatar"></div>
     <div class="tab-you-name" id="you-name">—</div>
     <div class="tab-you-tags" id="you-tags"></div>
     <div class="you-medal-shelf" id="you-medal-shelf" style="display:none;"></div>
@@ -796,10 +796,11 @@
   </div>
 
   <!-- Past Events Performance -->
+  <!-- Past Events & Certificates -->
   <div id="you-past-events-section" style="display:none; margin-top:20px;">
-    <div class="sec">Past Event Performance</div>
-    <div id="you-past-events-card" class="card" style="background:rgba(26,29,32,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); padding:10px 0;">
-      <!-- Dynamically rendered past events -->
+    <div class="sec">Past Events & Certificates</div>
+    <div id="you-past-events-card" class="card" style="background:rgba(26,29,32,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); padding:10px 0; overflow:visible !important;">
+      <!-- Dynamically rendered past events with certificate downloads -->
     </div>
   </div>
 
@@ -909,13 +910,15 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
-  <script src="app-config.js?v=20260711_v1" defer></script>
-  <script src="app-employee.js?v=20260712_v2" defer></script>
-  <script src="app-api.js?v=20260712_v6" defer></script>
-  <script src="app-drawers.js?v=20260711_v1" defer></script>
-  <script src="app-events.js?v=20260711_v1" defer></script>
-  <script src="app-dashboard.js?v=20260712_v4" defer></script>
-  <script src="app-tabs.js?v=20260712_v1" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="app-config.js?v=20260713_v16" defer></script>
+  <script src="app-employee.js?v=20260713_v16" defer></script>
+  <script src="app-api.js?v=20260713_v16" defer></script>
+  <script src="app-drawers.js?v=20260713_v16" defer></script>
+  <script src="app-events.js?v=20260713_v16" defer></script>
+  <script src="app-dashboard.js?v=20260713_v16" defer></script>
+  <script src="app-tabs.js?v=20260713_v16" defer></script>
 
 
 
@@ -936,7 +939,7 @@
         <div id="highlight-modal-emoji" style="font-size:72px; margin-bottom:16px; filter:drop-shadow(0 0 16px rgba(255,255,255,0.2));">🔥</div>
         <div id="highlight-modal-title" style="font-size:22px; font-weight: 700; color:#fff; margin-bottom:8px; letter-spacing:0.3px;">Streak Leader!</div>
         <div id="highlight-modal-subtitle" style="font-size:12px; font-weight: 700; color:var(--brand); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:20px;">12 Days Active</div>
-        <div id="highlight-modal-body" style="font-size:14.5px; color:rgba(255,255,255,0.75); line-height:1.6; margin-bottom:28px; max-width:480px;">Prakash Mali is on fire with 12 consecutive days of activities! Keep it going!</div>
+        <div id="highlight-modal-body" style="font-size:14.5px; color:rgba(255,255,255,0.75); line-height:1.6; margin-bottom:28px; max-width:480px;">Loading dashboard...</div>
         <button class="btn" style="width:100%; max-width:320px; border:none; border-radius:12px; font-weight: 700; padding:14px; background:linear-gradient(135deg, #FC6100 0%, var(--brand) 100%); color:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 6px 20px rgba(232,98,42,0.35); font-size:13px;" onclick="triggerHighlightCheer(event)">Clap Support 👏</button>
       </div>
     </div>
@@ -1165,8 +1168,8 @@
     <div class="detail-content" style="padding-top:20px;">
       <!-- Avatar & Basic Info -->
       <div style="text-align:center; margin-bottom:24px;">
-        <div id="prof-avatar" class="profile-avatar-large">PM</div>
-        <div id="prof-name" style="font-size:20px; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; gap:6px;">Prakash Mali</div>
+        <div id="prof-avatar" class="profile-avatar-large"></div>
+        <div id="prof-name" style="font-size:20px; font-weight:900; color:#fff; display:flex; align-items:center; justify-content:center; gap:6px;">Loading...</div>
         <!-- Shift, Team and Gender details removed -->
         <div id="prof-team-shift" style="display:none;"></div>
         <div id="prof-location" style="font-size:11.5px; color:var(--muted); margin-top:6px; display:none;"></div>
