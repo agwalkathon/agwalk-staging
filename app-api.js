@@ -2061,6 +2061,21 @@ async function loadPastEventsPerformance(reg, athleteId) {
       console.warn('Failed to load past event configs:', e);
     }
 
+    // Batched rank lookup: for each past event, get all athletes ordered by total_points desc
+    var rankMap = {};
+    try {
+      var rankRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=in.(' + pastEventIds.join(',') + ')&select=athlete_id,event_id,total_points&order=event_id.asc,total_points.desc', { headers: HDR });
+      var rankRows = await rankRes.json();
+      if (Array.isArray(rankRows)) {
+        rankRows.forEach(function(row) {
+          if (!rankMap[row.event_id]) rankMap[row.event_id] = [];
+          rankMap[row.event_id].push(String(row.athlete_id));
+        });
+      }
+    } catch(e) {
+      console.warn('Failed to load past event ranks:', e);
+    }
+
     var html = '';
     otherRegs.sort(function(a, b) { return a.event_id - b.event_id; });
     window.pastCertDataMap = {};
@@ -2178,12 +2193,19 @@ async function loadPastEventsPerformance(reg, athleteId) {
 
       var showDownloadBtn = hasEnded && certCfg && certCfg.template_url;
 
+      var athleteRank = null;
+      if (rankMap[pastEventId]) {
+        var idx = rankMap[pastEventId].indexOf(String(pReg.strava_athlete_id));
+        if (idx > -1) athleteRank = idx + 1;
+      }
+
       if (showDownloadBtn) {
         window.pastCertDataMap[pastEventId] = {
           name: reg.full_name || 'Participant',
           medal: medalTitle,
           distance: totalKm,
           points: totalPts,
+          rank: athleteRank,
           eventName: pastEventName,
           config: certCfg,
           medals: medalsCfg
@@ -2675,6 +2697,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
       else if (p.type === 'medal_title') textVal = certData.medal;
       else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
       else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
+      else if (p.type === 'rank') textVal = certData.rank ? formatOrdinalRank(certData.rank) : '-';
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
       var templateText = p.key || '';
@@ -2709,6 +2732,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
       else if (p.type === 'medal_title') textVal = certData.medal;
       else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
       else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
+      else if (p.type === 'rank') textVal = certData.rank ? formatOrdinalRank(certData.rank) : '-';
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
       ctx.save();
@@ -2794,6 +2818,13 @@ window.downloadPastCertAction = function(type, pastEventId) {
     }
   });
 };
+
+function formatOrdinalRank(n) {
+  n = parseInt(n, 10);
+  if (!n || n < 1) return '-';
+  var s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 
 window.loadGoogleFont = function(fontName) {
   if (!fontName) return;
