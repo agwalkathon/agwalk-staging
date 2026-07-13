@@ -2577,6 +2577,19 @@ window.updateCertPreviewCanvas = function(forceReload) {
 };
 
 var _certHitBoxes = [];
+var _certMedalImgCache = {};
+
+// Cached loader for the medal preview image; triggers a redraw once loaded
+function getCertPreviewMedalImg(url) {
+  if (_certMedalImgCache[url]) return _certMedalImgCache[url];
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() { queueCertRedraw(); };
+  img.onerror = function() { console.warn('Medal preview image failed to load: ' + url); };
+  img.src = url;
+  _certMedalImgCache[url] = img;
+  return img;
+}
 
 function drawCertPlaceholdersOnCanvas(canvas, scale) {
   var ctx = canvas.getContext('2d');
@@ -2615,11 +2628,20 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       ctx.fill();
       ctx.stroke();
       
-      ctx.fillStyle = '#E8622A';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = 'bold ' + Math.round(boxSize * 0.55) + 'px "Poppins", sans-serif';
-      ctx.fillText('🏅', textX, textY);
+      // Draw the actual configured medal image (gold shown in preview); fall back to gold emoji
+      var goldUrlEl = document.getElementById('gold-img-url');
+      var goldUrl = goldUrlEl ? goldUrlEl.value.trim() : '';
+      var previewImg = goldUrl ? getCertPreviewMedalImg(goldUrl) : null;
+      if (previewImg && previewImg.complete && previewImg.naturalWidth > 0) {
+        ctx.setLineDash([]);
+        ctx.drawImage(previewImg, textX - boxSize/2, textY - boxSize/2, boxSize, boxSize);
+      } else {
+        ctx.fillStyle = '#E8622A';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = Math.round(boxSize * 0.7) + 'px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+        ctx.fillText('🥇', textX, textY);
+      }
 
       var hitEntry = { row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY, isImage: true };
 
