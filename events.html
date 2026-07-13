@@ -60,6 +60,9 @@
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+.cert-placeholder-row summary::-webkit-details-marker{display:none}
+.cert-placeholder-row details[open] summary .ti-chevron-down{transform:rotate(180deg)}
+.cert-placeholder-row summary:hover{background:#fafbfd;border-radius:8px}
 body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
 
     /* Sidebar styling */
@@ -701,56 +704,50 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <h3 style="font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-certificate"></i> Certificate Configuration</h3>
       <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">Configure dynamic certificate templates for the event. Participants can download certificates once the event has ended.</p>
       
-      <div class="grid" style="margin-bottom: 20px;">
-        <div class="fld" style="grid-column: 1 / -1;">
-          <label style="font-weight:600; color:#333; margin-bottom:4px; display:block;">Certificate Template PDF</label>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf" style="flex:1;">
-            <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload PDF</button>
-            <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
-          </div>
-          <span style="font-size:11px; color:#64748b; margin-top:4px; display:block;">Enter a file path/URL or upload a local PDF template. Uploading large templates will convert them to Base64 in config.</span>
+      <!-- Template row: URL + upload + download formats in one compact line -->
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px;">
+        <div class="fld" style="margin:0; flex:1; min-width:260px;">
+          <label style="font-size:11px; font-weight:600; color:#333;">Certificate Template PDF</label>
+          <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
+        <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; height:38px;">
+          <span style="font-size:11px; font-weight:600; color:#64748b;">Downloads:</span>
+          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> JPEG</label>
+          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF</label>
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 20px;">
+      <!-- Main workspace: compact placeholder list (left) + large preview (right) -->
+      <div style="display:grid; grid-template-columns: 350px 1fr; gap:16px; align-items:start;">
         <div>
-          <h4 style="font-size:13px; font-weight:700; color:#333; margin-bottom:12px;">Placeholders Mapping</h4>
-          <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
+          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('participant_name')">+ Name</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_title')">+ Medal</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('distance')">+ Distance</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('rank')">+ Rank</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('points')">+ Points</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_image')">+ Medal Img</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px;" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Custom</button>
+          </div>
+          <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:6px; max-height:62vh; overflow-y:auto; padding-right:4px;">
             <!-- Rendered list of placeholder config rows -->
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-            <button type="button" class="btn btn-ghost btn-sm" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Add Placeholder</button>
-            <span style="font-size:11px; color:#94a3b8;">Quick add:</span>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('participant_name')">+ Name</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('medal_title')">+ Medal</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('distance')">+ Distance</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('rank')">+ Rank</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('points')">+ Points</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('medal_image')">+ Medal Image</button>
-          </div>
-          
-          <div style="margin-top: 24px;">
-            <h4 style="font-size:13px; font-weight:700; color:#333; margin-bottom:12px;">Download Format Options</h4>
-            <div style="display:flex; gap:16px;">
-              <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> Photo (JPEG)</label>
-              <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF Document</label>
-            </div>
-          </div>
         </div>
-        
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <h4 style="font-size:13px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between;">
+
+        <div style="display:flex; flex-direction:column; gap:6px; position:sticky; top:10px;">
+          <h4 style="font-size:12px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between; margin:0;">
             <span>Live Interactive Preview</span>
             <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
           </h4>
-          <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:10px; display:flex; align-items:center; justify-content:center; min-height:280px; position:relative; overflow:hidden;">
-            <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:350px; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
+          <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:8px; display:flex; align-items:center; justify-content:center; min-height:420px; position:relative; overflow:hidden;">
+            <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:74vh; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
             <div id="cert-preview-placeholder" style="font-size:12px; color:#64748b; text-align:center;">
               <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
             </div>
           </div>
-          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> to move &middot; <strong>Corner handle / scroll wheel</strong> to resize &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps) &middot; <strong>Click</strong> empty space to place active row</span>
+          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> to move &middot; <strong>Corner handle / scroll wheel</strong> to resize &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps)</span>
         </div>
       </div>
     </div>
@@ -2409,21 +2406,26 @@ window.addCertPlaceholderRow = function(data) {
   var row = document.createElement('div');
   row.className = 'cert-placeholder-row';
   row.id = rowId;
-  row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; position:relative; display:flex; flex-direction:column; gap:10px;';
+  row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; position:relative;';
   
   var isChecked = list.children.length === 0 ? 'checked' : '';
+  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Custom', medal_image: 'Medal Image' };
+  var titleText = typeLabels[p.type] || 'Placeholder';
   
   row.innerHTML = 
-    '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-      '<label style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer;">' +
-        '<input type="radio" name="active-cert-placeholder" ' + isChecked + ' style="cursor:pointer;" onchange="updateCertPreviewCanvas()"> Active for click-mapping' +
-      '</label>' +
-      '<button type="button" class="btn btn-ghost btn-xs" style="color:#ef4444; padding:2px 6px; font-size:11px; cursor:pointer;" onclick="document.getElementById(\'' + rowId + '\').remove(); updateCertPreviewCanvas();"><i class="ti ti-trash"></i> Remove</button>' +
-    '</div>' +
-    '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:10px;">' +
+    '<details>' +
+    '<summary style="display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; list-style:none; user-select:none;">' +
+      '<input type="radio" name="active-cert-placeholder" ' + isChecked + ' title="Set active for canvas placement" style="cursor:pointer; flex-shrink:0;" onclick="event.stopPropagation();" onchange="updateCertPreviewCanvas()">' +
+      '<span class="cert-row-title" style="font-size:12px; font-weight:700; color:#0F1117; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + esc(titleText) + '</span>' +
+      '<span class="cert-row-swatch" style="width:12px; height:12px; border-radius:3px; border:1px solid #ddd; background:' + (p.color || '#000000') + '; flex-shrink:0;"></span>' +
+      '<button type="button" class="btn btn-ghost btn-xs" style="color:#ef4444; padding:1px 5px; font-size:11px; cursor:pointer; flex-shrink:0;" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById(\'' + rowId + '\').remove(); updateCertPreviewCanvas();"><i class="ti ti-trash"></i></button>' +
+      '<i class="ti ti-chevron-down" style="font-size:13px; color:#94a3b8; flex-shrink:0;"></i>' +
+    '</summary>' +
+    '<div style="display:flex; flex-direction:column; gap:8px; padding:0 10px 10px 10px; border-top:1px solid #f1f5f9; padding-top:8px;">' +
+    '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Placeholder Key</label><input type="text" class="cert-p-key" placeholder="e.g. <Participant Name>" value="' + esc(p.key || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Value Mapping</label>' +
-        '<select class="cert-p-type" onchange="toggleCertCustomVal(this); updateCertPreviewCanvas();">' +
+        '<select class="cert-p-type" onchange="toggleCertCustomVal(this); certRowTitleSync(this); updateCertPreviewCanvas();">' +
           '<option value="participant_name"' + (p.type === 'participant_name' ? ' selected' : '') + '>Participant\'s Full Name</option>' +
           '<option value="medal_title"' + (p.type === 'medal_title' ? ' selected' : '') + '>Medal Achieved (e.g. Gold Medal)</option>' +
           '<option value="distance"' + (p.type === 'distance' ? ' selected' : '') + '>Total Distance</option>' +
@@ -2435,13 +2437,13 @@ window.addCertPlaceholderRow = function(data) {
       '</div>' +
     '</div>' +
     '<div class="fld cert-custom-val-wrap" style="margin:0; display:' + (p.type === 'custom' ? 'block' : 'none') + ';"><label style="font-size:11px;">Custom Text Value</label><input type="text" class="cert-p-custom-val" placeholder="e.g. CEO Signature" value="' + esc(p.custom_val || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
-    '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">X Pos (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Y Pos (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size (px)</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">X (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Y (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" style="height:32px; padding:2px;" oninput="updateCertPreviewCanvas(); var s=this.closest(\'.cert-placeholder-row\').querySelector(\'.cert-row-swatch\'); if(s) s.style.background=this.value;"></div>' +
     '</div>' +
-    '<div style="display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:8px;">' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" oninput="updateCertPreviewCanvas()"></div>' +
+    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Weight</label>' +
         '<select class="cert-p-weight" onchange="updateCertPreviewCanvas();">' +
           '<option value="bold"' + (p.font_style === 'bold' ? ' selected' : '') + '>Bold</option>' +
@@ -2468,10 +2470,20 @@ window.addCertPlaceholderRow = function(data) {
         '<option value="Great Vibes"' + (p.font_family === 'Great Vibes' ? ' selected' : '') + '>Great Vibes</option>' +
         '<option value="Outfit"' + (p.font_family === 'Outfit' ? ' selected' : '') + '>Outfit</option>' +
       '</select>' +
-    '</div>';
+    '</div>' +
+    '</div>' +
+    '</details>';
     
   list.appendChild(row);
   updateCertPreviewCanvas();
+};
+
+// Keep the compact row title in sync with the selected value mapping
+window.certRowTitleSync = function(select) {
+  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Custom', medal_image: 'Medal Image' };
+  var row = select.closest('.cert-placeholder-row');
+  var title = row ? row.querySelector('.cert-row-title') : null;
+  if (title) title.textContent = typeLabels[select.value] || 'Placeholder';
 };
 
 var _activeCertPdfDoc = null;
@@ -2738,8 +2750,15 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     var radio = row.querySelector('input[name="active-cert-placeholder"]');
     if (radio && !radio.checked) radio.checked = true;
     row.style.boxShadow = '0 0 0 2px #E8622A inset';
+    var det = row.querySelector('details');
+    if (det && !det.open) det.open = true;
+    row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
-      if (r !== row) r.style.boxShadow = '';
+      if (r !== row) {
+        r.style.boxShadow = '';
+        var d = r.querySelector('details');
+        if (d) d.open = false;
+      }
     });
   }
 
