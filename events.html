@@ -753,7 +753,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
               <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
             </div>
           </div>
-          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> any placeholder directly on the preview to move it &middot; <strong>Click</strong> empty space to place the active row &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps)</span>
+          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> to move &middot; <strong>Corner handle / scroll wheel</strong> to resize &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps) &middot; <strong>Click</strong> empty space to place active row</span>
         </div>
       </div>
     </div>
@@ -2441,7 +2441,7 @@ window.addCertPlaceholderRow = function(data) {
     '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">X Pos (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Y Pos (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size (px)</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="400" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size (px)</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
     '</div>' +
     '<div style="display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" oninput="updateCertPreviewCanvas()"></div>' +
@@ -2620,8 +2620,24 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       ctx.textBaseline = 'middle';
       ctx.font = 'bold ' + Math.round(boxSize * 0.55) + 'px "Poppins", sans-serif';
       ctx.fillText('🏅', textX, textY);
+
+      var hitEntry = { row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY, isImage: true };
+
+      // Resize handle (bottom-right corner) when this placeholder is selected
+      if (isChecked) {
+        var hs = 12;
+        var hx = textX + boxSize/2;
+        var hy = textY + boxSize/2;
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#E8622A';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.fillRect(hx - hs/2, hy - hs/2, hs, hs);
+        ctx.strokeRect(hx - hs/2, hy - hs/2, hs, hs);
+        hitEntry.handle = { x0: hx - hs, y0: hy - hs, x1: hx + hs, y1: hy + hs };
+      }
       ctx.restore();
-      _certHitBoxes.push({ row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY });
+      _certHitBoxes.push(hitEntry);
       return;
     }
 
@@ -2719,12 +2735,32 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     if (!canvas || canvas._certDragWired) return;
     canvas._certDragWired = true;
 
+    var _resizeRow = null;
+    var _resizeAnchorX = 0, _resizeAnchorY = 0;
+
     canvas.addEventListener('pointerdown', function(e) {
       var c = canvasCoords(canvas, e);
       _downPx = c.px; _downPy = c.py;
       _dragMoved = false;
       _dragRow = null;
-      // topmost placeholder wins (iterate in reverse draw order)
+      _resizeRow = null;
+
+      // 1st pass: resize handles win over drag (topmost first)
+      for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
+        var b = _certHitBoxes[i];
+        if (b.handle && c.px >= b.handle.x0 && c.px <= b.handle.x1 && c.py >= b.handle.y0 && c.py <= b.handle.y1) {
+          _resizeRow = b.row;
+          _resizeAnchorX = b.anchorX;
+          _resizeAnchorY = b.anchorY;
+          canvas.setPointerCapture(e.pointerId);
+          canvas.style.cursor = 'nwse-resize';
+          canvas.focus();
+          e.preventDefault();
+          return;
+        }
+      }
+
+      // 2nd pass: body drag (topmost placeholder wins)
       for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
         var b = _certHitBoxes[i];
         if (c.px >= b.x0 && c.px <= b.x1 && c.py >= b.y0 && c.py <= b.y1) {
@@ -2743,8 +2779,20 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     });
 
     canvas.addEventListener('pointermove', function(e) {
-      if (!_dragRow) return;
       var c = canvasCoords(canvas, e);
+      if (_resizeRow) {
+        // Distance from placeholder center = new radius; diameter -> size value
+        var dx = c.px - _resizeAnchorX;
+        var dy = c.py - _resizeAnchorY;
+        var r = Math.sqrt(dx * dx + dy * dy);
+        var newSize = Math.round((2 * r) / (_certPreviewScale * 0.5));
+        if (newSize < 8) newSize = 8;
+        if (newSize > 999) newSize = 999;
+        _resizeRow.querySelector('.cert-p-size').value = newSize;
+        queueCertRedraw();
+        return;
+      }
+      if (!_dragRow) return;
       if (Math.abs(c.px - _downPx) > 2 || Math.abs(c.py - _downPy) > 2) _dragMoved = true;
       setRowXY(_dragRow, (c.px - _dragOffX) / canvas.width, (c.py - _dragOffY) / canvas.height);
       queueCertRedraw();
@@ -2752,6 +2800,10 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
 
     canvas.addEventListener('pointerup', function(e) {
       canvas.style.cursor = 'grab';
+      if (_resizeRow) {
+        _resizeRow = null;
+        return;
+      }
       if (!_dragRow && !_dragMoved) {
         // Clicked empty space: place the active radio row there (legacy click-to-place)
         var activeRow = getActiveRow();
@@ -2764,6 +2816,21 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       _dragRow = null;
       _dragMoved = false;
     });
+
+    // Scroll wheel over the canvas resizes the selected placeholder (any type)
+    canvas.addEventListener('wheel', function(e) {
+      var row = getActiveRow();
+      if (!row) return;
+      e.preventDefault();
+      var sizeInput = row.querySelector('.cert-p-size');
+      var cur = parseInt(sizeInput.value) || 24;
+      var step = e.shiftKey ? 10 : 3;
+      var next = cur + (e.deltaY < 0 ? step : -step);
+      if (next < 8) next = 8;
+      if (next > 999) next = 999;
+      sizeInput.value = next;
+      queueCertRedraw();
+    }, { passive: false });
 
     canvas.addEventListener('keydown', function(e) {
       var step = e.shiftKey ? 0.02 : 0.005;
