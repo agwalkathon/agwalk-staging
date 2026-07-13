@@ -263,15 +263,44 @@
       }
     }
 
-    // 2. Render custom rings if configured. If not, keep the classic layout
+    // 2. Resolve layout: Prioritize Arc chart if checked. Otherwise fall back to configured custom rings
+    var showArc = false;
+    if (ev && ev.rules_config && ev.rules_config.dashboard && ev.rules_config.dashboard.sections) {
+      var sec = ev.rules_config.dashboard.sections;
+      if (sec.show_arc_on_dashboard !== undefined) {
+        showArc = !!sec.show_arc_on_dashboard;
+      } else {
+        try {
+          var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+          showArc = !!brCache.show_arc_on_dashboard;
+        } catch(e) {}
+      }
+    } else {
+      try {
+        var brCache = JSON.parse(localStorage.getItem('ag_branding_cache') || '{}');
+        showArc = !!brCache.show_arc_on_dashboard;
+      } catch(e) {}
+    }
+
+    var arcW = document.getElementById('hero-arc-wrap');
+    var ringsHost = document.getElementById('medal-rings');
+
+    if (showArc) {
+      // Show Arc layout: clear dynamic flag and assert visibility
+      try { localStorage.removeItem('ag_dyn_dash'); } catch(e){}
+      if (arcW) arcW.style.display = 'block';
+      if (ringsHost) ringsHost.style.display = 'none';
+      return;
+    }
+
+    // Render custom dynamic rings if configured
     var hasDash = ev.rules_config && ev.rules_config.dashboard &&
                   Array.isArray(ev.rules_config.dashboard.rings) && ev.rules_config.dashboard.rings.length;
     if (!hasDash) {
-      // classic rings path: clear any stale dynamic flag so the hero arc can render
+      // Classic layout (three medal rings): clear dynamic flag and assert visibility
       try { localStorage.removeItem('ag_dyn_dash'); } catch(e){}
-      var arcW = document.getElementById('hero-arc-wrap');
-      var ringsHost = document.getElementById('medal-rings');
-      if (arcW && ringsHost && ringsHost.style.display === 'none') arcW.style.display = 'block';
+      if (arcW) arcW.style.display = 'none';
+      if (ringsHost) ringsHost.style.display = 'flex';
       return;
     }
     
