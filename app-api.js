@@ -2037,43 +2037,45 @@ async function loadPastEventsPerformance(reg, athleteId) {
       return;
     }
 
-    var eventsRes = await fetch(SUPABASE_URL + '/rest/v1/events?select=id,name,status,end_date', { headers: HDR });
-    var eventsList = await eventsRes.json();
+    var pastEventIds = otherRegs.map(function(r) { return r.event_id; });
+
+    // Run all three lookups in parallel (was 3 sequential round-trips)
     var eventMap = {};
+    var configMap = {};
+    var rankMap = {};
+    var summaryMap = {}; // athleteId_eventId -> summary row (reused for stats, no per-event fetch needed)
+
+    var lookups = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/events?select=id,name,status,end_date', { headers: HDR })
+        .then(function(r) { return r.json(); }).catch(function() { return []; }),
+      fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=in.(' + pastEventIds.join(',') + ')&select=event_id,config_key,config_value', { headers: HDR })
+        .then(function(r) { return r.json(); }).catch(function() { return []; }),
+      fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=in.(' + pastEventIds.join(',') + ')&select=athlete_id,event_id,total_points,total_distance_km,activities_count&order=event_id.asc,total_points.desc', { headers: HDR })
+        .then(function(r) { return r.json(); }).catch(function() { return []; })
+    ]);
+
+    var eventsList = lookups[0];
     if (Array.isArray(eventsList)) {
       eventsList.forEach(function(e) {
         eventMap[e.id] = e;
       });
     }
 
-    var pastEventIds = otherRegs.map(function(r) { return r.event_id; });
-    var configMap = {};
-    try {
-      var cfgRes = await fetch(SUPABASE_URL + '/rest/v1/leaderboard_config?event_id=in.(' + pastEventIds.join(',') + ')&select=event_id,config_key,config_value', { headers: HDR });
-      var cfgRows = await cfgRes.json();
-      if (Array.isArray(cfgRows)) {
-        cfgRows.forEach(function(row) {
-          if (!configMap[row.event_id]) configMap[row.event_id] = {};
-          configMap[row.event_id][row.config_key] = row.config_value;
-        });
-      }
-    } catch(e) {
-      console.warn('Failed to load past event configs:', e);
+    var cfgRows = lookups[1];
+    if (Array.isArray(cfgRows)) {
+      cfgRows.forEach(function(row) {
+        if (!configMap[row.event_id]) configMap[row.event_id] = {};
+        configMap[row.event_id][row.config_key] = row.config_value;
+      });
     }
 
-    // Batched rank lookup: for each past event, get all athletes ordered by total_points desc
-    var rankMap = {};
-    try {
-      var rankRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?event_id=in.(' + pastEventIds.join(',') + ')&select=athlete_id,event_id,total_points&order=event_id.asc,total_points.desc', { headers: HDR });
-      var rankRows = await rankRes.json();
-      if (Array.isArray(rankRows)) {
-        rankRows.forEach(function(row) {
-          if (!rankMap[row.event_id]) rankMap[row.event_id] = [];
-          rankMap[row.event_id].push(String(row.athlete_id));
-        });
-      }
-    } catch(e) {
-      console.warn('Failed to load past event ranks:', e);
+    var rankRows = lookups[2];
+    if (Array.isArray(rankRows)) {
+      rankRows.forEach(function(row) {
+        if (!rankMap[row.event_id]) rankMap[row.event_id] = [];
+        rankMap[row.event_id].push(String(row.athlete_id));
+        summaryMap[String(row.athlete_id) + '_' + row.event_id] = row;
+      });
     }
 
     var html = '';
@@ -2087,14 +2089,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
       var pastEventName = eventObj ? eventObj.name : (pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId));
       var team = pReg.leaderboard_team || 'No Team';
       
-      var scoreObj = null;
-      try {
-        var cacheRes = await fetch(SUPABASE_URL + '/rest/v1/athlete_points_summary?athlete_id=eq.' + pReg.strava_athlete_id + '&event_id=eq.' + pastEventId, { headers: HDR });
-        var cacheData = await cacheRes.json();
-        if (Array.isArray(cacheData) && cacheData.length > 0) {
-          scoreObj = cacheData[0];
-        }
-      } catch(e) {}
+      var scoreObj = summaryMap[String(pReg.strava_athlete_id) + '_' + pastEventId] || null;
 
       var totalKm = 0;
       var totalPts = 0;
@@ -2106,7 +2101,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
         actsCount = parseInt(scoreObj.activities_count || 0);
       } else {
         try {
-          var actRes = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + pReg.strava_athlete_id + '&event_id=eq.' + pastEventId + '&is_deleted=eq.false', { headers: HDR });
+          var actRes = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + pReg.strava_athlete_id + '&event_id=eq.' + pastEventId + '&is_deleted=eq.false&select=distance_meters,is_flagged', { headers: HDR });
           var pastActs = await actRes.json();
           if (Array.isArray(pastActs)) {
             actsCount = pastActs.length;
