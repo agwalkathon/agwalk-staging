@@ -2185,7 +2185,8 @@ async function loadPastEventsPerformance(reg, athleteId) {
           distance: totalKm,
           points: totalPts,
           eventName: pastEventName,
-          config: certCfg
+          config: certCfg,
+          medals: medalsCfg
         };
       }
 
@@ -2708,12 +2709,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
         else if (certData.medal === 'Bronze Medal') tier = 'bronze';
         
         var eventCfg = (window.pastCertDataMap[pastEventId] && window.pastCertDataMap[pastEventId].config) ? window.pastCertDataMap[pastEventId].config : null;
-        var medalsCfg = null;
-        
-        // Find medals configuration in configMap if available
-        if (configMap && configMap[pastEventId]) {
-          medalsCfg = configMap[pastEventId]['medals'];
-        }
+        var medalsCfg = (window.pastCertDataMap[pastEventId] && window.pastCertDataMap[pastEventId].medals) ? window.pastCertDataMap[pastEventId].medals : null;
 
         if (tier && medalsCfg && medalsCfg[tier] && medalsCfg[tier].image_url) {
           imgUrl = medalsCfg[tier].image_url;
