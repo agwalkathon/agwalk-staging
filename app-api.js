@@ -2694,10 +2694,10 @@ window.downloadPastCertAction = function(type, pastEventId) {
       
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
-      else if (p.type === 'medal_title') textVal = certData.medal;
-      else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
-      else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
-      else if (p.type === 'rank') textVal = certData.rank ? formatOrdinalRank(certData.rank) : '-';
+      else if (p.type === 'medal_title') textVal = 'Medal Achieved: ' + String(certData.medal || '').replace(' Medal', '');
+      else if (p.type === 'distance') textVal = 'Distance: ' + certData.distance.toFixed(1) + ' KM';
+      else if (p.type === 'points') textVal = 'Total Points: ' + certData.points.toFixed(0);
+      else if (p.type === 'rank') textVal = 'Rank: ' + (certData.rank ? certData.rank : '-');
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
       var templateText = p.key || '';
@@ -2729,10 +2729,10 @@ window.downloadPastCertAction = function(type, pastEventId) {
 
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
-      else if (p.type === 'medal_title') textVal = certData.medal;
-      else if (p.type === 'distance') textVal = certData.distance.toFixed(1) + ' km';
-      else if (p.type === 'points') textVal = certData.points.toFixed(0) + ' pts';
-      else if (p.type === 'rank') textVal = certData.rank ? formatOrdinalRank(certData.rank) : '-';
+      else if (p.type === 'medal_title') textVal = 'Medal Achieved: ' + String(certData.medal || '').replace(' Medal', '');
+      else if (p.type === 'distance') textVal = 'Distance: ' + certData.distance.toFixed(1) + ' KM';
+      else if (p.type === 'points') textVal = 'Total Points: ' + certData.points.toFixed(0);
+      else if (p.type === 'rank') textVal = 'Rank: ' + (certData.rank ? certData.rank : '-');
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
       ctx.save();
