@@ -1,5 +1,5 @@
 // Global Configuration and State Variables
-var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
+var SUPABASE_URL = 'https://jglvwxeaqiswpxzcofmy.supabase.co';
 var BACKEND      = window.BACKEND_URL || 'https://agwalk-backend.onrender.com';
 var _currentTab  = 'dashboard';
 var _feedData    = [];
@@ -56,7 +56,7 @@ var CURRENT_ACTS = null;
 var CURRENT_DAY_BREAKDOWN = null;
 var CURRENT_ACT_BREAKDOWN = null;
 var CURRENT_GENDER = null;
-var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
 var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 var currentSession = null;
 
@@ -140,10 +140,31 @@ function userGuard() {
   }
 }
 function logout() {
+  var sessUuid = sessionStorage.getItem('wk_session_uuid');
+  if (sessUuid) {
+    try {
+      var backendUrl = typeof BACKEND !== 'undefined' ? BACKEND : 'https://agwalk-backend.onrender.com';
+      fetch(backendUrl + '/participant/session/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_uuid: sessUuid }),
+        keepalive: true
+      }).catch(function(e){});
+      sessionStorage.removeItem('wk_session_uuid');
+    } catch(e) {}
+  }
   safeRemoveItem('wk_user');
   safeRemoveItem('ag_emp_token');
   safeRemoveItem('ag_emp');
   safeRemoveItem('ag_push_emp_synced');
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf('agwalk_') === 0) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch(e) {}
   try { sessionStorage.removeItem('wk_admin'); } catch(e){}
   location.reload();
 }
@@ -1046,6 +1067,15 @@ function getEffectiveAccentColor() {
   return DEFAULT_BRAND_COLOR;
 }
 
+function getBrandingOverrideColor(key, fallbackKey) {
+  try {
+    var br = JSON.parse(localStorage.getItem('ag_branding_cache') || 'null');
+    if (br && br[key]) return br[key];
+    if (br && fallbackKey && br[fallbackKey]) return br[fallbackKey];
+  } catch (e) {}
+  return getEffectiveAccentColor();
+}
+
 function applyEffectiveAccentColor() {
   var c = getEffectiveAccentColor();
   try { document.documentElement.style.setProperty('--brand', c); } catch (e) {}
@@ -1058,7 +1088,7 @@ function applyEffectiveAccentColor() {
 }
 
 function getFallbackAvatarStyle() {
-  return 'background:#282e36; border:2px solid ' + getEffectiveAccentColor() + '; color:#fff;';
+  return 'background:#282e36; border:2px solid ' + getBrandingOverrideColor('avatar_accent_color', 'accent_color') + '; color:#fff;';
 }
 
 // Apply immediately on script execution (uses cache; no need to wait for any network fetch)
