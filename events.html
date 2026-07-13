@@ -2665,10 +2665,10 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
 
     var previewText = key;
     if (type === 'participant_name') previewText = 'Prakash Mali';
-    else if (type === 'medal_title') previewText = 'Gold Medal';
-    else if (type === 'distance') previewText = '300.5 km';
-    else if (type === 'points') previewText = '350 pts';
-    else if (type === 'rank') previewText = '3rd';
+    else if (type === 'medal_title') previewText = 'Medal Achieved: Gold';
+    else if (type === 'distance') previewText = 'Distance: 300.5 KM';
+    else if (type === 'points') previewText = 'Total Points: 350';
+    else if (type === 'rank') previewText = 'Rank: 3';
     else if (type === 'custom') previewText = customVal || key;
     
     ctx.save();
