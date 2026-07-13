@@ -722,7 +722,16 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
             <!-- Rendered list of placeholder config rows -->
           </div>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Add Placeholder</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="addCertPlaceholderRow()"><i class="ti ti-plus"></i> Add Placeholder</button>
+            <span style="font-size:11px; color:#94a3b8;">Quick add:</span>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('participant_name')">+ Name</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('medal_title')">+ Medal</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('distance')">+ Distance</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('rank')">+ Rank</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('points')">+ Points</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:3px 8px; font-size:11px;" onclick="addCertPreset('medal_image')">+ Medal Image</button>
+          </div>
           
           <div style="margin-top: 24px;">
             <h4 style="font-size:13px; font-weight:700; color:#333; margin-bottom:12px;">Download Format Options</h4>
@@ -736,15 +745,15 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <div style="display:flex; flex-direction:column; gap:8px;">
           <h4 style="font-size:13px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between;">
             <span>Live Interactive Preview</span>
-            <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas()"><i class="ti ti-refresh"></i> Refresh</button>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
           </h4>
           <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:10px; display:flex; align-items:center; justify-content:center; min-height:280px; position:relative; overflow:hidden;">
-            <canvas id="cert-preview-canvas" style="max-width:100%; max-height:350px; border:1px solid #ccc; display:none; cursor:crosshair;" onclick="handleCertPreviewCanvasClick(event)"></canvas>
+            <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:350px; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
             <div id="cert-preview-placeholder" style="font-size:12px; color:#64748b; text-align:center;">
               <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
             </div>
           </div>
-          <span style="font-size:11px; color:#64748b; text-align:center;">Click on the preview canvas to set the X/Y coordinates of the active placeholder row.</span>
+          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> any placeholder directly on the preview to move it &middot; <strong>Click</strong> empty space to place the active row &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps)</span>
         </div>
       </div>
     </div>
@@ -2469,7 +2478,31 @@ window.addCertPlaceholderRow = function(data) {
 };
 
 var _activeCertPdfDoc = null;
-window.updateCertPreviewCanvas = function() {
+var _certBgCanvas = null;   // offscreen cache of the rendered PDF background
+var _certBgUrl = '';
+var _certPreviewScale = 1;
+var _certRedrawQueued = false;
+
+// Fast path: blit cached background + draw placeholders. No PDF work.
+window.redrawCertPreview = function() {
+  var canvas = document.getElementById('cert-preview-canvas');
+  if (!canvas || !_certBgCanvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(_certBgCanvas, 0, 0);
+  drawCertPlaceholdersOnCanvas(canvas, _certPreviewScale);
+};
+
+function queueCertRedraw() {
+  if (_certRedrawQueued) return;
+  _certRedrawQueued = true;
+  requestAnimationFrame(function() {
+    _certRedrawQueued = false;
+    window.redrawCertPreview();
+  });
+}
+
+window.updateCertPreviewCanvas = function(forceReload) {
   var url = (document.getElementById('cert-template-url').value || '').trim();
   var canvas = document.getElementById('cert-preview-canvas');
   var placeholder = document.getElementById('cert-preview-placeholder');
@@ -2483,6 +2516,12 @@ window.updateCertPreviewCanvas = function() {
   if (placeholder) placeholder.style.display = 'none';
   if (canvas) canvas.style.display = 'block';
 
+  // If background already rendered for this URL, skip PDF work entirely
+  if (!forceReload && _certBgCanvas && _certBgUrl === url) {
+    queueCertRedraw();
+    return;
+  }
+
   var renderPreview = function(pdfDoc) {
     pdfDoc.getPage(1).then(function(page) {
       var viewport = page.getViewport({ scale: 1.0 });
@@ -2491,16 +2530,21 @@ window.updateCertPreviewCanvas = function() {
       if (scale > 1.5) scale = 1.5;
       
       var scaledViewport = page.getViewport({ scale: scale });
-      canvas.width = scaledViewport.width;
-      canvas.height = scaledViewport.height;
-      var ctx = canvas.getContext('2d');
+      var bg = document.createElement('canvas');
+      bg.width = scaledViewport.width;
+      bg.height = scaledViewport.height;
       
       var renderContext = {
-        canvasContext: ctx,
+        canvasContext: bg.getContext('2d'),
         viewport: scaledViewport
       };
       page.render(renderContext).promise.then(function() {
-        drawCertPlaceholdersOnCanvas(canvas, scale);
+        _certBgCanvas = bg;
+        _certBgUrl = url;
+        _certPreviewScale = scale;
+        canvas.width = bg.width;
+        canvas.height = bg.height;
+        window.redrawCertPreview();
       });
     });
   };
@@ -2532,10 +2576,13 @@ window.updateCertPreviewCanvas = function() {
   });
 };
 
+var _certHitBoxes = [];
+
 function drawCertPlaceholdersOnCanvas(canvas, scale) {
   var ctx = canvas.getContext('2d');
   var w = canvas.width;
   var h = canvas.height;
+  _certHitBoxes = [];
   
   document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
     var key = row.querySelector('.cert-p-key').value.trim() || 'Placeholder';
@@ -2574,6 +2621,7 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       ctx.font = 'bold ' + Math.round(boxSize * 0.55) + 'px "Poppins", sans-serif';
       ctx.fillText('🏅', textX, textY);
       ctx.restore();
+      _certHitBoxes.push({ row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY });
       return;
     }
 
@@ -2623,32 +2671,137 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     ctx.strokeRect(boxX - paddingX, textY - boxHeight/2, textWidth + (paddingX * 2), boxHeight);
     
     ctx.restore();
+    _certHitBoxes.push({ row: row, x0: boxX - paddingX, y0: textY - boxHeight/2, x1: boxX - paddingX + textWidth + (paddingX * 2), y1: textY + boxHeight/2, anchorX: textX, anchorY: textY });
   });
 }
 
-window.handleCertPreviewCanvasClick = function(event) {
-  var canvas = document.getElementById('cert-preview-canvas');
-  if (!canvas) return;
-  
-  var rect = canvas.getBoundingClientRect();
-  var clickX = event.clientX - rect.left;
-  var clickY = event.clientY - rect.top;
-  
-  var pctX = (clickX / rect.width).toFixed(3);
-  var pctY = (clickY / rect.height).toFixed(3);
-  
-  var activeRow = null;
-  document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
-    if (row.querySelector('input[name="active-cert-placeholder"]').checked) {
-      activeRow = row;
-    }
-  });
-  
-  if (activeRow) {
-    activeRow.querySelector('.cert-p-x').value = pctX;
-    activeRow.querySelector('.cert-p-y').value = pctY;
-    updateCertPreviewCanvas();
+// ===== Drag & drop, click-to-place, keyboard nudge for certificate placeholders =====
+(function() {
+  var _dragRow = null;
+  var _dragOffX = 0, _dragOffY = 0;
+  var _dragMoved = false;
+  var _downPx = 0, _downPy = 0;
+
+  function canvasCoords(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      px: (event.clientX - rect.left) * (canvas.width / rect.width),
+      py: (event.clientY - rect.top) * (canvas.height / rect.height)
+    };
   }
+
+  function selectRow(row) {
+    var radio = row.querySelector('input[name="active-cert-placeholder"]');
+    if (radio && !radio.checked) radio.checked = true;
+    row.style.boxShadow = '0 0 0 2px #E8622A inset';
+    document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
+      if (r !== row) r.style.boxShadow = '';
+    });
+  }
+
+  function getActiveRow() {
+    var active = null;
+    document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+      if (row.querySelector('input[name="active-cert-placeholder"]').checked) active = row;
+    });
+    return active;
+  }
+
+  function setRowXY(row, xFrac, yFrac) {
+    if (xFrac < 0) xFrac = 0; if (xFrac > 1) xFrac = 1;
+    if (yFrac < 0) yFrac = 0; if (yFrac > 1) yFrac = 1;
+    row.querySelector('.cert-p-x').value = xFrac.toFixed(3);
+    row.querySelector('.cert-p-y').value = yFrac.toFixed(3);
+  }
+
+  function initCertCanvasInteraction() {
+    var canvas = document.getElementById('cert-preview-canvas');
+    if (!canvas || canvas._certDragWired) return;
+    canvas._certDragWired = true;
+
+    canvas.addEventListener('pointerdown', function(e) {
+      var c = canvasCoords(canvas, e);
+      _downPx = c.px; _downPy = c.py;
+      _dragMoved = false;
+      _dragRow = null;
+      // topmost placeholder wins (iterate in reverse draw order)
+      for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
+        var b = _certHitBoxes[i];
+        if (c.px >= b.x0 && c.px <= b.x1 && c.py >= b.y0 && c.py <= b.y1) {
+          _dragRow = b.row;
+          _dragOffX = c.px - b.anchorX;
+          _dragOffY = c.py - b.anchorY;
+          selectRow(b.row);
+          canvas.setPointerCapture(e.pointerId);
+          canvas.style.cursor = 'grabbing';
+          queueCertRedraw();
+          break;
+        }
+      }
+      canvas.focus();
+      e.preventDefault();
+    });
+
+    canvas.addEventListener('pointermove', function(e) {
+      if (!_dragRow) return;
+      var c = canvasCoords(canvas, e);
+      if (Math.abs(c.px - _downPx) > 2 || Math.abs(c.py - _downPy) > 2) _dragMoved = true;
+      setRowXY(_dragRow, (c.px - _dragOffX) / canvas.width, (c.py - _dragOffY) / canvas.height);
+      queueCertRedraw();
+    });
+
+    canvas.addEventListener('pointerup', function(e) {
+      canvas.style.cursor = 'grab';
+      if (!_dragRow && !_dragMoved) {
+        // Clicked empty space: place the active radio row there (legacy click-to-place)
+        var activeRow = getActiveRow();
+        if (activeRow) {
+          var c = canvasCoords(canvas, e);
+          setRowXY(activeRow, c.px / canvas.width, c.py / canvas.height);
+          queueCertRedraw();
+        }
+      }
+      _dragRow = null;
+      _dragMoved = false;
+    });
+
+    canvas.addEventListener('keydown', function(e) {
+      var step = e.shiftKey ? 0.02 : 0.005;
+      var dx = 0, dy = 0;
+      if (e.key === 'ArrowLeft') dx = -step;
+      else if (e.key === 'ArrowRight') dx = step;
+      else if (e.key === 'ArrowUp') dy = -step;
+      else if (e.key === 'ArrowDown') dy = step;
+      else return;
+      var row = getActiveRow();
+      if (!row) return;
+      e.preventDefault();
+      var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+      var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+      setRowXY(row, x + dx, y + dy);
+      queueCertRedraw();
+    });
+  }
+
+  // Wire up once DOM is ready (script runs at end of body, canvas exists)
+  initCertCanvasInteraction();
+  window.initCertCanvasInteraction = initCertCanvasInteraction;
+})();
+
+// One-click preset placeholders (incl. Rank)
+window.addCertPreset = function(type) {
+  var presets = {
+    participant_name: { key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' },
+    medal_title:      { key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' },
+    distance:         { key: '<Distance>', type: 'distance', x: 0.55, y: 0.55, font_size: 30, color: '#1A1D20', font_style: 'bold', align: 'left' },
+    rank:             { key: '<Rank>', type: 'rank', x: 0.55, y: 0.62, font_size: 30, color: '#1A1D20', font_style: 'bold', align: 'left' },
+    points:           { key: '<Points>', type: 'points', x: 0.55, y: 0.69, font_size: 30, color: '#1A1D20', font_style: 'bold', align: 'left' },
+    medal_image:      { key: '<Medal Image>', type: 'medal_image', x: 0.28, y: 0.75, font_size: 120, color: '#1A1D20', font_style: 'normal', align: 'center' }
+  };
+  var p = presets[type];
+  if (!p) return;
+  addCertPlaceholderRow(p);
+  updateCertPreviewCanvas();
 };
 
 window.uploadMedalImage = async function(event, tier) {
