@@ -1,4 +1,4 @@
-﻿?<!DOCTYPE html>
+?<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -311,7 +311,7 @@ tr:hover td{background:#FAFAFA}
 <body>
           <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
+      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
       <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
     </div>
     
@@ -373,81 +373,230 @@ tr:hover td{background:#FAFAFA}
       <span class="section-chevron" id="chev-appbranding">&#9660;</span>
     </div>
     <div class="section-body" id="body-appbranding">
-      <div class="form-grid">
-        <div class="field"><label>App Name</label><input id="br-name" maxlength="40" placeholder="Arcgate"></div>
-        <div class="field"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
-        <div class="field"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
-        <div class="field"><label>Font Family (Google Font)</label>
-          <input id="br-font" list="google-fonts" placeholder="Type or select any Google Font..." value="Inter">
-          <datalist id="google-fonts">
-            <option value="Inter"><option value="Poppins"><option value="Roboto"><option value="Outfit">
-            <option value="Montserrat"><option value="Lato"><option value="Open Sans"><option value="Oswald">
-            <option value="Raleway"><option value="Playfair Display"><option value="Merriweather"><option value="Noto Sans">
-            <option value="Ubuntu"><option value="Nunito"><option value="Rubik"><option value="Lora">
-            <option value="Fira Sans"><option value="Quicksand"><option value="Work Sans"><option value="PT Sans">
-            <option value="Cabin"><option value="Mukta"><option value="Kanit"><option value="Barlow">
-            <option value="Titillium Web"><option value="Bebas Neue"><option value="Lobster"><option value="Pacifico">
-            <option value="system-ui">
-          </datalist>
+      <div class="branding-layout" style="display:flex; gap:32px; flex-wrap:wrap; align-items:flex-start;">
+        
+        <!-- Left Panel: Controls (60%) -->
+        <div class="branding-controls" style="flex: 1 1 500px; min-width:320px; display:flex; flex-direction:column; gap:20px;">
+          <!-- General & Typography Configuration Card -->
+          <div style="background:#fff; border:1px solid #e8e8e8; border-radius:12px; padding:20px;">
+            <h3 style="margin:0 0 16px 0; font-size:13.5px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px;"><i class="ti ti-typography" style="color:var(--brand); font-size:16px;"></i> Typography &amp; Content</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              
+              <!-- App Name Field Row -->
+              <div style="border-bottom:1px solid #f3f4f6; padding-bottom:16px;">
+                <div style="display:flex; gap:16px; align-items:flex-end;">
+                  <div class="field" style="flex:1;"><label>App Name</label><input id="br-name" maxlength="40" placeholder="Arcgate"></div>
+                  <div style="display:flex; align-items:center; gap:10px; background:#fafafa; padding:8px 12px; border-radius:8px; border:1px solid #eee; height:38px;">
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">Show</span>
+                    <label class="switch"><input type="checkbox" id="br-show-name" checked><span class="slider"></span></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Login Title Field Row -->
+              <div style="border-bottom:1px solid #f3f4f6; padding-bottom:16px;">
+                <div class="field" style="margin-bottom:10px;"><label>Login Title</label><input id="br-title" maxlength="60" placeholder="Welcome to Arcgate"></div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+                  <div style="display:flex; align-items:center; gap:10px; background:#fafafa; padding:8px 12px; border-radius:8px; border:1px solid #eee; height:38px;">
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">Show</span>
+                    <label class="switch"><input type="checkbox" id="br-show-title" checked><span class="slider"></span></label>
+                  </div>
+                  <div class="field" style="width:110px;"><label>Text Size (px)</label><input id="br-title-size" type="number" min="14" max="64" value="26"></div>
+                  <div class="field" style="flex:1; min-width:180px;"><label>Title Color</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-title-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-title-color-hex" placeholder="#FFFFFF" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tagline Field Row -->
+              <div>
+                <div class="field" style="margin-bottom:10px;"><label>Tagline</label><input id="br-tag" maxlength="90" placeholder="Celebrate. Move. Belong."></div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+                  <div style="display:flex; align-items:center; gap:10px; background:#fafafa; padding:8px 12px; border-radius:8px; border:1px solid #eee; height:38px;">
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">Show</span>
+                    <label class="switch"><input type="checkbox" id="br-show-tagline" checked><span class="slider"></span></label>
+                  </div>
+                  <div class="field" style="width:110px;"><label>Text Size (px)</label><input id="br-tag-size" type="number" min="10" max="32" value="14"></div>
+                  <div class="field" style="flex:1; min-width:180px;"><label>Tagline Color</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-tag-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-tag-color-hex" placeholder="#9CA3AF" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dashboard Layout Section -->
+              <div style="margin-top: 14px; border-top: 1px solid #f3f4f6; padding-top: 14px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#fafafa; padding:10px 14px; border-radius:8px; border:1px solid #eee;">
+                  <span style="font-size:12.5px; font-weight:600; color:var(--text-primary)">Enable Arc Progress Chart on Dashboard (Otherwise shows Three Medal Rings)</span>
+                  <label class="switch"><input type="checkbox" id="br-show-arc"><span class="slider"></span></label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Color Settings Card -->
+          <div style="background:#fff; border:1px solid #e8e8e8; border-radius:12px; padding:20px;">
+            <h3 style="margin:0 0 16px 0; font-size:13.5px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px;"><i class="ti ti-palette" style="color:var(--brand); font-size:16px;"></i> Global Theme</h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+              <div class="field" style="grid-column: 1 / -1;"><label>Font Family (Google Font)</label>
+                <input id="br-font" list="google-fonts" placeholder="Type or select any Google Font..." value="Inter">
+                <datalist id="google-fonts">
+                  <option value="Inter"><option value="Poppins"><option value="Roboto"><option value="Outfit">
+                  <option value="Montserrat"><option value="Lato"><option value="Open Sans"><option value="Oswald">
+                  <option value="Raleway"><option value="Playfair Display"><option value="Merriweather"><option value="Noto Sans">
+                  <option value="Ubuntu"><option value="Nunito"><option value="Rubik"><option value="Lora">
+                  <option value="Fira Sans"><option value="Quicksand"><option value="Work Sans"><option value="PT Sans">
+                  <option value="Cabin"><option value="Mukta"><option value="Kanit"><option value="Barlow">
+                  <option value="Titillium Web"><option value="Bebas Neue"><option value="Lobster"><option value="Pacifico">
+                  <option value="system-ui">
+                </datalist>
+              </div>
+              
+              <div class="field"><label>Accent Color</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input type="color" id="br-accent" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                  <input type="text" id="br-accent-hex" placeholder="#E8622A" style="flex:1" maxlength="7">
+                </div>
+              </div>
+              <div class="field"><label>Footnote Color</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input type="color" id="br-footnote-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                  <input type="text" id="br-footnote-color-hex" placeholder="#6B7280" style="flex:1" maxlength="7">
+                </div>
+              </div>
+
+              <!-- Overrides Section -->
+              <div style="grid-column: 1 / -1; margin-top: 10px; border-top: 1px solid #f3f4f6; padding-top: 14px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 11px; text-transform: uppercase; color: #888; letter-spacing: 0.5px; font-weight: 600;">Custom Accent Overrides (Defaults to Global Accent)</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                  <div class="field"><label>Login Screen Accent</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-login" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-login-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                  <div class="field"><label>Map Track Accent</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-map" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-map-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                  <div class="field"><label>Dashboard Progress Ring</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-progress" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-progress-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                  <div class="field"><label>Avatar Border Accent</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-avatar" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-avatar-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                  <div class="field"><label>Certificate Frame Accent</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-cert" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-cert-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                  <div class="field"><label>Event Highlight Accent</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="color" id="br-accent-event" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
+                      <input type="text" id="br-accent-event-hex" placeholder="Default" style="flex:1" maxlength="7">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Logo Management Card -->
+          <div style="background:#fff; border:1px solid #e8e8e8; border-radius:12px; padding:20px;">
+            <h3 style="margin:0 0 16px 0; font-size:13.5px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px;"><i class="ti ti-photo" style="color:var(--brand); font-size:16px;"></i> Logo Settings</h3>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="field"><label>Logo URL &amp; Upload</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input id="br-logo" placeholder="https://… or upload →" style="flex:1">
+                  <button type="button" class="btn-save-ch" id="btn-brlogo-up">Upload</button>
+                  <input type="file" id="brlogo-file" accept="image/*" style="display:none">
+                </div>
+              </div>
+              
+              <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+                <div style="display:flex; align-items:center; gap:10px; background:#fafafa; padding:8px 12px; border-radius:8px; border:1px solid #eee; height:38px;">
+                  <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">Show</span>
+                  <label class="switch"><input type="checkbox" id="br-show-logo" checked><span class="slider"></span></label>
+                </div>
+                <div class="field" style="width:110px;"><label>Width (px)</label><input id="br-logo-size" type="number" min="30" max="400" value="120"></div>
+                <div class="field" style="flex:1; min-width:140px;"><label>Logo Color filter</label>
+                  <select id="br-logo-filter">
+                    <option value="none">Original (no filter)</option>
+                    <option value="white">Force White</option>
+                    <option value="black">Force Black</option>
+                  </select>
+                </div>
+                <div class="field" style="flex:1; min-width:140px;"><label>Position</label>
+                  <select id="br-logo-pos">
+                    <option value="top">Top (above App Name)</option>
+                    <option value="center">Center (between App Name &amp; Title)</option>
+                    <option value="hidden">Hidden</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save actions -->
+          <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+            <button class="save-btn" onclick="saveBranding()">Save Branding Settings</button>
+            <span class="saved-msg" id="branding-saved">&#9989; Saved!</span>
+            <div id="branding-msg-err" class="msg err"></div>
+          </div>
+
         </div>
-        <div class="field"><label>Title Text Size (px)</label><input id="br-title-size" type="number" min="14" max="64" value="26"></div>
-        <div class="field"><label>Tagline Text Size (px)</label><input id="br-tag-size" type="number" min="10" max="32" value="14"></div>
-        <div class="field"><label>Accent Color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="br-accent" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
-            <input type="text" id="br-accent-hex" placeholder="#E8622A" style="flex:1" maxlength="7">
+
+        <!-- Right Panel: Live Mockup Preview (40%) -->
+        <div class="branding-preview-pane" style="flex: 0 0 360px; position:-webkit-sticky; position:sticky; top:20px; z-index:10;">
+          <div id="branding-live-preview-box" style="width:360px; background:#0F1117; border-radius:20px; padding:32px 24px; box-shadow:0 12px 40px rgba(0,0,0,0.18); border:1px solid #1f2937; overflow:hidden; display:flex; flex-direction:column; align-items:center; box-sizing:border-box; transition:all 0.3s;">
+            <span style="font-size:10px; color:#6b7280; text-transform:uppercase; font-weight:700; letter-spacing:1px; margin-bottom:20px; align-self:flex-start; font-family:sans-serif;">Live Login Preview</span>
+            
+            <div id="prev-elements-container" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+              <!-- Logo Container -->
+              <div id="prev-logo-wrap" style="height:64px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                <img id="prev-logo-img" src="" style="max-height:60px; max-width:140px; object-fit:contain; display:none;">
+                <div id="prev-logo-fallback" style="width:52px; height:52px; border-radius:14px; background:#E8622A; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">🏆</div>
+              </div>
+
+              <!-- App Name -->
+              <div id="prev-app-name" style="font-size:20px; font-weight:900; color:#E8622A; text-align:center; margin-top:-6px; margin-bottom:16px; letter-spacing:-0.5px;">Arcgate</div>
+
+              <!-- Title -->
+              <div id="prev-login-title" style="font-size:22px; font-weight:900; color:#fff; text-align:center; line-height:1.2; letter-spacing:-0.5px; margin-bottom:8px;">Welcome to Arcgate</div>
+
+              <!-- Tagline -->
+              <div id="prev-login-sub" style="font-size:12px; color:rgba(255, 255, 255, 0.4); text-align:center; line-height:1.5; margin-bottom:20px; max-width:240px;">Celebrate. Move. Belong.</div>
+            </div>
+
+            <!-- Card Body (Glass Mock) -->
+            <div style="width:100%; background:rgba(255, 255, 255, 0.04); border:1px solid rgba(255, 255, 255, 0.09); border-radius:14px; padding:18px 16px 16px; box-sizing:border-box;">
+              <label style="display:block; font-size:10px; font-weight:600; color:rgba(255, 255, 255, 0.35); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Registered Email</label>
+              <div style="width:100%; padding:10px 12px; background:rgba(255, 255, 255, 0.06); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; color:rgba(255,255,255,0.4); font-size:13px; box-sizing:border-box; margin-bottom:12px;">you@company.com</div>
+              <button id="prev-login-btn" style="width:100%; padding:11px; background:#E8622A; border:1px solid #E8622A; border-radius:9px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 4px 14px rgba(232, 98, 42, 0.25);">Send Login Code</button>
+              <div style="font-size:10px; color:rgba(255, 255, 255, 0.3); text-align:center; margin-top:12px;">By continuing, you agree to our Terms and Privacy.</div>
+            </div>
+
+            <!-- Footnote -->
+            <p id="prev-footnote" style="font-size:10px; color:#6b7280; text-align:center; margin-top:20px; margin-bottom:0;">Sessions last 30 days · Read-only · Never posts to Strava</p>
           </div>
         </div>
-        <div class="field"><label>Title Color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="br-title-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
-            <input type="text" id="br-title-color-hex" placeholder="#FFFFFF" style="flex:1" maxlength="7">
-          </div>
-        </div>
-        <div class="field"><label>Tagline Color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="br-tag-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
-            <input type="text" id="br-tag-color-hex" placeholder="#9CA3AF" style="flex:1" maxlength="7">
-          </div>
-        </div>
-        <div class="field"><label>Footnote Color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="br-footnote-color" style="width:48px;height:36px;padding:2px;border:1px solid #e8e8e8;border-radius:6px;background:none;cursor:pointer">
-            <input type="text" id="br-footnote-color-hex" placeholder="#6B7280" style="flex:1" maxlength="7">
-          </div>
-        </div>
-        <div class="field"><label>Logo URL &amp; Upload</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input id="br-logo" placeholder="https://… or upload →" style="flex:1">
-            <button type="button" class="btn-save-ch" id="btn-brlogo-up">Upload</button>
-            <input type="file" id="brlogo-file" accept="image/*" style="display:none">
-          </div>
-        </div>
-        <div class="field"><label>Logo Width (px)</label><input id="br-logo-size" type="number" min="30" max="400" value="120"></div>
-        <div class="field"><label>Logo Color</label>
-          <select id="br-logo-filter">
-            <option value="none">Original (no filter)</option>
-            <option value="white">Force White</option>
-            <option value="black">Force Black</option>
-          </select>
-        </div>
-        <div class="field"><label>Logo Position</label>
-          <select id="br-logo-pos">
-            <option value="top">Top (above App Name)</option>
-            <option value="center">Center (between App Name &amp; Title)</option>
-            <option value="hidden">Hidden</option>
-          </select>
-        </div>
-      </div>
-      <div style="margin-top:14px;background:#0F1117;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;min-height:60px">
-        <img id="br-logo-preview" style="max-height:60px;max-width:200px;object-fit:contain;display:none">
-        <span id="br-logo-empty" style="color:#9CA3AF;font-size:12px">No logo set — preview appears here</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-        <button class="save-btn" onclick="saveBranding()">Save Branding</button>
-        <button class="btn-save-ch" id="btn-br-preview" type="button" style="background:#f5f5f5;color:#333;">👁️ Show Preview</button>
-        <span class="saved-msg" id="branding-saved">&#9989; Saved!</span>
-        <div id="branding-msg-err" class="msg err"></div>
+
       </div>
     </div>
   </div>
@@ -537,8 +686,8 @@ function getActDate(a) {
   }
   return getISTDate(a.activity_date);
 }
-var SB_URL='https://jhdgkncpkrttvemvwukc.supabase.co';
-var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
+var SB_URL='https://jglvwxeaqiswpxzcofmy.supabase.co';
+var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
 var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON,'Content-Type':'application/json'};
 var _BU= window.BACKEND_URL;function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
@@ -774,9 +923,42 @@ async function loadBrandingConfig(){
     document.getElementById('br-footnote-color').value = footCol;
     document.getElementById('br-footnote-color-hex').value = footCol;
 
+    var accentLogin = br.login_accent_color || '';
+    document.getElementById('br-accent-login').value = accentLogin || accent;
+    document.getElementById('br-accent-login-hex').value = accentLogin;
+
+    var accentMap = br.map_accent_color || '';
+    document.getElementById('br-accent-map').value = accentMap || accent;
+    document.getElementById('br-accent-map-hex').value = accentMap;
+
+    var accentProg = br.progress_accent_color || '';
+    document.getElementById('br-accent-progress').value = accentProg || accent;
+    document.getElementById('br-accent-progress-hex').value = accentProg;
+
+    var accentAv = br.avatar_accent_color || '';
+    document.getElementById('br-accent-avatar').value = accentAv || accent;
+    document.getElementById('br-accent-avatar-hex').value = accentAv;
+
+    var accentCert = br.cert_accent_color || '';
+    document.getElementById('br-accent-cert').value = accentCert || accent;
+    document.getElementById('br-accent-cert-hex').value = accentCert;
+
+    var accentEv = br.event_accent_color || '';
+    document.getElementById('br-accent-event').value = accentEv || accent;
+    document.getElementById('br-accent-event-hex').value = accentEv;
+
     document.getElementById('br-logo-size').value = br.logo_width || 120;
     document.getElementById('br-logo-pos').value = br.logo_position || 'top';
-    updateLogoPreview(br.logo_url || '');
+    document.getElementById('br-show-name').checked = br.show_app_name !== false;
+    document.getElementById('br-show-title').checked = br.show_login_title !== false;
+    document.getElementById('br-show-tagline').checked = br.show_tagline !== false;
+    document.getElementById('br-show-logo').checked = br.show_logo !== false;
+    document.getElementById('br-show-arc').checked = br.show_arc_on_dashboard === true;
+    updateLivePreview();
+    if (!window._prevListenersBound) {
+      initLivePreviewListeners();
+      window._prevListenersBound = true;
+    }
   } catch(e) {
     console.warn('Failed to load branding config:', e);
   }
@@ -786,59 +968,175 @@ function logoFilterCss(mode){
   if (mode === 'black') return 'brightness(0)';
   return 'none';
 }
-function updateLogoPreview(url){
-  var img = document.getElementById('br-logo-preview'), empty = document.getElementById('br-logo-empty');
-  var filterSel = document.getElementById('br-logo-filter');
-  var filterMode = filterSel ? filterSel.value : 'none';
-  if (url) { img.src = url; img.style.display = 'block'; img.style.filter = logoFilterCss(filterMode); empty.style.display = 'none'; }
-  else { img.style.display = 'none'; empty.style.display = 'block'; }
+function hexToRgba(hex, alpha) {
+  if (!hex) return 'rgba(232,98,42,' + alpha + ')';
+  var c = hex.replace('#', '');
+  if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+  var rVal = parseInt(c.substring(0, 2), 16);
+  var gVal = parseInt(c.substring(2, 4), 16);
+  var bVal = parseInt(c.substring(4, 6), 16);
+  return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
 }
-document.getElementById('br-logo').addEventListener('input', function(){ updateLogoPreview(this.value.trim()); });
-document.getElementById('br-logo-filter').addEventListener('change', function(){ updateLogoPreview(document.getElementById('br-logo').value.trim()); });
+function loadPreviewGoogleFont(fontName) {
+  if (!fontName) return;
+  var linkId = 'prev-gfont-' + fontName.replace(/\s+/g, '-').toLowerCase();
+  if (!document.getElementById(linkId)) {
+    var link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontName) + ':wght@300;400;500;600;700;800;900&display=swap';
+    document.head.appendChild(link);
+  }
+  var pBox = document.getElementById('branding-live-preview-box');
+  if (pBox) pBox.style.fontFamily = `"${fontName}", sans-serif`;
+}
+function updateLivePreview() {
+  const name = document.getElementById('br-name').value.trim() || 'Arcgate';
+  const title = document.getElementById('br-title').value.trim() || 'Welcome to Arcgate';
+  const tagline = document.getElementById('br-tag').value.trim() || 'Celebrate. Move. Belong.';
+  const logoUrl = document.getElementById('br-logo').value.trim();
+  const logoFilter = document.getElementById('br-logo-filter').value;
+  const logoWidth = parseInt(document.getElementById('br-logo-size').value) || 120;
+  const logoPos = document.getElementById('br-logo-pos').value;
+  const accent = document.getElementById('br-accent-hex').value.trim() || '#E8622A';
+  const accentLogin = document.getElementById('br-accent-login-hex').value.trim() || accent;
+  const titleCol = document.getElementById('br-title-color-hex').value.trim() || '#FFFFFF';
+  const tagCol = document.getElementById('br-tag-color-hex').value.trim() || '#9CA3AF';
+  const footCol = document.getElementById('br-footnote-color-hex').value.trim() || '#6B7280';
+  const font = document.getElementById('br-font').value || 'Inter';
+  
+  const showName = document.getElementById('br-show-name').checked;
+  const showTitle = document.getElementById('br-show-title').checked;
+  const showTag = document.getElementById('br-show-tagline').checked;
+  const showLogo = document.getElementById('br-show-logo').checked;
+
+  loadPreviewGoogleFont(font);
+
+  const prevAppName = document.getElementById('prev-app-name');
+  if (prevAppName) {
+    prevAppName.textContent = name;
+    prevAppName.style.color = accent;
+    prevAppName.style.display = showName ? 'block' : 'none';
+  }
+
+  const prevTitle = document.getElementById('prev-login-title');
+  if (prevTitle) {
+    prevTitle.textContent = title;
+    prevTitle.style.color = titleCol;
+    prevTitle.style.fontSize = Math.max(14, (parseInt(document.getElementById('br-title-size').value) || 26) * 0.8) + 'px';
+    prevTitle.style.display = showTitle ? 'block' : 'none';
+  }
+
+  const prevTag = document.getElementById('prev-login-sub');
+  if (prevTag) {
+    prevTag.textContent = tagline;
+    prevTag.style.color = tagCol;
+    prevTag.style.fontSize = Math.max(10, (parseInt(document.getElementById('br-tag-size').value) || 14) * 0.8) + 'px';
+    prevTag.style.display = showTag ? 'block' : 'none';
+  }
+
+  const prevFootnote = document.getElementById('prev-footnote');
+  if (prevFootnote) {
+    prevFootnote.style.color = footCol;
+  }
+
+  const prevBtn = document.getElementById('prev-login-btn');
+  if (prevBtn) {
+    prevBtn.style.backgroundColor = accentLogin;
+    prevBtn.style.borderColor = accentLogin;
+    prevBtn.style.boxShadow = `0 4px 14px ${hexToRgba(accentLogin, 0.25)}`;
+  }
+
+  const prevLogoImg = document.getElementById('prev-logo-img');
+  const prevLogoFallback = document.getElementById('prev-logo-fallback');
+  const prevLogoWrap = document.getElementById('prev-logo-wrap');
+  
+  if (prevLogoWrap) {
+    if (showLogo) {
+      prevLogoWrap.style.display = 'flex';
+      if (logoUrl) {
+        prevLogoImg.src = logoUrl;
+        prevLogoImg.style.display = 'block';
+        prevLogoImg.style.width = Math.min(140, logoWidth * 0.8) + 'px';
+        prevLogoImg.style.filter = logoFilterCss(logoFilter);
+        prevLogoFallback.style.display = 'none';
+      } else {
+        prevLogoImg.style.display = 'none';
+        prevLogoFallback.style.display = 'flex';
+        prevLogoFallback.style.backgroundColor = accent;
+      }
+    } else {
+      prevLogoWrap.style.display = 'none';
+    }
+  }
+
+  const container = document.getElementById('prev-elements-container');
+  if (container && prevLogoWrap && prevAppName && prevTitle) {
+    if (logoPos === 'center') {
+      container.insertBefore(prevLogoWrap, prevTitle);
+    } else if (logoPos === 'hidden') {
+      prevLogoWrap.style.display = 'none';
+    } else { // top
+      container.insertBefore(prevLogoWrap, prevAppName);
+    }
+  }
+}
+function initLivePreviewListeners() {
+  const inputs = [
+    'br-name', 'br-title', 'br-tag', 'br-font', 'br-title-size', 'br-tag-size',
+    'br-logo', 'br-logo-size', 'br-logo-filter', 'br-logo-pos',
+    'br-accent-hex', 'br-title-color-hex', 'br-tag-color-hex', 'br-footnote-color-hex',
+    'br-accent-login-hex', 'br-accent-map-hex', 'br-accent-progress-hex', 'br-accent-avatar-hex', 'br-accent-cert-hex', 'br-accent-event-hex',
+    'br-show-name', 'br-show-title', 'br-show-tagline', 'br-show-logo', 'br-show-arc'
+  ];
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const eventType = el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(eventType, updateLivePreview);
+    }
+  });
+}
+
 document.getElementById('btn-brlogo-up').addEventListener('click', function(){ document.getElementById('brlogo-file').click(); });
 document.getElementById('brlogo-file').addEventListener('change', function(){
   var f = this.files[0]; this.value = ''; if (!f) return;
   var rd = new FileReader();
   rd.onload = async function(){
     var r = await brandingApi('/admin/upload-image', { method:'POST', body: JSON.stringify({ data: rd.result }) });
-    if (r.success) { document.getElementById('br-logo').value = r.url; updateLogoPreview(r.url); }
-    else alert(r.error || 'Upload failed');
+    if (r.success) {
+      document.getElementById('br-logo').value = r.url;
+      updateLivePreview();
+    } else alert(r.error || 'Upload failed');
   };
   rd.readAsDataURL(f);
 });
+
 function bindColorPair(pickerId, hexId){
   var picker = document.getElementById(pickerId);
   var hexInput = document.getElementById(hexId);
-  picker.addEventListener('input', function(){ hexInput.value = this.value.toUpperCase(); });
+  picker.addEventListener('input', function(){
+    hexInput.value = this.value.toUpperCase();
+    updateLivePreview();
+  });
   hexInput.addEventListener('input', function(){
     var val = this.value.trim();
-    if (val.match(/^#[0-9A-F]{6}$/i)) picker.value = val;
+    if (val.match(/^#[0-9A-F]{6}$/i)) {
+      picker.value = val;
+      updateLivePreview();
+    }
   });
 }
 bindColorPair('br-accent', 'br-accent-hex');
 bindColorPair('br-title-color', 'br-title-color-hex');
 bindColorPair('br-tag-color', 'br-tag-color-hex');
 bindColorPair('br-footnote-color', 'br-footnote-color-hex');
-document.getElementById('btn-br-preview').addEventListener('click', function(){
-  var previewObj = {
-    app_name: document.getElementById('br-name').value.trim(),
-    login_title: document.getElementById('br-title').value.trim(),
-    tagline: document.getElementById('br-tag').value.trim(),
-    logo_url: document.getElementById('br-logo').value.trim(),
-    logo_filter: document.getElementById('br-logo-filter').value,
-    accent_color: document.getElementById('br-accent-hex').value.trim(),
-    font_family: document.getElementById('br-font').value,
-    title_size: parseInt(document.getElementById('br-title-size').value) || 26,
-    tagline_size: parseInt(document.getElementById('br-tag-size').value) || 14,
-    title_color: document.getElementById('br-title-color-hex').value.trim(),
-    tagline_color: document.getElementById('br-tag-color-hex').value.trim(),
-    footnote_color: document.getElementById('br-footnote-color-hex').value.trim(),
-    logo_width: parseInt(document.getElementById('br-logo-size').value) || 120,
-    logo_position: document.getElementById('br-logo-pos').value
-  };
-  localStorage.setItem('ag_branding_preview_temp', JSON.stringify(previewObj));
-  window.open('index.html?preview=1', '_blank');
-});
+bindColorPair('br-accent-login', 'br-accent-login-hex');
+bindColorPair('br-accent-map', 'br-accent-map-hex');
+bindColorPair('br-accent-progress', 'br-accent-progress-hex');
+bindColorPair('br-accent-avatar', 'br-accent-avatar-hex');
+bindColorPair('br-accent-cert', 'br-accent-cert-hex');
+bindColorPair('br-accent-event', 'br-accent-event-hex');
 async function saveBranding(){
   var errEl = document.getElementById('branding-msg-err');
   errEl.textContent = '';
@@ -855,8 +1153,19 @@ async function saveBranding(){
     title_color: document.getElementById('br-title-color-hex').value.trim(),
     tagline_color: document.getElementById('br-tag-color-hex').value.trim(),
     footnote_color: document.getElementById('br-footnote-color-hex').value.trim(),
+    login_accent_color: document.getElementById('br-accent-login-hex').value.trim(),
+    map_accent_color: document.getElementById('br-accent-map-hex').value.trim(),
+    progress_accent_color: document.getElementById('br-accent-progress-hex').value.trim(),
+    avatar_accent_color: document.getElementById('br-accent-avatar-hex').value.trim(),
+    cert_accent_color: document.getElementById('br-accent-cert-hex').value.trim(),
+    event_accent_color: document.getElementById('br-accent-event-hex').value.trim(),
     logo_width: parseInt(document.getElementById('br-logo-size').value) || 120,
-    logo_position: document.getElementById('br-logo-pos').value
+    logo_position: document.getElementById('br-logo-pos').value,
+    show_app_name: document.getElementById('br-show-name').checked,
+    show_login_title: document.getElementById('br-show-title').checked,
+    show_tagline: document.getElementById('br-show-tagline').checked,
+    show_logo: document.getElementById('br-show-logo').checked,
+    show_arc_on_dashboard: document.getElementById('br-show-arc').checked
   };
   try {
     var r = await brandingApi('/admin/celebrate/config', { method:'POST', body: JSON.stringify({ config_key:'branding', config_value:value }) });
