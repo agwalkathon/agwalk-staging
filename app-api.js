@@ -2761,9 +2761,18 @@ window.downloadPastCertAction = function(type, pastEventId) {
 
         if (tier && medalsCfg && medalsCfg[tier] && medalsCfg[tier].image_url) {
           imgUrl = medalsCfg[tier].image_url;
-        } else if (tier) {
-          imgUrl = 'medal_' + tier + '_medal.png'; // local fallback
         }
+
+        var drawEmojiMedal = function() {
+          if (!tier) return; // 'Participant' (no medal earned): draw nothing
+          var emoji = tier === 'gold' ? '\uD83E\uDD47' : tier === 'silver' ? '\uD83E\uDD48' : '\uD83E\uDD49';
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = Math.round(size * 0.9) + 'px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+          ctx.fillText(emoji, w * p.x, h * p.y);
+          ctx.restore();
+        };
 
         if (imgUrl) {
           var pms = new Promise(function(resolve) {
@@ -2774,12 +2783,15 @@ window.downloadPastCertAction = function(type, pastEventId) {
               resolve();
             };
             img.onerror = function() {
-              console.warn('Failed to load medal image: ' + imgUrl);
+              console.warn('Failed to load medal image, using emoji fallback: ' + imgUrl);
+              drawEmojiMedal();
               resolve();
             };
             img.src = imgUrl;
           });
           imagePromises.push(pms);
+        } else {
+          drawEmojiMedal();
         }
       }
     });
