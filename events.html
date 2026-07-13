@@ -56,10 +56,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <title>Events — Arcgate Walkathon</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -2171,7 +2168,7 @@ async function loadActivityStatsForEvent(ev) {
   try {
     var url = SB_URL + '/rest/v1/activities?event_id=eq.' + ev.id + '&is_deleted=eq.false&order=activity_date_time_ist.desc,id.desc&select=strava_athlete_id,distance_meters,sport_type,activity_date_time_ist&limit=5';
     var res = await fetch(url, {
-      headers: Object.assign({}, HDR, { 'Prefer': 'count=exact' })
+      headers: Object.assign({}, HDR, { 'Prefer': 'count=estimated' })
     });
     var range = res.headers.get('content-range');
     var totalCount = 0;
@@ -2520,6 +2517,15 @@ window.updateCertPreviewCanvas = function(forceReload) {
   if (!forceReload && _certBgCanvas && _certBgUrl === url) {
     queueCertRedraw();
     return;
+  }
+
+  // pdf.js is loaded with defer; wait briefly if this fires before it finishes loading
+  if (typeof pdfjsLib === 'undefined') {
+    setTimeout(function() { window.updateCertPreviewCanvas(forceReload); }, 200);
+    return;
+  }
+  if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   }
 
   var renderPreview = function(pdfDoc) {
