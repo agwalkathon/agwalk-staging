@@ -1406,34 +1406,66 @@ async function submitActivityReport() {
 window._shareActivityData = null;
 window._shareThemeIndex = 0;
 window._shareBgTransparent = false;
+window._shareSplits = null;
+
+// 6 glassmorphic accent themes (approved mockup): Teal, Amber, Violet, Ocean, Rose, Mono
+var SHARE_THEMES = [
+  { name: 'Teal',   accent: '#2ED9A3', barHi: '#D9FFF2', glowRGB: '46,217,163'  },
+  { name: 'Amber',  accent: '#FF9F45', barHi: '#FFE9D2', glowRGB: '255,159,69'  },
+  { name: 'Violet', accent: '#A78BFA', barHi: '#EDE6FF', glowRGB: '167,139,250' },
+  { name: 'Ocean',  accent: '#4FB6FF', barHi: '#DCF0FF', glowRGB: '79,182,255'  },
+  { name: 'Rose',   accent: '#FF6B8B', barHi: '#FFE1E8', glowRGB: '255,107,139' },
+  { name: 'Mono',   accent: '#C7CDD1', barHi: '#F2F4F5', glowRGB: '200,208,213' }
+];
 
 function showShareSheet() {
   var sh = document.getElementById('share-sheet');
   if (sh) sh.style.display = 'flex';
-  
-  window._shareThemeIndex = 0;
+
+  // Pre-select theme by sport: Ride -> Amber, everything else -> Teal
+  var act = window._shareActivityData || {};
+  var st = (act.sport_type || act.type || 'walk').toLowerCase();
+  var isRide = st === 'ride' || st === 'virtualride' || st === 'mountainbikeride' || st === 'cycling';
+  window._shareThemeIndex = isRide ? 1 : 0;
   window._shareBgTransparent = false;
-  
+  window._shareSplits = null;
+
   var toggle = document.getElementById('share-bg-toggle');
   if (toggle) toggle.checked = false;
-  
-  updateThemeButtons(0);
-  
+
+  updateThemeButtons(window._shareThemeIndex);
+
   setTimeout(function() {
     window.renderShareCard();
   }, 100);
+
+  // Load real per-km splits for the effort bars, then re-render
+  var actId = window._currentStravaActivityId;
+  if (actId && typeof SUPABASE_URL !== 'undefined' && typeof HDR !== 'undefined') {
+    fetch(SUPABASE_URL + '/rest/v1/activity_splits?activity_id=eq.' + actId + '&order=split_number.asc', { headers: HDR })
+      .then(function(r) { return r.json(); })
+      .then(function(splits) {
+        if (splits && splits.length > 1) {
+          window._shareSplits = splits;
+          window.renderShareCard();
+        }
+      })
+      .catch(function(e) { console.warn('Share splits load failed:', e); });
+  }
 }
 
 function updateThemeButtons(activeIndex) {
-  for (var i = 0; i < 5; i++) {
+  for (var i = 0; i < SHARE_THEMES.length; i++) {
     var btn = document.getElementById('theme-btn-' + i);
     if (!btn) continue;
     var check = btn.querySelector('span');
     if (i === activeIndex) {
-      btn.style.border = '2px solid #3b82f6';
+      btn.style.border = '2px solid #ffffff';
+      btn.style.transform = 'scale(1.12)';
       if (check) check.style.display = 'inline';
     } else {
       btn.style.border = '2px solid rgba(255,255,255,0.1)';
+      btn.style.transform = 'scale(1)';
       if (check) check.style.display = 'none';
     }
   }
@@ -1458,19 +1490,21 @@ window.toggleShareBg = function() {
 window.renderShareCard = function() {
   var act = window._shareActivityData;
   if (!act) return;
-  
+
   var canvas = document.getElementById('share-card-canvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
-  
-  // Instagram Story 9:16 Vertical Canvas
-  var W = 600;
-  var H = 1066;
+
+  // Instagram Story 9:16 vertical canvas
+  var W = 600, H = 1066;
   canvas.width = W;
   canvas.height = H;
-  
   ctx.clearRect(0, 0, W, H);
-  
+
+  var TH = SHARE_THEMES[window._shareThemeIndex] || SHARE_THEMES[0];
+  var accent = TH.accent;
+  var glow = function(a) { return 'rgba(' + TH.glowRGB + ',' + a + ')'; };
+
   var _crr = function(ctx, x, y, w, h, r) {
     ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
     ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
@@ -1482,329 +1516,278 @@ window.renderShareCard = function() {
   var drawBlob = function(x, y, r, color) {
     var g = ctx.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, color);
-    g.addColorStop(1, 'transparent');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.fill();
   };
 
-  // Theme Configurations (Vivid Glassmorphic & Card Styles)
-  var isDark = true;
-  var cardBgColor = 'rgba(255, 255, 255, 0.07)'; // Frosted White Glass pane (highly visible!)
-  var textColor = '#ffffff'; // Crisp white values
-  var labelColor = 'rgba(255, 255, 255, 0.55)'; // Semi-transparent white labels
-  var routeColor = '#E8622A'; // Brand Orange Route Core
-  var logoColor = '#ffffff'; // Inverted white logo (white filter!)
-  var blob1Col = 'rgba(99, 102, 241, 0.32)'; // Vivid Indigo ambient glow
-  var blob2Col = 'rgba(232, 98, 42, 0.32)'; // Vivid Brand Orange ambient glow
-  var gridVisible = true;
-  
-  if (window._shareThemeIndex === 1) {
-    // Frosted Terracotta Sunrise
-    cardBgColor = 'rgba(255, 255, 255, 0.18)'; // Frosted White Glass
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.75)';
-    routeColor = '#7c2d12'; // Dark terracotta core
-    logoColor = '#ffffff';
-    blob1Col = 'rgba(251, 146, 60, 0.4)';
-    blob2Col = 'rgba(239, 68, 68, 0.3)';
-    gridVisible = false;
-  } else if (window._shareThemeIndex === 2) {
-    // Frosted Emerald Jade
-    cardBgColor = 'rgba(255, 255, 255, 0.06)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#E8622A';
-    blob1Col = 'rgba(16, 185, 129, 0.38)';
-    blob2Col = 'rgba(232, 98, 42, 0.22)';
-  } else if (window._shareThemeIndex === 3) {
-    // Frosted Tech Indigo
-    cardBgColor = 'rgba(255, 255, 255, 0.07)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#E8622A';
-    blob1Col = 'rgba(99, 102, 241, 0.42)';
-    blob2Col = 'rgba(232, 98, 42, 0.25)';
-  } else if (window._shareThemeIndex === 4) {
-    // Frosted Obsidian Black
-    cardBgColor = 'rgba(255, 255, 255, 0.03)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#E8622A';
-    blob1Col = 'rgba(232, 98, 42, 0.25)';
-    blob2Col = 'rgba(255, 255, 255, 0.02)';
-    gridVisible = false;
-  }
-
+  // ---- Backdrop ----
   if (!window._shareBgTransparent) {
-    // Draw background linear gradient
     var bgGrad = ctx.createLinearGradient(0, 0, W, H);
-    if (window._shareThemeIndex === 1) {
-      bgGrad.addColorStop(0, '#3f1b0d');
-      bgGrad.addColorStop(1, '#54200d');
-    } else if (window._shareThemeIndex === 2) {
-      bgGrad.addColorStop(0, '#081a11');
-      bgGrad.addColorStop(1, '#162c1f');
-    } else if (window._shareThemeIndex === 3) {
-      bgGrad.addColorStop(0, '#0b1021');
-      bgGrad.addColorStop(1, '#192035');
-    } else if (window._shareThemeIndex === 4) {
-      bgGrad.addColorStop(0, '#050506');
-      bgGrad.addColorStop(1, '#0f0f12');
-    } else {
-      bgGrad.addColorStop(0, '#0f1319');
-      bgGrad.addColorStop(1, '#1a1d24');
-    }
+    bgGrad.addColorStop(0, '#14181B');
+    bgGrad.addColorStop(1, '#1B2126');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
-    
-    // Draw ambient background glassmorphism glows
-    drawBlob(80, 120, 420, blob1Col);
-    drawBlob(W - 80, H - 200, 460, blob2Col);
+    // Ambient accent glow behind glass (top + bottom, like mockup)
+    drawBlob(W/2, 140, 420, glow(0.16));
+    drawBlob(W/2, H - 160, 400, glow(0.13));
   }
-  
-  // Draw outer rounded card (frosted glass pane)
+
+  // ---- Glass card ----
+  var CX = 28, CY = 28, CW = W - 56, CH = H - 56, CR = 40;
   ctx.save();
-  ctx.fillStyle = window._shareBgTransparent ? 'rgba(30, 41, 59, 0.85)' : cardBgColor;
-  
-  // Draw premium soft, wide drop shadow on card for depth
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-  ctx.shadowBlur = 32;
-  ctx.shadowOffsetY = 15;
-  _crr(ctx, 24, 24, W - 48, H - 48, 36);
-  ctx.fill();
-  ctx.restore();
-  
-  // Draw card border (Linear gradient glass edge highlight)
-  ctx.save();
-  var borderGrad = ctx.createLinearGradient(24, 24, W - 24, H - 24);
-  if (window._shareThemeIndex === 4) {
-    borderGrad.addColorStop(0, 'rgba(232, 98, 42, 0.28)');
-    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
-    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
-  } else if (window._shareThemeIndex === 1) {
-    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
-    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.04)');
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 34;
+  ctx.shadowOffsetY = 16;
+  var cardGrad = ctx.createLinearGradient(CX, CY, CX + CW*0.4, CY + CH);
+  if (window._shareBgTransparent) {
+    cardGrad.addColorStop(0, 'rgba(34,41,47,0.94)');
+    cardGrad.addColorStop(1, 'rgba(24,29,33,0.94)');
   } else {
-    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
-    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)');
-    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+    cardGrad.addColorStop(0, 'rgba(255,255,255,0.10)');
+    cardGrad.addColorStop(0.38, 'rgba(255,255,255,0.045)');
+    cardGrad.addColorStop(1, 'rgba(255,255,255,0.02)');
   }
-  ctx.strokeStyle = borderGrad;
-  ctx.lineWidth = 1.8;
-  _crr(ctx, 24, 24, W - 48, H - 48, 36);
-  ctx.stroke();
-  ctx.restore();
-  
-  // Subtle card grid overlay
-  if (gridVisible && !window._shareBgTransparent) {
-    ctx.save();
-    ctx.beginPath();
-    _crr(ctx, 24, 24, W - 48, H - 48, 36);
-    ctx.clip();
-    
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.01)';
-    ctx.lineWidth = 1;
-    for (var x = 24 + 24; x < W - 24; x += 24) {
-      ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
-    }
-    for (var y = 24 + 24; y < H - 24; y += 24) {
-      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(W - 24, y); ctx.stroke();
-    }
-    ctx.restore();
-  }
-  
-  // 1. Draw Activity Name (left-aligned)
-  var actName = act.activity_name || 'Activity';
-  ctx.font = "bold 23px 'Poppins', system-ui, sans-serif"; // Slightly smaller white text
-  ctx.fillStyle = textColor;
-  var maxNameW = W - 200;
-  var actNameTruncated = actName;
-  if (ctx.measureText(actNameTruncated).width > maxNameW) {
-    while (ctx.measureText(actNameTruncated + '...').width > maxNameW && actNameTruncated.length > 0) {
-      actNameTruncated = actNameTruncated.substring(0, actNameTruncated.length - 1);
-    }
-    actNameTruncated += '...';
-  }
-  ctx.fillText(actNameTruncated, 56, 95);
-  
-  // 2. Draw Location (left-aligned)
-  var locText = act.location || 'Udaipur, RJ, India';
-  ctx.font = "500 14px 'Poppins', system-ui, sans-serif"; // Slightly smaller gray text
-  ctx.fillStyle = labelColor;
-  ctx.fillText(locText, 56, 126);
-  
-  // 3. Draw Inverted White Logo in Right Top Corner (show in white filter!)
-  ctx.save();
-  ctx.translate(W - 90, 78); // Right corner aligned at x = 510, y = 78
-  ctx.scale(26/24, 26/24);
-  ctx.fillStyle = logoColor;
-  var logoPath = new Path2D("M10 2L14 2L23 22L19 22L12 6.5L5 22L1 22Z");
-  ctx.fill(logoPath);
-  ctx.restore();
-  
-  // 4. Map in Card Format (Enclosed in a beautiful rounded glass card container)
-  var mapX = 40;
-  var mapY = 160;
-  var mapW = W - 80;
-  var mapH = H - 210 - 160 - 20; // 676px tall
-  
-  ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.lineWidth = 1;
-  _crr(ctx, mapX, mapY, mapW, mapH, 24);
+  ctx.fillStyle = cardGrad;
+  _crr(ctx, CX, CY, CW, CH, CR);
   ctx.fill();
+  ctx.restore();
+
+  // Glass edge highlight: brighter top, fading down
+  ctx.save();
+  var borderGrad = ctx.createLinearGradient(CX, CY, CX, CY + CH);
+  borderGrad.addColorStop(0, 'rgba(255,255,255,0.28)');
+  borderGrad.addColorStop(0.25, 'rgba(255,255,255,0.12)');
+  borderGrad.addColorStop(1, 'rgba(255,255,255,0.04)');
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth = 1.6;
+  _crr(ctx, CX, CY, CW, CH, CR);
   ctx.stroke();
   ctx.restore();
-  
-  // Draw GPS Route inside the Map Card
+
+  var padX = CX + 34;
+  var textColor = '#F4F6F7';
+  var labelColor = 'rgba(244,246,247,0.55)';
+
+  // ---- Badge pill (top-left): activity date ----
+  var badgeText = 'Activity';
+  try {
+    var bd = new Date(act.activity_date);
+    if (!isNaN(bd.getTime())) {
+      badgeText = bd.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  } catch(e) {}
+  ctx.font = "600 15px 'Poppins', system-ui, sans-serif";
+  var bw = ctx.measureText(badgeText).width + 40;
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  _crr(ctx, padX, CY + 30, bw, 38, 19);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  _crr(ctx, padX, CY + 30, bw, 38, 19);
+  ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = 'rgba(244,246,247,0.72)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(badgeText, padX + 20, CY + 55);
+
+  // ---- Brand A-mark (top-right, white) ----
+  ctx.save();
+  ctx.translate(W - padX - 30, CY + 32);
+  ctx.scale(30/100, 30/100 * 1.02);
+  ctx.fillStyle = '#FFFFFF';
+  var aPath = new Path2D('M47 0 L53 0 L100 102 L82 102 L50 30 L18 102 L0 102 Z');
+  ctx.fill(aPath);
+  ctx.restore();
+
+  // ---- Title ----
+  var actName = act.activity_name || 'Activity';
+  ctx.font = "bold 31px 'Poppins', system-ui, sans-serif";
+  ctx.fillStyle = textColor;
+  var maxNameW = CW - 68;
+  var nameT = actName;
+  if (ctx.measureText(nameT).width > maxNameW) {
+    while (ctx.measureText(nameT + '\u2026').width > maxNameW && nameT.length > 0) {
+      nameT = nameT.substring(0, nameT.length - 1);
+    }
+    nameT += '\u2026';
+  }
+  ctx.fillText(nameT, padX, CY + 130);
+
+  // ---- Location / athlete line ----
+  var locText = act.location || act.athlete_name || '';
+  ctx.font = "500 18px 'Poppins', system-ui, sans-serif";
+  ctx.fillStyle = labelColor;
+  ctx.fillText(locText, padX, CY + 162);
+
+  // ---- Route trace (accent, soft glow) ----
+  var routeTop = CY + 195;
+  var routeH = 330;
+  var routeW = CW - 120;
+  var routeX = CX + (CW - routeW) / 2;
+
   var coords = [];
   if (act.summary_polyline) {
-    try {
-      coords = decodePolyline(act.summary_polyline);
-    } catch(e) {
-      console.warn('Decode polyline failed for share:', e);
-    }
+    try { coords = decodePolyline(act.summary_polyline); } catch(e) { console.warn('Decode polyline failed for share:', e); }
   }
-  
-  var innerMapX = mapX + 16;
-  var innerMapY = mapY + 16;
-  var innerMapW = mapW - 32;
-  var innerMapH = mapH - 32;
-  
+  ctx.save();
   if (coords && coords.length > 0) {
-    ctx.save();
-    drawRouteOnCanvas(ctx, coords, innerMapX, innerMapY, innerMapW, innerMapH, 'rgba(255, 255, 255, 0.95)', 6.5);
-    drawRouteOnCanvas(ctx, coords, innerMapX, innerMapY, innerMapW, innerMapH, routeColor, 2.2);
-    ctx.restore();
+    ctx.shadowColor = glow(0.65);
+    ctx.shadowBlur = 14;
+    ctx.globalAlpha = 0.82;
+    drawRouteOnCanvas(ctx, coords, routeX, routeTop, routeW, routeH, accent, 5.5);
+    ctx.globalAlpha = 1;
   } else {
-    ctx.save();
-    ctx.strokeStyle = routeColor;
-    ctx.lineWidth = 5;
+    // Stylized fallback trace
+    ctx.shadowColor = glow(0.6);
+    ctx.shadowBlur = 14;
+    ctx.strokeStyle = accent;
+    ctx.globalAlpha = 0.8;
+    ctx.lineWidth = 5.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(W/2 - 100, H/2 - 90);
-    ctx.bezierCurveTo(W/2 - 50, H/2 - 140, W/2 + 50, H/2 - 40, W/2 + 100, H/2 - 90);
+    var fy = routeTop + routeH/2;
+    ctx.moveTo(routeX + 20, fy + 40);
+    ctx.bezierCurveTo(routeX + routeW*0.25, fy - 110, routeX + routeW*0.42, fy + 90, routeX + routeW*0.56, fy - 20);
+    ctx.bezierCurveTo(routeX + routeW*0.7, fy - 120, routeX + routeW*0.85, fy + 60, routeX + routeW - 20, fy - 40);
     ctx.stroke();
-    ctx.restore();
-    ctx.font = '64px system-ui';
-    ctx.fillText('🏃', W/2, H/2 - 90);
+    ctx.globalAlpha = 1;
   }
-  
-  // 5. Stats in Card Format (Enclosed in a beautiful rounded glass card container)
-  var statsCardX = 40;
-  var statsCardY = H - 210;
-  var statsCardW = W - 80;
-  var statsCardH = 170;
-  
-  ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.lineWidth = 1;
-  _crr(ctx, statsCardX, statsCardY, statsCardW, statsCardH, 24);
-  ctx.fill();
-  ctx.stroke();
   ctx.restore();
-  
-  // Compile stats depending on Sport Type and Heart Rate availability
+
+  // ---- Effort bars (rounded waveform) ----
+  var barsTop = routeTop + routeH + 40;
+  var barsH = 130;
+  var barsX = padX;
+  var barsW = CW - 68;
+
+  var heights = [];
+  if (window._shareSplits && window._shareSplits.length > 1) {
+    // Real per-km pace: faster split = taller bar
+    var paces = window._shareSplits.map(function(s) {
+      var d = parseFloat(s.distance_meters || 0) / 1000;
+      var t = parseFloat(s.moving_time_seconds || 0);
+      return (d > 0.05 && t > 0) ? t / d : null;
+    }).filter(function(p) { return p !== null; });
+    if (paces.length > 1) {
+      var pMin = Math.min.apply(null, paces), pMax = Math.max.apply(null, paces);
+      var span = (pMax - pMin) || 1;
+      paces.forEach(function(p) {
+        heights.push(0.38 + 0.55 * (1 - (p - pMin) / span));
+      });
+      // Widen sparse data so the waveform stays dense like the mockup
+      while (heights.length < 14) {
+        var doubled = [];
+        for (var di = 0; di < heights.length; di++) {
+          doubled.push(heights[di]);
+          if (di < heights.length - 1) doubled.push((heights[di] + heights[di+1]) / 2);
+        }
+        heights = doubled;
+      }
+    }
+  }
+  if (!heights.length) {
+    heights = [0.42,0.30,0.55,0.72,0.80,0.76,0.62,0.48,0.38,0.58,0.84,0.78,0.70,0.66,0.72,0.64,0.58,0.66,0.74,0.68,0.60,0.52,0.64,0.70,0.62,0.54,0.60,0.72,0.66,0.44,0.58,0.50];
+  }
+  if (heights.length > 40) {
+    var step = heights.length / 40, sampled = [];
+    for (var si = 0; si < 40; si++) sampled.push(heights[Math.floor(si * step)]);
+    heights = sampled;
+  }
+
+  var gap = 5;
+  var bwid = (barsW - gap * (heights.length - 1)) / heights.length;
+  for (var bi = 0; bi < heights.length; bi++) {
+    var bh = Math.max(barsH * heights[bi], bwid);
+    var bx = barsX + bi * (bwid + gap);
+    var by = barsTop + barsH - bh;
+    var edge = Math.min(bi, heights.length - 1 - bi);
+    ctx.save();
+    ctx.globalAlpha = edge < 3 ? (0.45 + edge * 0.18) : 0.92;
+    var barGrad = ctx.createLinearGradient(0, by, 0, by + bh * 1.4);
+    barGrad.addColorStop(0, TH.barHi);
+    barGrad.addColorStop(1, accent);
+    ctx.fillStyle = barGrad;
+    _crr(ctx, bx, by, bwid, bh, bwid / 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ---- Stats grid (2 x 3, mockup order) ----
   var kmVal = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
-  var movingSec = act.moving_time_seconds||0;
-  
+  var movingSec = act.moving_time_seconds || 0;
+
   var totalMins = Math.floor(movingSec/60);
   var hrs = Math.floor(totalMins/60);
   var mins = totalMins % 60;
   var secs = Math.round(movingSec % 60);
-  
-  var durationStr = '';
-  if (hrs > 0) {
-    durationStr = hrs + ':' + (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
-  } else {
-    durationStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
-  }
+  var durationStr = hrs > 0
+    ? hrs + ':' + (mins<10?'0':'') + mins + ':' + (secs<10?'0':'') + secs
+    : mins + ':' + (secs<10?'0':'') + secs;
   if (movingSec === 0 && act.duration_minutes) {
-    var fallbackMins = Math.round(act.duration_minutes);
-    var fHrs = Math.floor(fallbackMins/60);
-    var fMins = fallbackMins % 60;
-    durationStr = fHrs > 0 ? fHrs + ':' + (fMins<10?'0':'') + fMins + ':00' : fMins + ':00';
+    var fMinsAll = Math.round(act.duration_minutes);
+    var fH = Math.floor(fMinsAll/60), fM = fMinsAll % 60;
+    durationStr = fH > 0 ? fH + ':' + (fM<10?'0':'') + fM + ':00' : fM + ':00';
   }
-  
+
   var sportType = (act.sport_type || act.type || 'walk').toLowerCase();
-  var isRide = sportType === 'ride' || sportType === 'virtualride' || sportType === 'cycling';
-  
-  var elevVal = (act.total_elevation_gain || act.elevation_gain_meters) ? Math.round(act.total_elevation_gain || act.elevation_gain_meters) + 'm' : '19m';
+  var isRide = sportType === 'ride' || sportType === 'virtualride' || sportType === 'mountainbikeride' || sportType === 'cycling';
+
   var hrVal = act.average_heartrate || act.avg_hr;
-  
+  var elevNum = act.total_elevation_gain || act.elevation_gain_meters || act.elevation_gain || 0;
+  var cadNum = act.average_cadence ? Math.round(act.average_cadence) : null;
+
   var items = [];
+  items.push({ label: 'Distance', value: kmVal.toFixed(2) + 'km' });
   if (isRide) {
-    // Ride stats: Speed, Time, Elevation, Distance + HR (if available)
-    items.push({ label: 'Distance', value: kmVal.toFixed(2) + 'km' });
     var speedVal = movingSec > 0 ? (kmVal / (movingSec / 3600)) : 0;
-    items.push({ label: 'Speed', value: speedVal.toFixed(1) + ' km/h' });
-    items.push({ label: 'Time', value: durationStr });
-    items.push({ label: 'Elevation', value: elevVal });
-    if (hrVal) {
-      items.push({ label: 'Heart rate', value: Math.round(hrVal) + 'bpm' });
-    }
+    items.push({ label: 'Speed', value: speedVal.toFixed(1) + 'km/h' });
   } else {
-    // Walk/Run stats: Distance, Pace, Time, Steps, Cadence, Elevation + HR (if available)
-    var paceSecPerKm = kmVal>0 ? movingSec/kmVal : 0;
-    var paceMin = Math.floor(paceSecPerKm/60);
-    var paceSec = Math.round(paceSecPerKm%60);
-    var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
-    
+    var paceSecPerKm = kmVal > 0 && movingSec > 0 ? movingSec / kmVal : 0;
+    var pM = Math.floor(paceSecPerKm/60), pS = Math.round(paceSecPerKm%60);
+    items.push({ label: 'Pace', value: paceSecPerKm > 0 ? pM + ':' + (pS<10?'0':'') + pS + '/km' : '\u2014' });
+  }
+  items.push({ label: 'Time', value: durationStr });
+  // Row 2
+  if (hrVal) {
+    items.push({ label: 'Heart rate', value: Math.round(hrVal) + 'bpm' });
+  } else if (!isRide) {
     var stepsCount = act.steps || act.strava_steps || Math.round(kmVal * 1350);
-    var cadVal = act.average_cadence ? Math.round(act.average_cadence) + 'spm' : '136spm';
-    
-    items.push({ label: 'Distance', value: kmVal.toFixed(2) + 'km' });
-    items.push({ label: 'Pace', value: paceStr });
-    items.push({ label: 'Time', value: durationStr });
     items.push({ label: 'Steps', value: Math.round(stepsCount).toLocaleString('en-IN') });
-    items.push({ label: 'Cadence', value: cadVal });
-    items.push({ label: 'Elevation', value: elevVal });
-    if (hrVal) {
-      items.push({ label: 'Heart rate', value: Math.round(hrVal) + 'bpm' });
-    }
+  } else {
+    items.push({ label: 'Max speed', value: act.max_speed ? (act.max_speed * 3.6).toFixed(1) + 'km/h' : '\u2014' });
   }
-  
-  // Arrange grid columns dynamically depending on item counts
-  var numCols = 3;
-  if (items.length <= 4) {
-    numCols = 2;
-  } else if (items.length >= 7) {
-    numCols = 4;
+  items.push({ label: 'Elevation gain', value: Math.round(elevNum) + 'm' });
+  if (cadNum) {
+    items.push({ label: 'Cadence', value: (isRide ? cadNum : cadNum * 2) + (isRide ? 'rpm' : 'spm') });
+  } else if (act.calories) {
+    items.push({ label: 'Calories', value: Math.round(act.calories) + 'kcal' });
+  } else if (!isRide) {
+    items.push({ label: 'Avg steps/km', value: '1,350' });
+  } else {
+    items.push({ label: 'Elapsed', value: durationStr });
   }
-  
-  var colW = (statsCardW - 40) / numCols;
-  var cols = [];
-  for (var i = 0; i < numCols; i++) {
-    cols.push(statsCardX + 24 + i * colW);
-  }
-  
-  var rows = [statsCardY + 50, statsCardY + 120];
-  
+
+  var gridTop = barsTop + barsH + 62;
+  var colXs = [padX, padX + (CW-68) * 0.40, padX + (CW-68) * 0.755];
+  var rowYs = [gridTop, gridTop + 108];
+
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  
-  for (var idx = 0; idx < items.length; idx++) {
-    var r = Math.floor(idx / numCols);
-    var c = idx % numCols;
-    var item = items[idx];
-    var cx = cols[c];
-    var cy = rows[r];
-    
-    // Label
-    ctx.font = "500 12px 'Poppins', system-ui, sans-serif";
+  for (var idx = 0; idx < items.length && idx < 6; idx++) {
+    var r = Math.floor(idx / 3);
+    var c = idx % 3;
+    ctx.font = "500 17px 'Poppins', system-ui, sans-serif";
     ctx.fillStyle = labelColor;
-    ctx.fillText(item.label, cx, cy - 26);
-    
-    // Value
-    ctx.font = "bold 23px 'Poppins', system-ui, sans-serif";
+    ctx.fillText(items[idx].label, colXs[c], rowYs[r]);
+    ctx.font = "bold 29px 'Poppins', system-ui, sans-serif";
     ctx.fillStyle = textColor;
-    ctx.fillText(item.value, cx, cy);
+    ctx.fillText(items[idx].value, colXs[c], rowYs[r] + 38);
   }
 };
 
