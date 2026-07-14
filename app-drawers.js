@@ -1478,70 +1478,120 @@ window.renderShareCard = function() {
     ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
   };
 
-  // Theme Configurations (Charcoal Grey, Brand Orange, Forest Green, Deep Indigo, Classic Black)
+  var drawBlob = function(x, y, r, color) {
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, color);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fill();
+  };
+
+  // Theme Configurations (Glassmorphic)
   var isDark = true;
-  var bgColor = '#1a1a1a';
-  var cardBgColor = '#2b2b2b';
+  var bgColor = '#0b0f19';
+  var cardBgColor = 'rgba(15, 23, 42, 0.65)'; // Frosted Slate Glass
   var textColor = '#ffffff';
   var labelColor = 'rgba(255, 255, 255, 0.55)';
-  var routeColor = '#e2e8f0';
-  var logoColor = '#E8622A';
-  var cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+  var routeColor = '#E8622A'; // Brand Orange Route
+  var logoColor = '#ffffff'; // White Logo
+  var cardBorderColor = 'rgba(255, 255, 255, 0.12)';
+  var blob1Col = 'rgba(99, 102, 241, 0.25)'; // Indigo blob
+  var blob2Col = 'rgba(232, 98, 42, 0.22)'; // Brand Orange blob
+  var gridVisible = true;
   
   if (window._shareThemeIndex === 1) {
-    // Brand Orange
+    // Brand Orange Sunrise Theme
     bgColor = '#7c2d12';
-    cardBgColor = '#E8622A';
+    cardBgColor = 'rgba(255, 255, 255, 0.15)'; // Frosted White Glass
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.75)';
     routeColor = '#ffffff';
-    logoColor = '#ffffff';
-    cardBorderColor = 'rgba(255, 255, 255, 0.15)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.25)';
+    blob1Col = 'rgba(251, 146, 60, 0.35)'; // Vibrant peach blob
+    blob2Col = 'rgba(239, 68, 68, 0.25)'; // Red blob
+    gridVisible = false;
   } else if (window._shareThemeIndex === 2) {
-    // Forest Green
-    bgColor = '#0d2318';
-    cardBgColor = '#163f2b';
+    // Forest Green Theme
+    bgColor = '#06170f';
+    cardBgColor = 'rgba(15, 23, 42, 0.65)';
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#e2e8f0';
-    logoColor = '#E8622A';
-    cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+    routeColor = '#E8622A';
+    cardBorderColor = 'rgba(255, 255, 255, 0.12)';
+    blob1Col = 'rgba(16, 185, 129, 0.25)'; // Emerald Green blob
+    blob2Col = 'rgba(232, 98, 42, 0.2)'; // Brand Orange blob
   } else if (window._shareThemeIndex === 3) {
-    // Deep Indigo
-    bgColor = '#111322';
-    cardBgColor = '#1e2238';
+    // Tech Indigo Theme
+    bgColor = '#0a0d1d';
+    cardBgColor = 'rgba(15, 23, 42, 0.65)';
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#e2e8f0';
-    logoColor = '#E8622A';
-    cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+    routeColor = '#E8622A';
+    cardBorderColor = 'rgba(255, 255, 255, 0.12)';
+    blob1Col = 'rgba(99, 102, 241, 0.3)'; // Indigo blob
+    blob2Col = 'rgba(232, 98, 42, 0.2)'; // Brand Orange blob
   } else if (window._shareThemeIndex === 4) {
-    // Classic Black
-    bgColor = '#09090b';
-    cardBgColor = '#18181b';
+    // Pure Black Theme
+    bgColor = '#000000';
+    cardBgColor = 'rgba(24, 24, 27, 0.8)';
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.5)';
-    routeColor = '#d1d5db';
-    logoColor = '#E8622A';
-    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+    routeColor = '#E8622A';
+    cardBorderColor = 'rgba(232, 98, 42, 0.25)'; // Subtle orange-glass boundary
+    blob1Col = 'rgba(232, 98, 42, 0.15)';
+    blob2Col = 'rgba(255, 255, 255, 0.05)';
+    gridVisible = false;
   }
 
   if (!window._shareBgTransparent) {
+    // Draw background color
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, W, H);
+    
+    // Draw background glassmorphism blobs
+    drawBlob(80, 120, 380, blob1Col);
+    drawBlob(W - 80, H - 200, 420, blob2Col);
   }
   
-  // Draw outer rounded card
+  // Draw outer rounded card (frosted glass pane)
   ctx.save();
-  ctx.fillStyle = window._shareBgTransparent ? 'rgba(43, 43, 43, 0.85)' : cardBgColor;
+  ctx.fillStyle = window._shareBgTransparent ? 'rgba(24, 24, 27, 0.85)' : cardBgColor;
+  
+  // Draw shadow on card for depth
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 15;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.fill();
+  ctx.restore();
   
+  // Draw card border
+  ctx.save();
   ctx.strokeStyle = cardBorderColor;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.8;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.stroke();
   ctx.restore();
+  
+  // Subtle card grid overlay
+  if (gridVisible && !window._shareBgTransparent) {
+    ctx.save();
+    ctx.beginPath();
+    _crr(ctx, 24, 24, W - 48, H - 48, 36);
+    ctx.clip();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+    ctx.lineWidth = 1;
+    for (var x = 24 + 24; x < W - 24; x += 24) {
+      ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
+    }
+    for (var y = 24 + 24; y < H - 24; y += 24) {
+      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(W - 24, y); ctx.stroke();
+    }
+    ctx.restore();
+  }
   
   // 1. Draw Activity Name (left-aligned)
   var actName = act.activity_name || 'Activity';
@@ -1563,10 +1613,10 @@ window.renderShareCard = function() {
   ctx.fillStyle = labelColor;
   ctx.fillText(locText, 56, 120);
   
-  // 3. Draw Custom Chevron Logo (top right)
+  // 3. Draw Inverted White Logo (top right, smaller 22px size)
   ctx.save();
-  ctx.translate(W - 84, 65);
-  ctx.scale(32/24, 32/24);
+  ctx.translate(W - 78, 74); // Centered vertically with title text at y = 85
+  ctx.scale(22/24, 22/24);
   ctx.fillStyle = logoColor;
   var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
   ctx.fill(logoPath);
@@ -1590,7 +1640,7 @@ window.renderShareCard = function() {
   if (coords && coords.length > 0) {
     ctx.save();
     drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, routeColor, 6.5);
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, window._shareThemeIndex === 1 ? '#ffffff' : '#f8fafc', 2);
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, '#ffffff', 2);
     ctx.restore();
   } else {
     ctx.save();
