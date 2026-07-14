@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="env-config.js?v=20260710_v1"></script>
+  <script>
+    (function(){
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].update();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
+          });
+        });
+      }
+    })();
+  </script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Certificate Designer — Arcgate Walkathon</title>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <style>
+:root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+.cert-placeholder-row summary::-webkit-details-marker{display:none}
+.cert-placeholder-row details[open] summary .ti-chevron-down{transform:rotate(180deg)}
+.cert-placeholder-row summary:hover{background:#fafbfd;border-radius:8px}
+body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary);min-height:100vh;display:flex}
+
+    /* Sidebar styling */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); display: flex; flex-direction: column; align-items: center; padding: 12px 0; z-index: 300; transition: width .24s cubic-bezier(.4,0,.2,1); overflow-x: hidden; overflow-y: hidden; }
+    .sidebar:hover { width: var(--sidebar-exp); overflow-y: auto; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+    .sidebar:hover::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.22); }
+    .sb-logo { display: flex; align-items: center; width: 100%; padding: 4px 14px 12px; text-decoration: none; gap: 10px; flex-shrink: 0; }
+    .sb-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-logo-icon i { color: #fff; font-size: 20px; }
+    .sb-logo-text { font-size: 13px; font-weight: 600; color: #fff; opacity: 0; white-space: nowrap; transition: opacity .18s; line-height: 1.3; }
+    .sb-logo-text span { display: block; font-size: 10px; font-weight: 400; color: rgba(255,255,255,.45); }
+    .sidebar:hover .sb-logo-text { opacity: 1; }
+    .sb-scroll-area { width: 100%; display: flex; flex-direction: column; }
+    .sb-section { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.22); padding: 8px 14px 4px; width: 100%; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+    .sidebar:hover .sb-section { opacity: 1; }
+    .sb-item { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 34px; text-decoration: none; gap: 10px; border-left: 3px solid transparent; transition: all .16s; margin-bottom: 2px; }
+    .sb-item:hover { background: rgba(255,255,255,.06); border-left-color: rgba(232,98,42,.5); }
+    .sb-item.active { background: rgba(232,98,42,.12); border-left-color: var(--brand); }
+    .sb-item i { font-size: 18px; color: rgba(255,255,255,.38); flex-shrink: 0; width: 28px; text-align: center; transition: color .16s; }
+    .sb-item:hover i { color: rgba(255,255,255,.7); }
+    .sb-item.active i { color: var(--brand); }
+    .sb-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+    .sidebar:hover .sb-label { opacity: 1; }
+    .sb-item:hover .sb-label { color: rgba(255,255,255,.9); }
+    .sb-item.active .sb-label { color: #fff; font-weight: 600; }
+    .sb-spacer { flex: 1; }
+    .sb-divider { width: calc(100% - 24px); height: 1px; background: rgba(255,255,255,.07); margin: 6px 12px; flex-shrink: 0; }
+    .sb-signout { display: flex; align-items: center; width: 100%; padding: 0 12px; min-height: 34px; gap: 10px; border: none; background: none; cursor: pointer; transition: all .16s; font-family: var(--font); }
+    .sb-signout:hover { background: rgba(255,80,80,.08); }
+    .sb-signout i { font-size: 18px; color: rgba(255,255,255,.25); flex-shrink: 0; width: 28px; text-align: center; }
+    .sb-signout:hover i { color: #ff6b6b; }
+    .sb-signout .sb-label { color: rgba(255,255,255,.3); }
+    .sb-signout:hover .sb-label { color: #ff6b6b; }
+    
+    .main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--card-bg);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100}
+.topbar-left h1{font-size:20px;font-weight:600}
+.topbar-left p{font-size:12.5px;color:var(--text-secondary)}
+.topbar-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.topbar-back:hover{background:var(--page-bg)}
+.content{padding:26px 28px;max-width:1200px;width:100%}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;cursor:pointer;font-family:var(--font);font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:var(--radius-sm);transition:all .15s}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:#d5551f}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
+.btn-ghost:hover{background:#fff}
+.btn-xs{padding:4px 8px;font-size:11px;font-weight:600}
+.btn-sm{padding:6px 12px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.panel{background:var(--card-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:24px;margin-bottom:20px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13.5px;background:#fff}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--brand)}
+.row-end{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;align-items:center}
+.saved-msg{font-size:13px;color:#16A34A;font-weight:500;opacity:0;transition:opacity .3s}
+.saved-msg.show{opacity:1}
+.err-msg{font-size:13px;color:#DC2626}
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
+      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+    </div>
+    
+    <div class="sb-scroll-area">
+      <div class="sb-section">Operations</div>
+      <a href="admin.html" class="sb-item"><i class="ti ti-layout-dashboard"></i><span class="sb-label">Dashboard</span></a>
+      <a href="events.html" class="sb-item"><i class="ti ti-calendar-event"></i><span class="sb-label">Events</span></a>
+      <a href="ag-leaderboard.html" class="sb-item"><i class="ti ti-trophy"></i><span class="sb-label">Leaderboard</span></a>
+      <a href="athletedtl.html" class="sb-item"><i class="ti ti-users"></i><span class="sb-label">Participants</span></a>
+      <a href="reports.html" class="sb-item"><i class="ti ti-chart-bar"></i><span class="sb-label">Reports</span></a>
+
+      <div class="sb-section">Social Feed</div>
+      <a href="feed-config.html" class="sb-item"><i class="ti ti-rss"></i><span class="sb-label">Feed Settings</span></a>
+      <a href="celebrate-config.html" class="sb-item"><i class="ti ti-confetti"></i><span class="sb-label">Celebrate</span></a>
+      <a href="push-notifications.html" class="sb-item"><i class="ti ti-bell"></i><span class="sb-label">Notifications</span></a>
+      <a href="email-send.html" class="sb-item"><i class="ti ti-mail"></i><span class="sb-label">Email Send</span></a>
+
+      <div class="sb-section">System</div>
+      <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item active"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
+      <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
+      <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
+      <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
+      <a href="audit-log.html" class="sb-item"><i class="ti ti-shield-check"></i><span class="sb-label">Audit Log</span></a>
+      <a href="api-docs.html" class="sb-item"><i class="ti ti-book"></i><span class="sb-label">API & Logic Docs</span></a>
+    </div>
+
+    <div class="sb-spacer"></div>
+    <div class="sb-divider"></div>
+    <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
+  </aside>
+<div class="main">
+<header class="topbar">
+  <div class="topbar-left" style="display:flex; align-items:center; gap:16px;">
+    <a href="events.html" class="topbar-back"><i class="ti ti-arrow-left"></i> Back</a>
+    <div>
+      <h1>Certificate Designer</h1>
+      <p>Design and customize templates for participants</p>
+    </div>
+  </div>
+  <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
+    <div class="fld" style="margin:0; display:flex; align-items:center; gap:8px;">
+      <label style="margin:0; white-space:nowrap; font-weight:600; font-size:13px; color:#475569;">Event:</label>
+      <select id="event-selector" onchange="switchEvent(this.value)" style="width:260px; padding:6px 12px; font-size:13.5px; border-radius:6px; font-weight:500;"></select>
+    </div>
+  </div>
+</header>
+<div class="content">
+
+  <div class="panel" style="padding: 24px; background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+    <div class="edit-group" style="border-left: 4px solid var(--brand); background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-certificate"></i> Template Configuration</h3>
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">Configure dynamic certificate templates for the event. Participants can download certificates once the event has ended.</p>
+      
+      <!-- Template row: mode + source + download formats in one compact line -->
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px;">
+        <div class="fld" style="margin:0; width:190px;">
+          <label style="font-size:11px; font-weight:600; color:#333;">Design Mode</label>
+          <select id="cert-canvas-mode" onchange="toggleCertMode(); updateCertPreviewCanvas(true);">
+            <option value="pdf">PDF Template</option>
+            <option value="blank">Blank Canvas (full design)</option>
+          </select>
+        </div>
+        <div id="cert-pdf-wrap" style="display:flex; gap:8px; align-items:flex-end; flex:1; min-width:260px;">
+          <div class="fld" style="margin:0; flex:1;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Certificate Template PDF</label>
+            <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
+          <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+        </div>
+        <div id="cert-blank-wrap" style="display:none; gap:8px; align-items:flex-end;">
+          <div class="fld" style="margin:0; width:140px;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Orientation</label>
+            <select id="cert-canvas-orient" onchange="updateCertPreviewCanvas(true);">
+              <option value="landscape">Landscape</option>
+              <option value="portrait">Portrait</option>
+            </select>
+          </div>
+          <div class="fld" style="margin:0; width:120px;">
+            <label style="font-size:11px; font-weight:600; color:#333;">Background</label>
+            <input type="color" id="cert-canvas-bg" value="#ffffff" style="height:38px; padding:3px; width:100%;" oninput="updateCertPreviewCanvas(true);">
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; height:38px;">
+          <span style="font-size:11px; font-weight:600; color:#64748b;">Downloads:</span>
+          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> JPEG</label>
+          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF</label>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fffdfa; border:1px solid #ffd8a8; border-radius:8px; height:38px;">
+          <label style="font-size:12px; font-weight:600; color:#e8590c; display:flex; align-items:center; gap:5px; cursor:pointer;">
+            <input type="checkbox" id="cert-enabled"> Enable Certificate Button for Participants
+          </label>
+        </div>
+      </div>
+
+      <!-- Main workspace: compact placeholder list (left) + large preview (right) -->
+      <div style="display:grid; grid-template-columns: 350px 1fr; gap:16px; align-items:start;">
+        <div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('participant_name')">+ Name</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_title')">+ Medal</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('distance')">+ Distance</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('rank')">+ Rank</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('points')">+ Points</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_image')">+ Medal Img</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('static_image')">+ Image</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('custom')">+ Text</button>
+          </div>
+          <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:6px; max-height:62vh; overflow-y:auto; padding-right:4px;">
+            <!-- Rendered list of placeholder config rows -->
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px; position:sticky; top:10px;">
+          <h4 style="font-size:12px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between; margin:0;">
+            <span>Live Interactive Preview</span>
+            <span style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="downloadCertPreview()"><i class="ti ti-download"></i> Download Preview</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
+            </span>
+          </h4>
+          <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:8px; display:flex; align-items:center; justify-content:center; min-height:420px; position:relative; overflow:hidden;">
+            <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:74vh; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
+            <div id="cert-preview-placeholder" style="font-size:12px; color:#64748b; text-align:center;">
+              <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
+            </div>
+          </div>
+          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> to move &middot; <strong>Corner handle / scroll wheel</strong> to resize &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
+      <span class="err-msg" id="ed-err"></span>
+      <span class="saved-msg" id="ed-saved">✅ Saved</span>
+      <button type="button" class="btn btn-ghost" onclick="window.location.href='events.html'">Cancel</button>
+      <button type="button" class="btn btn-primary" id="btn-save-cert" onclick="saveCertConfig()"><i class="ti ti-device-floppy"></i> Save Design</button>
+    </div>
+  </div>
+
+</div>
+</div>
+<script src="nav.js"></script>
+<script>
+  var SB_URL='https://jglvwxeaqiswpxzcofmy.supabase.co';
+  var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
+  var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON};
+  var BACKEND=window.BACKEND_URL;
+
+  authGuard();
+
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  var activeEventId = null;
+
+  async function loadEventsList() {
+    try {
+      var r = await fetch(SB_URL + '/rest/v1/events?select=id,name&order=start_date.desc', { headers: HDR });
+      var events = await r.json();
+      var sel = document.getElementById('event-selector');
+      sel.innerHTML = '';
+      
+      if (!Array.isArray(events) || events.length === 0) {
+        sel.innerHTML = '<option value="">No events found</option>';
+        return;
+      }
+
+      events.forEach(function(ev) {
+        var opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = ev.name;
+        sel.appendChild(opt);
+      });
+
+      // Check URL parameters for event_id
+      var params = new URLSearchParams(window.location.search);
+      var paramId = params.get('event_id');
+      if (paramId && events.find(function(x) { return x.id == paramId; })) {
+        activeEventId = parseInt(paramId);
+        sel.value = activeEventId;
+      } else {
+        activeEventId = parseInt(events[0].id);
+        sel.value = activeEventId;
+      }
+
+      loadEventCertConfig();
+    } catch(err) {
+      console.error('Failed to load events:', err);
+    }
+  }
+
+  function switchEvent(id) {
+    activeEventId = parseInt(id);
+    // Update URL query parameter without reloading
+    var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?event_id=' + id;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+    loadEventCertConfig();
+  }
+
+  async function loadEventCertConfig() {
+    if (!activeEventId) return;
+    try {
+      var res = await fetch(SB_URL + '/rest/v1/leaderboard_config?event_id=eq.' + activeEventId + '&select=*', { headers: HDR });
+      var cfgData = await res.json();
+      
+      var certCfgRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'certificate_config'; }) : null;
+      if (certCfgRow && certCfgRow.config_value) {
+        var c = certCfgRow.config_value;
+        document.getElementById('cert-template-url').value = c.template_url || '';
+        document.getElementById('cert-canvas-mode').value = c.canvas_mode || 'pdf';
+        document.getElementById('cert-canvas-orient').value = c.canvas_orientation || 'landscape';
+        document.getElementById('cert-canvas-bg').value = c.canvas_bg || '#ffffff';
+        toggleCertMode();
+        document.getElementById('cert-opt-image').checked = (c.download_options || []).indexOf('image') > -1;
+        document.getElementById('cert-opt-pdf').checked = (c.download_options || []).indexOf('pdf') > -1;
+        document.getElementById('cert-enabled').checked = !!c.enabled;
+        
+        var list = document.getElementById('cert-placeholders-list');
+        list.innerHTML = '';
+        if (Array.isArray(c.placeholders)) {
+          c.placeholders.forEach(function(p) {
+            addCertPlaceholderRow(p);
+          });
+        }
+      } else {
+        // Defaults for new event config
+        document.getElementById('cert-template-url').value = '';
+        document.getElementById('cert-canvas-mode').value = 'pdf';
+        document.getElementById('cert-canvas-orient').value = 'landscape';
+        document.getElementById('cert-canvas-bg').value = '#ffffff';
+        toggleCertMode();
+        document.getElementById('cert-opt-image').checked = true;
+        document.getElementById('cert-opt-pdf').checked = true;
+        document.getElementById('cert-enabled').checked = false;
+        
+        var list = document.getElementById('cert-placeholders-list');
+        list.innerHTML = '';
+        addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
+        addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
+      }
+      setTimeout(updateCertPreviewCanvas, 200);
+    } catch(err) {
+      console.error('Failed to load event subconfig:', err);
+    }
+  }
+
+  async function upsertConfigValue(key, val, eventId) {
+    // Check if row already exists
+    var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?event_id=eq.' + eventId + '&config_key=eq.' + key + '&select=id', { headers: HDR });
+    var rows = await r.json();
+    
+    var body = {
+      event_id: eventId,
+      config_key: key,
+      config_value: val,
+      updated_at: new Date().toISOString()
+    };
+    
+    var url = SB_URL + '/rest/v1/leaderboard_config';
+    var method = 'POST';
+    var headers = Object.assign({}, HDR, { Prefer: 'return=representation' });
+    
+    if (Array.isArray(rows) && rows.length > 0) {
+      url += '?id=eq.' + rows[0].id;
+      method = 'PATCH';
+      headers = HDR;
+    }
+    
+    var res = await fetch(url, {
+      method: method,
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+    
+    if (!res.ok) {
+      var txt = await res.text();
+      throw new Error('Save sub-config failed for key ' + key + ': ' + txt);
+    }
+  }
+
+  async function saveCertConfig() {
+    if (!activeEventId) return;
+    var btn = document.getElementById('btn-save-cert');
+    var err = document.getElementById('ed-err');
+    var saved = document.getElementById('ed-saved');
+    err.textContent = '';
+    saved.classList.remove('show');
+    btn.disabled = true;
+
+    try {
+      var certPlaceholders = [];
+      document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+        var key = row.querySelector('.cert-p-key').value.trim();
+        var type = row.querySelector('.cert-p-type').value;
+        var customVal = row.querySelector('.cert-p-custom-val').value.trim();
+        var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+        var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+        var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
+        var color = row.querySelector('.cert-p-color').value;
+        var weight = row.querySelector('.cert-p-weight').value;
+        var align = row.querySelector('.cert-p-align').value;
+        var family = row.querySelector('.cert-p-font').value || 'Poppins';
+        var imgUrlEl = row.querySelector('.cert-p-imgurl');
+        if (key) {
+          var transpEl = row.querySelector('.cert-p-transparent');
+          certPlaceholders.push({
+            key: key,
+            type: type,
+            custom_val: customVal,
+            image_url: imgUrlEl ? imgUrlEl.value.trim() : '',
+            transparent_bg: transpEl ? transpEl.checked : false,
+            x: x,
+            y: y,
+            font_size: size,
+            color: color,
+            font_style: weight,
+            align: align,
+            font_family: family
+          });
+        }
+      });
+
+      var certDownloadOptions = [];
+      if (document.getElementById('cert-opt-image').checked) certDownloadOptions.push('image');
+      if (document.getElementById('cert-opt-pdf').checked) certDownloadOptions.push('pdf');
+
+      var certConfigVal = {
+        template_url: document.getElementById('cert-template-url').value.trim() || null,
+        canvas_mode: document.getElementById('cert-canvas-mode').value || 'pdf',
+        canvas_orientation: document.getElementById('cert-canvas-orient').value || 'landscape',
+        canvas_bg: document.getElementById('cert-canvas-bg').value || '#ffffff',
+        placeholders: certPlaceholders,
+        download_options: certDownloadOptions,
+        enabled: document.getElementById('cert-enabled').checked
+      };
+
+      await upsertConfigValue('certificate_config', certConfigVal, activeEventId);
+      
+      saved.classList.add('show');
+      setTimeout(function() { saved.classList.remove('show'); }, 3000);
+    } catch(e) {
+      err.textContent = 'Save failed: ' + e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  /* ---------- certificate designer scripts ---------- */
+  window.toggleCertCustomVal = function(select) {
+    var row = select.closest('.cert-placeholder-row');
+    var wrap = row.querySelector('.cert-custom-val-wrap');
+    if (wrap) {
+      wrap.style.display = select.value === 'custom' ? 'block' : 'none';
+    }
+    var imgWrap = row.querySelector('.cert-img-wrap');
+    if (imgWrap) {
+      imgWrap.style.display = select.value === 'static_image' ? 'flex' : 'none';
+    }
+  };
+
+  window.toggleCertMode = function() {
+    var mode = document.getElementById('cert-canvas-mode').value;
+    if (mode === 'blank') {
+      document.getElementById('cert-pdf-wrap').style.display = 'none';
+      document.getElementById('cert-blank-wrap').style.display = 'flex';
+    } else {
+      document.getElementById('cert-pdf-wrap').style.display = 'flex';
+      document.getElementById('cert-blank-wrap').style.display = 'none';
+    }
+  };
+
+  window.handleCertElementImageUpload = async function(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var inputUrl = event.target.closest('.cert-img-wrap').querySelector('.cert-p-imgurl');
+    var rd = new FileReader();
+    rd.onload = async function() {
+      try {
+        var r = await fetch(BACKEND + '/admin/upload-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+          },
+          body: JSON.stringify({ data: rd.result })
+        });
+        var d2 = await r.json();
+        if (d2.success && inputUrl) {
+          inputUrl.value = d2.url;
+          updateCertPreviewCanvas();
+        } else if (!d2.success) {
+          if (inputUrl) { inputUrl.value = rd.result; updateCertPreviewCanvas(); }
+        }
+      } catch(err) {
+        if (inputUrl) { inputUrl.value = rd.result; updateCertPreviewCanvas(); }
+      }
+    };
+    rd.readAsDataURL(file);
+  };
+
+  window.handleCertTemplateUpload = function(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+      document.getElementById('cert-template-url').value = reader.result;
+      updateCertPreviewCanvas();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.addCertPlaceholderRow = function(data) {
+    var p = data || { key: '', type: 'participant_name', x: 0.1, y: 0.1, font_size: 24, color: '#000000', font_style: 'normal', align: 'left', custom_val: '', font_family: 'Poppins' };
+    var list = document.getElementById('cert-placeholders-list');
+    var rowId = 'cpr-' + Date.now() + '-' + Math.round(Math.random() * 1000);
+    
+    if (p.font_family) {
+      loadGoogleFont(p.font_family);
+    }
+
+    var row = document.createElement('div');
+    row.className = 'cert-placeholder-row';
+    row.id = rowId;
+    row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; position:relative;';
+    
+    var isChecked = list.children.length === 0 ? 'checked' : '';
+    var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
+    var titleText = typeLabels[p.type] || 'Placeholder';
+    
+    row.innerHTML = 
+      '<details>' +
+      '<summary style="display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; list-style:none; user-select:none;">' +
+        '<input type="radio" name="active-cert-placeholder" ' + isChecked + ' title="Set active for canvas placement" style="cursor:pointer; flex-shrink:0;" onclick="event.stopPropagation();" onchange="updateCertPreviewCanvas()">' +
+        '<span class="cert-row-title" style="font-size:12px; font-weight:700; color:#0F1117; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + esc(titleText) + '</span>' +
+        '<span class="cert-row-swatch" style="width:12px; height:12px; border-radius:3px; border:1px solid #ddd; background:' + (p.color || '#000000') + '; flex-shrink:0;"></span>' +
+        '<button type="button" class="btn btn-ghost btn-xs" style="color:#ef4444; padding:1px 5px; font-size:11px; cursor:pointer; flex-shrink:0;" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById(\'' + rowId + '\').remove(); updateCertPreviewCanvas();"><i class="ti ti-trash"></i></button>' +
+        '<i class="ti ti-chevron-down" style="font-size:13px; color:#94a3b8; flex-shrink:0;"></i>' +
+      '</summary>' +
+      '<div style="display:flex; flex-direction:column; gap:8px; padding:0 10px 10px 10px; border-top:1px solid #f1f5f9; padding-top:8px;">' +
+      '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:8px;">' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Placeholder Key</label><input type="text" class="cert-p-key" placeholder="e.g. <Participant Name>" value="' + esc(p.key || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Value Mapping</label>' +
+          '<select class="cert-p-type" onchange="toggleCertCustomVal(this); certRowTitleSync(this); updateCertPreviewCanvas();">' +
+            '<option value="participant_name"' + (p.type === 'participant_name' ? ' selected' : '') + '>Participant\'s Full Name</option>' +
+            '<option value="medal_title"' + (p.type === 'medal_title' ? ' selected' : '') + '>Medal Achieved (e.g. Gold Medal)</option>' +
+            '<option value="distance"' + (p.type === 'distance' ? ' selected' : '') + '>Total Distance</option>' +
+            '<option value="points"' + (p.type === 'points' ? ' selected' : '') + '>Total Points</option>' +
+            '<option value="rank"' + (p.type === 'rank' ? ' selected' : '') + '>Leaderboard Rank</option>' +
+            '<option value="custom"' + (p.type === 'custom' ? ' selected' : '') + '>Custom Text Value</option>' +
+            '<option value="medal_image"' + (p.type === 'medal_image' ? ' selected' : '') + '>Earned Medal Image</option>' +
+            '<option value="static_image"' + (p.type === 'static_image' ? ' selected' : '') + '>Image (logo / signature / art)</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fld cert-custom-val-wrap" style="margin:0; display:' + (p.type === 'custom' ? 'block' : 'none') + ';"><label style="font-size:11px;">Custom Text Value</label><input type="text" class="cert-p-custom-val" placeholder="e.g. CEO Signature" value="' + esc(p.custom_val || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+      '<div class="cert-img-wrap" style="display:' + (p.type === 'static_image' ? 'flex' : 'none') + '; gap:6px; align-items:flex-end;">' +
+        '<div class="fld" style="margin:0; flex:1;"><label style="font-size:11px;">Image URL</label><input type="text" class="cert-p-imgurl" placeholder="https://... or upload" value="' + esc(p.image_url || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
+        '<button type="button" class="btn btn-ghost btn-xs" style="padding:6px 9px; font-size:11px;" onclick="this.nextElementSibling.click()"><i class="ti ti-upload"></i></button>' +
+        '<input type="file" accept="image/*" style="display:none;" onchange="handleCertElementImageUpload(event)">' +
+      '</div>' +
+      '<label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; color:#475569;"><input type="checkbox" class="cert-p-transparent"' + (p.transparent_bg ? ' checked' : '') + ' onchange="updateCertPreviewCanvas()"> Transparent background (no white cover box)</label>' +
+      '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">X (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Y (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Size</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" style="height:32px; padding:2px;" oninput="updateCertPreviewCanvas(); var s=this.closest(\'.cert-placeholder-row\').querySelector(\'.cert-row-swatch\'); if(s) s.style.background=this.value;"></div>' +
+      '</div>' +
+      '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Weight</label>' +
+          '<select class="cert-p-weight" onchange="updateCertPreviewCanvas();">' +
+            '<option value="bold"' + (p.font_style === 'bold' ? ' selected' : '') + '>Bold</option>' +
+            '<option value="normal"' + (p.font_style !== 'bold' ? ' selected' : '') + '>Normal</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Alignment</label>' +
+          '<select class="cert-p-align" onchange="updateCertPreviewCanvas();">' +
+            '<option value="left"' + (p.align === 'left' ? ' selected' : '') + '>Left</option>' +
+            '<option value="center"' + (p.align === 'center' ? ' selected' : '') + '>Center</option>' +
+            '<option value="right"' + (p.align === 'right' ? ' selected' : '') + '>Right</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Family (Google Fonts)</label>' +
+        '<select class="cert-p-font" onchange="loadGoogleFont(this.value); updateCertPreviewCanvas();" style="width:100%;">' +
+          '<option value="Poppins"' + (p.font_family === 'Poppins' || !p.font_family ? ' selected' : '') + '>Poppins</option>' +
+          '<option value="Inter"' + (p.font_family === 'Inter' ? ' selected' : '') + '>Inter</option>' +
+          '<option value="Roboto"' + (p.font_family === 'Roboto' ? ' selected' : '') + '>Roboto</option>' +
+          '<option value="Playfair Display"' + (p.font_family === 'Playfair Display' ? ' selected' : '') + '>Playfair Display</option>' +
+          '<option value="Montserrat"' + (p.font_family === 'Montserrat' ? ' selected' : '') + '>Montserrat</option>' +
+          '<option value="Cinzel"' + (p.font_family === 'Cinzel' ? ' selected' : '') + '>Cinzel</option>' +
+          '<option value="Dancing Script"' + (p.font_family === 'Dancing Script' ? ' selected' : '') + '>Dancing Script</option>' +
+          '<option value="Great Vibes"' + (p.font_family === 'Great Vibes' ? ' selected' : '') + '>Great Vibes</option>' +
+          '<option value="Outfit"' + (p.font_family === 'Outfit' ? ' selected' : '') + '>Outfit</option>' +
+        '</select>' +
+      '</div>' +
+      '</div>' +
+      '</details>';
+      
+    list.appendChild(row);
+    updateCertPreviewCanvas();
+  };
+
+  // Keep the compact row title in sync with the selected value mapping
+  window.certRowTitleSync = function(select) {
+    var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
+    var row = select.closest('.cert-placeholder-row');
+    var title = row ? row.querySelector('.cert-row-title') : null;
+    if (title) title.textContent = typeLabels[select.value] || 'Placeholder';
+  };
+
+  var _activeCertPdfDoc = null;
+  var _certBgCanvas = null;   // offscreen cache of the rendered PDF background
+  var _certBgUrl = '';
+  var _certPreviewScale = 1;
+  var _certRedrawQueued = false;
+
+  var _certSnapGuides = [];
+  var _certCleanRender = false;
+
+  // Fast path: blit cached background + draw placeholders. No PDF work.
+  window.redrawCertPreview = function() {
+    var canvas = document.getElementById('cert-preview-canvas');
+    if (!canvas || !_certBgCanvas) return;
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(_certBgCanvas, 0, 0);
+    drawCertPlaceholdersOnCanvas(canvas, _certPreviewScale);
+    if (!_certCleanRender && _certSnapGuides.length) {
+      ctx.save();
+      ctx.strokeStyle = '#E8622A';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 4]);
+      _certSnapGuides.forEach(function(g) {
+        ctx.beginPath();
+        if (g.type === 'v') { ctx.moveTo(g.pos, 0); ctx.lineTo(g.pos, canvas.height); }
+        else { ctx.moveTo(0, g.pos); ctx.lineTo(canvas.width, g.pos); }
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+  };
+
+  // Renders the preview without editor chrome (outlines, handles, guides) and downloads it
+  window.downloadCertPreview = function() {
+    var canvas = document.getElementById('cert-preview-canvas');
+    if (!canvas || !_certBgCanvas) { alert('Nothing to download yet - set up a template or blank canvas first.'); return; }
+    _certCleanRender = true;
+    window.redrawCertPreview();
+    var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    _certCleanRender = false;
+    queueCertRedraw();
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'certificate-preview.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  function queueCertRedraw() {
+    if (_certRedrawQueued) return;
+    _certRedrawQueued = true;
+    requestAnimationFrame(function() {
+      _certRedrawQueued = false;
+      window.redrawCertPreview();
+    });
+  }
+
+  window.updateCertPreviewCanvas = function(forceReload) {
+    var mode = document.getElementById('cert-canvas-mode') ? document.getElementById('cert-canvas-mode').value : 'pdf';
+    var url = (document.getElementById('cert-template-url').value || '').trim();
+    var canvas = document.getElementById('cert-preview-canvas');
+    var placeholder = document.getElementById('cert-preview-placeholder');
+
+    // ---- Blank canvas mode: build background from color, no PDF involved ----
+    if (mode === 'blank') {
+      if (placeholder) placeholder.style.display = 'none';
+      if (canvas) canvas.style.display = 'block';
+      var orient = document.getElementById('cert-canvas-orient').value || 'landscape';
+      var bgColor = document.getElementById('cert-canvas-bg').value || '#ffffff';
+      var blankKey = 'blank:' + orient + ':' + bgColor;
+      if (!forceReload && _certBgCanvas && _certBgUrl === blankKey) {
+        queueCertRedraw();
+        return;
+      }
+      var cw = canvas.parentElement.clientWidth - 16;
+      if (cw < 300) cw = 300;
+      var bg = document.createElement('canvas');
+      if (orient === 'portrait') {
+        bg.width = cw; bg.height = Math.round(cw * 1.4142);
+      } else {
+        bg.width = cw; bg.height = Math.round(cw / 1.4142);
+      }
+      var bctx = bg.getContext('2d');
+      bctx.fillStyle = bgColor;
+      bctx.fillRect(0, 0, bg.width, bg.height);
+      _certBgCanvas = bg;
+      _certBgUrl = blankKey;
+      _certPreviewScale = cw / 1000;
+      canvas.width = bg.width;
+      canvas.height = bg.height;
+      window.redrawCertPreview();
+      return;
+    }
+
+    if (!url) {
+      if (canvas) canvas.style.display = 'none';
+      if (placeholder) placeholder.style.display = 'block';
+      return;
+    }
+
+    if (placeholder) placeholder.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+
+    // If background already rendered for this URL, skip PDF work entirely
+    if (!forceReload && _certBgCanvas && _certBgUrl === url) {
+      queueCertRedraw();
+      return;
+    }
+
+    // pdf.js is loaded with defer; wait briefly if this fires before it finishes loading
+    if (typeof pdfjsLib === 'undefined') {
+      setTimeout(function() { window.updateCertPreviewCanvas(forceReload); }, 200);
+      return;
+    }
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+
+    var renderPreview = function(pdfDoc) {
+      pdfDoc.getPage(1).then(function(page) {
+        var viewport = page.getViewport({ scale: 1.0 });
+        var containerWidth = canvas.parentElement.clientWidth - 20;
+        var scale = containerWidth / viewport.width;
+        if (scale > 1.5) scale = 1.5;
+        
+        var scaledViewport = page.getViewport({ scale: scale });
+        var bg = document.createElement('canvas');
+        bg.width = scaledViewport.width;
+        bg.height = scaledViewport.height;
+        
+        var renderContext = {
+          canvasContext: bg.getContext('2d'),
+          viewport: scaledViewport
+        };
+        page.render(renderContext).promise.then(function() {
+          _certBgCanvas = bg;
+          _certBgUrl = url;
+          _certPreviewScale = scale;
+          canvas.width = bg.width;
+          canvas.height = bg.height;
+          window.redrawCertPreview();
+        });
+      });
+    };
+
+    // Load PDF
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      _activeCertPdfDoc = pdf;
+      renderPreview(pdf);
+    }).catch(function(err) {
+      console.warn('PDF load direct failed, trying fallback:', err.message);
+      if (url.indexOf('data:') === -1 && url.indexOf('http') === -1) {
+        pdfjsLib.getDocument(url).promise.then(function(pdf) {
+          _activeCertPdfDoc = pdf;
+          renderPreview(pdf);
+        }).catch(function(e) {
+          if (placeholder) {
+            placeholder.style.display = 'block';
+            placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(e.message) + '</p>';
+          }
+          if (canvas) canvas.style.display = 'none';
+        });
+      } else {
+        if (placeholder) {
+          placeholder.style.display = 'block';
+          placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(err.message) + '</p>';
+        }
+        if (canvas) canvas.style.display = 'none';
+      }
+    });
+  };
+
+  var _certHitBoxes = [];
+  var _certMedalImgCache = {};
+
+  // Cached loader for the medal preview image; triggers a redraw once loaded
+  function getCertPreviewMedalImg(url) {
+    if (_certMedalImgCache[url]) return _certMedalImgCache[url];
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() { queueCertRedraw(); };
+    img.onerror = function() { console.warn('Medal preview image failed to load: ' + url); };
+    img.src = url;
+    _certMedalImgCache[url] = img;
+    return img;
+  }
+
+  function drawCertPlaceholdersOnCanvas(canvas, scale) {
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+    _certHitBoxes = [];
+    
+    document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+      var key = row.querySelector('.cert-p-key').value.trim() || 'Placeholder';
+      var type = row.querySelector('.cert-p-type').value;
+      var customVal = row.querySelector('.cert-p-custom-val').value.trim();
+      var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+      var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+      var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
+      var color = row.querySelector('.cert-p-color').value;
+      var weight = row.querySelector('.cert-p-weight').value;
+      var align = row.querySelector('.cert-p-align').value;
+      var family = row.querySelector('.cert-p-font').value || 'Poppins';
+      var imgUrlEl = row.querySelector('.cert-p-imgurl');
+      var transpEl = row.querySelector('.cert-p-transparent');
+      
+      var isChecked = row.querySelector('input[name="active-cert-placeholder"]').checked;
+      
+      if (type === 'medal_image') {
+        var boxSize = Math.round(size * scale * 0.5);
+        var ix = x * w;
+        var iy = y * h;
+        
+        var bx = ix;
+        if (align === 'center') bx = ix - (boxSize / 2);
+        else if (align === 'right') bx = ix - boxSize;
+        var by = iy - (boxSize / 2);
+
+        if (!_certCleanRender) {
+          var isTransp = transpEl ? transpEl.checked : false;
+          if (!isTransp) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(bx, by, boxSize, boxSize);
+          }
+          ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+          ctx.lineWidth = isChecked ? 2 : 1;
+          ctx.strokeRect(bx, by, boxSize, boxSize);
+        }
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Medal Icon', bx + boxSize/2, by + boxSize/2);
+
+        _certHitBoxes.push({
+          row: row,
+          x: bx, y: by, w: boxSize, h: boxSize,
+          anchorX: ix, anchorY: iy
+        });
+        return;
+      }
+      
+      if (type === 'static_image') {
+        var boxSize = Math.round(size * scale * 0.5);
+        var imgUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
+        var ix = x * w;
+        var iy = y * h;
+        
+        var bx = ix;
+        if (align === 'center') bx = ix - (boxSize / 2);
+        else if (align === 'right') bx = ix - boxSize;
+        var by = iy - (boxSize / 2);
+
+        var loadedImg = null;
+        if (imgUrl) loadedImg = getCertPreviewMedalImg(imgUrl);
+
+        if (!_certCleanRender) {
+          var isTransp = transpEl ? transpEl.checked : false;
+          if (!isTransp) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(bx, by, boxSize, boxSize);
+          }
+          ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+          ctx.lineWidth = isChecked ? 2 : 1;
+          ctx.strokeRect(bx, by, boxSize, boxSize);
+        }
+
+        if (loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
+          ctx.drawImage(loadedImg, bx, by, boxSize, boxSize);
+        } else {
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Image', bx + boxSize/2, by + boxSize/2);
+        }
+
+        _certHitBoxes.push({
+          row: row,
+          x: bx, y: by, w: boxSize, h: boxSize,
+          anchorX: ix, anchorY: iy
+        });
+        return;
+      }
+
+      var text = key;
+      if (type === 'custom') text = customVal || 'CEO Signature';
+
+      ctx.font = (weight === 'bold' ? 'bold ' : '') + Math.round(size * scale * 0.5) + 'px "' + family + '", sans-serif';
+      ctx.textAlign = align;
+      ctx.textBaseline = 'middle';
+      
+      var metrics = ctx.measureText(text);
+      var textWidth = metrics.width;
+      var textHeight = Math.round(size * scale * 0.5);
+
+      var px = x * w;
+      var py = y * h;
+
+      var tx = px;
+      if (align === 'center') tx = px - (textWidth / 2);
+      else if (align === 'right') tx = px - textWidth;
+      var ty = py - (textHeight / 2);
+
+      if (!_certCleanRender) {
+        var isTransp = transpEl ? transpEl.checked : false;
+        if (!isTransp) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(tx - 4, ty - 4, textWidth + 8, textHeight + 8);
+        }
+        ctx.strokeStyle = isChecked ? '#E8622A' : '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(tx - 4, ty - 4, textWidth + 8, textHeight + 8);
+
+        if (isChecked) {
+          ctx.fillStyle = '#E8622A';
+          ctx.beginPath();
+          ctx.arc(tx + textWidth + 4, ty + textHeight + 4, 4, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#3b82f6';
+          ctx.fill();
+        }
+      }
+
+      ctx.fillStyle = color;
+      ctx.fillText(text, px, py);
+
+      _certHitBoxes.push({
+        row: row,
+        x: tx - 4, y: ty - 4, w: textWidth + 8, h: textHeight + 8,
+        anchorX: px, anchorY: py
+      });
+    });
+  }
+
+  function getActiveRow() {
+    var activeRadio = document.querySelector('input[name="active-cert-placeholder"]:checked');
+    return activeRadio ? activeRadio.closest('.cert-placeholder-row') : null;
+  }
+
+  function selectRow(row) {
+    if (!row) return;
+    var radio = row.querySelector('input[name="active-cert-placeholder"]');
+    if (radio) radio.checked = true;
+    
+    var details = row.querySelector('details');
+    if (details) details.open = true;
+    
+    document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
+      if (r !== row) {
+        var d = r.querySelector('details');
+        if (d) d.open = false;
+      }
+    });
+  }
+
+  function setRowXY(row, rx, ry) {
+    if (!row) return;
+    var xEl = row.querySelector('.cert-p-x');
+    var yEl = row.querySelector('.cert-p-y');
+    if (xEl) xEl.value = Math.max(0, Math.min(1, rx)).toFixed(3);
+    if (yEl) yEl.value = Math.max(0, Math.min(1, ry)).toFixed(3);
+  }
+
+  function canvasCoords(canvas, e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    return {
+      px: (e.clientX - rect.left) * scaleX,
+      py: (e.clientY - rect.top) * scaleY
+    };
+  }
+
+  window.loadGoogleFont = function(fontName) {
+    if (!fontName) return;
+    var fontId = 'gf-' + fontName.toLowerCase().replace(/\s+/g, '-');
+    if (document.getElementById(fontId)) return;
+    
+    var link = document.createElement('link');
+    link.id = fontId;
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=' + fontName.replace(/\s+/g, '+') + ':wght@400;700&display=swap';
+    document.head.appendChild(link);
+  };
+
+  (function() {
+    var _dragRow = null;
+    var _dragOffX = 0, _dragOffY = 0;
+    var _dragMoved = false;
+    var _downPx = 0, _downPy = 0;
+    
+    var _resizeRow = null;
+
+    function initCertCanvasInteraction() {
+      var canvas = document.getElementById('cert-preview-canvas');
+      if (!canvas) return;
+      
+      if (canvas.getAttribute('data-wired') === 'true') return;
+      canvas.setAttribute('data-wired', 'true');
+
+      canvas.addEventListener('pointerdown', function(e) {
+        var c = canvasCoords(canvas, e);
+        _downPx = c.px;
+        _downPy = c.py;
+        _dragRow = null;
+        _resizeRow = null;
+
+        var activeRow = getActiveRow();
+        if (activeRow) {
+          var activeBox = _certHitBoxes.find(function(b) { return b.row === activeRow; });
+          if (activeBox) {
+            var hx = activeBox.x + activeBox.w;
+            var hy = activeBox.y + activeBox.h;
+            var dist = Math.sqrt((c.px - hx) * (c.px - hx) + (c.py - hy) * (c.py - hy));
+            if (dist <= 8) {
+              _resizeRow = activeRow;
+              canvas.setPointerCapture(e.pointerId);
+              return;
+            }
+          }
+        }
+
+        for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
+          var b = _certHitBoxes[i];
+          if (c.px >= b.x && c.px <= b.x + b.w && c.py >= b.y && c.py <= b.y + b.h) {
+            _dragRow = b.row;
+            _dragOffX = c.px - b.anchorX;
+            _dragOffY = c.py - b.anchorY;
+            selectRow(b.row);
+            canvas.setPointerCapture(e.pointerId);
+            canvas.style.cursor = 'grabbing';
+            queueCertRedraw();
+            break;
+          }
+        }
+        canvas.focus();
+        e.preventDefault();
+      });
+
+      canvas.addEventListener('pointermove', function(e) {
+        var c = canvasCoords(canvas, e);
+        if (_resizeRow) {
+          var sizeInput = _resizeRow.querySelector('.cert-p-size');
+          var box = _certHitBoxes.find(function(b) { return b.row === _resizeRow; });
+          if (!box) return;
+          var dx = c.px - box.anchorX;
+          var dy = c.py - box.anchorY;
+          var r = Math.sqrt(dx * dx + dy * dy);
+          var newSize = Math.round((2 * r) / (_certPreviewScale * 0.5));
+          if (newSize < 8) newSize = 8;
+          if (newSize > 999) newSize = 999;
+          sizeInput.value = newSize;
+          queueCertRedraw();
+          return;
+        }
+        if (!_dragRow) return;
+        if (Math.abs(c.px - _downPx) > 2 || Math.abs(c.py - _downPy) > 2) _dragMoved = true;
+
+        var wantX = c.px - _dragOffX;
+        var wantY = c.py - _dragOffY;
+        var SNAP = 6;
+        
+        var candX = [canvas.width / 2];
+        var candY = [canvas.height / 2];
+        _certHitBoxes.forEach(function(b) {
+          if (b.row !== _dragRow) {
+            candX.push(b.anchorX);
+            candY.push(b.anchorY);
+          }
+        });
+
+        _certSnapGuides = [];
+        for (var ci = 0; ci < candX.length; ci++) {
+          if (Math.abs(wantX - candX[ci]) < SNAP) { wantX = candX[ci]; _certSnapGuides.push({ type: 'v', pos: candX[ci] }); break; }
+        }
+        for (var cj = 0; cj < candY.length; cj++) {
+          if (Math.abs(wantY - candY[cj]) < SNAP) { wantY = candY[cj]; _certSnapGuides.push({ type: 'h', pos: candY[cj] }); break; }
+        }
+
+        setRowXY(_dragRow, wantX / canvas.width, wantY / canvas.height);
+        queueCertRedraw();
+      });
+
+      canvas.addEventListener('pointerup', function(e) {
+        canvas.style.cursor = 'grab';
+        if (_certSnapGuides.length) { _certSnapGuides = []; queueCertRedraw(); }
+        if (_resizeRow) {
+          _resizeRow = null;
+          return;
+        }
+        if (!_dragRow && !_dragMoved) {
+          var activeRow = getActiveRow();
+          if (activeRow) {
+            var c = canvasCoords(canvas, e);
+            setRowXY(activeRow, c.px / canvas.width, c.py / canvas.height);
+            queueCertRedraw();
+          }
+        }
+        _dragRow = null;
+        _dragMoved = false;
+      });
+
+      canvas.addEventListener('wheel', function(e) {
+        var row = getActiveRow();
+        if (!row) return;
+        var sizeInput = row.querySelector('.cert-p-size');
+        if (!sizeInput) return;
+        e.preventDefault();
+        var cur = parseInt(sizeInput.value) || 24;
+        var step = e.shiftKey ? 10 : 3;
+        var next = cur + (e.deltaY < 0 ? step : -step);
+        if (next < 8) next = 8;
+        if (next > 999) next = 999;
+        sizeInput.value = next;
+        queueCertRedraw();
+      }, { passive: false });
+
+      canvas.addEventListener('keydown', function(e) {
+        var row = getActiveRow();
+        if (!row) return;
+        var step = e.shiftKey ? 0.02 : 0.005;
+        var dx = 0, dy = 0;
+        if (e.key === 'ArrowLeft') dx = -step;
+        else if (e.key === 'ArrowRight') dx = step;
+        else if (e.key === 'ArrowUp') dy = -step;
+        else if (e.key === 'ArrowDown') dy = step;
+        else return;
+        if (!row) return;
+        e.preventDefault();
+        var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
+        var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
+        setRowXY(row, x + dx, y + dy);
+        queueCertRedraw();
+      });
+    }
+
+    initCertCanvasInteraction();
+  })();
+
+  window.addCertPreset = function(type) {
+    var presets = {
+      participant_name: { key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' },
+      medal_title:      { key: '<MEDAL>', type: 'medal_title', x: 0.55, y: 0.69, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
+      distance:         { key: '<Distance>', type: 'distance', x: 0.55, y: 0.48, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
+      rank:             { key: '<Rank>', type: 'rank', x: 0.55, y: 0.55, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
+      points:           { key: '<Points>', type: 'points', x: 0.55, y: 0.62, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
+      medal_image:      { key: '<Medal Image>', type: 'medal_image', x: 0.28, y: 0.75, font_size: 120, color: '#1A1D20', font_style: 'normal', align: 'center' },
+      static_image:     { key: '<Image>', type: 'static_image', x: 0.5, y: 0.15, font_size: 200, color: '#1A1D20', font_style: 'normal', align: 'center', image_url: '' },
+      custom:           { key: 'Your text here', type: 'custom', x: 0.5, y: 0.5, font_size: 24, color: '#1A1D20', font_style: 'normal', align: 'center', custom_val: 'Your text here' }
+    };
+    var p = presets[type];
+    if (!p) return;
+    addCertPlaceholderRow(p);
+    updateCertPreviewCanvas();
+  };
+
+  loadEventsList();
+</script>
+</body>
+</html>
