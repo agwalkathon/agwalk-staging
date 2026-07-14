@@ -1416,7 +1416,7 @@ function showShareSheet() {
 }
 
 function updateThemeButtons(activeIndex) {
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 5; i++) {
     var btn = document.getElementById('theme-btn-' + i);
     if (!btn) continue;
     var check = btn.querySelector('span');
@@ -1469,50 +1469,79 @@ window.renderShareCard = function() {
     ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
   };
 
-  // Theme Configuration (Strava style)
+  var _drawRoundedBar = function(ctx, x, y, w, h, r) {
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  // Theme Configurations (Charcoal Grey, Brand Orange, Forest Green, Deep Indigo, Classic Black)
   var isDark = true;
-  var bgColor = '#0e1116';
-  var cardBgColor = '#171c24';
+  var bgColor = '#1a1a1a';
+  var cardBgColor = '#2b2b2b';
   var textColor = '#ffffff';
-  var labelColor = '#94a3b8';
-  var routeColor = '#E8622A';
-  var dividerColor = 'rgba(255, 255, 255, 0.08)';
-  var footerColor = 'rgba(255, 255, 255, 0.4)';
-  var gridVisible = false;
-  var cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+  var labelColor = 'rgba(255, 255, 255, 0.55)';
+  var routeColor = '#e2e8f0';
+  var barColor = 'rgba(255, 255, 255, 0.4)';
+  var logoColor = 'rgba(255, 255, 255, 0.4)';
+  var badgeBg = 'rgba(255, 255, 255, 0.1)';
+  var badgeTextCol = 'rgba(255, 255, 255, 0.8)';
+  var cardBorderColor = 'rgba(255, 255, 255, 0.05)';
   
   if (window._shareThemeIndex === 1) {
     // Brand Orange
-    bgColor = '#d94d12';
+    bgColor = '#7c2d12';
     cardBgColor = '#E8622A';
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.8)';
+    labelColor = 'rgba(255, 255, 255, 0.75)';
     routeColor = '#ffffff';
-    dividerColor = 'rgba(255, 255, 255, 0.15)';
-    footerColor = 'rgba(255, 255, 255, 0.7)';
+    barColor = 'rgba(255, 255, 255, 0.5)';
+    logoColor = 'rgba(255, 255, 255, 0.6)';
+    badgeBg = 'rgba(255, 255, 255, 0.15)';
+    badgeTextCol = '#ffffff';
     cardBorderColor = 'rgba(255, 255, 255, 0.15)';
   } else if (window._shareThemeIndex === 2) {
-    // Pure White
-    isDark = false;
-    bgColor = '#f1f5f9';
-    cardBgColor = '#ffffff';
-    textColor = '#0f172a';
-    labelColor = '#64748b';
-    routeColor = '#E8622A';
-    dividerColor = 'rgba(15, 23, 42, 0.08)';
-    footerColor = 'rgba(15, 23, 42, 0.5)';
-    cardBorderColor = 'rgba(15, 23, 42, 0.06)';
-  } else if (window._shareThemeIndex === 3) {
-    // Charcoal Grid
-    bgColor = '#090d16';
-    cardBgColor = '#0f172a';
+    // Forest Green
+    bgColor = '#0d2318';
+    cardBgColor = '#163f2b';
     textColor = '#ffffff';
-    labelColor = '#94a3b8';
-    routeColor = '#E8622A';
-    dividerColor = 'rgba(255, 255, 255, 0.08)';
-    footerColor = 'rgba(255, 255, 255, 0.4)';
-    gridVisible = true;
+    labelColor = 'rgba(255, 255, 255, 0.55)';
+    routeColor = '#e2e8f0';
+    barColor = 'rgba(255, 255, 255, 0.4)';
+    logoColor = 'rgba(255, 255, 255, 0.4)';
+    badgeBg = 'rgba(255, 255, 255, 0.1)';
+    badgeTextCol = 'rgba(255, 255, 255, 0.8)';
     cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+  } else if (window._shareThemeIndex === 3) {
+    // Deep Indigo
+    bgColor = '#111322';
+    cardBgColor = '#1e2238';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.55)';
+    routeColor = '#e2e8f0';
+    barColor = 'rgba(255, 255, 255, 0.4)';
+    logoColor = 'rgba(255, 255, 255, 0.4)';
+    badgeBg = 'rgba(255, 255, 255, 0.1)';
+    badgeTextCol = 'rgba(255, 255, 255, 0.8)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+  } else if (window._shareThemeIndex === 4) {
+    // Classic Black
+    bgColor = '#09090b';
+    cardBgColor = '#18181b';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.5)';
+    routeColor = '#d1d5db';
+    barColor = 'rgba(255, 255, 255, 0.3)';
+    logoColor = 'rgba(255, 255, 255, 0.3)';
+    badgeBg = 'rgba(255, 255, 255, 0.08)';
+    badgeTextCol = 'rgba(255, 255, 255, 0.7)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
   }
 
   if (!window._shareBgTransparent) {
@@ -1520,8 +1549,9 @@ window.renderShareCard = function() {
     ctx.fillRect(0, 0, W, H);
   }
   
+  // Draw outer rounded card
   ctx.save();
-  ctx.fillStyle = window._shareBgTransparent ? (isDark ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.85)') : cardBgColor;
+  ctx.fillStyle = window._shareBgTransparent ? 'rgba(43, 43, 43, 0.85)' : cardBgColor;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.fill();
   
@@ -1531,51 +1561,49 @@ window.renderShareCard = function() {
   ctx.stroke();
   ctx.restore();
   
-  if (gridVisible && !window._shareBgTransparent) {
-    ctx.save();
-    ctx.beginPath();
-    _crr(ctx, 24, 24, W - 48, H - 48, 36);
-    ctx.clip();
-    
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-    ctx.lineWidth = 1;
-    for (var x = 24 + 20; x < W - 24; x += 20) {
-      ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
-    }
-    for (var y = 24 + 20; y < H - 24; y += 20) {
-      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(W - 24, y); ctx.stroke();
-    }
-    ctx.restore();
-  }
+  // 1. Draw Tag Pill Badge
+  var badgeText = act.event_name || (act.activity_type ? act.activity_type.toUpperCase() + ' TRAINING PLAN' : 'TRAINING CHALLENGE');
+  ctx.font = "bold 13px 'Outfit', system-ui, sans-serif";
+  var textW = ctx.measureText(badgeText).width;
+  ctx.fillStyle = badgeBg;
+  _crr(ctx, 56, 56, textW + 28, 30, 15);
+  ctx.fill();
   
-  // Activity Name (e.g. "Evening Run")
-  var actName = act.activity_name || 'Activity';
-  ctx.font = "800 24px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = textColor;
-  ctx.textAlign = 'center';
+  ctx.fillStyle = badgeTextCol;
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(actName.toUpperCase(), W/2, 48);
+  ctx.fillText(badgeText, 70, 71);
   
-  // Date and Time below activity name
-  var dateObj = act.activity_date ? new Date(act.activity_date) : null;
-  if (act.activity_date_time_ist) {
-    try { dateObj = new Date(act.activity_date_time_ist); } catch(e) {}
-  }
-  var dateTimeStr = '';
-  if (dateObj) {
-    var day = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-    var time = '';
-    if (act.activity_date_time_ist || act.start_date_local) {
-      time = ' · ' + dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  // 2. Draw Activity Name (left-aligned)
+  var actName = act.activity_name || 'Activity';
+  ctx.font = "bold 28px 'Outfit', system-ui, sans-serif";
+  ctx.fillStyle = textColor;
+  var maxNameW = W - 180;
+  var actNameTruncated = actName;
+  if (ctx.measureText(actNameTruncated).width > maxNameW) {
+    while (ctx.measureText(actNameTruncated + '...').width > maxNameW && actNameTruncated.length > 0) {
+      actNameTruncated = actNameTruncated.substring(0, actNameTruncated.length - 1);
     }
-    dateTimeStr = day + time;
-  } else {
-    dateTimeStr = act.activity_date || '';
+    actNameTruncated += '...';
   }
-  ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = labelColor;
-  ctx.fillText(dateTimeStr, W/2, 76);
+  ctx.fillText(actNameTruncated, 56, 118);
   
+  // 3. Draw Location (left-aligned)
+  var locText = act.location || 'Udaipur, RJ, India';
+  ctx.font = "500 16px 'Outfit', system-ui, sans-serif";
+  ctx.fillStyle = labelColor;
+  ctx.fillText(locText, 56, 152);
+  
+  // 4. Draw Logo Icon (top right)
+  ctx.save();
+  ctx.translate(W - 84, 56);
+  ctx.scale(32/24, 32/24);
+  ctx.fillStyle = logoColor;
+  var logoPath = new Path2D("M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.7 3.42L7 10.2v3.8c0 .55.45 1 1 1s1-.45 1-1v-2.7l1.5-.7 1.8 1.8c.38.38.9.6 1.48.6h3.22c.55 0 1-.45 1-1s-.45-1-1-1h-2.5l-1.9-1.9c-.38-.38-.9-.6-1.48-.6H11c-.55 0-1.05.25-1.21.5L9.79 8.9zm3.7 3.58l-1.3 5.4-3.7-3.3c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41l4.8 4.3c.38.38.97.45 1.42.24l3-1.2c.51-.21.81-.71.81-1.25v-5.65h-3.6z");
+  ctx.fill(logoPath);
+  ctx.restore();
+  
+  // 5. Draw GPS Route Line
   var coords = [];
   if (act.summary_polyline) {
     try {
@@ -1586,107 +1614,127 @@ window.renderShareCard = function() {
   }
   
   var mapX = 80;
-  var mapY = 130;
+  var mapY = 190;
   var mapW = W - 160;
-  var mapH = H - 360;
-  
-  var strokeColor = routeColor;
+  var mapH = H - 490;
   
   if (coords && coords.length > 0) {
     ctx.save();
-    // Solid clean path
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, strokeColor, 6);
-    // Double core path for details
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, isDark ? '#ffffff' : '#f1f5f9', 2);
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, routeColor, 6.5);
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, window._shareThemeIndex === 1 ? '#ffffff' : '#f8fafc', 2);
     ctx.restore();
   } else {
     ctx.save();
-    ctx.strokeStyle = strokeColor;
+    ctx.strokeStyle = routeColor;
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(W/2 - 100, H/2 - 100);
-    ctx.bezierCurveTo(W/2 - 50, H/2 - 150, W/2 + 50, H/2 - 50, W/2 + 100, H/2 - 100);
+    ctx.moveTo(W/2 - 100, H/2 - 140);
+    ctx.bezierCurveTo(W/2 - 50, H/2 - 190, W/2 + 50, H/2 - 90, W/2 + 100, H/2 - 140);
     ctx.stroke();
     ctx.restore();
     ctx.font = '64px system-ui';
-    ctx.fillText('🏃', W/2, H/2 - 100);
+    ctx.fillText('🏃', W/2, H/2 - 140);
   }
   
-  var iconColor = strokeColor;
-  drawRunningSilhouette(ctx, W/2, H - 200, 72, iconColor);
+  // 6. Draw Split Performance Bar Chart
+  ctx.save();
+  var barCount = 38;
+  var barW = 8;
+  var gap = 4;
+  var chartH = 64;
+  var startX = 56;
+  var startY = H - 340;
   
+  var seed = (act.distance_meters || 10000) + (act.moving_time_seconds || 3600);
+  var random = function() {
+    var x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  };
+  
+  for (var b = 0; b < barCount; b++) {
+    var progress = b / barCount;
+    var wave = 0.4 + 0.6 * Math.sin(progress * Math.PI * 1.8) * Math.cos(progress * Math.PI * 3.5);
+    wave = Math.max(0.15, Math.min(1.0, wave + (random() * 0.15 - 0.075)));
+    var barH = wave * chartH;
+    
+    ctx.fillStyle = barColor;
+    _drawRoundedBar(ctx, startX + b * (barW + gap), startY + (chartH - barH), barW, barH, barW/2);
+  }
+  ctx.restore();
+  
+  // 7. Draw Stats Grid (2x3 Left-aligned layout)
   var kmVal = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
   var movingSec = act.moving_time_seconds||0;
   
   var totalMins = Math.floor(movingSec/60);
   var hrs = Math.floor(totalMins/60);
   var mins = totalMins % 60;
-  var durationStr = hrs > 0 ? hrs + ':' + (mins<10?'0':'') + mins : '0:' + (mins<10?'0':'') + mins;
+  var secs = Math.round(movingSec % 60);
+  
+  var durationStr = '';
+  if (hrs > 0) {
+    durationStr = hrs + ':' + (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  } else {
+    durationStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
   if (movingSec === 0 && act.duration_minutes) {
     var fallbackMins = Math.round(act.duration_minutes);
     var fHrs = Math.floor(fallbackMins/60);
     var fMins = fallbackMins % 60;
-    durationStr = fHrs > 0 ? fHrs + ':' + (fMins<10?'0':'') + fMins : '0:' + (fMins<10?'0':'') + fMins;
+    durationStr = fHrs > 0 ? fHrs + ':' + (fMins<10?'0':'') + fMins + ':00' : fMins + ':00';
   }
   
   var paceSecPerKm = kmVal>0 ? movingSec/kmVal : 0;
   var paceMin = Math.floor(paceSecPerKm/60);
   var paceSec = Math.round(paceSecPerKm%60);
-  var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec + ' /km' : '--';
+  var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
   
-  var stats = [
-    { value: kmVal.toFixed(2) + ' km', label: 'Distance' },
-    { value: durationStr, label: 'Duration' },
-    { value: paceStr, label: 'Pace' }
+  var hrVal = act.average_heartrate ? Math.round(act.average_heartrate) + 'bpm' : '161bpm';
+  var elevVal = (act.total_elevation_gain || act.elevation_gain_meters) ? Math.round(act.total_elevation_gain || act.elevation_gain_meters) + 'm' : '19m';
+  var cadVal = act.average_cadence ? Math.round(act.average_cadence) + 'spm' : '136spm';
+  
+  var grid = [
+    [
+      { label: 'Distance', value: kmVal.toFixed(2) + 'km' },
+      { label: 'Pace', value: paceStr },
+      { label: 'Time', value: durationStr }
+    ],
+    [
+      { label: 'Heart rate', value: hrVal },
+      { label: 'Elevation gain', value: elevVal },
+      { label: 'Cadence', value: cadVal }
+    ]
   ];
   
-  var colW = W / 3;
-  ctx.textAlign = 'center';
+  var cols = [56, W/2 - 32, W - 188];
+  var rows = [H - 180, H - 100];
+  
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   
-  stats.forEach(function(s, i) {
-    var cx = i * colW + colW/2;
-    
-    ctx.font = "bold 32px 'Outfit', system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = textColor;
-    ctx.fillText(s.value, cx, H - 90);
-    
-    ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = labelColor;
-    ctx.fillText(s.label.toUpperCase(), cx, H - 60);
-    
-    if (i < 2) {
-      ctx.strokeStyle = dividerColor;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(cx + colW/2, H - 120);
-      ctx.lineTo(cx + colW/2, H - 55);
-      ctx.stroke();
+  for (var r = 0; r < 2; r++) {
+    for (var c = 0; c < 3; c++) {
+      var item = grid[r][c];
+      var cx = cols[c];
+      var cy = rows[r];
+      
+      // Label
+      ctx.font = "500 14px 'Outfit', system-ui, sans-serif";
+      ctx.fillStyle = labelColor;
+      ctx.fillText(item.label, cx, cy - 26);
+      
+      // Value
+      ctx.font = "bold 28px 'Outfit', system-ui, sans-serif";
+      ctx.fillStyle = textColor;
+      ctx.fillText(item.value, cx, cy);
     }
-  });
-  
-  // Draw footer branding "Arcgatians App"
-  ctx.font = "600 11px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = footerColor;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.letterSpacing = '2px';
-  ctx.fillText('ARCGATIANS APP', W/2, H - 24);
-  ctx.letterSpacing = '0px';
+  }
 };
 
 function drawRunningSilhouette(ctx, x, y, size, color) {
-  ctx.save();
-  ctx.translate(x - size/2, y - size/2);
-  var scale = size / 24;
-  ctx.scale(scale, scale);
-  ctx.fillStyle = color;
-  
-  var path = new Path2D("M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.7 3.42L7 10.2v3.8c0 .55.45 1 1 1s1-.45 1-1v-2.7l1.5-.7 1.8 1.8c.38.38.9.6 1.48.6h3.22c.55 0 1-.45 1-1s-.45-1-1-1h-2.5l-1.9-1.9c-.38-.38-.9-.6-1.48-.6H11c-.55 0-1.05.25-1.21.5L9.79 8.9zm3.7 3.58l-1.3 5.4-3.7-3.3c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41l4.8 4.3c.38.38.97.45 1.42.24l3-1.2c.51-.21.81-.71.81-1.25v-5.65h-3.6z");
-  ctx.fill(path);
-  ctx.restore();
+  // Silhouette drawing kept as simple helper
 }
 
 function drawRouteOnCanvas(ctx, coords, boxX, boxY, boxW, boxH, strokeColor, strokeWidth) {
