@@ -1408,14 +1408,26 @@ function showShareSheet() {
   var toggle = document.getElementById('share-bg-toggle');
   if (toggle) toggle.checked = false;
   
-  var dots = document.querySelectorAll('.share-dot');
-  dots.forEach(function(d, i) {
-    if (d) d.style.opacity = (i === 0) ? '1' : '0.3';
-  });
+  updateThemeButtons(0);
   
   setTimeout(function() {
     window.renderShareCard();
   }, 100);
+}
+
+function updateThemeButtons(activeIndex) {
+  for (var i = 0; i < 4; i++) {
+    var btn = document.getElementById('theme-btn-' + i);
+    if (!btn) continue;
+    var check = btn.querySelector('span');
+    if (i === activeIndex) {
+      btn.style.border = '2px solid #3b82f6';
+      if (check) check.style.display = 'inline';
+    } else {
+      btn.style.border = '2px solid rgba(255,255,255,0.1)';
+      if (check) check.style.display = 'none';
+    }
+  }
 }
 
 function hideShareSheet() {
@@ -1425,10 +1437,7 @@ function hideShareSheet() {
 
 window.setShareTheme = function(index) {
   window._shareThemeIndex = index;
-  var dots = document.querySelectorAll('.share-dot');
-  dots.forEach(function(d, i) {
-    if (d) d.style.opacity = (i === index) ? '1' : '0.3';
-  });
+  updateThemeButtons(index);
   window.renderShareCard();
 };
 
@@ -1460,48 +1469,89 @@ window.renderShareCard = function() {
     ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
   };
 
-  if (!window._shareBgTransparent) {
-    ctx.fillStyle = '#0b0f19';
-    ctx.fillRect(0, 0, W, H);
-    
-    var drawBlob = function(x, y, r, color) {
-      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, color);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI*2);
-      ctx.fill();
-    };
+  // Theme Configuration (Strava style)
+  var isDark = true;
+  var bgColor = '#0e1116';
+  var cardBgColor = '#171c24';
+  var textColor = '#ffffff';
+  var labelColor = '#94a3b8';
+  var routeColor = '#E8622A';
+  var dividerColor = 'rgba(255, 255, 255, 0.08)';
+  var footerColor = 'rgba(255, 255, 255, 0.4)';
+  var gridVisible = false;
+  var cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+  
+  if (window._shareThemeIndex === 1) {
+    // Brand Orange
+    bgColor = '#d94d12';
+    cardBgColor = '#E8622A';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.8)';
+    routeColor = '#ffffff';
+    dividerColor = 'rgba(255, 255, 255, 0.15)';
+    footerColor = 'rgba(255, 255, 255, 0.7)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.15)';
+  } else if (window._shareThemeIndex === 2) {
+    // Pure White
+    isDark = false;
+    bgColor = '#f1f5f9';
+    cardBgColor = '#ffffff';
+    textColor = '#0f172a';
+    labelColor = '#64748b';
+    routeColor = '#E8622A';
+    dividerColor = 'rgba(15, 23, 42, 0.08)';
+    footerColor = 'rgba(15, 23, 42, 0.5)';
+    cardBorderColor = 'rgba(15, 23, 42, 0.06)';
+  } else if (window._shareThemeIndex === 3) {
+    // Charcoal Grid
+    bgColor = '#090d16';
+    cardBgColor = '#0f172a';
+    textColor = '#ffffff';
+    labelColor = '#94a3b8';
+    routeColor = '#E8622A';
+    dividerColor = 'rgba(255, 255, 255, 0.08)';
+    footerColor = 'rgba(255, 255, 255, 0.4)';
+    gridVisible = true;
+    cardBorderColor = 'rgba(255, 255, 255, 0.05)';
+  }
 
-    if (window._shareThemeIndex === 0) {
-      drawBlob(W - 100, 150, 420, 'rgba(217, 70, 239, 0.45)');
-      drawBlob(100, H - 200, 450, 'rgba(6, 182, 212, 0.45)');
-      drawBlob(W/2, H/2, 350, 'rgba(99, 102, 241, 0.25)');
-    } else if (window._shareThemeIndex === 1) {
-      drawBlob(100, 150, 420, 'rgba(236, 72, 153, 0.45)');
-      drawBlob(W - 100, H - 200, 450, 'rgba(249, 115, 22, 0.45)');
-      drawBlob(W/2, H/2, 350, 'rgba(239, 68, 68, 0.25)');
-    } else if (window._shareThemeIndex === 2) {
-      drawBlob(W/2, 100, 420, 'rgba(132, 204, 22, 0.45)');
-      drawBlob(W/2, H - 150, 450, 'rgba(20, 184, 166, 0.45)');
-      drawBlob(100, H/2, 350, 'rgba(16, 185, 129, 0.25)');
+  if (!window._shareBgTransparent) {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+  }
+  
+  ctx.save();
+  ctx.fillStyle = window._shareBgTransparent ? (isDark ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.85)') : cardBgColor;
+  _crr(ctx, 24, 24, W - 48, H - 48, 36);
+  ctx.fill();
+  
+  ctx.strokeStyle = cardBorderColor;
+  ctx.lineWidth = 1.5;
+  _crr(ctx, 24, 24, W - 48, H - 48, 36);
+  ctx.stroke();
+  ctx.restore();
+  
+  if (gridVisible && !window._shareBgTransparent) {
+    ctx.save();
+    ctx.beginPath();
+    _crr(ctx, 24, 24, W - 48, H - 48, 36);
+    ctx.clip();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.lineWidth = 1;
+    for (var x = 24 + 20; x < W - 24; x += 20) {
+      ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
     }
-    
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
-    _crr(ctx, 24, 24, W - 48, H - 48, 36);
-    ctx.fill();
-    
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-    ctx.lineWidth = 2;
-    _crr(ctx, 24, 24, W - 48, H - 48, 36);
-    ctx.stroke();
+    for (var y = 24 + 20; y < H - 24; y += 20) {
+      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(W - 24, y); ctx.stroke();
+    }
+    ctx.restore();
   }
   
   // Activity Name (e.g. "Evening Run")
   var actName = act.activity_name || 'Activity';
   ctx.font = "800 24px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = textColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(actName.toUpperCase(), W/2, 48);
@@ -1523,7 +1573,7 @@ window.renderShareCard = function() {
     dateTimeStr = act.activity_date || '';
   }
   ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = '#94a3b8';
+  ctx.fillStyle = labelColor;
   ctx.fillText(dateTimeStr, W/2, 76);
   
   var coords = [];
@@ -1540,16 +1590,14 @@ window.renderShareCard = function() {
   var mapW = W - 160;
   var mapH = H - 360;
   
-  var themeColors = ['#00f0ff', '#ef4444', '#10b981'];
-  var strokeColor = themeColors[window._shareThemeIndex] || '#00f0ff';
+  var strokeColor = routeColor;
   
   if (coords && coords.length > 0) {
     ctx.save();
-    ctx.shadowColor = strokeColor;
-    ctx.shadowBlur = 15;
+    // Solid clean path
     drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, strokeColor, 6);
-    ctx.shadowBlur = 0;
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, '#ffffff', 2.5);
+    // Double core path for details
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, isDark ? '#ffffff' : '#f1f5f9', 2);
     ctx.restore();
   } else {
     ctx.save();
@@ -1557,8 +1605,6 @@ window.renderShareCard = function() {
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.shadowColor = strokeColor;
-    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.moveTo(W/2 - 100, H/2 - 100);
     ctx.bezierCurveTo(W/2 - 50, H/2 - 150, W/2 + 50, H/2 - 50, W/2 + 100, H/2 - 100);
@@ -1604,15 +1650,15 @@ window.renderShareCard = function() {
     var cx = i * colW + colW/2;
     
     ctx.font = "bold 32px 'Outfit', system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = textColor;
     ctx.fillText(s.value, cx, H - 90);
     
     ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = '#94a3b8';
+    ctx.fillStyle = labelColor;
     ctx.fillText(s.label.toUpperCase(), cx, H - 60);
     
     if (i < 2) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.strokeStyle = dividerColor;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(cx + colW/2, H - 120);
@@ -1623,7 +1669,7 @@ window.renderShareCard = function() {
   
   // Draw footer branding "Arcgatians App"
   ctx.font = "600 11px 'Outfit', system-ui, -apple-system, sans-serif";
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.fillStyle = footerColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.letterSpacing = '2px';
@@ -1637,10 +1683,6 @@ function drawRunningSilhouette(ctx, x, y, size, color) {
   var scale = size / 24;
   ctx.scale(scale, scale);
   ctx.fillStyle = color;
-  
-  // Glowing effect on the sport flat icon
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 8;
   
   var path = new Path2D("M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.7 3.42L7 10.2v3.8c0 .55.45 1 1 1s1-.45 1-1v-2.7l1.5-.7 1.8 1.8c.38.38.9.6 1.48.6h3.22c.55 0 1-.45 1-1s-.45-1-1-1h-2.5l-1.9-1.9c-.38-.38-.9-.6-1.48-.6H11c-.55 0-1.05.25-1.21.5L9.79 8.9zm3.7 3.58l-1.3 5.4-3.7-3.3c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41l4.8 4.3c.38.38.97.45 1.42.24l3-1.2c.51-.21.81-.71.81-1.25v-5.65h-3.6z");
   ctx.fill(path);
