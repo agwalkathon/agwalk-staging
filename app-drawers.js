@@ -1660,7 +1660,7 @@ window.renderShareCard = function() {
   }
   ctx.restore();
 
-  // ---- Effort bars (rounded waveform) ----
+  // ---- Effort bars (rounded waveform) — ONLY drawn from real per-km splits ----
   var barsTop = routeTop + routeH + 40;
   var barsH = 130;
   var barsX = padX;
@@ -1691,31 +1691,33 @@ window.renderShareCard = function() {
       }
     }
   }
-  if (!heights.length) {
-    heights = [0.42,0.30,0.55,0.72,0.80,0.76,0.62,0.48,0.38,0.58,0.84,0.78,0.70,0.66,0.72,0.64,0.58,0.66,0.74,0.68,0.60,0.52,0.64,0.70,0.62,0.54,0.60,0.72,0.66,0.44,0.58,0.50];
-  }
-  if (heights.length > 40) {
-    var step = heights.length / 40, sampled = [];
-    for (var si = 0; si < 40; si++) sampled.push(heights[Math.floor(si * step)]);
-    heights = sampled;
-  }
 
-  var gap = 5;
-  var bwid = (barsW - gap * (heights.length - 1)) / heights.length;
-  for (var bi = 0; bi < heights.length; bi++) {
-    var bh = Math.max(barsH * heights[bi], bwid);
-    var bx = barsX + bi * (bwid + gap);
-    var by = barsTop + barsH - bh;
-    var edge = Math.min(bi, heights.length - 1 - bi);
-    ctx.save();
-    ctx.globalAlpha = edge < 3 ? (0.45 + edge * 0.18) : 0.92;
-    var barGrad = ctx.createLinearGradient(0, by, 0, by + bh * 1.4);
-    barGrad.addColorStop(0, TH.barHi);
-    barGrad.addColorStop(1, accent);
-    ctx.fillStyle = barGrad;
-    _crr(ctx, bx, by, bwid, bh, bwid / 2);
-    ctx.fill();
-    ctx.restore();
+  var hasRealBars = heights.length > 0;
+
+  if (hasRealBars) {
+    if (heights.length > 40) {
+      var step = heights.length / 40, sampled = [];
+      for (var si = 0; si < 40; si++) sampled.push(heights[Math.floor(si * step)]);
+      heights = sampled;
+    }
+
+    var gap = 5;
+    var bwid = (barsW - gap * (heights.length - 1)) / heights.length;
+    for (var bi = 0; bi < heights.length; bi++) {
+      var bh = Math.max(barsH * heights[bi], bwid);
+      var bx = barsX + bi * (bwid + gap);
+      var by = barsTop + barsH - bh;
+      var edge = Math.min(bi, heights.length - 1 - bi);
+      ctx.save();
+      ctx.globalAlpha = edge < 3 ? (0.45 + edge * 0.18) : 0.92;
+      var barGrad = ctx.createLinearGradient(0, by, 0, by + bh * 1.4);
+      barGrad.addColorStop(0, TH.barHi);
+      barGrad.addColorStop(1, accent);
+      ctx.fillStyle = barGrad;
+      _crr(ctx, bx, by, bwid, bh, bwid / 2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   // ---- Stats grid (2 x 3, mockup order) ----
@@ -1773,7 +1775,7 @@ window.renderShareCard = function() {
     items.push({ label: 'Elapsed', value: durationStr });
   }
 
-  var gridTop = barsTop + barsH + 62;
+  var gridTop = hasRealBars ? (barsTop + barsH + 62) : (routeTop + routeH + 60);
   var colXs = [padX, padX + (CW-68) * 0.40, padX + (CW-68) * 0.755];
   var rowYs = [gridTop, gridTop + 108];
 
