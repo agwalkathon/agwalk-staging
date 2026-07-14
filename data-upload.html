@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!-- cache bust trigger v2 -->
 <html lang="en">
 <head>
@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Data Upload — Arcgate Walkathon 2026</title>
+  <title>Data Upload � Arcgate Walkathon 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -275,6 +275,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item active"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -317,9 +318,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <button class="stab" onclick="switchTab('tab-flag', this)"><i class="ti ti-flag"></i> Flag / Status Override</button>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         TAB 1 — UPLOAD TO DATABASE
-    ═══════════════════════════════════════════════════════════ -->
+    <!-- -----------------------------------------------------------
+         TAB 1 � UPLOAD TO DATABASE
+    ----------------------------------------------------------- -->
     <div id="tab-upload" class="tab-panel active">
 
       <!-- Step 1: Download template -->
@@ -328,8 +329,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div class="card-head-left">
             <div class="card-head-icon"><i class="ti ti-file-download"></i></div>
             <div>
-              <h2>Step 1 — Download Template</h2>
-              <p>Fill in the raw template (URLs, km, HH:MM:SS) — the system will auto-convert on upload</p>
+              <h2>Step 1 � Download Template</h2>
+              <p>Fill in the raw template (URLs, km, HH:MM:SS) � the system will auto-convert on upload</p>
             </div>
           </div>
           <button class="btn btn-teal" onclick="downloadTemplate()">
@@ -340,14 +341,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <!-- Collapsible format reference -->
           <div style="margin-bottom:4px">
             <div onclick="toggleFormatRef()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:9px 12px;background:#f8f8f8;border:1px solid var(--border);border-radius:8px;user-select:none">
-              <span style="font-size:13px;font-weight:600;color:var(--text-primary)">📋 Template Columns &amp; ⚙️ Auto-conversion Reference</span>
-              <span id="fmt-ref-chevron" style="font-size:12px;color:#888;transition:transform .2s">▼ Show</span>
+              <span style="font-size:13px;font-weight:600;color:var(--text-primary)">?? Template Columns &amp; ?? Auto-conversion Reference</span>
+              <span id="fmt-ref-chevron" style="font-size:12px;color:#888;transition:transform .2s">? Show</span>
             </div>
             <div id="fmt-ref-body" style="display:none;margin-top:4px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
           <div class="two-col" style="padding:16px">
             <!-- Template columns -->
             <div>
-              <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">📋 Template Columns (raw format)</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">?? Template Columns (raw format)</div>
               <table class="fmt-table">
                 <thead><tr><th>Column</th><th>Format / Example</th><th>Notes</th></tr></thead>
                 <tbody>
@@ -358,30 +359,30 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
                   <tr><td>activity_date</td><td>2026-06-14</td><td>YYYY-MM-DD</td></tr>
                   <tr><td>distance_km</td><td>5.23</td><td>Kilometres (decimal OK)</td></tr>
                   <tr><td>duration</td><td>0:45:30</td><td>H:MM:SS or HH:MM:SS</td></tr>
-                  <tr><td>steps</td><td>7500</td><td>Optional — leave blank if unknown</td></tr>
-                  <tr><td>elevation_m</td><td>45</td><td>Optional — metres</td></tr>
+                  <tr><td>steps</td><td>7500</td><td>Optional � leave blank if unknown</td></tr>
+                  <tr><td>elevation_m</td><td>45</td><td>Optional � metres</td></tr>
                 </tbody>
               </table>
             </div>
             <!-- What gets converted -->
             <div>
-              <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">⚙️ Auto-conversion on Upload</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">?? Auto-conversion on Upload</div>
               <table class="fmt-table">
-                <thead><tr><th>Raw column</th><th>→</th><th>DB column</th></tr></thead>
+                <thead><tr><th>Raw column</th><th>?</th><th>DB column</th></tr></thead>
                 <tbody>
-                  <tr><td>athlete_url</td><td>→</td><td>strava_athlete_id (number extracted)</td></tr>
-                  <tr><td>activity_url</td><td>→</td><td>strava_activity_id (number extracted)</td></tr>
-                  <tr><td>activity_date</td><td>→</td><td>activity_date (T06:30:00 appended)</td></tr>
-                  <tr><td>distance_km</td><td>→</td><td>distance_meters (× 1000)</td></tr>
-                  <tr><td>duration (H:MM:SS)</td><td>→</td><td>moving_time_seconds</td></tr>
-                  <tr><td>duration</td><td>→</td><td>avg_speed (distance ÷ seconds, m/s)</td></tr>
-                  <tr><td>steps</td><td>→</td><td>steps (integer)</td></tr>
-                  <tr><td>elevation_m</td><td>→</td><td>elevation_gain</td></tr>
+                  <tr><td>athlete_url</td><td>?</td><td>strava_athlete_id (number extracted)</td></tr>
+                  <tr><td>activity_url</td><td>?</td><td>strava_activity_id (number extracted)</td></tr>
+                  <tr><td>activity_date</td><td>?</td><td>activity_date (T06:30:00 appended)</td></tr>
+                  <tr><td>distance_km</td><td>?</td><td>distance_meters (� 1000)</td></tr>
+                  <tr><td>duration (H:MM:SS)</td><td>?</td><td>moving_time_seconds</td></tr>
+                  <tr><td>duration</td><td>?</td><td>avg_speed (distance � seconds, m/s)</td></tr>
+                  <tr><td>steps</td><td>?</td><td>steps (integer)</td></tr>
+                  <tr><td>elevation_m</td><td>?</td><td>elevation_gain</td></tr>
                 </tbody>
               </table>
               <div class="conv-note">
-                <strong>💡 Tip</strong>
-                You fill exactly what you have from your raw data. The system converts everything automatically — no manual calculation needed.
+                <strong>?? Tip</strong>
+                You fill exactly what you have from your raw data. The system converts everything automatically � no manual calculation needed.
               </div>
             </div>
           </div>
@@ -396,14 +397,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div class="card-head-left">
             <div class="card-head-icon"><i class="ti ti-file-upload"></i></div>
             <div>
-              <h2>Step 2 — Upload &amp; Preview</h2>
-              <p>Drag the filled template here — duplicates auto-detected before import</p>
+              <h2>Step 2 � Upload &amp; Preview</h2>
+              <p>Drag the filled template here � duplicates auto-detected before import</p>
             </div>
           </div>
         </div>
         <div class="card-body">
           <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-            <div class="dz-icon">📄</div>
+            <div class="dz-icon">??</div>
             <div class="dz-text" id="dz-text">Click to select CSV or drag &amp; drop here</div>
             <div class="dz-sub" id="dz-sub">Supports template format (raw) or standard DB format</div>
           </div>
@@ -431,10 +432,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
               <div style="font-size:13px;font-weight:600" id="preview-label">Preview</div>
               <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost" onclick="resetUpload()">🗑 Clear</button>
-                <button class="btn btn-primary" id="import-btn" onclick="startImport('unique')">⬆️ Import Unique</button>
-                <button class="btn btn-purple" id="import-existing-btn" onclick="startImport('update-only')">🔄 Update Existing Only</button>
-                <button class="btn btn-teal" id="import-update-btn" onclick="startImport('all')">⚡ Import &amp; Update All</button>
+                <button class="btn btn-ghost" onclick="resetUpload()">?? Clear</button>
+                <button class="btn btn-primary" id="import-btn" onclick="startImport('unique')">?? Import Unique</button>
+                <button class="btn btn-purple" id="import-existing-btn" onclick="startImport('update-only')">?? Update Existing Only</button>
+                <button class="btn btn-teal" id="import-update-btn" onclick="startImport('all')">? Import &amp; Update All</button>
               </div>
             </div>
             <div class="preview-wrap">
@@ -460,9 +461,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       </div>
     </div><!-- /tab-upload -->
 
-    <!-- ═══════════════════════════════════════════════════════════
-         TAB 2 — GENERATE SQL FILE
-    ═══════════════════════════════════════════════════════════ -->
+    <!-- -----------------------------------------------------------
+         TAB 2 � GENERATE SQL FILE
+    ----------------------------------------------------------- -->
     <div id="tab-sql" class="tab-panel">
 
       <!-- Info -->
@@ -472,31 +473,31 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <div class="card-head-icon" style="background:#FAF5FF;color:#7C3AED"><i class="ti ti-database-import"></i></div>
             <div>
               <h2>Generate SQL Import File</h2>
-              <p>Upload your raw file → get a SQL file ready to paste directly in Supabase SQL Editor</p>
+              <p>Upload your raw file ? get a SQL file ready to paste directly in Supabase SQL Editor</p>
             </div>
           </div>
         </div>
         <div class="card-body">
           <div class="two-col" style="margin-bottom:20px">
             <div class="tpl-box">
-              <div class="tpl-icon">📥</div>
-              <h3>Step 1 — Download Template</h3>
+              <div class="tpl-icon">??</div>
+              <h3>Step 1 � Download Template</h3>
               <p>Same raw format: Athlete URL, Activity URL, Distance (km), Duration (H:MM:SS). Fill it with your data.</p>
               <button class="btn btn-teal" onclick="downloadTemplate()"><i class="ti ti-download"></i> Download Template CSV</button>
             </div>
             <div class="tpl-box" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-color:#C4B5FD">
-              <div class="tpl-icon">🗄️</div>
-              <h3>Step 2 — Upload → Get SQL</h3>
+              <div class="tpl-icon">???</div>
+              <h3>Step 2 � Upload ? Get SQL</h3>
               <p>Drop your filled template here. System converts and generates a complete <strong>.sql</strong> file ready for Supabase.</p>
-              <div style="font-size:11px;color:#6D28D9;margin-top:8px">No database connection needed — pure offline conversion</div>
+              <div style="font-size:11px;color:#6D28D9;margin-top:8px">No database connection needed � pure offline conversion</div>
             </div>
           </div>
 
           <!-- SQL Drop zone -->
           <div class="drop-zone" id="sql-drop-zone" onclick="document.getElementById('sql-file-input').click()">
-            <div class="dz-icon">🗂️</div>
+            <div class="dz-icon">???</div>
             <div class="dz-text" id="sql-dz-text">Click to select your raw CSV file</div>
-            <div class="dz-sub" id="sql-dz-sub">Upload the filled template → SQL file will be generated</div>
+            <div class="dz-sub" id="sql-dz-sub">Upload the filled template ? SQL file will be generated</div>
           </div>
           <input type="file" id="sql-file-input" accept=".csv" style="display:none">
 
@@ -509,19 +510,19 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
           <!-- SQL result -->
           <div class="sql-result" id="sql-result">
-            <h4>✅ SQL File Ready</h4>
+            <h4>? SQL File Ready</h4>
             <p id="sql-result-msg">SQL file generated with X activities. Download and paste into Supabase SQL Editor.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="btn btn-purple" id="sql-download-btn" onclick="downloadSQL()"><i class="ti ti-download"></i> Download .sql File</button>
-              <button class="btn btn-ghost" onclick="resetSQL()">🗑 Clear &amp; Start Over</button>
+              <button class="btn btn-ghost" onclick="resetSQL()">?? Clear &amp; Start Over</button>
             </div>
             <div style="margin-top:16px;padding:14px;background:#fff;border-radius:8px;border:1px solid #BBF7D0">
-              <div style="font-size:12px;font-weight:600;color:#065F46;margin-bottom:8px">📌 How to import in Supabase:</div>
+              <div style="font-size:12px;font-weight:600;color:#065F46;margin-bottom:8px">?? How to import in Supabase:</div>
               <ol style="font-size:12px;color:#047857;line-height:2;padding-left:18px">
-                <li>Go to <a href="https://supabase.com/dashboard/project/jhdgkncpkrttvemvwukc/sql" target="_blank" style="color:#059669;font-weight:600">Supabase → SQL Editor</a></li>
+                <li>Go to <a href="https://supabase.com/dashboard/project/jhdgkncpkrttvemvwukc/sql" target="_blank" style="color:#059669;font-weight:600">Supabase ? SQL Editor</a></li>
                 <li>Click <strong>New query</strong></li>
                 <li>Open the downloaded .sql file and copy all contents</li>
-                <li>Paste into SQL Editor → Click <strong>Run</strong></li>
+                <li>Paste into SQL Editor ? Click <strong>Run</strong></li>
                 <li>Verify with: <code style="background:#F0FDF4;padding:1px 5px;border-radius:3px">SELECT COUNT(*) FROM activities;</code></li>
               </ol>
             </div>
@@ -553,7 +554,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <div class="card-body">
           <div style="background:#1A1A1A;border-radius:10px;padding:16px 20px;font-family:monospace;font-size:12px;color:#a5d6a7;line-height:2;overflow-x:auto">
             <span style="color:#6B7280">-- Generated by Arcgate Walkathon Data Upload</span><br>
-            <span style="color:#6B7280">-- Paste in Supabase SQL Editor → Run</span><br><br>
+            <span style="color:#6B7280">-- Paste in Supabase SQL Editor ? Run</span><br><br>
             <span style="color:#93C5FD">INSERT INTO</span> activities (<br>
             &nbsp;&nbsp;strava_activity_id, strava_athlete_id, activity_name, sport_type,<br>
             &nbsp;&nbsp;activity_date, distance_meters, moving_time_seconds,<br>
@@ -570,9 +571,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       </div>
     </div><!-- /tab-sql -->
 
-    <!-- ═══════════════════════════════════════════════════════════
-         TAB 3 — DISTANCE OVERRIDE
-    ═══════════════════════════════════════════════════════════ -->
+    <!-- -----------------------------------------------------------
+         TAB 3 � DISTANCE OVERRIDE
+    ----------------------------------------------------------- -->
     <div id="tab-distance" class="tab-panel">
       <div class="card">
         <div class="card-head">
@@ -592,7 +593,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             </div>
             
             <div class="drop-zone" id="dist-dropzone" onclick="document.getElementById('dist-bulk-file').click()" style="margin-bottom:20px">
-              <div class="dz-icon">📄</div>
+              <div class="dz-icon">??</div>
               <div class="dz-text" id="dist-dz-text">Click to select Distance CSV or drag &amp; drop here</div>
               <div class="dz-sub">Format: activity_id, new_distance_km</div>
             </div>
@@ -607,9 +608,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <!-- Bulk Preview wrap -->
             <div id="dist-bulk-preview-wrap" style="display:none">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
-                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">🔍 Preview Proposed Bulk Distance Changes (No Pagination)</h4>
+                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">?? Preview Proposed Bulk Distance Changes (No Pagination)</h4>
                 <div style="display:flex;gap:8px">
-                  <button type="button" class="btn btn-ghost" onclick="resetDistBulk()">🗑 Clear</button>
+                  <button type="button" class="btn btn-ghost" onclick="resetDistBulk()">?? Clear</button>
                   <button type="button" class="btn btn-primary" id="dist-bulk-apply-btn" onclick="applyDistBulk()"><i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates</button>
                 </div>
               </div>
@@ -639,9 +640,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         TAB 4 — FLAG / STATUS OVERRIDE
-    ═══════════════════════════════════════════════════════════ -->
+    <!-- -----------------------------------------------------------
+         TAB 4 � FLAG / STATUS OVERRIDE
+    ----------------------------------------------------------- -->
     <div id="tab-flag" class="tab-panel">
       <div class="card">
         <div class="card-head">
@@ -661,7 +662,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             </div>
             
             <div class="drop-zone" id="flag-dropzone" onclick="document.getElementById('flag-bulk-file').click()" style="margin-bottom:20px">
-              <div class="dz-icon">📄</div>
+              <div class="dz-icon">??</div>
               <div class="dz-text" id="flag-dz-text">Click to select Flag Status CSV or drag &amp; drop here</div>
               <div class="dz-sub">Format: activity_id, action (flag/clear), reason</div>
             </div>
@@ -676,9 +677,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <!-- Bulk Preview wrap -->
             <div id="flag-bulk-preview-wrap" style="display:none">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
-                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">🔍 Preview Proposed Bulk Flag Changes (No Pagination)</h4>
+                <h4 style="font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px">?? Preview Proposed Bulk Flag Changes (No Pagination)</h4>
                 <div style="display:flex;gap:8px">
-                  <button type="button" class="btn btn-ghost" onclick="resetFlagBulk()">🗑 Clear</button>
+                  <button type="button" class="btn btn-ghost" onclick="resetFlagBulk()">?? Clear</button>
                   <button type="button" class="btn btn-primary" id="flag-bulk-apply-btn" onclick="applyFlagBulk()"><i class="ti ti-check"></i> Confirm &amp; Apply Bulk Updates</button>
                 </div>
               </div>
@@ -711,7 +712,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   </div><!-- /content -->
 
   <footer class="site-footer">
-    <span>© 2026 Arcgate Walkathon</span>
+    <span>� 2026 Arcgate Walkathon</span>
     <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
   </footer>
 </div><!-- /main -->
@@ -728,7 +729,7 @@ async function loadEventSelector(){
       var o=document.createElement("option");
       o.value=e.id;
       if (e.status === "live") {
-        o.textContent = "🟢 " + e.name + " (LIVE)";
+        o.textContent = "?? " + e.name + " (LIVE)";
         o.style.color = "#16a34a";
         o.style.fontWeight = "bold";
       } else {
@@ -768,13 +769,13 @@ function toggleFormatRef() {
   var chev = document.getElementById('fmt-ref-chevron');
   var open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
-  chev.textContent = open ? '▼ Show' : '▲ Hide';
+  chev.textContent = open ? '? Show' : '? Hide';
 }
 
 var _BU=window.BACKEND_URL;function authGuard(){var t=sessionStorage.getItem('wk_admin_token');if(!t){window.location.href='admin-login.html';return;}try{var p=JSON.parse(atob(t.split('.')[1]));if(p.exp&&p.exp*1000<Date.now()){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}catch(e){sessionStorage.removeItem('wk_admin_token');window.location.href='admin-login.html';}}function logout(){sessionStorage.removeItem('wk_admin_token');sessionStorage.removeItem('wk_admin');window.location.href='admin-login.html';}
 authGuard();
 
-// ── Tab switching ────────────────────────────────────────────
+// -- Tab switching --------------------------------------------
 function switchTab(id, btnEl) {
   document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
@@ -786,9 +787,9 @@ function switchTab(id, btnEl) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 // TEMPLATE DOWNLOAD
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 function downloadTemplate() {
   var header = 'athlete_url,activity_url,activity_name,sport_type,activity_date,distance_km,duration,steps,elevation_m';
   var example = [
@@ -804,11 +805,11 @@ function downloadTemplate() {
   a.click();
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 // CONVERSION HELPERS
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 
-// Extract ID from Strava URL  →  /athletes/12345  or  /activities/12345
+// Extract ID from Strava URL  ?  /athletes/12345  or  /activities/12345
 function extractStravaId(url) {
   if (!url) return null;
   url = url.trim();
@@ -818,7 +819,7 @@ function extractStravaId(url) {
   return m ? parseInt(m[1]) : null;
 }
 
-// HH:MM:SS or H:MM:SS  →  total seconds
+// HH:MM:SS or H:MM:SS  ?  total seconds
 function durationToSeconds(dur) {
   if (!dur) return null;
   var parts = dur.trim().split(':').map(Number);
@@ -871,9 +872,9 @@ function convertRawRow(raw, isMiles) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 // PARSE CSV
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 function parseCSV(text) {
   var lines = text.trim().split('\n');
   if (lines.length < 2) return { headers: [], rows: [] };
@@ -897,9 +898,9 @@ function parseCSV(text) {
   return { headers: headers, rows: rows };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 1 — UPLOAD TO DATABASE
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
+// TAB 1 � UPLOAD TO DATABASE
+// ---------------------------------------------------------------
 var parsedRows = [];
 var existingIds = new Set();
 
@@ -916,19 +917,19 @@ document.getElementById('file-input').addEventListener('change', function(e){
 
 async function handleFile(file) {
   if (!file.name.endsWith('.csv')) { alert('Please upload a .csv file only.'); return; }
-  document.getElementById('dz-text').textContent = '⏳ Reading ' + file.name + '...';
+  document.getElementById('dz-text').textContent = '? Reading ' + file.name + '...';
   document.getElementById('dz-sub').textContent  = '';
 
   var text = await file.text();
   var parsed = parseCSV(text);
   if (!parsed.rows.length) {
-    document.getElementById('dz-text').textContent = '❌ No data rows found in CSV';
+    document.getElementById('dz-text').textContent = '? No data rows found in CSV';
     return;
   }
 
   var raw = isRawFormat(parsed.headers);
-  document.getElementById('dz-text').textContent = '✅ ' + file.name + (raw ? ' (raw template — will auto-convert)' : ' (standard format)');
-  document.getElementById('dz-sub').textContent  = parsed.rows.length + ' rows found — checking duplicates…';
+  document.getElementById('dz-text').textContent = '? ' + file.name + (raw ? ' (raw template � will auto-convert)' : ' (standard format)');
+  document.getElementById('dz-sub').textContent  = parsed.rows.length + ' rows found � checking duplicates�';
   existingIds = await loadExistingIds();
   var isMiles = false;
   var unitEl = document.querySelector('input[name="csv-unit"]:checked');
@@ -992,7 +993,7 @@ async function loadExistingIds() {
 }
 
 function fmtSecs(s) {
-  if (!s) return '—';
+  if (!s) return '�';
   var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   if (h) return h+'h '+String(m).padStart(2,'0')+'m';
   return m+'m '+String(sec).padStart(2,'0')+'s';
@@ -1015,36 +1016,36 @@ function renderPreview() {
   var btnUpdate = document.getElementById('import-update-btn');
 
   btnUnique.disabled = newRows === 0;
-  btnUnique.innerHTML = newRows === 0 ? '⬆️ Nothing to Import' : '⬆️ Import ' + newRows + ' Unique';
+  btnUnique.innerHTML = newRows === 0 ? '?? Nothing to Import' : '?? Import ' + newRows + ' Unique';
 
   btnExisting.disabled = dups === 0;
-  btnExisting.innerHTML = dups === 0 ? '🔄 Nothing to Update' : '🔄 Update ' + dups + ' Existing Only';
+  btnExisting.innerHTML = dups === 0 ? '?? Nothing to Update' : '?? Update ' + dups + ' Existing Only';
 
   btnUpdate.disabled = (newRows + dups) === 0;
-  btnUpdate.innerHTML = (newRows + dups) === 0 ? '⚡ Nothing to Import/Update' : '⚡ Import & Update ' + (newRows + dups) + ' All';
+  btnUpdate.innerHTML = (newRows + dups) === 0 ? '? Nothing to Import/Update' : '? Import & Update ' + (newRows + dups) + ' All';
 
   var preview = parsedRows.slice(0, 50);
   document.getElementById('preview-body').innerHTML = preview.map(function(r) {
     var badge, reason = '';
     if (r.errors.length) {
-      badge = '<span class="badge badge-err">❌ Invalid</span>';
+      badge = '<span class="badge badge-err">? Invalid</span>';
       reason = r.errors.join(', ');
     } else if (r.isDup) {
-      badge = '<span class="badge badge-dup">⚠️ Duplicate</span>';
+      badge = '<span class="badge badge-dup">?? Duplicate</span>';
       reason = 'Already in DB';
     } else {
-      badge = '<span class="badge badge-new">✅ New</span>';
+      badge = '<span class="badge badge-new">? New</span>';
     }
-    var d   = r.row['activity_date'] ? r.row['activity_date'].split('T')[0] : '—';
-    var km  = r.row['distance_meters'] ? (parseFloat(r.row['distance_meters'])/1000).toFixed(2)+' km' : '—';
-    var dur = r.row['moving_time_seconds'] ? fmtSecs(parseInt(r.row['moving_time_seconds'])) : (r.row['_durationRaw'] || '—');
+    var d   = r.row['activity_date'] ? r.row['activity_date'].split('T')[0] : '�';
+    var km  = r.row['distance_meters'] ? (parseFloat(r.row['distance_meters'])/1000).toFixed(2)+' km' : '�';
+    var dur = r.row['moving_time_seconds'] ? fmtSecs(parseInt(r.row['moving_time_seconds'])) : (r.row['_durationRaw'] || '�');
     return '<tr>'
       + '<td style="color:#9CA3AF">' + r.index + '</td>'
       + '<td>' + badge + '</td>'
-      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_activity_id']||'—') + '</td>'
-      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_athlete_id']||'—') + '</td>'
-      + '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis">' + (r.row['activity_name']||'—') + '</td>'
-      + '<td>' + (r.row['sport_type']||'—') + '</td>'
+      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_activity_id']||'�') + '</td>'
+      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_athlete_id']||'�') + '</td>'
+      + '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis">' + (r.row['activity_name']||'�') + '</td>'
+      + '<td>' + (r.row['sport_type']||'�') + '</td>'
       + '<td>' + d + '</td>'
       + '<td>' + km + '</td>'
       + '<td>' + dur + '</td>'
@@ -1053,7 +1054,7 @@ function renderPreview() {
   }).join('');
 
   if (parsedRows.length > 50) {
-    document.getElementById('preview-body').innerHTML += '<tr><td colspan="10" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">…and ' + (parsedRows.length - 50) + ' more rows</td></tr>';
+    document.getElementById('preview-body').innerHTML += '<tr><td colspan="10" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">�and ' + (parsedRows.length - 50) + ' more rows</td></tr>';
   }
 
   document.getElementById('preview-section').style.display = 'block';
@@ -1085,7 +1086,7 @@ async function startImport(mode) {
   else if (mode === 'update-only') activeBtn = btnExisting;
   else activeBtn = btnUpdate;
 
-  activeBtn.innerHTML = '<div class="spinner"></div> Importing…';
+  activeBtn.innerHTML = '<div class="spinner"></div> Importing�';
 
   var pw = document.getElementById('progress-wrap');
   pw.style.display = 'block';
@@ -1107,15 +1108,15 @@ async function startImport(mode) {
     return act;
   });
 
-  addLog('🚀 Starting import of ' + allActivities.length + ' activities…');
+  addLog('?? Starting import of ' + allActivities.length + ' activities�');
   
   var updateExisting = (mode === 'all' || mode === 'update-only');
   if (mode === 'all') {
-    addLog('⚡ Mode: Import new activities and update existing duplicates.', '#90caf9');
+    addLog('? Mode: Import new activities and update existing duplicates.', '#90caf9');
   } else if (mode === 'update-only') {
-    addLog('🔄 Mode: Update existing duplicates only (new activities will be skipped).', '#b39ddb');
+    addLog('?? Mode: Update existing duplicates only (new activities will be skipped).', '#b39ddb');
   } else {
-    addLog('⬆️ Mode: Import unique activities only (duplicates will be skipped).', '#90caf9');
+    addLog('?? Mode: Import unique activities only (duplicates will be skipped).', '#90caf9');
   }
 
   var success = 0, failed = 0, skipped = 0;
@@ -1125,8 +1126,8 @@ async function startImport(mode) {
   for (var i = 0; i < allActivities.length; i += BATCH) {
     var batch = allActivities.slice(i, i + BATCH);
     var batchNum = Math.floor(i / BATCH) + 1;
-    lbl.textContent = 'Batch ' + batchNum + ' / ' + totalBatches + '…';
-    addLog('📡 Sending batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' rows)…', '#fff3e0');
+    lbl.textContent = 'Batch ' + batchNum + ' / ' + totalBatches + '�';
+    addLog('?? Sending batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' rows)�', '#fff3e0');
 
     try {
       var res = await fetch(BACKEND_URL + '/bulk-import', {
@@ -1140,7 +1141,7 @@ async function startImport(mode) {
       if (!res.ok) {
         var errText = await res.text();
         failed += batch.length;
-        addLog('❌ Batch ' + batchNum + ' server error: ' + errText.substring(0,120), '#ef9a9a');
+        addLog('? Batch ' + batchNum + ' server error: ' + errText.substring(0,120), '#ef9a9a');
       } else {
         var result = await res.json();
         if (result.success) {
@@ -1148,18 +1149,18 @@ async function startImport(mode) {
           skipped += result.skipped || 0;
           failed  += result.failed  || 0;
           if (updateExisting) {
-            addLog('✅ Batch ' + batchNum + ': ' + (result.imported||0) + ' processed (new/updated), ' + (result.failed||0) + ' failed');
+            addLog('? Batch ' + batchNum + ': ' + (result.imported||0) + ' processed (new/updated), ' + (result.failed||0) + ' failed');
           } else {
-            addLog('✅ Batch ' + batchNum + ': ' + (result.imported||0) + ' imported, ' + (result.skipped||0) + ' skipped (duplicates)');
+            addLog('? Batch ' + batchNum + ': ' + (result.imported||0) + ' imported, ' + (result.skipped||0) + ' skipped (duplicates)');
           }
         } else {
           failed += batch.length;
-          addLog('❌ Batch ' + batchNum + ': ' + (result.error||'Unknown'), '#ef9a9a');
+          addLog('? Batch ' + batchNum + ': ' + (result.error||'Unknown'), '#ef9a9a');
         }
       }
     } catch(e) {
       failed += batch.length;
-      addLog('❌ Batch ' + batchNum + ' network error: ' + e.message, '#ef9a9a');
+      addLog('? Batch ' + batchNum + ' network error: ' + e.message, '#ef9a9a');
     }
 
     var done = Math.min(i + BATCH, allActivities.length);
@@ -1170,22 +1171,22 @@ async function startImport(mode) {
 
   fill.style.width = '100%';
   pct.textContent = '100%';
-  lbl.textContent = '✅ Import complete';
+  lbl.textContent = '? Import complete';
   addLog('');
-  addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#555');
+  addLog('??????????????????????????????', '#555');
   if (mode === 'all') {
-    addLog('⚡ Processed (new/updated): ' + success);
+    addLog('? Processed (new/updated): ' + success);
   } else if (mode === 'update-only') {
-    addLog('🔄 Updated:   ' + success);
+    addLog('?? Updated:   ' + success);
   } else {
-    addLog('⬆️ Imported (new): ' + success);
-    addLog('⚠️  Skipped (duplicates): ' + skipped);
+    addLog('?? Imported (new): ' + success);
+    addLog('??  Skipped (duplicates): ' + skipped);
   }
-  if (failed) addLog('❌ Failed:    ' + failed, '#ef9a9a');
-  addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#555');
+  if (failed) addLog('? Failed:    ' + failed, '#ef9a9a');
+  addLog('??????????????????????????????', '#555');
 
   // Trigger automatic backfill for the event to recalculate points, bonus, challenges etc.
-  addLog('⏳ Recalculating all participant points, bonuses, and challenges...', '#E8622A');
+  addLog('? Recalculating all participant points, bonuses, and challenges...', '#E8622A');
   try {
     var bfRes = await fetch(BACKEND_URL + '/admin/backfill-points', {
       method: 'POST',
@@ -1197,15 +1198,15 @@ async function startImport(mode) {
     });
     var bfResult = await bfRes.json();
     if (bfResult.success) {
-      addLog('✓ Points, bonuses, and challenges recalculated successfully!', '#2e7d32');
+      addLog('? Points, bonuses, and challenges recalculated successfully!', '#2e7d32');
     } else {
-      addLog('⚠️ Recalculation warning: ' + (bfResult.error || 'Check backend logs'), '#ef6c00');
+      addLog('?? Recalculation warning: ' + (bfResult.error || 'Check backend logs'), '#ef6c00');
     }
   } catch(e) {
-    addLog('⚠️ Recalculation failed: ' + e.message, '#ef6c00');
+    addLog('?? Recalculation failed: ' + e.message, '#ef6c00');
   }
 
-  activeBtn.innerHTML = '✅ Done — ' + success + ' processed';
+  activeBtn.innerHTML = '? Done � ' + success + ' processed';
   
   // Re-enable all buttons after 2 seconds
   setTimeout(function() {
@@ -1285,9 +1286,9 @@ function resetUpload() {
   document.getElementById('progress-fill').style.width = '0%';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 2 — GENERATE SQL FILE
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
+// TAB 2 � GENERATE SQL FILE
+// ---------------------------------------------------------------
 var sqlRows = [];
 var generatedSQL = '';
 
@@ -1304,19 +1305,19 @@ document.getElementById('sql-file-input').addEventListener('change', function(e)
 
 async function handleSQLFile(file) {
   if (!file.name.endsWith('.csv')) { alert('Please upload a .csv file only.'); return; }
-  document.getElementById('sql-dz-text').textContent = '⏳ Reading ' + file.name + '…';
+  document.getElementById('sql-dz-text').textContent = '? Reading ' + file.name + '�';
   document.getElementById('sql-dz-sub').textContent = '';
 
   var text = await file.text();
   var parsed = parseCSV(text);
   if (!parsed.rows.length) {
-    document.getElementById('sql-dz-text').textContent = '❌ No data rows found';
+    document.getElementById('sql-dz-text').textContent = '? No data rows found';
     return;
   }
 
   var raw = isRawFormat(parsed.headers);
-  document.getElementById('sql-dz-text').textContent = '✅ ' + file.name;
-  document.getElementById('sql-dz-sub').textContent = parsed.rows.length + ' rows parsed — generating SQL…';
+  document.getElementById('sql-dz-text').textContent = '? ' + file.name;
+  document.getElementById('sql-dz-sub').textContent = parsed.rows.length + ' rows parsed � generating SQL�';
 
   sqlRows = [];
   var valid = 0, invalid = 0;
@@ -1362,7 +1363,7 @@ async function handleSQLFile(file) {
   document.getElementById('sql-preview-body').innerHTML = preview.map(function(r, idx) {
     var km = (r.distance_meters / 1000).toFixed(2) + ' km';
     var dur = fmtSecs(r.moving_time_seconds);
-    var d = r.activity_date ? r.activity_date.split('T')[0] : '—';
+    var d = r.activity_date ? r.activity_date.split('T')[0] : '�';
     return '<tr>'
       + '<td style="color:#9CA3AF">' + (idx+1) + '</td>'
       + '<td style="font-family:monospace;font-size:11px">' + r.strava_activity_id + '</td>'
@@ -1372,12 +1373,12 @@ async function handleSQLFile(file) {
       + '<td>' + d + '</td>'
       + '<td>' + km + '</td>'
       + '<td>' + dur + '</td>'
-      + '<td>' + (r.steps || '—') + '</td>'
+      + '<td>' + (r.steps || '�') + '</td>'
       + '</tr>';
   }).join('');
 
   if (sqlRows.length > 30) {
-    document.getElementById('sql-preview-body').innerHTML += '<tr><td colspan="9" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">…and ' + (sqlRows.length-30) + ' more rows in SQL file</td></tr>';
+    document.getElementById('sql-preview-body').innerHTML += '<tr><td colspan="9" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">�and ' + (sqlRows.length-30) + ' more rows in SQL file</td></tr>';
   }
 
   document.getElementById('sql-preview-label').textContent = 'Preview (first 30 of ' + sqlRows.length + ' rows)';
@@ -1397,7 +1398,7 @@ function generateSQL(rows) {
   var today = new Date().toISOString().split('T')[0];
   var lines = [];
   lines.push('-- =====================================================');
-  lines.push('-- Arcgate Walkathon 2026 — Activity Import');
+  lines.push('-- Arcgate Walkathon 2026 � Activity Import');
   lines.push('-- Generated: ' + today);
   lines.push('-- Total rows: ' + rows.length);
   lines.push('-- ON CONFLICT DO NOTHING = duplicates auto-skipped');
@@ -1493,16 +1494,16 @@ function resetSQL() {
   generatedSQL = '';
   document.getElementById('sql-file-input').value = '';
   document.getElementById('sql-dz-text').textContent = 'Click to select your raw CSV file';
-  document.getElementById('sql-dz-sub').textContent  = 'Upload the filled template → SQL file will be generated';
+  document.getElementById('sql-dz-sub').textContent  = 'Upload the filled template ? SQL file will be generated';
   document.getElementById('sql-stats-row').style.display = 'none';
   document.getElementById('sql-result').style.display = 'none';
   document.getElementById('sql-preview-section').style.display = 'none';
   document.getElementById('sql-preview-body').innerHTML = '';
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 // DISTANCE OVERRIDE / FLAG STATUS LOGIC
-// ═══════════════════════════════════════════════════════════════
+// ---------------------------------------------------------------
 var loadedActivity = null;
 
 async function searchActivityForDistance() {
@@ -1542,9 +1543,9 @@ async function searchActivityForDistance() {
     
     // Fill fields
     document.getElementById('dist-athlete-name').textContent = name;
-    document.getElementById('dist-act-name').textContent = loadedActivity.activity_name || '—';
+    document.getElementById('dist-act-name').textContent = loadedActivity.activity_name || '�';
     
-    var dateStr = '—';
+    var dateStr = '�';
     if (loadedActivity.activity_date_time_ist) {
       var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
       dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
@@ -1648,7 +1649,7 @@ async function applyDistanceOverride() {
   }
 }
 
-// ── Flag status logic ─────────────────────────────────────────
+// -- Flag status logic -----------------------------------------
 async function searchActivityForFlag() {
   var searchId = document.getElementById('flag-search-id').value.trim();
   if (!searchId) {
@@ -1686,9 +1687,9 @@ async function searchActivityForFlag() {
     
     // Fill fields
     document.getElementById('flag-athlete-name').textContent = name;
-    document.getElementById('flag-act-name').textContent = loadedActivity.activity_name || '—';
+    document.getElementById('flag-act-name').textContent = loadedActivity.activity_name || '�';
     
-    var dateStr = '—';
+    var dateStr = '�';
     if (loadedActivity.activity_date_time_ist) {
       var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
       dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
@@ -1697,7 +1698,7 @@ async function searchActivityForFlag() {
     
     var isFlagged = loadedActivity.is_flagged === true || loadedActivity.is_flagged === 'true';
     var statusEl = document.getElementById('flag-current-status');
-    statusEl.textContent = isFlagged ? 'Flagged 🚩' : 'Clear ✓';
+    statusEl.textContent = isFlagged ? 'Flagged ??' : 'Clear ?';
     statusEl.style.color = isFlagged ? '#DC2626' : '#059669';
     
     document.getElementById('flag-current-reason').textContent = loadedActivity.flag_reason || 'None';
@@ -1729,10 +1730,10 @@ function previewFlagChange() {
     return;
   }
   
-  var beforeStatus = loadedActivity.is_flagged ? 'Flagged 🚩' : 'Clear ✓';
+  var beforeStatus = loadedActivity.is_flagged ? 'Flagged ??' : 'Clear ?';
   var beforeReason = loadedActivity.flag_reason || 'None';
   
-  var afterStatus = action === 'flag' ? 'Flagged 🚩' : 'Clear ✓';
+  var afterStatus = action === 'flag' ? 'Flagged ??' : 'Clear ?';
   var afterReason = action === 'flag' ? reasonText : (reasonText || 'Resolved after review');
   
   var statusBeforeEl = document.getElementById('flag-prev-status-before');
@@ -1815,7 +1816,7 @@ async function triggerPointsRecalculation() {
   }
 }
 
-// ── Bulk override logic ─────────────────────────────────────────
+// -- Bulk override logic -----------------------------------------
 function toggleDistMode(mode) {
   if (mode === 'single') {
     document.getElementById('dist-single-area').style.display = 'block';
@@ -1990,9 +1991,9 @@ async function handleDistBulkCSV(files) {
         var newDistKm = parseFloat(r.new_distance_km);
         var dbAct = dbActivities[actId];
         
-        var athleteName = '—';
-        var actName = '—';
-        var oldDistStr = '—';
+        var athleteName = '�';
+        var actName = '�';
+        var oldDistStr = '�';
         var statusText = 'Ready';
         var statusColor = '#059669';
         var isValid = true;
@@ -2009,11 +2010,11 @@ async function handleDistBulkCSV(files) {
           isValid = false;
         } else {
           athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-          actName = dbAct.activity_name || '—';
+          actName = dbAct.activity_name || '�';
           oldDistStr = (dbAct.distance_meters / 1000).toFixed(2) + ' km';
         }
         
-        var newDistStr = isNaN(newDistKm) ? '—' : newDistKm.toFixed(2) + ' km';
+        var newDistStr = isNaN(newDistKm) ? '�' : newDistKm.toFixed(2) + ' km';
         
         var tr = document.createElement('tr');
         tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
@@ -2206,9 +2207,9 @@ async function handleFlagBulkCSV(files) {
         var csvReason = (r.reason || '').trim();
         var dbAct = dbActivities[actId];
         
-        var athleteName = '—';
-        var actName = '—';
-        var oldStatusStr = '—';
+        var athleteName = '�';
+        var actName = '�';
+        var oldStatusStr = '�';
         var statusText = 'Ready';
         var statusColor = '#059669';
         var isValid = true;
@@ -2231,12 +2232,12 @@ async function handleFlagBulkCSV(files) {
           isValid = false;
         } else {
           athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-          actName = dbAct.activity_name || '—';
+          actName = dbAct.activity_name || '�';
           var wasFlagged = dbAct.is_flagged === true || dbAct.is_flagged === 'true';
-          oldStatusStr = wasFlagged ? `Flagged 🚩 (${dbAct.flag_reason || 'No Reason'})` : 'Clear ✓';
+          oldStatusStr = wasFlagged ? `Flagged ?? (${dbAct.flag_reason || 'No Reason'})` : 'Clear ?';
         }
         
-        var proposedStatusStr = (csvAction === 'flag') ? `Flagged 🚩 (${csvReason})` : 'Clear ✓';
+        var proposedStatusStr = (csvAction === 'flag') ? `Flagged ?? (${csvReason})` : 'Clear ?';
         
         var tr = document.createElement('tr');
         tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
