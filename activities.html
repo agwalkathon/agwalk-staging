@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Activities — Arcgate Walkathon 2026</title>
+  <title>Activities â€” Arcgate Walkathon 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -695,7 +695,7 @@ td button.btn:last-child { margin-right: 0; }
           <span id="searching-indicator" style="display:none;align-items:center;gap:8px;font-size:13px;color:#888"><div class="spinner" style="width:18px;height:18px;border-width:2px"></div>Searching...</span>
         </div>
       </div>
-      <div class="stats-grid" id="stats-row" style="display:none"><div class="stat-card"><div class="val" id="total-activities">—</div><div class="lbl">Activities found</div></div><div class="stat-card"><div class="val" id="total-distance">—</div><div class="lbl">Total km</div></div><div class="stat-card dark"><div class="val" id="total-participants">—</div><div class="lbl">Participants</div></div><div class="stat-card green"><div class="val" id="total-valid">—</div><div class="lbl">Valid</div></div><div class="stat-card red"><div class="val" id="total-flagged">—</div><div class="lbl">Flagged</div></div></div>
+      <div class="stats-grid" id="stats-row" style="display:none"><div class="stat-card"><div class="val" id="total-activities">â€”</div><div class="lbl">Activities found</div></div><div class="stat-card"><div class="val" id="total-distance">â€”</div><div class="lbl">Total km</div></div><div class="stat-card dark"><div class="val" id="total-participants">â€”</div><div class="lbl">Participants</div></div><div class="stat-card green"><div class="val" id="total-valid">â€”</div><div class="lbl">Valid</div></div><div class="stat-card red"><div class="val" id="total-flagged">â€”</div><div class="lbl">Flagged</div></div></div>
       <div id="flag-counts" style="display:none;margin-bottom:18px;gap:8px;flex-wrap:wrap"></div>
       
       <!-- Bulk actions bar for All Workouts -->
@@ -846,7 +846,7 @@ td button.btn:last-child { margin-right: 0; }
             <button class="btn btn-primary" onclick="openAddReasonModal()" style="padding:6px 14px; font-size:12.5px;">+ Add Reason</button>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">?? Copy to event…</button>
+            <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">?? Copy to eventâ€¦</button>
             <select id="fr-type-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
               <option value="">All Types</option>
               <option value="auto">Auto</option>
@@ -1216,7 +1216,7 @@ td button.btn:last-child { margin-right: 0; }
               <span style="font-size:18px; flex-shrink:0;">??</span>
               <div style="flex:1;">
                 <div style="font-size:13px; font-weight:700; color:#92400e; margin-bottom:4px;">Auto-Flag on Incoming Activity</div>
-                <div style="font-size:12px; color:#78350f; line-height:1.5; margin-bottom:10px;">When enabled, any new activity that exactly matches an existing participant's activity on all selected fields will be <strong>automatically flagged</strong> with reason: <em>"Shared Activity (auto-detected) — identical [fields] as [Participant Name]"</em></div>
+                <div style="font-size:12px; color:#78350f; line-height:1.5; margin-bottom:10px;">When enabled, any new activity that exactly matches an existing participant's activity on all selected fields will be <strong>automatically flagged</strong> with reason: <em>"Shared Activity (auto-detected) â€” identical [fields] as [Participant Name]"</em></div>
                 <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer;">
                   <input type="checkbox" id="shared-auto-flag" style="cursor:pointer; width:15px; height:15px; accent-color:#E8622A;">
                   Enable auto-flag on activity sync
@@ -1241,7 +1241,7 @@ td button.btn:last-child { margin-right: 0; }
                 <div style="font-size:13px; font-weight:600; color:#0F1117;" id="shared-preview-count"></div>
                 <div style="display:flex; gap:8px;">
                   <a href="#" style="font-size:12px; color:#E8622A; text-decoration:none; font-weight:500;" onclick="toggleAllSharedChecks(true);return false;">Select all</a>
-                  <span style="color:#ccc;">·</span>
+                  <span style="color:#ccc;">Â·</span>
                   <a href="#" style="font-size:12px; color:#6B7280; text-decoration:none;" onclick="toggleAllSharedChecks(false);return false;">None</a>
                 </div>
               </div>
@@ -1289,7 +1289,7 @@ td button.btn:last-child { margin-right: 0; }
           <button class="btn btn-primary" onclick="previewFlagRules()">??? Preview matches</button>
           <button class="btn btn-danger" id="btn-apply-flags" onclick="applyFlagRules()" disabled>?? Flag Selected</button>
           <span id="flag-preview-count" style="font-size:13px; color:var(--text-secondary); margin-left: 8px;"></span>
-          <span id="flag-selected-count" style="font-size:13px; color:var(--text-secondary); display:none;">— <strong id="flag-selected-num">0</strong> selected</span>
+          <span id="flag-selected-count" style="font-size:13px; color:var(--text-secondary); display:none;">â€” <strong id="flag-selected-num">0</strong> selected</span>
         </div>
       </div>
 
@@ -1297,7 +1297,7 @@ td button.btn:last-child { margin-right: 0; }
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding: 0 4px;">
           <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0;">Matching Activities</h3>
           <div style="font-size:13px; color:var(--text-secondary);">
-            <a href="#" style="color:var(--brand); text-decoration:none; font-weight:500;" onclick="toggleAllPreviewCheckboxes(true);return false;">Select all</a> &nbsp;·&nbsp; 
+            <a href="#" style="color:var(--brand); text-decoration:none; font-weight:500;" onclick="toggleAllPreviewCheckboxes(true);return false;">Select all</a> &nbsp;Â·&nbsp; 
             <a href="#" style="color:var(--text-secondary); text-decoration:none;" onclick="toggleAllPreviewCheckboxes(false);return false;">None</a>
           </div>
         </div>
@@ -1335,7 +1335,7 @@ td button.btn:last-child { margin-right: 0; }
     </div>
     <div id="shared-modal-step1" style="display:flex; gap:10px; justify-content:flex-end;">
       <button class="btn" style="background:#f5f5f5; color:#555;" onclick="closeSharedModal()">Cancel</button>
-      <button class="btn btn-danger" onclick="sharedModalStep2()">I Understand — Proceed</button>
+      <button class="btn btn-danger" onclick="sharedModalStep2()">I Understand â€” Proceed</button>
     </div>
     <div id="shared-modal-step2" style="display:none; flex-direction:column; gap:10px;">
       <div style="font-size:13px; font-weight:600; color:#991b1b; text-align:center;">Are you absolutely sure? This cannot be undone automatically.</div>
@@ -1346,7 +1346,7 @@ td button.btn:last-child { margin-right: 0; }
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="flag-modal"><div class="modal"><h3>Update Status</h3><p class="sub" id="modal-sub"></p><label>Flag reason</label><select id="modal-flag-reason" onchange="checkModalDist()"><option value="">— Mark as Valid (clear flag) —</option><optgroup label="-- Manual Review --"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="-- Auto Flags --"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="-- Manual Flags --"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select><div class="dist-field" id="modal-dist-field"><label>Corrected distance (meters)</label><input type="number" id="modal-corrected-dist" placeholder="e.g. 3500"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-confirm" onclick="confirmStatus()">Save</button></div></div></div>
+<div class="modal-overlay" id="flag-modal"><div class="modal"><h3>Update Status</h3><p class="sub" id="modal-sub"></p><label>Flag reason</label><select id="modal-flag-reason" onchange="checkModalDist()"><option value="">â€” Mark as Valid (clear flag) â€”</option><optgroup label="-- Manual Review --"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="-- Auto Flags --"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="-- Manual Flags --"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select><div class="dist-field" id="modal-dist-field"><label>Corrected distance (meters)</label><input type="number" id="modal-corrected-dist" placeholder="e.g. 3500"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-confirm" onclick="confirmStatus()">Save</button></div></div></div>
 
 <!-- Custom Edit Activity Modal -->
 <div class="modal-overlay" id="edit-activity-modal">
@@ -1486,7 +1486,7 @@ td button.btn:last-child { margin-right: 0; }
     </div>
   </div>
 </div>
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+<footer class="site-footer"><span>Â© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 <script>
 
@@ -1576,32 +1576,32 @@ function getActDate(a) {
   }
   return getISTDate(a.activity_date);
 }function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}function localDateValue(d){var dt=d?new Date(d):new Date();dt.setMinutes(dt.getMinutes()-dt.getTimezoneOffset());return dt.toISOString().slice(0,10)}function fmtUTCDateTime(d, startTime){
-  if(!d) return '—';
-  if(!startTime) return '—';
+  if(!d) return 'â€”';
+  if(!startTime) return 'â€”';
   try {
     var dt = new Date(d);
-    if(isNaN(dt.getTime())) return '—';
+    if(isNaN(dt.getTime())) return 'â€”';
     return dt.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'UTC'}) + ' UTC';
   } catch(e) {
     return d;
   }
 }
 function fmtISTDateTime(d, startTime){
-  if(!d) return '—';
+  if(!d) return 'â€”';
   if(!startTime){
     var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
     return new Date(naive).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
   }
   try {
     var dt = new Date(d);
-    if(isNaN(dt.getTime())) return '—';
+    if(isNaN(dt.getTime())) return 'â€”';
     return dt.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'}) + ' IST';
   } catch(e) {
     return d;
   }
 }
 function fmtActivityIST(a) {
-  if (!a) return '—';
+  if (!a) return 'â€”';
   if (a.activity_date_time_ist) {
     try {
       var dt = new Date(a.activity_date_time_ist.replace(' ', 'T') + '+05:30');
@@ -1620,7 +1620,7 @@ function fmtActivityIST(a) {
     }
   }
   return fmtISTDateTime(a.activity_date, a.start_time);
-}function fmtDur(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m'}function fmtPS(ms,t){if(!ms)return'—';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}function bc(t){if(t==='Walk')return'badge-walk';if(t==='Run'||t==='VirtualRun')return'badge-run';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return'badge-ride';return'badge-hike'}
+}function fmtDur(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m'}function fmtPS(ms,t){if(!ms)return'â€”';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}function bc(t){if(t==='Walk')return'badge-walk';if(t==='Run'||t==='VirtualRun')return'badge-run';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return'badge-ride';return'badge-hike'}
 
 var regMap = {};
 async function loadRegistrations() {
@@ -1765,14 +1765,14 @@ async function saveDist(cell,actId,val){
 function startEditType(cell,actId,current){
   var types=['Walk','Run','Hike','Ride','VirtualRun','VirtualRide','MountainBikeRide'];
   var opts=types.map(function(t){return'<option value="'+t+'"'+(t===current?' selected':'')+'>'+t+'</option>'}).join('');
-  cell.innerHTML='<select class="edit-select"><option value="">— Select —</option>'+opts+'</select>';
+  cell.innerHTML='<select class="edit-select"><option value="">â€” Select â€”</option>'+opts+'</select>';
   var sel=cell.querySelector('select');
   sel.focus();
   sel.addEventListener('blur',function(){saveType(cell,actId,sel.value)});
   sel.addEventListener('change',function(){sel.blur()});
 }
 async function saveType(cell,actId,newType){
-  if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'—';return}
+  if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'â€”';return}
   cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';
   try{
     var adminEmail = 'Unknown Admin';
@@ -2072,15 +2072,15 @@ async function loadActivities(){
         
       var chkHtml = '<td data-label="Select" style="text-align:center"><input type="checkbox" class="row-chk-all" data-id="'+a.id+'" onchange="toggleRowAll('+a.id+', this.checked)" '+(bulkSelected[a.id]?'checked':'')+' style="cursor:pointer; width:15px; height:15px"></td>';
       
-      return'<tr class="activity-row" id="activity-row-'+a.id+'" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'—')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'—')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'—')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'—')+'" data-steps="'+(a.steps||'—')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'—')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points">'
+      return'<tr class="activity-row" id="activity-row-'+a.id+'" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'â€”')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'â€”')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'â€”')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'â€”')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'â€”')+'" data-steps="'+(a.steps||'â€”')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'â€”')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points">'
         + chkHtml
         + '<td data-label="Status" id="status-cell-'+a.id+'" data-reason="'+esc(a.flag_reason||'')+'">'+statusBadge+'</td>'
         + '<td data-label="IST Time">'+fmtActivityIST(a)+'</td>'
         + '<td data-label="Participant"><a href="https://www.strava.com/athletes/'+a.strava_athlete_id+'" target="_blank" class="ath">'+esc(athleteName)+'</a></td>'
-        + '<td data-label="Activity" style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'—')+'</a></td>'
-        + '<td data-label="Type" class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'—')+'</span></td>'
-        + '<td data-label="Distance" class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—')+'</td>'
-        + '<td data-label="Moving Time">'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—')+'</td>'
+        + '<td data-label="Activity" style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'â€”')+'</a></td>'
+        + '<td data-label="Type" class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'â€”')+'</span></td>'
+        + '<td data-label="Distance" class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'â€”')+'</td>'
+        + '<td data-label="Moving Time">'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'â€”')+'</td>'
         + '<td data-label="Pace/Speed">'+fmtPS(a.avg_speed,a.sport_type)+'</td>'
         + '<td data-label="Deleted">' + ((a.is_deleted === true || a.is_deleted === 'true') ? '<span class="badge badge-invalid" style="background:#FFE4E6; color:#E11D48; border-color:#FDA4AF;">Yes</span>' : '<span class="badge badge-valid">No</span>') + '</td>'
         + '<td data-label="Audit Trail">' + renderAuditTrail(a) + '</td>'
@@ -2149,7 +2149,7 @@ async function toggleRowSplits(row) {
   function isValEmpty(val) {
     if (val === null || val === undefined) return true;
     var s = String(val).trim();
-    return s === '' || s === '-' || s === '—' || s === 'null' || s === '0 points';
+    return s === '' || s === '-' || s === 'â€”' || s === 'null' || s === '0 points';
   }
 
   var metaItems = [];
@@ -2196,7 +2196,7 @@ async function toggleRowSplits(row) {
         var dist = (s.distance_meters / 1000).toFixed(2) + ' km';
         var time = fmtDurSplit(s.moving_time_seconds);
         var pace = fmtPSSplit(s.avg_speed, 'metric');
-        var elev = s.elevation_difference ? (s.elevation_difference > 0 ? '+' : '') + s.elevation_difference.toFixed(0) + ' m' : '—';
+        var elev = s.elevation_difference ? (s.elevation_difference > 0 ? '+' : '') + s.elevation_difference.toFixed(0) + ' m' : 'â€”';
         html += '<tr><td>' + s.split_number + '</td><td>' + dist + '</td><td>' + time + '</td><td>' + pace + '</td><td>' + elev + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
@@ -2212,7 +2212,7 @@ async function toggleRowSplits(row) {
 }
 
 function fmtDurSplit(s) {
-  if (!s) return '—';
+  if (!s) return 'â€”';
   var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   var out = '';
   if (h > 0) out += h + ':';
@@ -2221,7 +2221,7 @@ function fmtDurSplit(s) {
 }
 
 function fmtPSSplit(ms, system) {
-  if (!ms) return '—';
+  if (!ms) return 'â€”';
   var dist = system === 'metric' ? 1000 : 1609.34;
   var p = dist / ms;
   var min = Math.floor(p/60), sec = Math.round(p%60);
@@ -2258,7 +2258,7 @@ function switchTab(t){
 
   if (t === 'rules') {
     document.getElementById('page-title').textContent = 'Flag Reasons';
-    document.getElementById('page-subtitle').textContent = 'Manage all flag reasons — auto rules and manual flags in one place';
+    document.getElementById('page-subtitle').textContent = 'Manage all flag reasons â€” auto rules and manual flags in one place';
     document.getElementById('all-workouts-container').style.display = 'none';
     document.getElementById('flagged-data-container').style.display = 'none';
     document.getElementById('rules-container').style.display = 'block';
@@ -2404,7 +2404,7 @@ function applyFlaggedFilters() {
     sum.textContent = filteredFlaggedActivities.length ? '?? ' + filteredFlaggedActivities.length + ' activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + ' flagged for review' : '? No flagged activities match the filters!';
   } else {
     sum.className = 'summary info';
-    sum.textContent = '??? ' + filteredFlaggedActivities.length + ' deleted activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + '— can be restored anytime';
+    sum.textContent = '??? ' + filteredFlaggedActivities.length + ' deleted activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + 'â€” can be restored anytime';
   }
 
   // Adjust table checkboxes
@@ -2454,24 +2454,24 @@ function applyFlaggedFilters() {
     }
 
     return '<tr id="row-' + a.id + '" class="activity-row" data-strava-id="' + a.strava_activity_id + '"'
-      + ' data-device="' + esc(a.device_name || '—') + '"'
-      + ' data-elapsed="' + (a.elapsed_time_seconds ? fmtDur(a.elapsed_time_seconds) : '—') + '"'
-      + ' data-avg-hr="' + (a.avg_heart_rate ? a.avg_heart_rate.toFixed(0) + ' bpm' : '—') + '"'
-      + ' data-max-hr="' + (a.max_heart_rate ? a.max_heart_rate.toFixed(0) + ' bpm' : '—') + '"'
-      + ' data-calories="' + (a.calories ? a.calories.toFixed(0) + ' kcal' : '—') + '"'
-      + ' data-steps="' + (a.steps || '—') + '"'
+      + ' data-device="' + esc(a.device_name || 'â€”') + '"'
+      + ' data-elapsed="' + (a.elapsed_time_seconds ? fmtDur(a.elapsed_time_seconds) : 'â€”') + '"'
+      + ' data-avg-hr="' + (a.avg_heart_rate ? a.avg_heart_rate.toFixed(0) + ' bpm' : 'â€”') + '"'
+      + ' data-max-hr="' + (a.max_heart_rate ? a.max_heart_rate.toFixed(0) + ' bpm' : 'â€”') + '"'
+      + ' data-calories="' + (a.calories ? a.calories.toFixed(0) + ' kcal' : 'â€”') + '"'
+      + ' data-steps="' + (a.steps || 'â€”') + '"'
       + ' data-flagged="' + (a.is_flagged ? 'Yes' : 'No') + '"'
-      + ' data-flag-reason="' + esc(a.flag_reason || '—') + '"'
+      + ' data-flag-reason="' + esc(a.flag_reason || 'â€”') + '"'
       + ' data-deleted="' + (a.is_deleted ? 'Yes' : 'No') + '"'
       + ' data-bonus="' + (a.manual_bonus || 0) + ' points">'
       + '<td data-label="Select" style="text-align:center"><input type="checkbox" class="row-chk" data-id="' + a.id + '"' + isChecked + ' onchange="toggleRowSelect(' + a.id + ', this.checked)" style="cursor:pointer; width:15px; height:15px"></td>'
       + '<td data-label="Athlete"><a href="https://www.strava.com/athletes/' + a.strava_athlete_id + '" target="_blank" class="ath">' + name + '</a></td>'
-      + '<td data-label="Activity" style="max-width:120px"><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link" title="' + esc(a.activity_name || '') + '" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(a.activity_name || '—') + '</a></td>'
-      + '<td data-label="Type"><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '—') + '</span></td>'
+      + '<td data-label="Activity" style="max-width:120px"><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link" title="' + esc(a.activity_name || '') + '" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(a.activity_name || 'â€”') + '</a></td>'
+      + '<td data-label="Type"><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || 'â€”') + '</span></td>'
       + '<td data-label="Date & time">' + fmtActivityIST(a) + '</td>'
-      + '<td data-label="Distance">' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '—') + '</td>'
+      + '<td data-label="Distance">' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : 'â€”') + '</td>'
       + '<td data-label="Pace">' + fmtPS(a.avg_speed, a.sport_type) + '</td>'
-      + '<td data-label="Flag reason"><span class="flag-reason" title="' + esc(a.flag_reason || '—') + '">' + esc(a.flag_reason || '—') + '</span></td>'
+      + '<td data-label="Flag reason"><span class="flag-reason" title="' + esc(a.flag_reason || 'â€”') + '">' + esc(a.flag_reason || 'â€”') + '</span></td>'
       + statusCellHtml
       + '<td data-label="Actions">' + actions + '</td>'
       + '</tr>';
@@ -2832,7 +2832,7 @@ function findSharedActivityGroups(acts) {
     return true;
   }
 
-  // Build exact grouping key — no empty-string fallbacks
+  // Build exact grouping key â€” no empty-string fallbacks
   function makeKey(a) {
     var parts = [];
     if (cfg.checkDate) parts.push('D:' + getActDate(a));
@@ -2843,7 +2843,7 @@ function findSharedActivityGroups(acts) {
     return parts.join('|');
   }
 
-  // Group by key — only include activities passing full validation
+  // Group by key â€” only include activities passing full validation
   var keyMap = {};
   acts.forEach(function(a) {
     if (!isValidForGrouping(a)) return;
@@ -2899,12 +2899,12 @@ async function previewSharedActivities() {
     var totalActs = _sharedGroups.reduce(function(s, g) { return s + g.activities.length; }, 0);
     var fieldLabels = { date: 'Date', starttime: 'Start Time', distance: 'Distance', movingtime: 'Moving Time', pace: 'Pace' };
     var matchedOn = _sharedGroups[0].checkedFields.map(function(f) { return fieldLabels[f] || f; }).join(', ');
-    countEl.textContent = '?? Found ' + _sharedGroups.length + ' shared group' + (_sharedGroups.length === 1 ? '' : 's') + ' (' + totalActs + ' activities) — matched on: ' + matchedOn;
+    countEl.textContent = '?? Found ' + _sharedGroups.length + ' shared group' + (_sharedGroups.length === 1 ? '' : 's') + ' (' + totalActs + ' activities) â€” matched on: ' + matchedOn;
 
     groupsEl.innerHTML = _sharedGroups.map(function(g, gi) {
       var sample = g.activities[0];
       var date = getActDate(sample);
-      var startTime = getActStartTimeKey(sample) || '—';
+      var startTime = getActStartTimeKey(sample) || 'â€”';
       var km = ((parseFloat(sample.distance_meters) || 0) / 1000).toFixed(2);
       var moving = fmtDur(parseFloat(sample.moving_time_seconds) || 0);
       var pace = fmtPace(sample.avg_speed);
@@ -2917,13 +2917,13 @@ async function previewSharedActivities() {
         '<span style="font-size:12px; font-weight:700; color:#E8622A;">Group ' + (gi + 1) + '</span>' +
         '<span style="margin:0 8px; color:#e0e0e0;">|</span>' +
         '<span style="font-size:12px; color:#444;">?? ' + date + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">Â·</span>' +
         '<span style="font-size:12px; color:#444;">? ' + startTime + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">Â·</span>' +
         '<span style="font-size:12px; color:#444;">?? ' + km + ' km</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">Â·</span>' +
         '<span style="font-size:12px; color:#444;">?? ' + moving + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">Â·</span>' +
         '<span style="font-size:12px; color:#444;">? ' + pace + '</span>' +
         (allFlagged ? '<span style="margin-left:10px; font-size:11px; color:#059669; font-weight:600;">? All already flagged</span>' : '') +
         '</div>' +
@@ -2945,8 +2945,8 @@ async function previewSharedActivities() {
             : '<span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:10px; font-weight:600;">Active</span>';
           return '<tr style="border-bottom:1px solid #f5f5f5;">' +
             '<td style="padding:9px 16px; font-weight:600; color:#0F1117;">' + esc(name) + '</td>' +
-            '<td style="padding:9px 16px;"><a href="' + actUrl + '" target="_blank" style="color:#E8622A; text-decoration:none;">' + esc(a.activity_name || '—') + '</a></td>' +
-            '<td style="padding:9px 16px; color:#6B7280;">' + esc(a.sport_type || '—') + '</td>' +
+            '<td style="padding:9px 16px;"><a href="' + actUrl + '" target="_blank" style="color:#E8622A; text-decoration:none;">' + esc(a.activity_name || 'â€”') + '</a></td>' +
+            '<td style="padding:9px 16px; color:#6B7280;">' + esc(a.sport_type || 'â€”') + '</td>' +
             '<td style="padding:9px 16px;">' + statusBadge + '</td>' +
             '</tr>';
         }).join('') +
@@ -3008,13 +3008,13 @@ function flagSharedSelected() {
     if (!grp) return;
     var names = grp.activities.filter(function(a) { return !a.is_flagged; }).map(function(a) {
       var reg = regMap[String(a.strava_athlete_id).trim()];
-      return (reg ? reg.full_name : 'Unknown') + ' — ' + esc(a.activity_name || a.strava_activity_id);
+      return (reg ? reg.full_name : 'Unknown') + ' â€” ' + esc(a.activity_name || a.strava_activity_id);
     });
     participantLines.push('Group ' + (gi + 1) + ': ' + names.join(', '));
   });
 
-  document.getElementById('shared-modal-summary').textContent = selectedGis.length + ' group' + (selectedGis.length === 1 ? '' : 's') + ' — ' + actCount + ' activities will be flagged';
-  document.getElementById('shared-modal-detail').innerHTML = '<strong>Matched on: ' + matchedOn + '</strong><br><br>' + participantLines.map(function(l) { return '• ' + l; }).join('<br>');
+  document.getElementById('shared-modal-summary').textContent = selectedGis.length + ' group' + (selectedGis.length === 1 ? '' : 's') + ' â€” ' + actCount + ' activities will be flagged';
+  document.getElementById('shared-modal-detail').innerHTML = '<strong>Matched on: ' + matchedOn + '</strong><br><br>' + participantLines.map(function(l) { return 'Â• ' + l; }).join('<br>');
   document.getElementById('shared-modal-step1').style.display = 'flex';
   document.getElementById('shared-modal-step2').style.display = 'none';
   document.getElementById('shared-confirm-modal').style.display = 'flex';
@@ -3044,7 +3044,7 @@ async function executeSharedFlag() {
       var reg = regMap[String(a.strava_athlete_id).trim()];
       return reg ? reg.full_name : 'Unknown';
     }).join(', ');
-    var reason = 'Shared Activity (auto-detected) — identical ' + matchedOn + ' as: ' + otherNames;
+    var reason = 'Shared Activity (auto-detected) â€” identical ' + matchedOn + ' as: ' + otherNames;
     try {
       var r = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + item.act.id, {
         method: 'PATCH',
@@ -3061,7 +3061,7 @@ async function executeSharedFlag() {
   _pendingSharedToFlag = [];
 
   var countEl = document.getElementById('shared-preview-count');
-  countEl.textContent = '? Done — ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
+  countEl.textContent = '? Done â€” ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
   showToast(success + ' activities flagged as Shared Activity', false);
   // Refresh the preview to show updated states
   previewSharedActivities();
@@ -3224,7 +3224,7 @@ async function previewFlagRules() {
       var already = a.is_flagged ? ' style="opacity:0.5"' : '';
       var athleteUrl = 'https://www.strava.com/athletes/' + a.strava_athlete_id;
       var actUrl = 'https://www.strava.com/activities/' + (a.strava_activity_id || a.id);
-      var actName = esc(a.activity_name || '—');
+      var actName = esc(a.activity_name || 'â€”');
       var chkDisabled = a.is_flagged ? ' disabled title="Already flagged"' : '';
       var chkChecked = a.is_flagged ? '' : ' checked';
       
@@ -3232,7 +3232,7 @@ async function previewFlagRules() {
         + ' <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="row-preview-chk" data-idx="' + flagPreviewData.indexOf(m) + '"' + chkChecked + chkDisabled + ' onchange="updateSelectedPreviewCount()" style="cursor:pointer;width:15px;height:15px"></td>'
         + '<td style="padding:8px 12px">' + (a.is_flagged ? '<span style="color:#bbb;font-size:11px">? already</span> ' : '') + '<a href="' + athleteUrl + '" target="_blank" style="color:#E8622A;font-weight:600;text-decoration:none">' + esc(m.name) + '</a></td>'
         + '<td style="padding:8px 12px; max-width:24ch; width:24ch;"><a href="' + actUrl + '" target="_blank" title="' + actName + '" style="color:#1A1A1A;text-decoration:none; display:inline-block; max-width:22ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + actName + '</a></td>'
-        + '<td style="padding:8px 12px">' + esc(a.sport_type || '—') + '</td>'
+        + '<td style="padding:8px 12px">' + esc(a.sport_type || 'â€”') + '</td>'
         + '<td style="padding:8px 12px">' + dt + '</td>'
         + '<td style="padding:8px 12px">' + km + ' km</td>'
         + '<td style="padding:8px 12px">' + fmtPace(a.avg_speed) + '</td>'
@@ -3295,7 +3295,7 @@ async function applyFlagRules() {
   
   btn.textContent = '?? Flag Selected';
   btn.disabled = false;
-  countEl.textContent = '? Done — ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
+  countEl.textContent = '? Done â€” ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
   updateSelectedPreviewCount();
 }
 
@@ -4412,7 +4412,7 @@ async function loadFlagReasons(){
     if (FR_ORPHANS.length) {
       orphanEl.style.display = 'block';
       orphanEl.innerHTML = '?? <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
-        FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' · ');
+        FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' Â· ');
     } else { orphanEl.style.display = 'none'; }
     renderFlagReasons();
   } catch(e) {
@@ -4490,7 +4490,7 @@ function expandFlagReason(r, body){
   var meta = document.createElement('div');
   meta.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-bottom:8px;';
   meta.innerHTML = 'Type: <strong>' + (r.flag_type === 'auto' ? 'Auto (fraud engine)' : 'Manual') + '</strong>' +
-    (r.is_engine_rule ? ' · <span style="color:var(--text-muted)">engine rule — name locked</span>' : '');
+    (r.is_engine_rule ? ' Â· <span style="color:var(--text-muted)">engine rule â€” name locked</span>' : '');
   body.appendChild(meta);
 
   if (!r.is_engine_rule) {
@@ -4532,11 +4532,11 @@ function expandFlagReason(r, body){
   } else {
     var hint = document.createElement('div');
     hint.style.cssText = 'font-size:11.5px;color:var(--text-muted);line-height:1.5;';
-    hint.innerHTML = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule. The header toggle controls whether it appears in dropdowns; turning it off never changes already-flagged activities.';
+    hint.innerHTML = 'Manual flag â€” applied by admins from the flag dropdowns. No automatic rule. The header toggle controls whether it appears in dropdowns; turning it off never changes already-flagged activities.';
     body.appendChild(hint);
   }
 
-  // Delete — only offered when nothing is attached (server re-verifies too)
+  // Delete â€” only offered when nothing is attached (server re-verifies too)
   if (r.applied_count === 0 && !(r.is_engine_rule && frEventId() === 1)) {
     var delBar = document.createElement('div');
     delBar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:10px;';
@@ -4572,7 +4572,7 @@ function openCopyReasonsModal(){
   modal.style.cssText = 'background:#fff;border-radius:16px;padding:24px;width:100%;max-width:460px;max-height:80vh;overflow-y:auto;';
   modal.innerHTML =
     '<h3 style="font-size:16px;font-weight:600;margin:0 0 4px;">Copy flag reasons</h3>' +
-    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">From <strong>' + escFR(srcName) + '</strong> — auto rule thresholds are copied too if the target has none yet.</p>' +
+    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">From <strong>' + escFR(srcName) + '</strong> â€” auto rule thresholds are copied too if the target has none yet.</p>' +
     '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Target event</label>' +
     '<select id="fr-copy-target" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin:4px 0 14px;">' +
       targets.map(function(e){ return '<option value="' + e.id + '">' + escFR(e.name) + ' (' + e.status.toUpperCase() + ')</option>'; }).join('') +
@@ -4609,8 +4609,8 @@ async function executeCopyReasons(){
     if (!d.success) throw new Error(d.error || 'Copy failed');
     document.getElementById('fr-copy-overlay').remove();
     alert('? Copied ' + d.copied + ' reason' + (d.copied === 1 ? '' : 's') +
-      (d.skipped ? ' · ' + d.skipped + ' already existed on target' : '') +
-      (d.rules_copied ? ' · rule thresholds copied' : ''));
+      (d.skipped ? ' Â· ' + d.skipped + ' already existed on target' : '') +
+      (d.rules_copied ? ' Â· rule thresholds copied' : ''));
   } catch(e){ alert('Failed: ' + e.message); }
 }
 
@@ -4637,7 +4637,7 @@ async function toggleFlagReason(id, checked){
     var row = FR_DATA.find(function(x){ return x.id === id; });
     if (row) row.is_active = checked;
     if (row && !checked && row.applied_count > 0) {
-      alert('"' + row.reason + '" is applied on ' + row.applied_count + ' activities. They stay flagged — this reason just won\'t appear in dropdowns for new use.');
+      alert('"' + row.reason + '" is applied on ' + row.applied_count + ' activities. They stay flagged â€” this reason just won\'t appear in dropdowns for new use.');
     }
     populateFlagReasonDropdowns();
     renderFlagReasons();
