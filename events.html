@@ -740,7 +740,10 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <div style="display:flex; flex-direction:column; gap:6px; position:sticky; top:10px;">
           <h4 style="font-size:12px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between; margin:0;">
             <span>Live Interactive Preview</span>
-            <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
+            <span style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-ghost btn-xs" onclick="downloadCertPreview()"><i class="ti ti-download"></i> Download Preview</button>
+              <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
+            </span>
           </h4>
           <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:8px; display:flex; align-items:center; justify-content:center; min-height:420px; position:relative; overflow:hidden;">
             <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:74vh; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
@@ -2437,6 +2440,9 @@ var _certBgUrl = '';
 var _certPreviewScale = 1;
 var _certRedrawQueued = false;
 
+var _certSnapGuides = [];
+var _certCleanRender = false;
+
 // Fast path: blit cached background + draw placeholders. No PDF work.
 window.redrawCertPreview = function() {
   var canvas = document.getElementById('cert-preview-canvas');
@@ -2445,6 +2451,36 @@ window.redrawCertPreview = function() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(_certBgCanvas, 0, 0);
   drawCertPlaceholdersOnCanvas(canvas, _certPreviewScale);
+  if (!_certCleanRender && _certSnapGuides.length) {
+    ctx.save();
+    ctx.strokeStyle = '#E8622A';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 4]);
+    _certSnapGuides.forEach(function(g) {
+      ctx.beginPath();
+      if (g.type === 'v') { ctx.moveTo(g.pos, 0); ctx.lineTo(g.pos, canvas.height); }
+      else { ctx.moveTo(0, g.pos); ctx.lineTo(canvas.width, g.pos); }
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+};
+
+// Renders the preview without editor chrome (outlines, handles, guides) and downloads it
+window.downloadCertPreview = function() {
+  var canvas = document.getElementById('cert-preview-canvas');
+  if (!canvas || !_certBgCanvas) { alert('Nothing to download yet - set up a template or blank canvas first.'); return; }
+  _certCleanRender = true;
+  window.redrawCertPreview();
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  _certCleanRender = false;
+  queueCertRedraw();
+  var a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = 'certificate-preview.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 };
 
 function queueCertRedraw() {
@@ -2613,15 +2649,17 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       var textY = h * y;
       
       ctx.save();
-      ctx.fillStyle = 'rgba(232, 98, 42, 0.12)';
-      ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
-      ctx.lineWidth = isChecked ? 2 : 1;
-      ctx.setLineDash(isChecked ? [] : [2, 2]);
-      
-      ctx.beginPath();
-      ctx.arc(textX, textY, boxSize / 2, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.stroke();
+      if (!_certCleanRender) {
+        ctx.fillStyle = 'rgba(232, 98, 42, 0.12)';
+        ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+        ctx.lineWidth = isChecked ? 2 : 1;
+        ctx.setLineDash(isChecked ? [] : [2, 2]);
+        
+        ctx.beginPath();
+        ctx.arc(textX, textY, boxSize / 2, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+      }
       
       // Draw the actual configured medal image (gold shown in preview); fall back to gold emoji
       var goldUrlEl = document.getElementById('gold-img-url');
@@ -2641,7 +2679,7 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       var hitEntry = { row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY, isImage: true };
 
       // Resize handle (bottom-right corner) when this placeholder is selected
-      if (isChecked) {
+      if (isChecked && !_certCleanRender) {
         var hs = 12;
         var hx = textX + boxSize/2;
         var hy = textY + boxSize/2;
@@ -2670,11 +2708,11 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       if (elImg && elImg.complete && elImg.naturalWidth > 0) {
         imgH = Math.round(imgW * (elImg.naturalHeight / elImg.naturalWidth));
         ctx.drawImage(elImg, cx - imgW/2, cy - imgH/2, imgW, imgH);
-        if (isChecked) {
+        if (isChecked && !_certCleanRender) {
           ctx.strokeStyle = '#E8622A'; ctx.lineWidth = 2; ctx.setLineDash([]);
           ctx.strokeRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
         }
-      } else {
+      } else if (!_certCleanRender) {
         ctx.fillStyle = 'rgba(148,163,184,0.15)';
         ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
         ctx.lineWidth = isChecked ? 2 : 1;
@@ -2688,7 +2726,7 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
         ctx.fillText('IMAGE', cx, cy);
       }
       var imgHit = { row: row, x0: cx - imgW/2, y0: cy - imgH/2, x1: cx + imgW/2, y1: cy + imgH/2, anchorX: cx, anchorY: cy, isImage: true };
-      if (isChecked) {
+      if (isChecked && !_certCleanRender) {
         var hs2 = 12;
         var hx2 = cx + imgW/2, hy2 = cy + imgH/2;
         ctx.setLineDash([]);
@@ -2703,7 +2741,7 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     }
 
     var statLabels = { distance: 'DISTANCE', rank: 'RANK', points: 'POINTS', medal_title: 'MEDAL' };
-    var statValues = { distance: '300.5 KM', rank: '#3 of 487', points: '350', medal_title: 'Gold' };
+    var statValues = { distance: '300.5 KM', rank: '#3 of 487', points: '350', medal_title: '\ud83e\udd47 Gold' };
     var isStat = !!statLabels[type];
 
     var previewText = key;
@@ -2739,8 +2777,11 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     else if (align === 'right') boxX = textX - textWidth;
     
     var paddingX = 8;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-    ctx.fillRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
+    var isBlankPrev = document.getElementById('cert-canvas-mode') && document.getElementById('cert-canvas-mode').value === 'blank';
+    if (!isBlankPrev) {
+      ctx.fillStyle = _certCleanRender ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
+      ctx.fillRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
+    }
     
     ctx.fillStyle = color;
     if (isStat) {
@@ -2755,10 +2796,12 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       ctx.fillText(previewText, textX, textY);
     }
     
-    ctx.lineWidth = isChecked ? 2 : 1;
-    ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
-    ctx.setLineDash(isChecked ? [] : [2, 2]);
-    ctx.strokeRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
+    if (!_certCleanRender) {
+      ctx.lineWidth = isChecked ? 2 : 1;
+      ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
+      ctx.setLineDash(isChecked ? [] : [2, 2]);
+      ctx.strokeRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
+    }
     
     ctx.restore();
     _certHitBoxes.push({ row: row, x0: boxX - paddingX, y0: boxTop, x1: boxX - paddingX + textWidth + (paddingX * 2), y1: boxTop + boxHeight, anchorX: textX, anchorY: textY });
@@ -2875,12 +2918,35 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       }
       if (!_dragRow) return;
       if (Math.abs(c.px - _downPx) > 2 || Math.abs(c.py - _downPy) > 2) _dragMoved = true;
-      setRowXY(_dragRow, (c.px - _dragOffX) / canvas.width, (c.py - _dragOffY) / canvas.height);
+
+      // Alignment snapping: canvas center + other placeholders' anchors
+      var wantX = c.px - _dragOffX;
+      var wantY = c.py - _dragOffY;
+      var SNAP = 6;
+      _certSnapGuides = [];
+      var candX = [canvas.width / 2];
+      var candY = [canvas.height / 2];
+      document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
+        if (r === _dragRow) return;
+        var rx = parseFloat(r.querySelector('.cert-p-x').value);
+        var ry = parseFloat(r.querySelector('.cert-p-y').value);
+        if (!isNaN(rx)) candX.push(rx * canvas.width);
+        if (!isNaN(ry)) candY.push(ry * canvas.height);
+      });
+      for (var ci = 0; ci < candX.length; ci++) {
+        if (Math.abs(wantX - candX[ci]) < SNAP) { wantX = candX[ci]; _certSnapGuides.push({ type: 'v', pos: candX[ci] }); break; }
+      }
+      for (var cj = 0; cj < candY.length; cj++) {
+        if (Math.abs(wantY - candY[cj]) < SNAP) { wantY = candY[cj]; _certSnapGuides.push({ type: 'h', pos: candY[cj] }); break; }
+      }
+
+      setRowXY(_dragRow, wantX / canvas.width, wantY / canvas.height);
       queueCertRedraw();
     });
 
     canvas.addEventListener('pointerup', function(e) {
       canvas.style.cursor = 'grab';
+      if (_certSnapGuides.length) { _certSnapGuides = []; queueCertRedraw(); }
       if (_resizeRow) {
         _resizeRow = null;
         return;
