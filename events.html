@@ -717,6 +717,11 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> JPEG</label>
           <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF</label>
         </div>
+        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fffdfa; border:1px solid #ffd8a8; border-radius:8px; height:38px;">
+          <label style="font-size:12px; font-weight:600; color:#e8590c; display:flex; align-items:center; gap:5px; cursor:pointer;">
+            <input type="checkbox" id="cert-enabled"> Enable Certificate Button for Participants
+          </label>
+        </div>
       </div>
 
       <!-- Main workspace: compact placeholder list (left) + large preview (right) -->
@@ -1792,6 +1797,7 @@ async function openEditor(ev){
         toggleCertMode();
         document.getElementById('cert-opt-image').checked = (c.download_options || []).indexOf('image') > -1;
         document.getElementById('cert-opt-pdf').checked = (c.download_options || []).indexOf('pdf') > -1;
+        document.getElementById('cert-enabled').checked = !!c.enabled;
         
         var list = document.getElementById('cert-placeholders-list');
         list.innerHTML = '';
@@ -1808,6 +1814,7 @@ async function openEditor(ev){
         toggleCertMode();
         document.getElementById('cert-opt-image').checked = true;
         document.getElementById('cert-opt-pdf').checked = true;
+        document.getElementById('cert-enabled').checked = false;
         document.getElementById('cert-placeholders-list').innerHTML = '';
         addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
         addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
@@ -1857,6 +1864,7 @@ async function openEditor(ev){
     toggleCertMode();
     document.getElementById('cert-opt-image').checked = true;
     document.getElementById('cert-opt-pdf').checked = true;
+    document.getElementById('cert-enabled').checked = false;
     document.getElementById('cert-placeholders-list').innerHTML = '';
     addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
     addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
@@ -2049,7 +2057,8 @@ async function saveEvent() {
         canvas_orientation: document.getElementById('cert-canvas-orient').value || 'landscape',
         canvas_bg: document.getElementById('cert-canvas-bg').value || '#ffffff',
         placeholders: certPlaceholders,
-        download_options: certDownloadOptions
+        download_options: certDownloadOptions,
+        enabled: document.getElementById('cert-enabled').checked
       };
 
       await Promise.all([
