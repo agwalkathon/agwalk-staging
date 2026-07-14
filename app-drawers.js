@@ -1452,28 +1452,50 @@ window.renderShareCard = function() {
   
   ctx.clearRect(0, 0, W, H);
   
+  var _crr = function(ctx, x, y, w, h, r) {
+    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+  };
+
   if (!window._shareBgTransparent) {
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(0, 0, W, H);
+    
+    var drawBlob = function(x, y, r, color) {
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, color);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fill();
+    };
+
     if (window._shareThemeIndex === 0) {
-      var grad = ctx.createRadialGradient(W/2, 0, 50, W/2, 0, W * 1.1);
-      grad.addColorStop(0, '#1e3a8a');
-      grad.addColorStop(0.5, '#0b0f19');
-      grad.addColorStop(1, '#020617');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      drawBlob(W - 100, 150, 420, 'rgba(217, 70, 239, 0.45)');
+      drawBlob(100, H - 200, 450, 'rgba(6, 182, 212, 0.45)');
+      drawBlob(W/2, H/2, 350, 'rgba(99, 102, 241, 0.25)');
     } else if (window._shareThemeIndex === 1) {
-      var grad = ctx.createRadialGradient(W/2, 0, 50, W/2, 0, W * 1.1);
-      grad.addColorStop(0, '#7c2d12');
-      grad.addColorStop(0.5, '#0b0f19');
-      grad.addColorStop(1, '#090500');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      drawBlob(100, 150, 420, 'rgba(236, 72, 153, 0.45)');
+      drawBlob(W - 100, H - 200, 450, 'rgba(249, 115, 22, 0.45)');
+      drawBlob(W/2, H/2, 350, 'rgba(239, 68, 68, 0.25)');
     } else if (window._shareThemeIndex === 2) {
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(2, 2, W-4, H-4);
+      drawBlob(W/2, 100, 420, 'rgba(132, 204, 22, 0.45)');
+      drawBlob(W/2, H - 150, 450, 'rgba(20, 184, 166, 0.45)');
+      drawBlob(100, H/2, 350, 'rgba(16, 185, 129, 0.25)');
     }
+    
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+    _crr(ctx, 24, 24, W - 48, H - 48, 36);
+    ctx.fill();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 2;
+    _crr(ctx, 24, 24, W - 48, H - 48, 36);
+    ctx.stroke();
   }
   
   // Activity Name (e.g. "Evening Run")
