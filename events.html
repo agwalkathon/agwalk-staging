@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Events â€” Arcgate Walkathon</title>
+  <title>Events — Arcgate Walkathon</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -262,7 +262,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <div id="banner-preview-wrap" style="margin-top: 8px; display: none; align-items: center; gap: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px 12px; width: fit-content;">
           <span style="font-size: 11px; font-weight: 600; color: #64748b;">Preview:</span>
           <img id="banner-preview-img" src="" style="max-height: 60px; width: auto; border-radius: 4px;">
-          <button type="button" id="btn-banner-filter" onclick="toggleBannerFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">â¬›â†’â¬œ Invert</button>
+          <button type="button" id="btn-banner-filter" onclick="toggleBannerFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">⬛→⬜ Invert</button>
           <button type="button" class="btn btn-ghost btn-xs" onclick="clearBannerPreview()" style="color: #ef4444; padding: 2px 6px; font-size: 10px; border: 1px solid #fecaca; background: #fef2f2; cursor: pointer; border-radius: 4px;">Remove</button>
         </div>
       </div>
@@ -276,9 +276,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="grid" style="margin-bottom:14px">
       <div class="fld"><label>Tracking Mode</label>
         <select id="f-tracking">
-          <option value="strava" selected>Strava â€” auto-fetch activities via API</option>
-          <option value="manual">Manual â€” organizers enter results (cricket, quizâ€¦)</option>
-          <option value="none">None â€” no leaderboard, participation only</option>
+          <option value="strava" selected>Strava — auto-fetch activities via API</option>
+          <option value="manual">Manual — organizers enter results (cricket, quiz…)</option>
+          <option value="none">None — no leaderboard, participation only</option>
         </select>
       </div>
       <div class="fld" id="wrap-fetch-start"><label>Fetch Data From <span style="font-weight:400;text-transform:none">(blank = event start)</span></label><input type="date" id="f-fetch-start"></div>
@@ -288,7 +288,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="chips" id="sport-chips"></div>
   </div>
 
-  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">ðŸ“‹ Manual events don't track Strava activity â€” no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
+  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
 
   </div>
 
@@ -312,9 +312,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="grid" style="margin-bottom:14px" id="scoring-grid">
       <div class="fld"><label>Scoring Mode</label>
         <select id="f-smode">
-          <option value="raw">Raw Metric â€” rank by total directly, no points</option>
-          <option value="single_metric" selected>Single Metric â†’ Points (walkathon style)</option>
-          <option value="composite">Composite â€” points from multiple metrics</option>
+          <option value="raw">Raw Metric — rank by total directly, no points</option>
+          <option value="single_metric" selected>Single Metric → Points (walkathon style)</option>
+          <option value="composite">Composite — points from multiple metrics</option>
         </select>
       </div>
       <div class="fld" id="wrap-metric"><label>Primary Metric</label>
@@ -375,9 +375,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div style="display:flex; flex-direction:column; gap:16px;">
       <!-- Gold Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">ðŸ¥‡ Gold (Male Goal)</label><input type="number" id="gold-male" value="300" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">ðŸ¥‡ Gold (Female Goal)</label><input type="number" id="gold-female" value="250" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥‡ Gold Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Male Goal)</label><input type="number" id="gold-male" value="300" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Female Goal)</label><input type="number" id="gold-female" value="250" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥇 Gold Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="gold-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('gold-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -388,9 +388,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <!-- Silver Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">ðŸ¥ˆ Silver (Male Goal)</label><input type="number" id="silver-male" value="200" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">ðŸ¥ˆ Silver (Female Goal)</label><input type="number" id="silver-female" value="150" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥ˆ Silver Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Male Goal)</label><input type="number" id="silver-male" value="200" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Female Goal)</label><input type="number" id="silver-female" value="150" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥈 Silver Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="silver-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('silver-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -401,9 +401,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <!-- Bronze Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">ðŸ¥‰ Bronze (Male Goal)</label><input type="number" id="bronze-male" value="125" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">ðŸ¥‰ Bronze (Female Goal)</label><input type="number" id="bronze-female" value="100" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥‰ Bronze Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Male Goal)</label><input type="number" id="bronze-male" value="125" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Female Goal)</label><input type="number" id="bronze-female" value="100" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥉 Bronze Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="bronze-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('bronze-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -454,7 +454,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <!-- Locked Config Info message for new events -->
   <div id="new-event-subconfig-lock" style="padding:14px; background:#EFF6FF; color:#1E40AF; border-radius:8px; border:1px solid #BFDBFE; font-size:12.5px; margin-bottom:20px;">
-    â„¹ï¸ Special Days and Challenges can be configured after you save and create this event.
+    ℹ️ Special Days and Challenges can be configured after you save and create this event.
   </div>
 
   <!-- Group 4c: Special Days -->
@@ -514,14 +514,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <div class="grid" style="margin-bottom:18px">
         <div class="fld"><label>Event Logo (shown above rings)</label>
           <div style="display:flex;gap:8px;align-items:center">
-            <input id="f-logo-url" placeholder="https://... or upload â†’" style="flex:1" oninput="updateLogoPreview(this.value)">
+            <input id="f-logo-url" placeholder="https://... or upload →" style="flex:1" oninput="updateLogoPreview(this.value)">
             <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
             <input type="file" id="logo-file" accept="image/*" style="display:none">
           </div>
           <div id="logo-preview-wrap" style="margin-top: 8px; display: none; align-items: center; gap: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px 12px; width: fit-content;">
             <span style="font-size: 11px; font-weight: 600; color: #64748b;">Preview:</span>
             <img id="logo-preview-img" src="" style="max-height: 40px; width: auto; border-radius: 4px; background: #888; padding: 4px;">
-            <button type="button" id="btn-logo-filter" onclick="toggleLogoFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">â¬›â†’â¬œ Invert</button>
+            <button type="button" id="btn-logo-filter" onclick="toggleLogoFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">⬛→⬜ Invert</button>
             <button type="button" class="btn btn-ghost btn-xs" onclick="clearLogoPreview()" style="color: #ef4444; padding: 2px 6px; font-size: 10px; border: 1px solid #fecaca; background: #fef2f2; cursor: pointer; border-radius: 4px;">Remove</button>
           </div>
         </div>
@@ -662,7 +662,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn btn-primary" onclick="saveManualBonus()"><i class="ti ti-check"></i> Apply Manual Bonus</button>
-        <span class="saved-msg" id="manual-saved" style="display:none; color: #10B981; font-weight: 600;">âœ… Applied!</span>
+        <span class="saved-msg" id="manual-saved" style="display:none; color: #10B981; font-weight: 600;">✅ Applied!</span>
       </div>
       <div id="manual-result" class="msg info" style="margin-top: 10px; font-size: 13px; color: #555;"></div>
     </div>
@@ -680,13 +680,13 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
-    <span class="saved-msg" id="ed-saved">âœ… Saved</span>
+    <span class="saved-msg" id="ed-saved">✅ Saved</span>
     <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
     <button type="button" class="btn btn-primary" id="btn-save"><i class="ti ti-device-floppy"></i> Save Event</button>
   </div>
 </div>
 
-<div id="ev-list"><div class="empty">Loading eventsâ€¦</div></div>
+<div id="ev-list"><div class="empty">Loading events…</div></div>
 </div>
 </div>
 <script>
@@ -702,7 +702,7 @@ var SPORTS=['Walk','Run','Ride','Hike','Swim','Yoga','Workout','WeightTraining',
 var EVENTS=[], editId=null;
 
 /* ---------- list ---------- */
-function fmtD(d){if(!d)return 'â€”';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 async function loadEvents(){
   var r=await fetch(SB_URL+'/rest/v1/events?select=*&order=start_date.desc',{headers:HDR});
   EVENTS=await r.json();
@@ -764,7 +764,7 @@ function renderList(){
     
     var mt=document.createElement('div');mt.className='ev-meta';
     var rc=(ev.rules_config||{});
-    mt.textContent=fmtD(ev.start_date)+' â†’ '+fmtD(ev.end_date)+'  Â·  '+(ev.event_type||'')+'  Â·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
+    mt.textContent=fmtD(ev.start_date)+' → '+fmtD(ev.end_date)+'  ·  '+(ev.event_type||'')+'  ·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
     info.appendChild(nm);info.appendChild(mt);body.appendChild(info);
     var acts=document.createElement('div');acts.className='ev-actions';
     [['ti-pencil','Edit','edit'],['ti-certificate','Certificate','cert'],['ti-copy','Clone','clone'],['ti-arrows-exchange','Status','status']].forEach(function(a){
@@ -997,14 +997,14 @@ function setLogoFilter(on) {
   if (_logoFilterOn) {
     img.style.filter = 'invert(1) hue-rotate(180deg)';
     img.style.background = '#333';
-    btn.textContent = 'â†© Revert';
+    btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
     img.style.background = '#888';
-    btn.textContent = 'â¬› â†’ â¬œ Black to White';
+    btn.textContent = '⬛ → ⬜ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
@@ -1040,13 +1040,13 @@ function setBannerFilter(on) {
   var btn = document.getElementById('btn-banner-filter');
   if (_bannerFilterOn) {
     img.style.filter = 'invert(1) hue-rotate(180deg)';
-    btn.textContent = 'â†© Revert';
+    btn.textContent = '↩ Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
-    btn.textContent = 'â¬› â†’ â¬œ Black to White';
+    btn.textContent = '⬛ → ⬜ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
@@ -1176,7 +1176,7 @@ function addFFRow(f){
   var ed=document.createElement('input');ed.type='checkbox';ed.className='ff-editable';ed.checked=f.editable!==false;
   edLabel.appendChild(ed);edLabel.appendChild(document.createTextNode(' Editable'));
   
-  var del=document.createElement('button');del.type='button';del.className='ff-del';del.textContent='âœ•';
+  var del=document.createElement('button');del.type='button';del.className='ff-del';del.textContent='✕';
   del.style.cssText='height:34px;border:none;background:#FEF2F2;color:#DC2626;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:all 0.15s;';
   del.addEventListener('click',function(){row.remove();});
   
@@ -1221,7 +1221,7 @@ function renderMilestonesUI() {
     var delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'btn btn-ghost btn-sm';
-    delBtn.innerHTML = 'âœ•';
+    delBtn.innerHTML = '✕';
     delBtn.addEventListener('click', function() {
       row.remove();
     });
@@ -1250,7 +1250,7 @@ function renderSpecialDaysUI() {
     pill.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-bottom: 6px;';
     
     var left = document.createElement('div');
-    left.innerHTML = '<strong>' + esc(sd.special_date) + '</strong> â€” <span style="color:var(--text-secondary);">' + esc(sd.label || 'Special Day') + '</span>';
+    left.innerHTML = '<strong>' + esc(sd.special_date) + '</strong> — <span style="color:var(--text-secondary);">' + esc(sd.label || 'Special Day') + '</span>';
     
     var del = document.createElement('button');
     del.type = 'button';
@@ -1320,18 +1320,18 @@ function renderChallengesUI() {
         '<div style="flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
           statusDot +
           '<strong style="font-size:13.5px">' + esc(c.name) + '</strong>' +
-          '<span style="font-size:11.5px;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px">' + c.start_date + (c.end_date !== c.start_date ? ' â†’ ' + c.end_date : '') + '</span>' +
-          '<span style="font-size:11.5px;color:#666">ðŸ“ ' + c.distance_min + 'â€“' + c.distance_max + ' km</span>' +
+          '<span style="font-size:11.5px;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px">' + c.start_date + (c.end_date !== c.start_date ? ' → ' + c.end_date : '') + '</span>' +
+          '<span style="font-size:11.5px;color:#666">📏 ' + c.distance_min + '–' + c.distance_max + ' km</span>' +
           '<span style="font-size:11.5px;font-weight:700;color:#1565c0">+' + c.bonus_points + ' pts</span>' +
         '</div>' +
         '<div style="display:flex;gap:12px;align-items:center">' +
-          '<button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleChallengeActive(' + c.id + ',' + c.is_active + ')">' + (c.is_active ? 'â¸ Pause' : 'â–¶ï¸ Activate') + '</button>' +
-          '<span style="font-size:12px;color:#bbb">â–¼</span>' +
+          '<button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleChallengeActive(' + c.id + ',' + c.is_active + ')">' + (c.is_active ? '⏸ Pause' : '▶️ Activate') + '</button>' +
+          '<span style="font-size:12px;color:#bbb">▼</span>' +
         '</div>' +
       '</div>' +
       '<div class="ch-detail" id="chd-' + c.id + '" style="display:none;padding:18px;border-top:1px solid #f0f0f0;background:#fafafa">' +
         '<!-- Group 1: Basic Info -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸ“‹ Basic Info</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">📋 Basic Info</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           chField('Challenge name', 'ch-name-' + c.id, 'text', c.name) +
           chField('Start date', 'ch-start-' + c.id, 'date', c.start_date) +
@@ -1340,7 +1340,7 @@ function renderChallengesUI() {
         '</div>' +
         
         '<!-- Group 2: Qualifying Criteria -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸŽ¯ Qualifying Criteria</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎯 Qualifying Criteria</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           chField('Distance type', 'ch-dtype-' + c.id, 'select-dtype', c.distance_type) +
           chField('Min distance (km)', 'ch-dmin-' + c.id, 'number', c.distance_min) +
@@ -1353,7 +1353,7 @@ function renderChallengesUI() {
         '</div>' +
         
         '<!-- Group 3: Awards & Scoring -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸŽ Awards & Scoring</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎁 Awards & Scoring</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           '<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:8px">' +
             chField('Award type', 'ch-atype-' + c.id, 'select-atype-dep', c.award_type || (c.range_split ? 'range-split' : c.per_activity_points > 0 ? 'per-act' : 'one-time')) +
@@ -1364,8 +1364,8 @@ function renderChallengesUI() {
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;border-top:1px solid #eee;padding-top:12px;margin-top:16px">' +
-          '<button type="button" class="btn btn-primary btn-sm" onclick="saveChallengeCard(' + c.id + ')">ðŸ’¾ Save</button>' +
-          '<button type="button" class="btn btn-ghost btn-sm" style="color: #ff4d4d; border-color: rgba(255,77,77,0.3);" onclick="deleteChallengeCard(' + c.id + ')">ðŸ—‘ï¸ Delete</button>' +
+          '<button type="button" class="btn btn-primary btn-sm" onclick="saveChallengeCard(' + c.id + ')">💾 Save</button>' +
+          '<button type="button" class="btn btn-ghost btn-sm" style="color: #ff4d4d; border-color: rgba(255,77,77,0.3);" onclick="deleteChallengeCard(' + c.id + ')">🗑️ Delete</button>' +
         '</div>' +
       '</div>';
       
@@ -1396,7 +1396,7 @@ function chField(label, id, type, val) {
   } else if (type === 'select-scope') {
     input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="single"' + (val === 'single' ? ' selected' : '') + '>Single activity</option><option value="daily"' + (val === 'daily' ? ' selected' : '') + '>Entire day total</option></select>';
   } else if (type === 'select-dtype') {
-    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="fixed"' + (val === 'fixed' ? ' selected' : '') + '>Fixed (Â±0.1 km)</option><option value="range"' + (val === 'range' ? ' selected' : '') + '>Range (strict)</option><option value="extended"' + (val === 'extended' ? ' selected' : '') + '>Extended (min km+)</option></select>';
+    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="fixed"' + (val === 'fixed' ? ' selected' : '') + '>Fixed (±0.1 km)</option><option value="range"' + (val === 'range' ? ' selected' : '') + '>Range (strict)</option><option value="extended"' + (val === 'extended' ? ' selected' : '') + '>Extended (min km+)</option></select>';
   } else if (type === 'select-atype-dep') {
     var atypeDescs = {
       'one-time': 'Award bonus_points ONCE if any qualifying activity meets criteria.',
@@ -1924,7 +1924,7 @@ async function saveEvent() {
     document.getElementById('editor').classList.remove('open');editId=null;
     await loadEvents();
   } catch(e) {
-    err.textContent='âŒ '+e.message;
+    err.textContent='❌ '+e.message;
   } finally {
     btnBottom.disabled=false;
     btnTop.disabled=false;
@@ -1935,7 +1935,7 @@ async function saveEvent() {
 async function cycleStatus(ev){
   var order=['draft','upcoming','live','ended','archived'];
   var next=order[(order.indexOf(ev.status)+1)%order.length];
-  if(!confirm('Change "'+ev.name+'" status: '+ev.status+' â†’ '+next+' ?'))return;
+  if(!confirm('Change "'+ev.name+'" status: '+ev.status+' → '+next+' ?'))return;
   var r=await fetch(SB_URL+'/rest/v1/events?id=eq.'+ev.id,{method:'PATCH',headers:HDR,body:JSON.stringify({status:next})});
   if(!r.ok){alert('Status change failed '+r.status);return;}
   loadEvents();
@@ -1961,7 +1961,7 @@ async function cloneEvent(ev){
       await fetch(SB_URL+'/rest/v1/challenges',{method:'POST',headers:HDR,body:JSON.stringify(c)});
     }
     report.push(chs.length+' challenges copied (inactive).');
-  }catch(e){report.push('âš ï¸ challenges copy failed');}
+  }catch(e){report.push('⚠️ challenges copy failed');}
   // copy special days
   try{
     var sr=await fetch(SB_URL+'/rest/v1/special_scoring_days?event_id=eq.'+ev.id+'&select=*',{headers:HDR});
@@ -1971,7 +1971,7 @@ async function cloneEvent(ev){
       await fetch(SB_URL+'/rest/v1/special_scoring_days',{method:'POST',headers:HDR,body:JSON.stringify(s)});
     }
     report.push(sds.length+' special days copied.');
-  }catch(e){report.push('âš ï¸ special days copy failed');}
+  }catch(e){report.push('⚠️ special days copy failed');}
   alert(report.join('\n'));
   loadEvents();
 }
@@ -2057,7 +2057,7 @@ async function saveManualBonus() {
     }
   }
   
-  resultEl.innerHTML = 'âœ… Applied to ' + success + ' activities and created challenge' + (failed ? ' | âŒ ' + failed + ' not found' : '');
+  resultEl.innerHTML = '✅ Applied to ' + success + ' activities and created challenge' + (failed ? ' | ❌ ' + failed + ' not found' : '');
   
   var el = document.getElementById('manual-saved');
   if (el) {
@@ -2091,7 +2091,7 @@ async function loadManualBonuses() {
       rows.map(function(row) {
         return '<tr style="border-bottom:1px solid #f5f5f5">' +
           '<td style="padding:8px 12px"><a href="https://www.strava.com/activities/' + row.strava_activity_id + '" target="_blank" style="color:#E8622A;text-decoration:none;font-weight:500;">' + row.strava_activity_id + '</a></td>' +
-          '<td style="padding:8px 12px">' + esc(row.activity_name || 'â€”') + '</td>' +
+          '<td style="padding:8px 12px">' + esc(row.activity_name || '—') + '</td>' +
           '<td style="padding:8px 12px;font-weight:700;color:#1565c0">+' + row.manual_bonus + '</td>' +
           '<td style="padding:8px 12px"><button type="button" style="padding:4px 10px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;cursor:pointer" onclick="clearManualBonus(' + row.strava_activity_id + ')">Clear</button></td>' +
         '</tr>';
