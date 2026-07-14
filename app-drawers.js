@@ -1597,11 +1597,21 @@ window.renderShareCard = function() {
     ctx.restore();
   }
   
-  // 1. Draw Activity Name (left-aligned)
+  // 1. Draw Inverted White Logo (top left corner, elegant 22px size)
+  ctx.save();
+  ctx.translate(56, 68); // Left corner aligned at x = 56, vertically balanced at y = 68
+  ctx.scale(22/24, 22/24);
+  ctx.fillStyle = logoColor;
+  var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
+  ctx.fill(logoPath);
+  ctx.restore();
+
+  // 2. Draw Activity Name (left-aligned, offset to the right of the logo)
   var actName = act.activity_name || 'Activity';
   ctx.font = "bold 26px 'Poppins', system-ui, sans-serif";
   ctx.fillStyle = textColor;
-  var maxNameW = W - 180;
+  var textStartX = 56 + 22 + 12; // 90px
+  var maxNameW = W - textStartX - 56;
   var actNameTruncated = actName;
   if (ctx.measureText(actNameTruncated).width > maxNameW) {
     while (ctx.measureText(actNameTruncated + '...').width > maxNameW && actNameTruncated.length > 0) {
@@ -1609,22 +1619,13 @@ window.renderShareCard = function() {
     }
     actNameTruncated += '...';
   }
-  ctx.fillText(actNameTruncated, 56, 85);
+  ctx.fillText(actNameTruncated, textStartX, 85);
   
-  // 2. Draw Location (left-aligned)
+  // 3. Draw Location (left-aligned, offset to match title)
   var locText = act.location || 'Udaipur, RJ, India';
   ctx.font = "500 16px 'Poppins', system-ui, sans-serif";
   ctx.fillStyle = labelColor;
-  ctx.fillText(locText, 56, 120);
-  
-  // 3. Draw Inverted White Logo (top right, smaller 22px size)
-  ctx.save();
-  ctx.translate(W - 78, 74); // Centered vertically with title text at y = 85
-  ctx.scale(22/24, 22/24);
-  ctx.fillStyle = logoColor;
-  var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
-  ctx.fill(logoPath);
-  ctx.restore();
+  ctx.fillText(locText, textStartX, 120);
   
   // 4. Draw GPS Route Line (Smoothly drawn)
   var coords = [];
