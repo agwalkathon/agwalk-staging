@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>AG Leaderboards — Arcgate Walkathon 2026</title>
+  <title>AG Leaderboards � Arcgate Walkathon 2026</title>
   <!-- Load SheetJS for Excel export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -334,7 +334,7 @@ tr:hover td{background:#FAFAFA}
     .site-footer { background:#fff; color:#888; text-align: center; padding: 16px 28px; font-size: 12px; margin-top: auto; border-top:2px solid #E8622A;}
     
 
-    /* ── Mobile responsive ────────────────────────────────── */
+    /* -- Mobile responsive ---------------------------------- */
     @media (max-width: 768px) {
       .site-header { padding: 10px 14px; }
       
@@ -400,6 +400,7 @@ tr:hover td{background:#FAFAFA}
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -425,12 +426,12 @@ tr:hover td{background:#FAFAFA}
     </div>
 <!-- Stats row at top -->
   <div class="stats-grid">
-    <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Participants</div></div>
-    <div class="stat-card gold-card"><div class="val" id="stat-gold">—</div><div class="lbl">🥇 Gold</div></div>
-    <div class="stat-card silver-card"><div class="val" id="stat-silver">—</div><div class="lbl">🥈 Silver</div></div>
-    <div class="stat-card bronze-card"><div class="val" id="stat-bronze">—</div><div class="lbl">🥉 Bronze</div></div>
-    <div class="stat-card"><div class="val" id="stat-medals">—</div><div class="lbl">🏅 Total Medals</div></div>
-    <div class="stat-card"><div class="val" id="stat-km">—</div><div class="lbl">Total km</div></div>
+    <div class="stat-card"><div class="val" id="stat-total">�</div><div class="lbl">Participants</div></div>
+    <div class="stat-card gold-card"><div class="val" id="stat-gold">�</div><div class="lbl">?? Gold</div></div>
+    <div class="stat-card silver-card"><div class="val" id="stat-silver">�</div><div class="lbl">?? Silver</div></div>
+    <div class="stat-card bronze-card"><div class="val" id="stat-bronze">�</div><div class="lbl">?? Bronze</div></div>
+    <div class="stat-card"><div class="val" id="stat-medals">�</div><div class="lbl">?? Total Medals</div></div>
+    <div class="stat-card"><div class="val" id="stat-km">�</div><div class="lbl">Total km</div></div>
   </div>
 
   <!-- Filter bar -->
@@ -439,11 +440,11 @@ tr:hover td{background:#FAFAFA}
       <div class="filter-group">
         <label>Leaderboard</label>
         <select id="board-select" onchange="switchBoard(this.value)">
-          <option value="dayshift-male">👨 Dayshift — Male</option>
-          <option value="dayshift-female">👩 Dayshift — Female</option>
-          <option value="nightshift-all">🌙 Nightshift — All</option>
-          <option value="team-male">🏙️ Team — Male</option>
-          <option value="team-female">🏙️ Team — Female</option>
+          <option value="dayshift-male">?? Dayshift � Male</option>
+          <option value="dayshift-female">?? Dayshift � Female</option>
+          <option value="nightshift-all">?? Nightshift � All</option>
+          <option value="team-male">??? Team � Male</option>
+          <option value="team-female">??? Team � Female</option>
         </select>
       </div>
       <div class="filter-group">
@@ -472,9 +473,9 @@ tr:hover td{background:#FAFAFA}
         <label>Medal</label>
         <select id="medal-filter" onchange="applyFilters()">
           <option value="">All medals</option>
-          <option value="gold">🥇 Gold</option>
-          <option value="silver">🥈 Silver</option>
-          <option value="bronze">🥉 Bronze</option>
+          <option value="gold">?? Gold</option>
+          <option value="silver">?? Silver</option>
+          <option value="bronze">?? Bronze</option>
           <option value="none">No medal</option>
         </select>
       </div>
@@ -493,8 +494,8 @@ tr:hover td{background:#FAFAFA}
       <div class="info-chips"></div>
       <div class="filter-actions" style="display:flex;align-items:center;gap:8px">
         <button class="btn-refresh" id="export-leaderboard-btn" onclick="exportLeaderboardExcel()" style="background:#15803d;color:white;border:1px solid #15803d;"><i class="ti ti-file-spreadsheet"></i> Export Leaderboard</button>
-        <button class="btn-refresh" id="recalc-points-btn" onclick="doRecalculatePoints()" style="background:#d97706;color:white;border:1px solid #d97706;">⚡ Recalculate Points</button>
-        <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">📥 Export Activities</button>
+        <button class="btn-refresh" id="recalc-points-btn" onclick="doRecalculatePoints()" style="background:#d97706;color:white;border:1px solid #d97706;">? Recalculate Points</button>
+        <button class="btn-refresh" id="export-activities-btn" onclick="exportActivitiesCSV()" style="background:#2e7d32;display:none;">?? Export Activities</button>
       </div>
     </div>
   </div>
@@ -513,7 +514,7 @@ tr:hover td{background:#FAFAFA}
 </div>
   </div>
 
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+<footer class="site-footer"><span>� 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 <script>
 
@@ -521,7 +522,7 @@ var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
 
-// ── Indian number format ─────────────────────────────────────
+// -- Indian number format -------------------------------------
 function fmtIndian(n) {
   var num = parseFloat(n) || 0;
   return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -752,7 +753,7 @@ async function loadEventSelector(){
       var o=document.createElement("option");
       o.value=e.id;
       if (e.status === "live") {
-        o.textContent = "🟢 " + e.name + " (LIVE)";
+        o.textContent = "?? " + e.name + " (LIVE)";
         o.style.color = "#16a34a";
         o.style.fontWeight = "bold";
       } else {
@@ -820,7 +821,7 @@ async function applyFilters() {
 
   if ((sport || challenge) && (!allActivities || !allActivities.length)) {
     var infoEl = document.getElementById('result-info');
-    if (infoEl) infoEl.innerHTML = '<span style="color:#E8622A">⏳ Loading activity details for filtering...</span>';
+    if (infoEl) infoEl.innerHTML = '<span style="color:#E8622A">? Loading activity details for filtering...</span>';
     try {
       allActivities = await loadActivities();
     } catch(e) {
@@ -849,7 +850,7 @@ async function applyFilters() {
     });
   }
 
-  // Filter by sport — re-calc points using only matching sport activities
+  // Filter by sport � re-calc points using only matching sport activities
   if (sport) {
     // Recompute points for filtered sport only
     rows = rows.map(function(r) {
@@ -941,7 +942,7 @@ async function loadActivities() {
     var page = await r.json();
     if (!Array.isArray(page) || page.length === 0) break;
     allActs = allActs.concat(page);
-    console.log('Loaded page', Math.floor(from/pageSize)+1, '— total so far:', allActs.length);
+    console.log('Loaded page', Math.floor(from/pageSize)+1, '� total so far:', allActs.length);
     if (page.length < pageSize) break;
     from += pageSize;
   }
@@ -991,14 +992,14 @@ function checkChallenge(act, c) {
     if (km < dMin) return false;
   }
 
-  // Elevation criteria — activity must meet minimum elevation gain
+  // Elevation criteria � activity must meet minimum elevation gain
   var elevReq = parseFloat(c.elevation_criteria) || 0;
   if (elevReq > 0) {
     var actElev = parseFloat(act.elevation_gain || 0);
     if (actElev < elevReq) return false;
   }
 
-  // Start time criteria — activity must start AT OR BEFORE this time
+  // Start time criteria � activity must start AT OR BEFORE this time
   if (c.start_time_criteria) {
     // If it's an imported activity (no start_time stored, or it has common placeholder times), skip the time check
     var timeStr = act.start_time || (act.activity_date || '').split('T')[1] || '';
@@ -1032,10 +1033,10 @@ function getMedal(points, gender) {
   var goldPts   = g==='female' ? m.gold.female   : m.gold.male;
   var silverPts = g==='female' ? m.silver.female : m.silver.male;
   var bronzePts = g==='female' ? m.bronze.female : m.bronze.male;
-  if (points >= goldPts)   return {label:'🥇 Gold',   cls:'medal-gold'};
-  if (points >= silverPts) return {label:'🥈 Silver', cls:'medal-silver'};
-  if (points >= bronzePts) return {label:'🥉 Bronze', cls:'medal-bronze'};
-  return {label:'— No medal', cls:'medal-none'};
+  if (points >= goldPts)   return {label:'?? Gold',   cls:'medal-gold'};
+  if (points >= silverPts) return {label:'?? Silver', cls:'medal-silver'};
+  if (points >= bronzePts) return {label:'?? Bronze', cls:'medal-bronze'};
+  return {label:'� No medal', cls:'medal-none'};
 }
 
 function filterReg(reg, board) {
@@ -1053,7 +1054,7 @@ function filterReg(reg, board) {
 
 function calcPoints(acts, athleteId, gender, shift) {
   console.log("[TC] calcPoints called for", athleteId);
-  // ── Step 1: filter this athlete's valid activities ──────────────
+  // -- Step 1: filter this athlete's valid activities --------------
   var myActs = acts.filter(function(a) {
     return a.strava_athlete_id == athleteId && !a.is_flagged;
   });
@@ -1061,7 +1062,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     a.base_km = parseFloat(a.distance_meters || 0) / 1000;
   });
 
-  // ── Step 2: group by day ────────────────────────────────────────
+  // -- Step 2: group by day ----------------------------------------
   var byDay = {};
   myActs.forEach(function(a) {
     var d = getActDate(a);
@@ -1070,7 +1071,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     byDay[d].push(a);
   });
 
-  // ── Step 3: eligible challenges for this athlete ────────────────
+  // -- Step 3: eligible challenges for this athlete ----------------
   var _shiftN = (shift || '').toLowerCase();
   var _isNightShift = _shiftN.indexOf('night') > -1;
   var myChallenges = CHALLENGES.filter(function(c) {
@@ -1084,7 +1085,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     return false;
   });
 
-  // ── Step 4: identify range-split and per-act-no-bonus days ─────
+  // -- Step 4: identify range-split and per-act-no-bonus days -----
   var rangeSplitChallenges = myChallenges.filter(function(c) {
     return c.range_split;
   });
@@ -1104,7 +1105,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     });
   });
 
-  // ── Step 5: per-day distance + bonus calculation ────────────────
+  // -- Step 5: per-day distance + bonus calculation ----------------
   var totalDistKm  = 0;
   var totalDistPts = 0;
   var totalBonus   = 0;
@@ -1112,7 +1113,7 @@ function calcPoints(acts, athleteId, gender, shift) {
   var dayBreakdown = {};
   var actBreakdown = {};
 
-  // ── Pre-compute two-challenges-same-day ─────────────────────────
+  // -- Pre-compute two-challenges-same-day -------------------------
   var tcDays = {};
   var tcActMap = {}; // day -> { actId -> { km, challenge } }
   myChallenges.filter(function(c){ return c.award_type === 'two-challenges-same-day'; })
@@ -1248,7 +1249,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     };
   });
 
-  // ── Step 6: challenge bonus ─────────────────────────────────────
+  // -- Step 6: challenge bonus -------------------------------------
   var totalChallenge = 0;
   var challengeNames = [];
 
@@ -1358,7 +1359,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     var cName = c.name || 'Challenge';
 
     if (c.distance_type === 'manual') {
-      // 🎁 MANUAL CHALLENGE FLOW
+      // ?? MANUAL CHALLENGE FLOW
       myActs.forEach(function(a) {
         if (a.description === cName && (parseFloat(a.manual_bonus) > 0)) {
           totalChallenge += bp;
@@ -1489,7 +1490,7 @@ function calcPoints(acts, athleteId, gender, shift) {
     }
   });
 
-  // ── Step 7: manual bonus ────────────────────────────────────────
+  // -- Step 7: manual bonus ----------------------------------------
   myActs.forEach(function(a) {
     if (processedManualActIds.has(String(a.strava_activity_id))) return;
     var mb = parseFloat(a.manual_bonus) || 0;
@@ -1533,7 +1534,7 @@ async function doRecalculatePoints() {
   var oldHtml = btn.innerHTML;
   
   try {
-    btn.innerHTML = '⏳ Loading participant list...';
+    btn.innerHTML = '? Loading participant list...';
     var evId = EV_ID || 1;
     var resRegs = await fetch(SB_URL + '/rest/v1/registration?event_id=eq.' + evId + '&select=strava_athlete_id,full_name', {
       headers: HDR
@@ -1560,7 +1561,7 @@ async function doRecalculatePoints() {
       var percent = Math.round(((i + 1) / validAthletes.length) * 100);
       var elapsed = Math.round((Date.now() - startTime) / 1000);
       
-      btn.innerHTML = '⏳ Recalculating: ' + percent + '% (' + (i + 1) + '/' + validAthletes.length + ') - ' + elapsed + 's';
+      btn.innerHTML = '? Recalculating: ' + percent + '% (' + (i + 1) + '/' + validAthletes.length + ') - ' + elapsed + 's';
       
       try {
         var res = await fetch(_BU + '/admin/backfill-points', {
@@ -1585,10 +1586,10 @@ async function doRecalculatePoints() {
     }
     
     var totalTime = Math.round((Date.now() - startTime) / 1000);
-    alert('✓ Recalculation complete! Total athletes: ' + validAthletes.length + ' (' + totalTime + 's). Refreshing leaderboard scores.');
+    alert('? Recalculation complete! Total athletes: ' + validAthletes.length + ' (' + totalTime + 's). Refreshing leaderboard scores.');
     await doRefresh();
   } catch(e) {
-    alert('❌ Recalculation error: ' + e.message);
+    alert('? Recalculation error: ' + e.message);
   } finally {
     btn.disabled = false;
     btn.innerHTML = oldHtml;
@@ -1604,7 +1605,7 @@ async function doRefresh() {
 }
  // global for sport filter
 
-// Global exclusion sets — computed once in loadAll, used by renderBoard
+// Global exclusion sets � computed once in loadAll, used by renderBoard
 var teamExcludedMale = [];   // athlete IDs excluded from Team Male board
 var teamExcludedFemale = []; // athlete IDs excluded from Team Female board
 
@@ -1696,16 +1697,16 @@ async function loadAll() {
     if (el) el.textContent = rows.length;
   });
 
-  // ── Compute team exclusion sets ──────────────────────────────────────────
-  // Step 1: Top 3 of Dayshift-Female → excluded from Team Female
+  // -- Compute team exclusion sets ------------------------------------------
+  // Step 1: Top 3 of Dayshift-Female ? excluded from Team Female
   teamExcludedFemale = (allData['dayshift-female'] || []).slice(0, 3).map(function(r) {
     return String(r.p.strava_athlete_id);
   });
-  // Step 2: Top 3 of Dayshift-Male → excluded from Team Male
+  // Step 2: Top 3 of Dayshift-Male ? excluded from Team Male
   teamExcludedMale = (allData['dayshift-male'] || []).slice(0, 3).map(function(r) {
     return String(r.p.strava_athlete_id);
   });
-  // Step 3: Top 3 of Nightshift-All → split by gender into respective exclusion lists
+  // Step 3: Top 3 of Nightshift-All ? split by gender into respective exclusion lists
   (allData['nightshift-all'] || []).slice(0, 3).forEach(function(r) {
     var g = (r.p.gender || '').toLowerCase();
     var id = String(r.p.strava_athlete_id);
@@ -1715,14 +1716,14 @@ async function loadAll() {
       if (teamExcludedMale.indexOf(id) === -1) teamExcludedMale.push(id);
     }
   });
-  // ────────────────────────────────────────────────────────────────────────
+  // ------------------------------------------------------------------------
 
     applyFilters();
     var expBtn = document.getElementById('export-activities-btn');
     if (expBtn) expBtn.style.display = allActivities.length ? 'inline-block' : 'none';
   } catch(err) {
     console.error('loadAll error:', err);
-    document.getElementById('lb-body').innerHTML = '<div style="text-align:center;padding:60px;color:#c62828;font-size:14px">❌ Error loading data: '+err.message+'</div>';
+    document.getElementById('lb-body').innerHTML = '<div style="text-align:center;padding:60px;color:#c62828;font-size:14px">? Error loading data: '+err.message+'</div>';
   }
 }
 
@@ -1732,7 +1733,7 @@ function renderBoard(rows, board) {
     updateStats([]);
     return;
   }
-  // ── Team exclusion: filter out top individual performers ─────────────────
+  // -- Team exclusion: filter out top individual performers -----------------
   var isTeamBoard = board === 'team-male' || board === 'team-female';
   if (isTeamBoard) {
     var excludeSet = board === 'team-female' ? teamExcludedFemale : teamExcludedMale;
@@ -1740,7 +1741,7 @@ function renderBoard(rows, board) {
       return excludeSet.indexOf(String(row.p.strava_athlete_id)) === -1;
     });
   }
-  // ─────────────────────────────────────────────────────────────────────────
+  // -------------------------------------------------------------------------
   updateStats(rows, board);
   var renderedRows = [];
   if (isTeamBoard) {
@@ -1758,7 +1759,7 @@ function renderBoard(rows, board) {
     });
     teamNames.forEach(function(teamName) {
       // Team header row
-      renderedRows.push('<div style="background:#f5f5f5;padding:10px 20px;font-weight:700;color:#1A1A1A;font-size:14px;border-top:2px solid #E8622A">🏙️ '+teamName+'</div>');
+      renderedRows.push('<div style="background:#f5f5f5;padding:10px 20px;font-weight:700;color:#1A1A1A;font-size:14px;border-top:2px solid #E8622A">??? '+teamName+'</div>');
       // Top 2 highlight within each team group
       teams[teamName].forEach(function(row, i) {
         renderedRows.push(buildRow(row, i));
@@ -1795,7 +1796,7 @@ async function toggleExpand(athleteId, gender, trEl) {
     return;
   }
 
-  // First click — build hidden, show after build completes
+  // First click � build hidden, show after build completes
   var expRow = document.createElement('div');
   expRow.id = expId;
   expRow.setAttribute('data-open', '0');
@@ -1880,9 +1881,9 @@ async function toggleExpand(athleteId, gender, trEl) {
     var distLabel = dayKm.toFixed(2)+' km'
       +(inRangeKmExp>0?' <span style="font-size:10px;color:#1565c0;background:#e3f2fd;padding:1px 5px;border-radius:4px;vertical-align:middle">'+inRangeKmExp.toFixed(2)+' in-range</span>':'')
       +(capped?' <span style="font-size:10px;color:#e65100;background:#fff3e0;padding:1px 5px;border-radius:4px;vertical-align:middle">capped</span>':'')
-      +(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">★ special</span>':'');
+      +(isSpecialDay?' <span style="font-size:10px;color:#2e7d32;background:#e8f5e9;padding:1px 5px;border-radius:4px;vertical-align:middle">? special</span>':'');
 
-    // Build activity sub-rows for this day — hidden by default, toggled by clicking date row
+    // Build activity sub-rows for this day � hidden by default, toggled by clicking date row
     var sportColors = {Walk:'#e8f5e9|#2e7d32',Run:'#e3f2fd|#1565c0',Hike:'#fff3e0|#e65100',Ride:'#fce4ec|#c62828',VirtualRun:'#e3f2fd|#1565c0',VirtualRide:'#fce4ec|#c62828',MountainBikeRide:'#fce4ec|#c62828'};
     var dayActsId = 'acts-' + athleteId + '-' + day.replace(/-/g,'');
     
@@ -1902,14 +1903,14 @@ async function toggleExpand(athleteId, gender, trEl) {
 
     var actSubRows = dayActs.map(function(a){
       var name = (a.activity_name||'').trim();
-      var nameShort = name.length > 26 ? name.slice(0,25)+'…' : (name || '—');
+      var nameShort = name.length > 26 ? name.slice(0,25)+'�' : (name || '�');
       var sc = (sportColors[a.sport_type]||'#f5f5f5|#666').split('|');
-      var badge = '<span style="background:'+sc[0]+';color:'+sc[1]+';padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0">'+esc(a.sport_type||'—')+'</span>';
+      var badge = '<span style="background:'+sc[0]+';color:'+sc[1]+';padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0">'+esc(a.sport_type||'�')+'</span>';
       var linkStyle = 'color:#E8622A;text-decoration:none;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
       var actName = a.strava_activity_id
         ? '<a href="https://www.strava.com/activities/'+a.strava_activity_id+'" target="_blank" title="'+name.replace(/"/g,'&quot;')+'" style="'+linkStyle+'">'+esc(nameShort)+'</a>'
         : '<span style="font-size:12px;color:#666">'+esc(nameShort)+'</span>';
-      var dist = a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '—';
+      var dist = a.distance_meters ? (a.distance_meters/1000).toFixed(2)+' km' : '�';
       return '<tr style="background:#fff;border-bottom:1px solid #f0f0f0">'
         +'<td style="padding:5px 14px 5px 20px">'
         +  '<div style="display:flex;align-items:center;gap:7px;min-width:0">'+badge+actName+'</div>'
@@ -1920,17 +1921,17 @@ async function toggleExpand(athleteId, gender, trEl) {
         +'</tr>';
     }).join('');
 
-    // Date row: clickable, shows ▶ indicator, activities hidden in a collapsible tbody
+    // Date row: clickable, shows ? indicator, activities hidden in a collapsible tbody
     var dateRowStyle = 'background:#fafafa;border-top:1px solid #eee;cursor:pointer;user-select:none';
-    return '<tr style="'+dateRowStyle+'" onclick="(function(id){var b=document.getElementById(id);var ch=document.getElementById(\'ch-\'+id);if(!b)return;var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'table-row-group\';if(ch)ch.textContent=open?\'▶\':\'▼\';})(\''+dayActsId+'\')">'
+    return '<tr style="'+dateRowStyle+'" onclick="(function(id){var b=document.getElementById(id);var ch=document.getElementById(\'ch-\'+id);if(!b)return;var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'table-row-group\';if(ch)ch.textContent=open?\'?\':\'?\';})(\''+dayActsId+'\')">'
       +'<td style="padding:9px 14px;font-size:12px;color:#555;font-weight:600;white-space:nowrap">'
-      +  '<span id="ch-'+dayActsId+'" style="font-size:9px;color:#bbb;margin-right:5px">▶</span>'+day
+      +  '<span id="ch-'+dayActsId+'" style="font-size:9px;color:#bbb;margin-right:5px">?</span>'+day
       +'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#555;text-align:center;font-weight:600">'+byDay[day].length+'</td>'
       +'<td style="padding:8px 14px;font-size:12px">'+distLabel+'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+dp.toFixed(2)+'</td>'
       +'<td style="padding:8px 14px;font-size:12px;color:#E8622A;font-weight:600">+'+bp+'</td>'
-      +'<td style="padding:8px 14px;font-size:12px;color:#1565c0;font-weight:600">'+(cp>0?'+'+cp:'—')+'</td>'
+      +'<td style="padding:8px 14px;font-size:12px;color:#1565c0;font-weight:600">'+(cp>0?'+'+cp:'�')+'</td>'
       +'<td style="padding:8px 14px;font-size:13px;font-weight:700">+'+tp.toFixed(2)+'</td>'
       +'</tr>'
       +'<tbody id="'+dayActsId+'" style="display:none">'+actSubRows+'</tbody>';
@@ -1949,7 +1950,7 @@ async function toggleExpand(athleteId, gender, trEl) {
     +'<th style="padding:8px 14px;font-size:11px;color:#888;text-align:left;letter-spacing:0.5px">'
     +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
     +    '<span>'+(scoringMode()==='raw'?('TOTAL '+metricMeta().short):'TOTAL PTS')+'</span>'
-    +    '<button onclick="exportAthleteDailyCSV(\''+athleteId+'\')" style="background:#E8622A;color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;line-height:1.2">📥 Export</button>'
+    +    '<button onclick="exportAthleteDailyCSV(\''+athleteId+'\')" style="background:#E8622A;color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;line-height:1.2">?? Export</button>'
     +  '</div>'
     +'</th>'
     +'</tr></thead>'
@@ -1959,7 +1960,7 @@ async function toggleExpand(athleteId, gender, trEl) {
   expRow.setAttribute('data-open', '1');
   } catch(err) {
     console.error('Expand build error:', err);
-    expRow.innerHTML = '<div style="padding:14px 20px;color:#c62828;font-size:13px">⚠️ Error building breakdown: ' + err.message + '</div>';
+    expRow.innerHTML = '<div style="padding:14px 20px;color:#c62828;font-size:13px">?? Error building breakdown: ' + err.message + '</div>';
     expRow.style.cssText = 'display:block!important;background:#fafafa;border-bottom:2px solid #E8622A';
     expRow.setAttribute('data-open', '1');
   }
@@ -1970,7 +1971,7 @@ function buildRow(row, i) {
   var p = row.p, pts = row.pts;
   var medal = getMedal(pts.totalPts, p.gender);
   var rankCls = i===0?'r1':i===1?'r2':i===2?'r3':'';
-  var rankLabel = i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+  var rankLabel = i===0?'??':i===1?'??':i===2?'??':'#'+(i+1);
   var athleteId = p.strava_athlete_id;
   var gender = (p.gender||'').toLowerCase();
 
@@ -1982,11 +1983,11 @@ function buildRow(row, i) {
     +     (scoringMode()==='raw' ? '' : '<span class="medal-pill '+medal.cls+'">'+medal.label+'</span>')
     +   '</div>'
     +   '<div class="lb-meta">'
-    +     '<span>🏙️ '+(p.leaderboard_team||'—')+'</span>'
-    +     '<span>📏 <strong>'+pts.distKm.toFixed(2)+' KM</strong></span>'
+    +     '<span>??? '+(p.leaderboard_team||'�')+'</span>'
+    +     '<span>?? <strong>'+pts.distKm.toFixed(2)+' KM</strong></span>'
     +     (scoringMode()==='raw' ? '' :
-          '<span>⚡ <strong>+'+pts.bonusPts+'</strong></span>'
-          + (pts.challengePts > 0 ? '<span>🎯 <strong>+'+pts.challengePts+'</strong></span>' : ''))
+          '<span>? <strong>+'+pts.bonusPts+'</strong></span>'
+          + (pts.challengePts > 0 ? '<span>?? <strong>+'+pts.challengePts+'</strong></span>' : ''))
     +   '</div>'
     + '</div>'
     + '<div style="text-align:right">'
@@ -2114,7 +2115,7 @@ function exportLeaderboardExcel() {
           i + 1,
           p.full_name,
           p.strava_athlete_id,
-          p.leaderboard_team || '—',
+          p.leaderboard_team || '�',
           p.gender || '',
           p.shift || '',
           Number(pts.distKm.toFixed(2)),
@@ -2141,7 +2142,7 @@ function exportLeaderboardExcel() {
   // Get filename from event selector
   var sel = document.getElementById('ev-select');
   var eventName = sel ? sel.options[sel.selectedIndex].textContent : 'Arcgate_Walkathon';
-  eventName = eventName.replace(/🟢|🔴|🟡/g, '').trim().replace(/[^a-zA-Z0-9]/g, '_');
+  eventName = eventName.replace(/??|??|??/g, '').trim().replace(/[^a-zA-Z0-9]/g, '_');
   var filename = `Leaderboards_${eventName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
   XLSX.writeFile(wb, filename);
