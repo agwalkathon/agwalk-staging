@@ -2224,7 +2224,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
           medalBadgeHtml +
           (showDownloadBtn ? (
             '<div style="position:relative;overflow:visible;">' +
-              '<button id="btn-download-' + pastEventId + '" class="btn btn-sm" onclick="togglePastCertMenu(event, ' + pastEventId + ')" style="font-size:10px;font-weight:700;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;background:var(--brand);color:#fff;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px;"><i class="ti ti-certificate"></i> Cert</button>' +
+              '<button id="btn-download-' + pastEventId + '" class="btn btn-sm" onclick="togglePastCertMenu(event, ' + pastEventId + ')" style="font-size:10px;font-weight:700;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;background:var(--brand);color:#fff;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px;"><i class="ti ti-certificate"></i> Certificate</button>' +
               '<div id="cert-menu-' + pastEventId + '" class="past-cert-menu" style="display:none;position:absolute;right:0;top:28px;background:#1e222b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.3);z-index:100;min-width:120px;overflow:hidden;">' +
                 ((certCfg.download_options || []).indexOf('image') > -1 ? '<a href="javascript:void(0)" onclick="downloadPastCertAction(\'image\', ' + pastEventId + ')" style="display:block;padding:8px 12px;color:#fff;font-size:11px;text-align:left;text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);" onmouseenter="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseleave="this.style.background=\'none\'">Photo (JPEG)</a>' : '') +
                 ((certCfg.download_options || []).indexOf('pdf') > -1 ? '<a href="javascript:void(0)" onclick="downloadPastCertAction(\'pdf\', ' + pastEventId + ')" style="display:block;padding:8px 12px;color:#fff;font-size:11px;text-align:left;text-decoration:none;font-weight:600;" onmouseenter="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseleave="this.style.background=\'none\'">PDF Document</a>' : '') +
@@ -2612,7 +2612,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
   }
 
   var btn = document.getElementById('btn-download-' + pastEventId);
-  var origText = btn ? btn.innerHTML : 'Cert';
+  var origText = btn ? btn.innerHTML : 'Certificate';
   if (btn) {
     btn.textContent = 'Wait...';
     btn.disabled = true;
