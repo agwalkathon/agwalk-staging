@@ -211,6 +211,7 @@
         <button class="doc-nav-item" onclick="switchSection('app-portal')"><i class="ti ti-device-mobile"></i> Participant Portal (app.html)</button>
         <button class="doc-nav-item" onclick="switchSection('admin-portal')"><i class="ti ti-layout-dashboard"></i> Admin Panel (admin.html)</button>
         <button class="doc-nav-item" onclick="switchSection('events-mgmt')"><i class="ti ti-calendar-event"></i> Event Configuration (events.html)</button>
+        <button class="doc-nav-item" onclick="switchSection('cert-design-doc')"><i class="ti ti-certificate"></i> Certificate Designer</button>
         <button class="doc-nav-item" onclick="switchSection('registration-flow')"><i class="ti ti-user-plus"></i> Registration & Approvals</button>
         <button class="doc-nav-item" onclick="switchSection('scoring')"><i class="ti ti-calculator"></i> Scoring Engine</button>
         <button class="doc-nav-item" onclick="switchSection('strava-mappings')"><i class="ti ti-api"></i> Strava Payload Mappings</button>
@@ -988,6 +989,60 @@ WHERE strava_activity_id = 19055574519;</code></pre>
           </ul>
         </section>
 
+        <!-- Section: Certificate Designer (cert-config.html) -->
+        <section id="cert-design-doc" class="doc-section">
+          <h2><i class="ti ti-certificate"></i> Certificate Designer (cert-config.html)</h2>
+          <p>The Certificate Designer is a standalone administrative tool that allows organizers to customize digital certificate templates for event participants. It is accessed via <code>cert-config.html</code> or directly from the Events list by clicking the Certificate icon on an event card.</p>
+
+          <h3>1. Designer Mode & Layout</h3>
+          <ul>
+            <li><strong>PDF Template Mode:</strong> Upload a custom PDF template to act as the certificate background. Coordinate markers (X/Y) are positioned relative to the PDF viewport.</li>
+            <li><strong>Blank Canvas Mode:</strong> Design a certificate from scratch with a custom background color, orientation (Landscape/Portrait), and dimensions.</li>
+            <li><strong>Interactive Layout Canvas:</strong> Supports dragging and dropping coordinate tags directly on a visual preview. Position variables (X and Y coordinates) are calculated as proportions (from <code>0.0</code> to <code>1.0</code>) of the total canvas size to maintain scaling across devices.</li>
+            <li><strong>Nudge Alignment:</strong> Pressing <code>Arrow Keys</code> (or holding <code>Shift + Arrow Keys</code> for larger steps) allows precise pixel-level adjustment of selected element coordinates.</li>
+            <li><strong>Font Styling & Customization:</strong> Custom Google Fonts are supported (downloaded dynamically via the Google Fonts Web API). Organizers can adjust color, font size, alignment, and weights (normal/bold) for each placeholder.</li>
+          </ul>
+
+          <h3>2. Database Schema (certificate_config)</h3>
+          <p>Certificate configurations are saved under the <strong><code>leaderboard_config</code></strong> table targeting <code>config_key = 'certificate_config'</code> associated with the event ID. The JSON payload structure is detailed below:</p>
+          <pre><code>{
+  "enabled": true,                // Enable/Disable download button for participants
+  "canvas_mode": "pdf",           // "pdf" or "blank"
+  "template_url": "https://...",   // URL to the uploaded background PDF/image
+  "canvas_orientation": "landscape", // "landscape" or "portrait"
+  "canvas_bg": "#ffffff",         // Background hex code (used in blank canvas mode)
+  "download_options": ["pdf", "image"], // Allowed export formats for participants
+  "placeholders": [
+    {
+      "key": "&lt;Participant Name&gt;",
+      "type": "participant_name",
+      "x": 0.22,                  // X coordinate proportion (0.0 to 1.0)
+      "y": 0.31,                  // Y coordinate proportion (0.0 to 1.0)
+      "font_size": 52,            // Font size in points
+      "color": "#E8622A",         // Styling color hex code
+      "font_style": "bold",       // Font weight/style (normal/bold)
+      "align": "left"             // Text alignment (left/center/right)
+    },
+    {
+      "key": "&lt;MEDAL&gt;",
+      "type": "medal_title",
+      "x": 0.55,
+      "y": 0.69,
+      "font_size": 30,
+      "color": "#1A1D20",
+      "font_style": "normal",
+      "align": "left"
+    }
+  ]
+}</code></pre>
+
+          <h3>3. Key Features & Controls</h3>
+          <ul>
+            <li><strong>Participant Download Toggle:</strong> The <code>enabled</code> flag acts as a gatekeeper. By default, it is disabled. Organizers can manually check the <em>"Enable Certificate Button for Participants"</em> checkbox once scores have been audited and reconciled.</li>
+            <li><strong>Visual Snap Guides:</strong> Interactive canvas displays alignment snap guides when drag-moving elements near the center lines of the canvas or matching the alignment vectors of other placeholders on the template.</li>
+          </ul>
+        </section>
+
         <!-- Section: Change History -->
         <section id="changelog" class="doc-section">
           <h2><i class="ti ti-history"></i> Recent Changes & Updates</h2>
@@ -1025,6 +1080,11 @@ WHERE strava_activity_id = 19055574519;</code></pre>
             </li>
             <li><strong>Asynchronous Service Worker Purging on Boot (July 13, 2026)</strong>:
               <br>• Coordinated PWA cache cleaning script execution in <code>index.html</code> so it blocks login redirects until all Service Workers are fully unregistered and Cache Storage is deleted.
+            </li>
+            <li><strong>Certificate Decoupling & Independent Designer (July 14, 2026)</strong>:
+              <br>• Decoupled all certificate layout customization code from <code>events.html</code> to solve loading performance sluggishness.
+              <br>• Created a standalone <code>cert-config.html</code> designer dashboard with interactive visual canvas, snap guides, coordinate translation, and Google Fonts downloader.
+              <br>• Introduced the <code>enabled</code> database config toggle to allow manual activation/deactivation of the Download Certificate button for participants.
             </li>
           </ul>
 
