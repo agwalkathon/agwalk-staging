@@ -1463,9 +1463,9 @@ window.renderShareCard = function() {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   
-  // Instagram Post 1:1 Square Canvas
-  var W = 800;
-  var H = 800;
+  // Instagram Story 9:16 Vertical Canvas
+  var W = 600;
+  var H = 1066;
   canvas.width = W;
   canvas.height = H;
   
@@ -1560,8 +1560,8 @@ window.renderShareCard = function() {
     ctx.fillRect(0, 0, W, H);
     
     // Draw ambient background glassmorphism glows
-    drawBlob(80, 120, 450, blob1Col);
-    drawBlob(W - 80, H - 200, 480, blob2Col);
+    drawBlob(80, 120, 420, blob1Col);
+    drawBlob(W - 80, H - 200, 460, blob2Col);
   }
   
   // Draw outer rounded card (frosted glass pane)
@@ -1572,13 +1572,13 @@ window.renderShareCard = function() {
   ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
   ctx.shadowBlur = 32;
   ctx.shadowOffsetY = 15;
-  _crr(ctx, 32, 32, W - 64, H - 64, 40);
+  _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.fill();
   ctx.restore();
   
   // Draw card border (Linear gradient glass edge highlight)
   ctx.save();
-  var borderGrad = ctx.createLinearGradient(32, 32, W - 32, H - 32);
+  var borderGrad = ctx.createLinearGradient(24, 24, W - 24, H - 24);
   if (window._shareThemeIndex === 4) {
     borderGrad.addColorStop(0, 'rgba(232, 98, 42, 0.28)');
     borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
@@ -1594,7 +1594,7 @@ window.renderShareCard = function() {
   }
   ctx.strokeStyle = borderGrad;
   ctx.lineWidth = 1.8;
-  _crr(ctx, 32, 32, W - 64, H - 64, 40);
+  _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.stroke();
   ctx.restore();
   
@@ -1602,16 +1602,16 @@ window.renderShareCard = function() {
   if (gridVisible && !window._shareBgTransparent) {
     ctx.save();
     ctx.beginPath();
-    _crr(ctx, 32, 32, W - 64, H - 64, 40);
+    _crr(ctx, 24, 24, W - 48, H - 48, 36);
     ctx.clip();
     
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.01)';
     ctx.lineWidth = 1;
-    for (var x = 32 + 32; x < W - 32; x += 32) {
-      ctx.beginPath(); ctx.moveTo(x, 32); ctx.lineTo(x, H - 32); ctx.stroke();
+    for (var x = 24 + 24; x < W - 24; x += 24) {
+      ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
     }
-    for (var y = 32 + 32; y < H - 32; y += 32) {
-      ctx.beginPath(); ctx.moveTo(32, y); ctx.lineTo(W - 32, y); ctx.stroke();
+    for (var y = 24 + 24; y < H - 24; y += 24) {
+      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(W - 24, y); ctx.stroke();
     }
     ctx.restore();
   }
@@ -1628,17 +1628,17 @@ window.renderShareCard = function() {
     }
     actNameTruncated += '...';
   }
-  ctx.fillText(actNameTruncated, 68, 95);
+  ctx.fillText(actNameTruncated, 56, 95);
   
   // 2. Draw Location (left-aligned)
   var locText = act.location || 'Udaipur, RJ, India';
   ctx.font = "500 14px 'Poppins', system-ui, sans-serif"; // Slightly smaller gray text (16px -> 14px)
   ctx.fillStyle = labelColor;
-  ctx.fillText(locText, 68, 126);
+  ctx.fillText(locText, 56, 126);
   
   // 3. Draw Original Brand Orange Logo in Right Top Corner
   ctx.save();
-  ctx.translate(W - 100, 78); // Right corner aligned at x = 700, y = 78
+  ctx.translate(W - 90, 78); // Right corner aligned at x = 510, y = 78
   ctx.scale(26/24, 26/24);
   ctx.fillStyle = logoColor;
   var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
@@ -1655,11 +1655,10 @@ window.renderShareCard = function() {
     }
   }
   
-  var mapX = 68;
+  var mapX = 56;
   var mapY = 165;
-  var mapW = W - 136;
+  var mapW = W - 112;
   var mapH = H - 345;
-  
   if (coords && coords.length > 0) {
     ctx.save();
     drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, 'rgba(255, 255, 255, 0.95)', 6.5);
@@ -1723,7 +1722,7 @@ window.renderShareCard = function() {
     ]
   ];
   
-  var cols = [68, W/2 - 32, W - 200];
+  var cols = [56, W/2 - 32, W - 188];
   var rows = [H - 130, H - 65];
   
   ctx.textAlign = 'left';
