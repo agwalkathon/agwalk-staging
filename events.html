@@ -2702,16 +2702,16 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
       return;
     }
 
+    var statLabels = { distance: 'DISTANCE', rank: 'RANK', points: 'POINTS', medal_title: 'MEDAL' };
+    var statValues = { distance: '300.5 KM', rank: '#3 of 487', points: '350', medal_title: 'Gold' };
+    var isStat = !!statLabels[type];
+
     var previewText = key;
     if (type === 'participant_name') previewText = 'Prakash Mali';
-    else if (type === 'medal_title') previewText = 'Medal Achieved: Gold';
-    else if (type === 'distance') previewText = 'Distance: 300.5 KM';
-    else if (type === 'points') previewText = 'Total Points: 350';
-    else if (type === 'rank') previewText = 'Rank: 3';
+    else if (isStat) previewText = statValues[type];
     else if (type === 'custom') previewText = customVal || key;
     
     ctx.save();
-    ctx.fillStyle = color;
     ctx.textAlign = align;
     ctx.textBaseline = 'middle';
     
@@ -2723,32 +2723,45 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     var textX = w * x;
     var textY = h * y;
     
-    // Draw bounding box outline first
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
     var valWidth = ctx.measureText(previewText).width;
     var templateWidth = ctx.measureText(key).width;
     var textWidth = Math.max(valWidth, templateWidth);
+    var labelSize = Math.max(7, Math.round(scaledSize * 0.42));
+    if (isStat) {
+      ctx.font = labelSize + 'px "' + family + '", sans-serif';
+      textWidth = Math.max(textWidth, ctx.measureText(statLabels[type]).width);
+    }
     
-    var boxHeight = scaledSize * 1.5;
-    var textX = w * x;
-    var textY = h * y;
+    var boxHeight = isStat ? scaledSize * 2.05 : scaledSize * 1.5;
+    var boxTop = isStat ? textY - scaledSize * 1.1 : textY - boxHeight/2;
     var boxX = textX;
     if (align === 'center') boxX = textX - textWidth/2;
     else if (align === 'right') boxX = textX - textWidth;
     
     var paddingX = 8;
-    ctx.fillRect(boxX - paddingX, textY - boxHeight/2, textWidth + (paddingX * 2), boxHeight);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.fillRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
     
     ctx.fillStyle = color;
-    ctx.fillText(previewText, textX, textY);
+    if (isStat) {
+      ctx.globalAlpha = 0.55;
+      ctx.font = labelSize + 'px "' + family + '", sans-serif';
+      ctx.fillText(statLabels[type], textX, textY - scaledSize * 0.68);
+      ctx.globalAlpha = 1;
+      ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
+      ctx.fillText(statValues[type], textX, textY + scaledSize * 0.32);
+    } else {
+      ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
+      ctx.fillText(previewText, textX, textY);
+    }
     
     ctx.lineWidth = isChecked ? 2 : 1;
     ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
     ctx.setLineDash(isChecked ? [] : [2, 2]);
-    ctx.strokeRect(boxX - paddingX, textY - boxHeight/2, textWidth + (paddingX * 2), boxHeight);
+    ctx.strokeRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
     
     ctx.restore();
-    _certHitBoxes.push({ row: row, x0: boxX - paddingX, y0: textY - boxHeight/2, x1: boxX - paddingX + textWidth + (paddingX * 2), y1: textY + boxHeight/2, anchorX: textX, anchorY: textY });
+    _certHitBoxes.push({ row: row, x0: boxX - paddingX, y0: boxTop, x1: boxX - paddingX + textWidth + (paddingX * 2), y1: boxTop + boxHeight, anchorX: textX, anchorY: textY });
   });
 }
 
