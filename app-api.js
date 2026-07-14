@@ -2904,7 +2904,13 @@ function certStatValue(type, certData) {
     if (!certData.rank) return '-';
     return '#' + certData.rank + (certData.totalParticipants ? ' of ' + certData.totalParticipants : '');
   }
-  if (type === 'medal_title') return String(certData.medal || '').replace(' Medal', '') || '-';
+  if (type === 'medal_title') {
+    var mName = String(certData.medal || '').replace(' Medal', '');
+    if (mName === 'Gold') return '\ud83e\udd47 Gold';
+    if (mName === 'Silver') return '\ud83e\udd48 Silver';
+    if (mName === 'Bronze') return '\ud83e\udd49 Bronze';
+    return mName || '-';
+  }
   return '';
 }
 
