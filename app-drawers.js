@@ -1756,6 +1756,34 @@ window.performShareAction = function(action) {
   var canvas = document.getElementById('share-card-canvas');
   if (!canvas) return;
   
+  var act = window._shareActivityData || {};
+  var actName = act.activity_name || 'Activity';
+  var athleteName = act.athlete_name || 'Participant';
+  
+  // Format Date and Time for filename
+  var dateStr = '';
+  if (act.activity_date) {
+    try {
+      var d = new Date(act.activity_date);
+      if (!isNaN(d.getTime())) {
+        var pad = function(n) { return n < 10 ? '0' + n : n; };
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var day = pad(d.getDate());
+        var mon = months[d.getMonth()];
+        var yr = d.getFullYear();
+        var hr = d.getHours();
+        var min = pad(d.getMinutes());
+        var ampm = hr >= 12 ? 'PM' : 'AM';
+        hr = hr % 12;
+        if (hr === 0) hr = 12;
+        dateStr = '_' + day + '-' + mon + '-' + yr + '_' + hr + '-' + min + ampm;
+      }
+    } catch(e) {}
+  }
+  
+  var rawFileName = actName + '_' + athleteName + dateStr;
+  var safeFileName = rawFileName.replace(/[^a-zA-Z0-9_-]/g, '_') + '.png';
+  
   canvas.toBlob(function(blob) {
     if (action === 'copy') {
       if (navigator.clipboard && navigator.clipboard.write) {
@@ -1773,24 +1801,24 @@ window.performShareAction = function(action) {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'walkathon-activity.png';
+      a.download = safeFileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } else {
-      var file = new File([blob], 'walkathon-activity.png', { type: 'image/png' });
+      var file = new File([blob], safeFileName, { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({
           files: [file],
-          title: 'My Walkathon Activity',
-          text: 'Check out my latest activity!'
+          title: actName + ' - ' + athleteName,
+          text: 'Check out my activity: ' + actName
         }).catch(function(err) {
           if (err.name !== 'AbortError') {
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = 'walkathon-activity.png';
+            a.download = safeFileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1801,7 +1829,7 @@ window.performShareAction = function(action) {
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = 'walkathon-activity.png';
+        a.download = safeFileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
