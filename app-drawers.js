@@ -1488,49 +1488,49 @@ window.renderShareCard = function() {
     ctx.fill();
   };
 
-  // Theme Configurations (Frosted Glassmorphic & Card Styles)
+  // Theme Configurations (Vivid Glassmorphic & Card Styles)
   var isDark = true;
-  var cardBgColor = 'rgba(30, 41, 59, 0.45)'; // Frosted Slate Glass
+  var cardBgColor = 'rgba(255, 255, 255, 0.07)'; // Frosted White Glass pane (highly visible!)
   var textColor = '#ffffff'; // Crisp white values
-  var labelColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white labels
-  var routeColor = '#E8622A'; // Brand Orange Route
+  var labelColor = 'rgba(255, 255, 255, 0.55)'; // Semi-transparent white labels
+  var routeColor = '#E8622A'; // Brand Orange Route Core
   var logoColor = '#ffffff'; // Inverted white logo
-  var blob1Col = 'rgba(99, 102, 241, 0.16)'; // Indigo ambient glow
-  var blob2Col = 'rgba(232, 98, 42, 0.14)'; // Brand Orange ambient glow
+  var blob1Col = 'rgba(99, 102, 241, 0.32)'; // Vivid Indigo ambient glow
+  var blob2Col = 'rgba(232, 98, 42, 0.32)'; // Vivid Brand Orange ambient glow
   var gridVisible = true;
   
   if (window._shareThemeIndex === 1) {
     // Frosted Terracotta Sunrise
-    cardBgColor = 'rgba(255, 255, 255, 0.15)'; // Frosted White Glass
+    cardBgColor = 'rgba(255, 255, 255, 0.18)'; // Frosted White Glass
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.7)';
-    routeColor = '#ffffff';
-    blob1Col = 'rgba(251, 146, 60, 0.22)';
-    blob2Col = 'rgba(239, 68, 68, 0.16)';
+    labelColor = 'rgba(255, 255, 255, 0.75)';
+    routeColor = '#7c2d12'; // Dark terracotta core
+    blob1Col = 'rgba(251, 146, 60, 0.4)';
+    blob2Col = 'rgba(239, 68, 68, 0.3)';
     gridVisible = false;
   } else if (window._shareThemeIndex === 2) {
     // Frosted Emerald Jade
-    cardBgColor = 'rgba(16, 26, 21, 0.5)';
+    cardBgColor = 'rgba(255, 255, 255, 0.06)';
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.5)';
+    labelColor = 'rgba(255, 255, 255, 0.55)';
     routeColor = '#E8622A';
-    blob1Col = 'rgba(16, 185, 129, 0.18)';
-    blob2Col = 'rgba(232, 98, 42, 0.1)';
+    blob1Col = 'rgba(16, 185, 129, 0.38)';
+    blob2Col = 'rgba(232, 98, 42, 0.22)';
   } else if (window._shareThemeIndex === 3) {
     // Frosted Tech Indigo
-    cardBgColor = 'rgba(17, 24, 39, 0.55)';
+    cardBgColor = 'rgba(255, 255, 255, 0.07)';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.55)';
+    routeColor = '#E8622A';
+    blob1Col = 'rgba(99, 102, 241, 0.42)';
+    blob2Col = 'rgba(232, 98, 42, 0.25)';
+  } else if (window._shareThemeIndex === 4) {
+    // Frosted Obsidian Black
+    cardBgColor = 'rgba(255, 255, 255, 0.03)';
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.5)';
     routeColor = '#E8622A';
-    blob1Col = 'rgba(99, 102, 241, 0.22)';
-    blob2Col = 'rgba(232, 98, 42, 0.12)';
-  } else if (window._shareThemeIndex === 4) {
-    // Frosted Obsidian Black
-    cardBgColor = 'rgba(15, 15, 18, 0.78)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.45)';
-    routeColor = '#E8622A';
-    blob1Col = 'rgba(232, 98, 42, 0.14)';
+    blob1Col = 'rgba(232, 98, 42, 0.25)';
     blob2Col = 'rgba(255, 255, 255, 0.02)';
     gridVisible = false;
   }
@@ -1540,19 +1540,19 @@ window.renderShareCard = function() {
     var bgGrad = ctx.createLinearGradient(0, 0, W, H);
     if (window._shareThemeIndex === 1) {
       bgGrad.addColorStop(0, '#3f1b0d');
-      bgGrad.addColorStop(1, '#63270e');
+      bgGrad.addColorStop(1, '#54200d');
     } else if (window._shareThemeIndex === 2) {
-      bgGrad.addColorStop(0, '#05120c');
-      bgGrad.addColorStop(1, '#122419');
+      bgGrad.addColorStop(0, '#081a11');
+      bgGrad.addColorStop(1, '#162c1f');
     } else if (window._shareThemeIndex === 3) {
-      bgGrad.addColorStop(0, '#050814');
-      bgGrad.addColorStop(1, '#11162d');
+      bgGrad.addColorStop(0, '#0b1021');
+      bgGrad.addColorStop(1, '#192035');
     } else if (window._shareThemeIndex === 4) {
-      bgGrad.addColorStop(0, '#050507');
-      bgGrad.addColorStop(1, '#111115');
+      bgGrad.addColorStop(0, '#050506');
+      bgGrad.addColorStop(1, '#0f0f12');
     } else {
-      bgGrad.addColorStop(0, '#0d0e12');
-      bgGrad.addColorStop(1, '#1e2029');
+      bgGrad.addColorStop(0, '#0f1319');
+      bgGrad.addColorStop(1, '#1a1d24');
     }
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
@@ -1658,11 +1658,10 @@ window.renderShareCard = function() {
   var mapY = 155;
   var mapW = W - 112;
   var mapH = H - 325;
-  
   if (coords && coords.length > 0) {
     ctx.save();
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, routeColor, 6.5);
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, '#ffffff', 2);
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, 'rgba(255, 255, 255, 0.95)', 6.5);
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, routeColor, 2.2);
     ctx.restore();
   } else {
     ctx.save();
