@@ -54,7 +54,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Reports & Analytics � Arcgate Walkathon 2026</title>
+  <title>Reports & Analytics — Arcgate Walkathon 2026</title>
   <!-- Load SheetJS for Excel export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -286,34 +286,34 @@
 
       <!-- Tab Bar -->
       <div class="section-tabs">
-        <button class="stab active" onclick="switchReportTab('medal')">?? By Medal</button>
-        <button class="stab" onclick="switchReportTab('date')">?? By Date</button>
-        <button class="stab" onclick="switchReportTab('leaderboard-df')">?? Dayshift - Female</button>
-        <button class="stab" onclick="switchReportTab('leaderboard-dm')">?? Dayshift - Male</button>
-        <button class="stab" onclick="switchReportTab('leaderboard-ns')">?? Nightshift - All</button>
-        <button class="stab" onclick="switchReportTab('shift')">?? By Shift</button>
-        <button class="stab" onclick="switchReportTab('gender')">?? By Gender</button>
-        <button class="stab" onclick="switchReportTab('team')">?? By Team</button>
-        <button class="stab" onclick="switchReportTab('lead')">?? By Project Lead</button>
+        <button class="stab active" onclick="switchReportTab('medal')">🥇 By Medal</button>
+        <button class="stab" onclick="switchReportTab('date')">📅 By Date</button>
+        <button class="stab" onclick="switchReportTab('leaderboard-df')">👥 Dayshift - Female</button>
+        <button class="stab" onclick="switchReportTab('leaderboard-dm')">👥 Dayshift - Male</button>
+        <button class="stab" onclick="switchReportTab('leaderboard-ns')">👥 Nightshift - All</button>
+        <button class="stab" onclick="switchReportTab('shift')">📊 By Shift</button>
+        <button class="stab" onclick="switchReportTab('gender')">👫 By Gender</button>
+        <button class="stab" onclick="switchReportTab('team')">🏃 By Team</button>
+        <button class="stab" onclick="switchReportTab('lead')">👥 By Project Lead</button>
       </div>
 
       <!-- Stats overview row -->
       <div class="stats-row" id="stats-overview">
         <div class="stat-card brand">
           <div class="lbl">Active Participants</div>
-          <div class="val" id="stat-active-parts">�</div>
+          <div class="val" id="stat-active-parts">—</div>
         </div>
         <div class="stat-card">
           <div class="lbl">Total Distance</div>
-          <div class="val" id="stat-tot-dist">�</div>
+          <div class="val" id="stat-tot-dist">—</div>
         </div>
         <div class="stat-card green">
           <div class="lbl">Total Points</div>
-          <div class="val" id="stat-tot-pts">�</div>
+          <div class="val" id="stat-tot-pts">—</div>
         </div>
         <div class="stat-card">
           <div class="lbl">Medals Awarded</div>
-          <div class="val" id="stat-tot-medals">�</div>
+          <div class="val" id="stat-tot-medals">—</div>
         </div>
       </div>
 
@@ -1034,16 +1034,16 @@
 
     // Medal definition
     function getMedal(points, gender) {
-      if (!CONFIG.medals) return { label: '�', cls: 'badge-none' };
+      if (!CONFIG.medals) return { label: '—', cls: 'badge-none' };
       var g = (gender || '').toLowerCase();
       var m = CONFIG.medals;
       var goldPts = g === 'female' ? m.gold.female : m.gold.male;
       var silverPts = g === 'female' ? m.silver.female : m.silver.male;
       var bronzePts = g === 'female' ? m.bronze.female : m.bronze.male;
-      if (points >= goldPts) return { label: '?? Gold', cls: 'badge-gold' };
-      if (points >= silverPts) return { label: '?? Silver', cls: 'badge-silver' };
-      if (points >= bronzePts) return { label: '?? Bronze', cls: 'badge-bronze' };
-      return { label: '�', cls: 'badge-none' };
+      if (points >= goldPts) return { label: '🥇 Gold', cls: 'badge-gold' };
+      if (points >= silverPts) return { label: '🥈 Silver', cls: 'badge-silver' };
+      if (points >= bronzePts) return { label: '🥉 Bronze', cls: 'badge-bronze' };
+      return { label: '—', cls: 'badge-none' };
     }
 
     // Calculate Leaderboard
@@ -1081,7 +1081,7 @@
       var activeParts = LEADERBOARD.filter(function(r) { return r.pts.distKm > 0; }).length;
       var totDist = LEADERBOARD.reduce(function(s, r) { return s + r.pts.distKm; }, 0);
       var totPts = LEADERBOARD.reduce(function(s, r) { return s + r.pts.totalPts; }, 0);
-      var totMedals = LEADERBOARD.filter(function(r) { return r.medal.label !== '�'; }).length;
+      var totMedals = LEADERBOARD.filter(function(r) { return r.medal.label !== '—'; }).length;
       
       document.getElementById('stat-active-parts').textContent = activeParts;
       document.getElementById('stat-tot-dist').textContent = totDist.toFixed(1) + ' km';
@@ -1262,7 +1262,7 @@
         var tMins = Math.floor((tSecs % 3600) / 60);
         tbody.innerHTML += `<tr class="total-row">
           <td>TOTAL</td>
-          <td style="text-align:center">�</td>
+          <td style="text-align:center">—</td>
           <td style="text-align:right">${tDist.toFixed(1)}</td>
           <td style="text-align:right">${tHrs}h ${tMins}m</td>
           <td style="text-align:right">${tDistPts.toFixed(1)}</td>
@@ -1309,7 +1309,7 @@
             <td style="text-align:right"><strong>${r.pts.totalPts.toFixed(1)}</strong></td>
             <td style="text-align:center"><span class="badge ${r.medal.cls}">${r.medal.label}</span></td>
             <td>${r.p.leaderboard_team || 'No Team'}</td>
-            <td>${r.p.team_lead || '�'}</td>
+            <td>${r.p.team_lead || '—'}</td>
           </tr>`;
         });
       }
@@ -1378,7 +1378,7 @@
             var silver = list.filter(function(r){ return r.medal.label.includes('Silver'); }).length;
             var bronze = list.filter(function(r){ return r.medal.label.includes('Bronze'); }).length;
             
-            var medalStr = `${gold}?? / ${silver}?? / ${bronze}??`;
+            var medalStr = `${gold}🥇 / ${silver}🥈 / ${bronze}🥉`;
             
             tParts += activeCount;
             tDist += distSum;
@@ -1391,7 +1391,7 @@
             if (currentTab === 'team') {
               // Find the lead name from list
               var firstWithLead = list.find(function(r){ return r.p.team_lead; });
-              leadNameStr = `<td>${firstWithLead ? firstWithLead.p.team_lead : '�'}</td>`;
+              leadNameStr = `<td>${firstWithLead ? firstWithLead.p.team_lead : '—'}</td>`;
             }
 
             tbody.innerHTML += `<tr>
@@ -1410,14 +1410,14 @@
           // Total row
           tbody.innerHTML += `<tr class="total-row">
             <td>TOTAL</td>
-            ${currentTab === 'team' ? '<td>�</td>' : ''}
+            ${currentTab === 'team' ? '<td>—</td>' : ''}
             <td style="text-align:center">${tParts} / ${LEADERBOARD.length}</td>
             <td style="text-align:right">${tDist.toFixed(1)}</td>
             <td style="text-align:right">${tDistPts.toFixed(1)}</td>
             <td style="text-align:right">${tBonus}</td>
             <td style="text-align:right">${tChallenge}</td>
             <td style="text-align:right">${tTotal.toFixed(1)}</td>
-            <td style="text-align:center">�</td>
+            <td style="text-align:center">—</td>
           </tr>`;
         } else {
           // Detailed View grouped by Category
@@ -1452,7 +1452,7 @@
                 <td style="text-align:right"><strong>${r.pts.totalPts.toFixed(1)}</strong></td>
                 <td style="text-align:center"><span class="badge ${r.medal.cls}">${r.medal.label}</span></td>
                 <td>${r.p.leaderboard_team || 'No Team'}</td>
-                <td>${r.p.team_lead || '�'}</td>
+                <td>${r.p.team_lead || '—'}</td>
               </tr>`;
             });
           });
@@ -1765,7 +1765,7 @@
           var o=document.createElement("option");
           o.value=e.id;
           if (e.status === "live") {
-            o.textContent = "?? " + e.name + " (LIVE)";
+            o.textContent = "🔥 " + e.name + " (LIVE)";
             o.style.color = "#16a34a";
             o.style.fontWeight = "bold";
           } else {
