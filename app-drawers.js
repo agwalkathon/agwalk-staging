@@ -1395,164 +1395,343 @@ async function submitActivityReport() {
 
 // ── Share Activity Card ──────────────────────────────────────────────────────
 window._shareActivityData = null;
+window._shareThemeIndex = 0;
+window._shareBgTransparent = false;
 
 function showShareSheet() {
   var sh = document.getElementById('share-sheet');
   if (sh) sh.style.display = 'flex';
+  
+  window._shareThemeIndex = 0;
+  window._shareBgTransparent = false;
+  
+  var toggle = document.getElementById('share-bg-toggle');
+  if (toggle) toggle.checked = false;
+  
+  var dots = document.querySelectorAll('.share-dot');
+  dots.forEach(function(d, i) {
+    if (d) d.style.opacity = (i === 0) ? '1' : '0.3';
+  });
+  
+  setTimeout(function() {
+    window.renderShareCard();
+  }, 100);
 }
+
 function hideShareSheet() {
   var sh = document.getElementById('share-sheet');
   if (sh) sh.style.display = 'none';
 }
 
-async function shareActivityCard(type) {
-  hideShareSheet();
+window.setShareTheme = function(index) {
+  window._shareThemeIndex = index;
+  var dots = document.querySelectorAll('.share-dot');
+  dots.forEach(function(d, i) {
+    if (d) d.style.opacity = (i === index) ? '1' : '0.3';
+  });
+  window.renderShareCard();
+};
+
+window.toggleShareBg = function() {
+  window._shareBgTransparent = document.getElementById('share-bg-toggle').checked;
+  window.renderShareCard();
+};
+
+window.renderShareCard = function() {
   var act = window._shareActivityData;
   if (!act) return;
-  var km = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
+  
+  var canvas = document.getElementById('share-card-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  
+  var W = 600;
+  var H = 800;
+  canvas.width = W;
+  canvas.height = H;
+  
+  ctx.clearRect(0, 0, W, H);
+  
+  if (!window._shareBgTransparent) {
+    if (window._shareThemeIndex === 0) {
+      var grad = ctx.createRadialGradient(W/2, 0, 50, W/2, 0, W * 1.1);
+      grad.addColorStop(0, '#1e3a8a');
+      grad.addColorStop(0.5, '#0b0f19');
+      grad.addColorStop(1, '#020617');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    } else if (window._shareThemeIndex === 1) {
+      var grad = ctx.createRadialGradient(W/2, 0, 50, W/2, 0, W * 1.1);
+      grad.addColorStop(0, '#7c2d12');
+      grad.addColorStop(0.5, '#0b0f19');
+      grad.addColorStop(1, '#090500');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    } else if (window._shareThemeIndex === 2) {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, W-4, H-4);
+    }
+  }
+  
+  var brandText = 'ARCGATE';
+  if (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.display_name) {
+    brandText = CONFIG_LB.display_name.toUpperCase();
+  }
+  ctx.font = "800 24px 'Outfit', system-ui, -apple-system, sans-serif";
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = '6px';
+  ctx.fillText(brandText, W/2, 60);
+  ctx.letterSpacing = '0px';
+  
+  var coords = [];
+  if (act.summary_polyline) {
+    try {
+      coords = decodePolyline(act.summary_polyline);
+    } catch(e) {
+      console.warn('Decode polyline failed for share:', e);
+    }
+  }
+  
+  var mapX = 80;
+  var mapY = 130;
+  var mapW = W - 160;
+  var mapH = H - 360;
+  
+  var themeColors = ['#00f0ff', '#ef4444', '#10b981'];
+  var strokeColor = themeColors[window._shareThemeIndex] || '#00f0ff';
+  
+  if (coords && coords.length > 0) {
+    ctx.save();
+    ctx.shadowColor = strokeColor;
+    ctx.shadowBlur = 15;
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, strokeColor, 6);
+    ctx.shadowBlur = 0;
+    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, '#ffffff', 2.5);
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = strokeColor;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 100, H/2 - 100);
+    ctx.bezierCurveTo(W/2 - 50, H/2 - 150, W/2 + 50, H/2 - 50, W/2 + 100, H/2 - 100);
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = '64px system-ui';
+    ctx.fillText('🏃', W/2, H/2 - 100);
+  }
+  
+  var iconColor = strokeColor;
+  drawRunningSilhouette(ctx, W/2, H - 200, 72, iconColor);
+  
+  var kmVal = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
   var movingSec = act.moving_time_seconds||0;
-  var paceSecPerKm = km>0 ? movingSec/km : 0;
+  
+  var totalMins = Math.floor(movingSec/60);
+  var hrs = Math.floor(totalMins/60);
+  var mins = totalMins % 60;
+  var durationStr = hrs > 0 ? hrs + ':' + (mins<10?'0':'') + mins : '0:' + (mins<10?'0':'') + mins;
+  if (movingSec === 0 && act.duration_minutes) {
+    var fallbackMins = Math.round(act.duration_minutes);
+    var fHrs = Math.floor(fallbackMins/60);
+    var fMins = fallbackMins % 60;
+    durationStr = fHrs > 0 ? fHrs + ':' + (fMins<10?'0':'') + fMins : '0:' + (fMins<10?'0':'') + fMins;
+  }
+  
+  var paceSecPerKm = kmVal>0 ? movingSec/kmVal : 0;
   var paceMin = Math.floor(paceSecPerKm/60);
   var paceSec = Math.round(paceSecPerKm%60);
-  var paceStr = km>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
-  var totalMins = Math.floor(movingSec/60);
-  var timeHrs = Math.floor(totalMins/60);
-  var timeMinsRem = totalMins%60;
-  var timeStr = timeHrs>0 ? timeHrs+'h '+timeMinsRem+'m' : timeMinsRem+'m';
-  var steps = act.steps || Math.round(km*1350);
-  var stepsStr = steps.toLocaleString('en-IN');
-  var actName = act.activity_name||'Activity';
-  var dateStr='';
-  try { dateStr=act.activity_date ? new Date(act.activity_date).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : ''; } catch(e){}
-  var pName='Participant';
-  if(typeof currentSession!=='undefined'&&currentSession&&currentSession.name) pName=currentSession.name;
-  else if(typeof LB_ME!=='undefined'&&LB_ME&&LB_ME.full_name) pName=LB_ME.full_name;
-  var teamStr=(typeof LB_ME!=='undefined'&&LB_ME)?(LB_ME.team_name||LB_ME.shift||''):'';
-  var brPct=parseInt((document.getElementById('ring-pct-br')||{}).textContent)||0;
-  var siPct=parseInt((document.getElementById('ring-pct-si')||{}).textContent)||0;
-  var goPct=parseInt((document.getElementById('ring-pct-go')||{}).textContent)||0;
-  var data={km:km.toFixed(2),pace:paceStr,time:timeStr,steps:stepsStr,actName:actName,date:dateStr,name:pName,team:teamStr,brPct:brPct,siPct:siPct,goPct:goPct};
-  var canvas=document.createElement('canvas');
-  var ctx=canvas.getContext('2d');
-  if(type==='whatsapp'){canvas.width=900;canvas.height=675;_drawWACard(ctx,900,675,data);}
-  else{canvas.width=540;canvas.height=960;_drawStoryCard(ctx,540,960,data);}
-  canvas.toBlob(async function(blob){
-    var fname=type==='whatsapp'?'walkathon-activity.png':'walkathon-story.png';
-    if(navigator.canShare){
-      try{var file=new File([blob],fname,{type:'image/png'});
-        if(navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'My Walkathon Activity'});return;}
-      }catch(e){if(e.name==='AbortError')return;}
+  var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec + ' /km' : '--';
+  
+  var stats = [
+    { value: kmVal.toFixed(2) + ' km', label: 'Distance' },
+    { value: durationStr, label: 'Duration' },
+    { value: paceStr, label: 'Pace' }
+  ];
+  
+  var colW = W / 3;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  
+  stats.forEach(function(s, i) {
+    var cx = i * colW + colW/2;
+    
+    ctx.font = "bold 32px 'Outfit', system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(s.value, cx, H - 90);
+    
+    ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(s.label.toUpperCase(), cx, H - 60);
+    
+    if (i < 2) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + colW/2, H - 120);
+      ctx.lineTo(cx + colW/2, H - 55);
+      ctx.stroke();
     }
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');a.href=url;a.download=fname;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(function(){URL.revokeObjectURL(url);},1000);
-  },'image/png');
+  });
+};
+
+function drawRunningSilhouette(ctx, x, y, size, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  
+  ctx.beginPath();
+  ctx.arc(x, y - size*0.35, size*0.09, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.moveTo(x - size*0.04, y - size*0.22);
+  ctx.lineTo(x + size*0.04, y - size*0.05);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(x - size*0.02, y - size*0.2);
+  ctx.lineTo(x + size*0.14, y - size*0.14);
+  ctx.lineTo(x + size*0.08, y - size*0.04);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(x - size*0.02, y - size*0.2);
+  ctx.lineTo(x - size*0.14, y - size*0.16);
+  ctx.lineTo(x - size*0.16, y - size*0.05);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(x + size*0.04, y - size*0.05);
+  ctx.lineTo(x - size*0.08, y + size*0.06);
+  ctx.lineTo(x - size*0.03, y + size*0.18);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(x + size*0.04, y - size*0.05);
+  ctx.lineTo(x + size*0.11, y + size*0.08);
+  ctx.lineTo(x + size*0.02, y + size*0.22);
+  ctx.stroke();
+  
+  ctx.restore();
 }
 
-function _crr(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+function drawRouteOnCanvas(ctx, coords, boxX, boxY, boxW, boxH, strokeColor, strokeWidth) {
+  if (!coords || coords.length === 0) return;
+  
+  let minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity, maxLng = -Infinity;
+  for (let i = 0; i < coords.length; i++) {
+    const lat = coords[i][0];
+    const lng = coords[i][1];
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+  }
+  
+  const spanLat = maxLat - minLat;
+  const spanLng = maxLng - minLng;
+  
+  if (spanLat === 0 && spanLng === 0) return;
+  
+  const scaleX = boxW / (spanLng || 1);
+  const scaleY = boxH / (spanLat || 1);
+  const scale = Math.min(scaleX, scaleY);
+  
+  const pathW = spanLng * scale;
+  const pathH = spanLat * scale;
+  const offsetX = boxX + (boxW - pathW) / 2;
+  const offsetY = boxY + (boxH - pathH) / 2;
+  
+  ctx.beginPath();
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = strokeWidth;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  
+  for (let i = 0; i < coords.length; i++) {
+    const lat = coords[i][0];
+    const lng = coords[i][1];
+    const px = offsetX + (lng - minLng) * scale;
+    const py = offsetY + (maxLat - lat) * scale;
+    
+    if (i === 0) {
+      ctx.moveTo(px, py);
+    } else {
+      ctx.lineTo(px, py);
+    }
+  }
+  ctx.stroke();
 }
 
-function _drawWACard(ctx,W,H,d){
-  var BR=(typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('cert_accent_color', 'accent_color') : '#E8622A'),SFC='#1e2330',TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
-  ctx.fillStyle='#14181f';ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=SFC;_crr(ctx,32,24,W-64,80,12);ctx.fill();
-  ctx.font='bold 15px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='left';
-  ctx.fillText('WALKATHON',52,60);
-  ctx.font='600 11px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.fillText('Arcgate 2026',52,80);
-  ctx.font='bold 13px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.textAlign='right';
-  ctx.fillText(d.date,W-52,60);
-  [[d.brPct,'#C8843A'],[d.siPct,'#A8BCC8'],[d.goPct,'#D4A030']].forEach(function(m,i){
-    ctx.beginPath();ctx.arc(W-52-(2-i)*22,80,7,0,Math.PI*2);
-    ctx.fillStyle=m[0]>=100?m[1]:'rgba(255,255,255,0.1)';ctx.fill();
-  });
-  ctx.font='bold 14px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.textAlign='center';
-  ctx.fillText(d.actName.toUpperCase().substring(0,28),W/2,155);
-  var pts=d.km.split('.');
-  ctx.font='bold 96px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;
-  var iw=ctx.measureText(pts[0]).width;
-  ctx.font='bold 56px system-ui,Arial,sans-serif';
-  var dw=ctx.measureText('.'+(pts[1]||'00')).width;
-  var sx=(W-(iw+dw))/2;
-  ctx.font='bold 96px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='left';
-  ctx.fillText(pts[0],sx,285);
-  ctx.font='bold 56px system-ui,Arial,sans-serif';ctx.fillStyle=BR;
-  ctx.fillText('.'+(pts[1]||'00'),sx+iw,285);
-  ctx.font='800 16px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.textAlign='center';
-  ctx.fillText('KILOMETRES',W/2,325);
-  ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(64,355);ctx.lineTo(W-64,355);ctx.stroke();
-  var stats=[{v:d.pace,l:'PACE'},{v:d.time,l:'TIME'},{v:d.steps,l:'STEPS'},{v:d.name.split(' ')[0],l:'ATHLETE'}];
-  var cw=(W-96)/4;
-  stats.forEach(function(s,i){
-    var cx=48+i*cw+cw/2;
-    ctx.fillStyle=SFC;ctx.fillRect(48+i*cw+4,375,cw-8,100);
-    ctx.font='bold 18px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-    ctx.fillText(s.v,cx,432);
-    ctx.font='700 10px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.fillText(s.l,cx,454);
-  });
-  ctx.font='bold 15px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-  ctx.fillText(d.name,W/2,525);
-  ctx.font='600 12px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.fillText(d.team,W/2,548);
-  ctx.fillStyle=BR;ctx.fillRect(0,H-5,W,5);
-  ctx.font='600 11px system-ui,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.2)';ctx.textAlign='center';
-  ctx.fillText('arcgate.walkathon.in',W/2,H-18);
-}
-
-function _drawStoryCard(ctx,W,H,d){
-  var BR=(typeof getBrandingOverrideColor === 'function' ? getBrandingOverrideColor('cert_accent_color', 'accent_color') : '#E8622A'),TXT='#ffffff',MUT='rgba(255,255,255,0.48)';
-  var grad=ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,'#1a2030');grad.addColorStop(1,'#0e1115');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=BR;ctx.fillRect(0,0,W,4);
-  ctx.font='bold 22px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-  ctx.fillText('WALKATHON',W/2,72);
-  ctx.font='600 13px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;
-  ctx.fillText('Arcgate 2026  \u00b7  '+d.date,W/2,96);
-  var rings=[[d.brPct,'#C8843A','BRONZE'],[d.siPct,'#A8BCC8','SILVER'],[d.goPct,'#D4A030','GOLD']];
-  rings.forEach(function(r,i){
-    var cx=W/4*(i+1),cy=225,rr=58;
-    ctx.beginPath();ctx.arc(cx,cy,rr,-Math.PI/2,Math.PI*1.5);
-    ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=5;ctx.stroke();
-    ctx.beginPath();ctx.arc(cx,cy,rr,-Math.PI/2,-Math.PI/2+(Math.min(r[0],100)/100)*Math.PI*2);
-    ctx.strokeStyle=r[1];ctx.lineWidth=5;ctx.lineCap='round';ctx.stroke();
-    ctx.font='bold 18px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-    ctx.fillText(Math.min(r[0],100)+'%',cx,cy+7);
-    ctx.font='700 10px system-ui,Arial,sans-serif';ctx.fillStyle=r[1];ctx.fillText(r[2],cx,cy+rr+18);
-    if(r[0]>=100){ctx.font='600 10px system-ui,Arial,sans-serif';ctx.fillStyle='#22C55E';ctx.fillText('\u2713 Done',cx,cy+rr+34);}
-  });
-  ctx.font='bold 26px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-  ctx.fillText(d.name,W/2,345);
-  ctx.fillStyle=BR;ctx.fillRect(W/2-22,354,44,3);
-  ctx.font='600 13px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.fillText(d.team,W/2,378);
-  var pts2=d.km.split('.');
-  ctx.font='bold 76px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;
-  var iw2=ctx.measureText(pts2[0]).width;
-  ctx.font='bold 46px system-ui,Arial,sans-serif';
-  var dw2=ctx.measureText('.'+(pts2[1]||'00')).width;
-  var sx2=(W-(iw2+dw2))/2;
-  ctx.font='bold 76px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='left';
-  ctx.fillText(pts2[0],sx2,470);
-  ctx.font='bold 46px system-ui,Arial,sans-serif';ctx.fillStyle=BR;
-  ctx.fillText('.'+(pts2[1]||'00'),sx2+iw2,470);
-  ctx.font='800 13px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.textAlign='center';
-  ctx.fillText('KILOMETRES',W/2,498);
-  var st2=[{v:d.pace,l:'PACE'},{v:d.time,l:'TIME'},{v:d.steps,l:'STEPS'},{v:d.name.split(' ')[0],l:'ATHLETE'}];
-  var tw=(W-56)/2,th=82,ty0=528;
-  [0,1].forEach(function(row){[0,1].forEach(function(col){
-    var si2=row*2+col,tx=24+col*(tw+8),ty=ty0+row*(th+8);
-    ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fillRect(tx,ty,tw,th);
-    ctx.font='bold 20px system-ui,Arial,sans-serif';ctx.fillStyle=TXT;ctx.textAlign='center';
-    ctx.fillText(st2[si2].v,tx+tw/2,ty+44);
-    ctx.font='700 10px system-ui,Arial,sans-serif';ctx.fillStyle=MUT;ctx.fillText(st2[si2].l,tx+tw/2,ty+62);
-  });});
-  ctx.font='700 16px system-ui,Arial,sans-serif';ctx.fillStyle='rgba(232,98,42,0.7)';ctx.textAlign='center';
-  ctx.fillText('#ArcgateWalkathon',W/2,H-46);
-  ctx.font='600 12px system-ui,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,0.2)';
-  ctx.fillText('arcgate.walkathon.in',W/2,H-24);
-}
+window.performShareAction = function(action) {
+  var canvas = document.getElementById('share-card-canvas');
+  if (!canvas) return;
+  
+  canvas.toBlob(function(blob) {
+    if (action === 'copy') {
+      if (navigator.clipboard && navigator.clipboard.write) {
+        navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]).then(function() {
+          alert('Activity card copied to clipboard!');
+        }).catch(function(e) {
+          alert('Clipboard copy blocked or failed. Please download the image instead.');
+        });
+      } else {
+        alert('Clipboard Copy is not supported in this browser. Please download the image instead.');
+      }
+    } else if (action === 'download') {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'walkathon-activity.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      var file = new File([blob], 'walkathon-activity.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: 'My Walkathon Activity',
+          text: 'Check out my latest activity!'
+        }).catch(function(err) {
+          if (err.name !== 'AbortError') {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'walkathon-activity.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+        });
+      } else {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'walkathon-activity.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    }
+  }, 'image/png');
+};
