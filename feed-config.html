@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Feed Settings — Arcgate Walkathon 2026</title>
+  <title>Feed Settings � Arcgate Walkathon 2026</title>
   <style>
     :root {
       --brand: #E8622A;
@@ -259,6 +259,7 @@
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -296,17 +297,17 @@
 
       <!-- Tabs Navigation -->
       <div class="section-tabs">
-        <button class="stab active" data-target="announcements" onclick="switchFeedTab('announcements')">📢 Announcement Rules</button>
-        <button class="stab" data-target="filters" onclick="switchFeedTab('filters')">🔍 Content Filters</button>
-        <button class="stab" data-target="customization" onclick="switchFeedTab('customization')">🎨 Global Customization</button>
-        <button class="stab" data-target="posts" onclick="switchFeedTab('posts')">💬 Manage Posts</button>
+        <button class="stab active" data-target="announcements" onclick="switchFeedTab('announcements')">?? Announcement Rules</button>
+        <button class="stab" data-target="filters" onclick="switchFeedTab('filters')">?? Content Filters</button>
+        <button class="stab" data-target="customization" onclick="switchFeedTab('customization')">?? Global Customization</button>
+        <button class="stab" data-target="posts" onclick="switchFeedTab('posts')">?? Manage Posts</button>
       </div>
 
       <!-- Tab Panel: Announcements -->
       <div class="feed-tab-panel active" id="panel-announcements">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>📢</span><h2>Feed Announcement Rules</h2></div>
+          <div class="card-head-left"><span>??</span><h2>Feed Announcement Rules</h2></div>
         </div>
         <div class="card-body">
           <div class="toggle-row">
@@ -409,7 +410,7 @@
       <div class="feed-tab-panel" id="panel-filters">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>🔍</span><h2>Feed Content Filters</h2></div>
+          <div class="card-head-left"><span>??</span><h2>Feed Content Filters</h2></div>
         </div>
         <div class="card-body">
           <div class="form-group">
@@ -423,19 +424,19 @@
             <div class="check-grid">
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Walk" checked>
-                <span>Walk 🚶‍♂️</span>
+                <span>Walk ?????</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Run" checked>
-                <span>Run 🏃‍♂️</span>
+                <span>Run ?????</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Hike" checked>
-                <span>Hike 🥾</span>
+                <span>Hike ??</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Ride" checked>
-                <span>Ride 🚴‍♂️</span>
+                <span>Ride ?????</span>
               </label>
             </div>
           </div>
@@ -447,7 +448,7 @@
       <div class="feed-tab-panel" id="panel-customization">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>🎨</span><h2>Global Feed Customization</h2></div>
+          <div class="card-head-left"><span>??</span><h2>Global Feed Customization</h2></div>
         </div>
         <div class="card-body">
           <div class="toggle-row">
@@ -510,7 +511,7 @@
       </div>
 
       <div style="display:flex;align-items:center;margin-top:20px;">
-        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+        <button class="btn btn-primary" onclick="saveSettings()">?? Save Settings</button>
         <span id="status-msg" class="status-msg"></span>
       </div>
       </div>
@@ -519,7 +520,7 @@
       <div class="feed-tab-panel" id="panel-posts">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>💬</span><h2>Manage Social Feed Posts</h2></div>
+          <div class="card-head-left"><span>??</span><h2>Manage Social Feed Posts</h2></div>
         </div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
@@ -553,7 +554,7 @@
     </div>
 
     <footer class="site-footer">
-      <span>© 2026 Arcgate Walkathon</span>
+      <span>� 2026 Arcgate Walkathon</span>
       <div>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
@@ -601,7 +602,7 @@
         sel.innerHTML = evs.map(e => {
           const isLive = e.status === 'live';
           const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
-          const prefix = isLive ? '🟢 ' : '';
+          const prefix = isLive ? '?? ' : '';
           return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
         }).join('');
         
@@ -837,7 +838,7 @@
         }
         
         tbody.innerHTML = filtered.map(function(ann) {
-          var dateStr = '—';
+          var dateStr = '�';
           if (ann.created_at) {
             try {
               var d = new Date(ann.created_at);
@@ -851,7 +852,7 @@
             } catch(e) {}
           }
           
-          var userName = '—';
+          var userName = '�';
           if (ann.type === 'broadcast') {
             userName = '<strong style="color:var(--brand);">Organizers (Broadcast)</strong>';
           } else {
