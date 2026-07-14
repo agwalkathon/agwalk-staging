@@ -2707,6 +2707,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
     placeholders.forEach(function(p) {
       if (isBlankMode) return;
       if (p.type === 'medal_image' || p.type === 'static_image') return;
+      if (p.transparent_bg) return;
       
       var isStat = certStatLabel(p.type) !== null;
       var textVal = p.key;
