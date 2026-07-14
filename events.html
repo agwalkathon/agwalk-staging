@@ -56,7 +56,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <title>Events — Arcgate Walkathon</title>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -209,6 +208,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -235,7 +235,6 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <button type="button" class="stab" data-tab="scoring" onclick="switchEditorTab('scoring')"><i class="ti ti-medal"></i> Scoring & Medals</button>
     <button type="button" class="stab" data-tab="challenges" onclick="switchEditorTab('challenges')"><i class="ti ti-target-arrow"></i> Challenges</button>
     <button type="button" class="stab" data-tab="layout" onclick="switchEditorTab('layout')"><i class="ti ti-palette"></i> App Layout</button>
-    <button type="button" class="stab" data-tab="certificates" onclick="switchEditorTab('certificates')"><i class="ti ti-certificate"></i> Certificates</button>
     <button type="button" class="stab" data-tab="manual-bonus" id="tab-btn-manual-bonus" style="display:none" onclick="switchEditorTab('manual-bonus')"><i class="ti ti-gift"></i> Manual Bonuses</button>
   </div>
 
@@ -677,90 +676,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   </div>
 
   <!-- Tab Panel 7: Certificates -->
-  <div class="editor-tab-panel" id="editor-tab-panel-certificates" style="display:none">
-    <div class="edit-group" style="border-left: 4px solid var(--brand); background: #FAFBFD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #EDF0F5; border-left-width: 4px;">
-      <h3 style="font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="ti ti-certificate"></i> Certificate Configuration</h3>
-      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">Configure dynamic certificate templates for the event. Participants can download certificates once the event has ended.</p>
-      
-      <!-- Template row: mode + source + download formats in one compact line -->
-      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:14px;">
-        <div class="fld" style="margin:0; width:190px;">
-          <label style="font-size:11px; font-weight:600; color:#333;">Design Mode</label>
-          <select id="cert-canvas-mode" onchange="toggleCertMode(); updateCertPreviewCanvas(true);">
-            <option value="pdf">PDF Template</option>
-            <option value="blank">Blank Canvas (full design)</option>
-          </select>
-        </div>
-        <div id="cert-pdf-wrap" style="display:flex; gap:8px; align-items:flex-end; flex:1; min-width:260px;">
-          <div class="fld" style="margin:0; flex:1;">
-            <label style="font-size:11px; font-weight:600; color:#333;">Certificate Template PDF</label>
-            <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
-          </div>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
-          <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
-        </div>
-        <div id="cert-blank-wrap" style="display:none; gap:8px; align-items:flex-end;">
-          <div class="fld" style="margin:0; width:140px;">
-            <label style="font-size:11px; font-weight:600; color:#333;">Orientation</label>
-            <select id="cert-canvas-orient" onchange="updateCertPreviewCanvas(true);">
-              <option value="landscape">Landscape</option>
-              <option value="portrait">Portrait</option>
-            </select>
-          </div>
-          <div class="fld" style="margin:0; width:120px;">
-            <label style="font-size:11px; font-weight:600; color:#333;">Background</label>
-            <input type="color" id="cert-canvas-bg" value="#ffffff" style="height:38px; padding:3px; width:100%;" oninput="updateCertPreviewCanvas(true);">
-          </div>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; height:38px;">
-          <span style="font-size:11px; font-weight:600; color:#64748b;">Downloads:</span>
-          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-image" checked> JPEG</label>
-          <label style="font-size:12px; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="cert-opt-pdf" checked> PDF</label>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center; padding:8px 12px; background:#fffdfa; border:1px solid #ffd8a8; border-radius:8px; height:38px;">
-          <label style="font-size:12px; font-weight:600; color:#e8590c; display:flex; align-items:center; gap:5px; cursor:pointer;">
-            <input type="checkbox" id="cert-enabled"> Enable Certificate Button for Participants
-          </label>
-        </div>
-      </div>
 
-      <!-- Main workspace: compact placeholder list (left) + large preview (right) -->
-      <div style="display:grid; grid-template-columns: 350px 1fr; gap:16px; align-items:start;">
-        <div>
-          <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('participant_name')">+ Name</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_title')">+ Medal</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('distance')">+ Distance</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('rank')">+ Rank</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('points')">+ Points</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('medal_image')">+ Medal Img</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('static_image')">+ Image</button>
-            <button type="button" class="btn btn-ghost btn-xs" style="padding:4px 9px; font-size:11px; font-weight:700;" onclick="addCertPreset('custom')">+ Text</button>
-          </div>
-          <div id="cert-placeholders-list" style="display:flex; flex-direction:column; gap:6px; max-height:62vh; overflow-y:auto; padding-right:4px;">
-            <!-- Rendered list of placeholder config rows -->
-          </div>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:6px; position:sticky; top:10px;">
-          <h4 style="font-size:12px; font-weight:700; color:#333; display:flex; align-items:center; justify-content:space-between; margin:0;">
-            <span>Live Interactive Preview</span>
-            <span style="display:flex; gap:6px;">
-              <button type="button" class="btn btn-ghost btn-xs" onclick="downloadCertPreview()"><i class="ti ti-download"></i> Download Preview</button>
-              <button type="button" class="btn btn-ghost btn-xs" onclick="updateCertPreviewCanvas(true)"><i class="ti ti-refresh"></i> Refresh</button>
-            </span>
-          </h4>
-          <div style="border:1px dashed #cbd5e1; border-radius:8px; background:#fff; padding:8px; display:flex; align-items:center; justify-content:center; min-height:420px; position:relative; overflow:hidden;">
-            <canvas id="cert-preview-canvas" tabindex="0" style="max-width:100%; max-height:74vh; border:1px solid #ccc; display:none; cursor:grab; outline:none; touch-action:none;"></canvas>
-            <div id="cert-preview-placeholder" style="font-size:12px; color:#64748b; text-align:center;">
-              <p>Upload a template PDF or set a template URL to view the live preview canvas.</p>
-            </div>
-          </div>
-          <span style="font-size:11px; color:#64748b; text-align:center;"><strong>Drag</strong> to move &middot; <strong>Corner handle / scroll wheel</strong> to resize &middot; <strong>Arrow keys</strong> nudge selected (Shift = bigger steps)</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
@@ -851,7 +767,7 @@ function renderList(){
     mt.textContent=fmtD(ev.start_date)+' → '+fmtD(ev.end_date)+'  ·  '+(ev.event_type||'')+'  ·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
     info.appendChild(nm);info.appendChild(mt);body.appendChild(info);
     var acts=document.createElement('div');acts.className='ev-actions';
-    [['ti-pencil','Edit','edit'],['ti-copy','Clone','clone'],['ti-arrows-exchange','Status','status']].forEach(function(a){
+    [['ti-pencil','Edit','edit'],['ti-certificate','Certificate','cert'],['ti-copy','Clone','clone'],['ti-arrows-exchange','Status','status']].forEach(function(a){
       var b=document.createElement('button');b.className='btn btn-ghost btn-sm';
       var i=document.createElement('i');i.className='ti '+a[0];b.appendChild(i);b.appendChild(document.createTextNode(' '+a[1]));
       b.setAttribute('data-act',a[2]);b.setAttribute('data-id',ev.id);
@@ -876,6 +792,9 @@ document.getElementById('ev-list').addEventListener('click',function(e){
   if(act==='edit')openEditor(ev);
   if(act==='clone')cloneEvent(ev);
   if(act==='status')cycleStatus(ev);
+  if(act==='cert') {
+    window.location.href = 'cert-config.html?event_id=' + ev.id;
+  }
 });
 
 /* ---------- editor ---------- */
@@ -1787,39 +1706,7 @@ async function openEditor(ev){
         });
       }
 
-      var certCfgRow = Array.isArray(cfgData) ? cfgData.find(function(x) { return x.config_key === 'certificate_config'; }) : null;
-      if (certCfgRow && certCfgRow.config_value) {
-        var c = certCfgRow.config_value;
-        document.getElementById('cert-template-url').value = c.template_url || '';
-        document.getElementById('cert-canvas-mode').value = c.canvas_mode || 'pdf';
-        document.getElementById('cert-canvas-orient').value = c.canvas_orientation || 'landscape';
-        document.getElementById('cert-canvas-bg').value = c.canvas_bg || '#ffffff';
-        toggleCertMode();
-        document.getElementById('cert-opt-image').checked = (c.download_options || []).indexOf('image') > -1;
-        document.getElementById('cert-opt-pdf').checked = (c.download_options || []).indexOf('pdf') > -1;
-        document.getElementById('cert-enabled').checked = !!c.enabled;
-        
-        var list = document.getElementById('cert-placeholders-list');
-        list.innerHTML = '';
-        if (Array.isArray(c.placeholders)) {
-          c.placeholders.forEach(function(p) {
-            addCertPlaceholderRow(p);
-          });
-        }
-      } else {
-        document.getElementById('cert-template-url').value = '';
-        document.getElementById('cert-canvas-mode').value = 'pdf';
-        document.getElementById('cert-canvas-orient').value = 'landscape';
-        document.getElementById('cert-canvas-bg').value = '#ffffff';
-        toggleCertMode();
-        document.getElementById('cert-opt-image').checked = true;
-        document.getElementById('cert-opt-pdf').checked = true;
-        document.getElementById('cert-enabled').checked = false;
-        document.getElementById('cert-placeholders-list').innerHTML = '';
-        addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
-        addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
-      }
-      setTimeout(updateCertPreviewCanvas, 200);
+
 
     } catch(err) {
       console.warn('Failed to load sub-configurations:', err);
@@ -1857,18 +1744,7 @@ async function openEditor(ev){
       if (el) el.checked = true;
     });
 
-    document.getElementById('cert-template-url').value = '';
-    document.getElementById('cert-canvas-mode').value = 'pdf';
-    document.getElementById('cert-canvas-orient').value = 'landscape';
-    document.getElementById('cert-canvas-bg').value = '#ffffff';
-    toggleCertMode();
-    document.getElementById('cert-opt-image').checked = true;
-    document.getElementById('cert-opt-pdf').checked = true;
-    document.getElementById('cert-enabled').checked = false;
-    document.getElementById('cert-placeholders-list').innerHTML = '';
-    addCertPlaceholderRow({ key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' });
-    addCertPlaceholderRow({ key: '<MEDAL>', type: 'medal_title', x: 0.40, y: 0.75, font_size: 36, color: '#1A1D20', font_style: 'bold', align: 'left' });
-    setTimeout(updateCertPreviewCanvas, 200);
+
   }
 
   var tabBtn = document.getElementById('tab-btn-manual-bonus');
@@ -2015,51 +1891,7 @@ async function saveEvent() {
         ptsCfg[t] = el ? el.checked : true;
       });
 
-      var certPlaceholders = [];
-      document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
-        var key = row.querySelector('.cert-p-key').value.trim();
-        var type = row.querySelector('.cert-p-type').value;
-        var customVal = row.querySelector('.cert-p-custom-val').value.trim();
-        var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
-        var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
-        var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
-        var color = row.querySelector('.cert-p-color').value;
-        var weight = row.querySelector('.cert-p-weight').value;
-        var align = row.querySelector('.cert-p-align').value;
-        var family = row.querySelector('.cert-p-font').value || 'Poppins';
-        var imgUrlEl = row.querySelector('.cert-p-imgurl');
-        if (key) {
-          var transpEl = row.querySelector('.cert-p-transparent');
-          certPlaceholders.push({
-            key: key,
-            type: type,
-            custom_val: customVal,
-            image_url: imgUrlEl ? imgUrlEl.value.trim() : '',
-            transparent_bg: transpEl ? transpEl.checked : false,
-            x: x,
-            y: y,
-            font_size: size,
-            color: color,
-            font_style: weight,
-            align: align,
-            font_family: family
-          });
-        }
-      });
 
-      var certDownloadOptions = [];
-      if (document.getElementById('cert-opt-image').checked) certDownloadOptions.push('image');
-      if (document.getElementById('cert-opt-pdf').checked) certDownloadOptions.push('pdf');
-
-      var certConfigVal = {
-        template_url: document.getElementById('cert-template-url').value.trim() || null,
-        canvas_mode: document.getElementById('cert-canvas-mode').value || 'pdf',
-        canvas_orientation: document.getElementById('cert-canvas-orient').value || 'landscape',
-        canvas_bg: document.getElementById('cert-canvas-bg').value || '#ffffff',
-        placeholders: certPlaceholders,
-        download_options: certDownloadOptions,
-        enabled: document.getElementById('cert-enabled').checked
-      };
 
       await Promise.all([
         upsertConfigValue('medals', medalsVal, savedEventId),
@@ -2068,8 +1900,7 @@ async function saveEvent() {
         upsertConfigValue('hide_strava_connect', hideStrava, savedEventId),
         upsertConfigValue('team_leaderboard_enabled', teamLb, savedEventId),
         upsertConfigValue('tabs_config', tabsCfg, savedEventId),
-        upsertConfigValue('activities_points_config', ptsCfg, savedEventId),
-        upsertConfigValue('certificate_config', certConfigVal, savedEventId)
+        upsertConfigValue('activities_points_config', ptsCfg, savedEventId)
       ]);
       // Trigger points backfill asynchronously so it doesn't block the frontend save UI/collapse action
       fetch(BACKEND + '/admin/backfill-points', {
@@ -2324,334 +2155,6 @@ window.handleCertElementImageUpload = function(event) {
       if (d2.success && urlInput) {
         urlInput.value = d2.url;
         updateCertPreviewCanvas();
-      } else if (!d2.success) {
-        // Fall back to inline base64 if upload endpoint rejects
-        if (urlInput) { urlInput.value = rd.result; updateCertPreviewCanvas(); }
-      }
-    } catch(err) {
-      // Offline/endpoint failure: embed as base64 data URL directly
-      if (urlInput) { urlInput.value = rd.result; updateCertPreviewCanvas(); }
-    }
-  };
-  rd.readAsDataURL(file);
-};
-
-window.handleCertTemplateUpload = function(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function() {
-    document.getElementById('cert-template-url').value = reader.result;
-    updateCertPreviewCanvas();
-  };
-  reader.readAsDataURL(file);
-};
-
-window.addCertPlaceholderRow = function(data) {
-  var p = data || { key: '', type: 'participant_name', x: 0.1, y: 0.1, font_size: 24, color: '#000000', font_style: 'normal', align: 'left', custom_val: '', font_family: 'Poppins' };
-  var list = document.getElementById('cert-placeholders-list');
-  var rowId = 'cpr-' + Date.now() + '-' + Math.round(Math.random() * 1000);
-  
-  if (p.font_family) {
-    loadGoogleFont(p.font_family);
-  }
-
-  var row = document.createElement('div');
-  row.className = 'cert-placeholder-row';
-  row.id = rowId;
-  row.style.cssText = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; position:relative;';
-  
-  var isChecked = list.children.length === 0 ? 'checked' : '';
-  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
-  var titleText = typeLabels[p.type] || 'Placeholder';
-  
-  row.innerHTML = 
-    '<details>' +
-    '<summary style="display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; list-style:none; user-select:none;">' +
-      '<input type="radio" name="active-cert-placeholder" ' + isChecked + ' title="Set active for canvas placement" style="cursor:pointer; flex-shrink:0;" onclick="event.stopPropagation();" onchange="updateCertPreviewCanvas()">' +
-      '<span class="cert-row-title" style="font-size:12px; font-weight:700; color:#0F1117; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + esc(titleText) + '</span>' +
-      '<span class="cert-row-swatch" style="width:12px; height:12px; border-radius:3px; border:1px solid #ddd; background:' + (p.color || '#000000') + '; flex-shrink:0;"></span>' +
-      '<button type="button" class="btn btn-ghost btn-xs" style="color:#ef4444; padding:1px 5px; font-size:11px; cursor:pointer; flex-shrink:0;" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById(\'' + rowId + '\').remove(); updateCertPreviewCanvas();"><i class="ti ti-trash"></i></button>' +
-      '<i class="ti ti-chevron-down" style="font-size:13px; color:#94a3b8; flex-shrink:0;"></i>' +
-    '</summary>' +
-    '<div style="display:flex; flex-direction:column; gap:8px; padding:0 10px 10px 10px; border-top:1px solid #f1f5f9; padding-top:8px;">' +
-    '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:8px;">' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Placeholder Key</label><input type="text" class="cert-p-key" placeholder="e.g. <Participant Name>" value="' + esc(p.key || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Value Mapping</label>' +
-        '<select class="cert-p-type" onchange="toggleCertCustomVal(this); certRowTitleSync(this); updateCertPreviewCanvas();">' +
-          '<option value="participant_name"' + (p.type === 'participant_name' ? ' selected' : '') + '>Participant\'s Full Name</option>' +
-          '<option value="medal_title"' + (p.type === 'medal_title' ? ' selected' : '') + '>Medal Achieved (e.g. Gold Medal)</option>' +
-          '<option value="distance"' + (p.type === 'distance' ? ' selected' : '') + '>Total Distance</option>' +
-          '<option value="points"' + (p.type === 'points' ? ' selected' : '') + '>Total Points</option>' +
-          '<option value="rank"' + (p.type === 'rank' ? ' selected' : '') + '>Leaderboard Rank</option>' +
-          '<option value="custom"' + (p.type === 'custom' ? ' selected' : '') + '>Custom Text Value</option>' +
-          '<option value="medal_image"' + (p.type === 'medal_image' ? ' selected' : '') + '>Earned Medal Image</option>' +
-          '<option value="static_image"' + (p.type === 'static_image' ? ' selected' : '') + '>Image (logo / signature / art)</option>' +
-        '</select>' +
-      '</div>' +
-    '</div>' +
-    '<div class="fld cert-custom-val-wrap" style="margin:0; display:' + (p.type === 'custom' ? 'block' : 'none') + ';"><label style="font-size:11px;">Custom Text Value</label><input type="text" class="cert-p-custom-val" placeholder="e.g. CEO Signature" value="' + esc(p.custom_val || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
-    '<div class="cert-img-wrap" style="display:' + (p.type === 'static_image' ? 'flex' : 'none') + '; gap:6px; align-items:flex-end;">' +
-      '<div class="fld" style="margin:0; flex:1;"><label style="font-size:11px;">Image URL</label><input type="text" class="cert-p-imgurl" placeholder="https://... or upload" value="' + esc(p.image_url || '') + '" oninput="updateCertPreviewCanvas()"></div>' +
-      '<button type="button" class="btn btn-ghost btn-xs" style="padding:6px 9px; font-size:11px;" onclick="this.nextElementSibling.click()"><i class="ti ti-upload"></i></button>' +
-      '<input type="file" accept="image/*" style="display:none;" onchange="handleCertElementImageUpload(event)">' +
-    '</div>' +
-    '<label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; color:#475569;"><input type="checkbox" class="cert-p-transparent"' + (p.transparent_bg ? ' checked' : '') + ' onchange="updateCertPreviewCanvas()"> Transparent background (no white cover box)</label>' +
-    '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">X (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Y (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Size</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" style="height:32px; padding:2px;" oninput="updateCertPreviewCanvas(); var s=this.closest(\'.cert-placeholder-row\').querySelector(\'.cert-row-swatch\'); if(s) s.style.background=this.value;"></div>' +
-    '</div>' +
-    '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Weight</label>' +
-        '<select class="cert-p-weight" onchange="updateCertPreviewCanvas();">' +
-          '<option value="bold"' + (p.font_style === 'bold' ? ' selected' : '') + '>Bold</option>' +
-          '<option value="normal"' + (p.font_style !== 'bold' ? ' selected' : '') + '>Normal</option>' +
-        '</select>' +
-      '</div>' +
-      '<div class="fld" style="margin:0"><label style="font-size:11px;">Alignment</label>' +
-        '<select class="cert-p-align" onchange="updateCertPreviewCanvas();">' +
-          '<option value="left"' + (p.align === 'left' ? ' selected' : '') + '>Left</option>' +
-          '<option value="center"' + (p.align === 'center' ? ' selected' : '') + '>Center</option>' +
-          '<option value="right"' + (p.align === 'right' ? ' selected' : '') + '>Right</option>' +
-        '</select>' +
-      '</div>' +
-    '</div>' +
-    '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Family (Google Fonts)</label>' +
-      '<select class="cert-p-font" onchange="loadGoogleFont(this.value); updateCertPreviewCanvas();" style="width:100%;">' +
-        '<option value="Poppins"' + (p.font_family === 'Poppins' || !p.font_family ? ' selected' : '') + '>Poppins</option>' +
-        '<option value="Inter"' + (p.font_family === 'Inter' ? ' selected' : '') + '>Inter</option>' +
-        '<option value="Roboto"' + (p.font_family === 'Roboto' ? ' selected' : '') + '>Roboto</option>' +
-        '<option value="Playfair Display"' + (p.font_family === 'Playfair Display' ? ' selected' : '') + '>Playfair Display</option>' +
-        '<option value="Montserrat"' + (p.font_family === 'Montserrat' ? ' selected' : '') + '>Montserrat</option>' +
-        '<option value="Cinzel"' + (p.font_family === 'Cinzel' ? ' selected' : '') + '>Cinzel</option>' +
-        '<option value="Dancing Script"' + (p.font_family === 'Dancing Script' ? ' selected' : '') + '>Dancing Script</option>' +
-        '<option value="Great Vibes"' + (p.font_family === 'Great Vibes' ? ' selected' : '') + '>Great Vibes</option>' +
-        '<option value="Outfit"' + (p.font_family === 'Outfit' ? ' selected' : '') + '>Outfit</option>' +
-      '</select>' +
-    '</div>' +
-    '</div>' +
-    '</details>';
-    
-  list.appendChild(row);
-  updateCertPreviewCanvas();
-};
-
-// Keep the compact row title in sync with the selected value mapping
-window.certRowTitleSync = function(select) {
-  var typeLabels = { participant_name: 'Name', medal_title: 'Medal', distance: 'Distance', points: 'Points', rank: 'Rank', custom: 'Text', medal_image: 'Medal Image', static_image: 'Image' };
-  var row = select.closest('.cert-placeholder-row');
-  var title = row ? row.querySelector('.cert-row-title') : null;
-  if (title) title.textContent = typeLabels[select.value] || 'Placeholder';
-};
-
-var _activeCertPdfDoc = null;
-var _certBgCanvas = null;   // offscreen cache of the rendered PDF background
-var _certBgUrl = '';
-var _certPreviewScale = 1;
-var _certRedrawQueued = false;
-
-var _certSnapGuides = [];
-var _certCleanRender = false;
-
-// Fast path: blit cached background + draw placeholders. No PDF work.
-window.redrawCertPreview = function() {
-  var canvas = document.getElementById('cert-preview-canvas');
-  if (!canvas || !_certBgCanvas) return;
-  var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(_certBgCanvas, 0, 0);
-  drawCertPlaceholdersOnCanvas(canvas, _certPreviewScale);
-  if (!_certCleanRender && _certSnapGuides.length) {
-    ctx.save();
-    ctx.strokeStyle = '#E8622A';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 4]);
-    _certSnapGuides.forEach(function(g) {
-      ctx.beginPath();
-      if (g.type === 'v') { ctx.moveTo(g.pos, 0); ctx.lineTo(g.pos, canvas.height); }
-      else { ctx.moveTo(0, g.pos); ctx.lineTo(canvas.width, g.pos); }
-      ctx.stroke();
-    });
-    ctx.restore();
-  }
-};
-
-// Renders the preview without editor chrome (outlines, handles, guides) and downloads it
-window.downloadCertPreview = function() {
-  var canvas = document.getElementById('cert-preview-canvas');
-  if (!canvas || !_certBgCanvas) { alert('Nothing to download yet - set up a template or blank canvas first.'); return; }
-  _certCleanRender = true;
-  window.redrawCertPreview();
-  var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-  _certCleanRender = false;
-  queueCertRedraw();
-  var a = document.createElement('a');
-  a.href = dataUrl;
-  a.download = 'certificate-preview.jpg';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
-
-function queueCertRedraw() {
-  if (_certRedrawQueued) return;
-  _certRedrawQueued = true;
-  requestAnimationFrame(function() {
-    _certRedrawQueued = false;
-    window.redrawCertPreview();
-  });
-}
-
-window.updateCertPreviewCanvas = function(forceReload) {
-  var mode = document.getElementById('cert-canvas-mode') ? document.getElementById('cert-canvas-mode').value : 'pdf';
-  var url = (document.getElementById('cert-template-url').value || '').trim();
-  var canvas = document.getElementById('cert-preview-canvas');
-  var placeholder = document.getElementById('cert-preview-placeholder');
-
-  // ---- Blank canvas mode: build background from color, no PDF involved ----
-  if (mode === 'blank') {
-    if (placeholder) placeholder.style.display = 'none';
-    if (canvas) canvas.style.display = 'block';
-    var orient = document.getElementById('cert-canvas-orient').value || 'landscape';
-    var bgColor = document.getElementById('cert-canvas-bg').value || '#ffffff';
-    var blankKey = 'blank:' + orient + ':' + bgColor;
-    if (!forceReload && _certBgCanvas && _certBgUrl === blankKey) {
-      queueCertRedraw();
-      return;
-    }
-    var cw = canvas.parentElement.clientWidth - 16;
-    if (cw < 300) cw = 300;
-    var bg = document.createElement('canvas');
-    if (orient === 'portrait') {
-      bg.width = cw; bg.height = Math.round(cw * 1.4142);
-    } else {
-      bg.width = cw; bg.height = Math.round(cw / 1.4142);
-    }
-    var bctx = bg.getContext('2d');
-    bctx.fillStyle = bgColor;
-    bctx.fillRect(0, 0, bg.width, bg.height);
-    _certBgCanvas = bg;
-    _certBgUrl = blankKey;
-    _certPreviewScale = cw / 1000;
-    canvas.width = bg.width;
-    canvas.height = bg.height;
-    window.redrawCertPreview();
-    return;
-  }
-
-  if (!url) {
-    if (canvas) canvas.style.display = 'none';
-    if (placeholder) placeholder.style.display = 'block';
-    return;
-  }
-
-  if (placeholder) placeholder.style.display = 'none';
-  if (canvas) canvas.style.display = 'block';
-
-  // If background already rendered for this URL, skip PDF work entirely
-  if (!forceReload && _certBgCanvas && _certBgUrl === url) {
-    queueCertRedraw();
-    return;
-  }
-
-  // pdf.js is loaded with defer; wait briefly if this fires before it finishes loading
-  if (typeof pdfjsLib === 'undefined') {
-    setTimeout(function() { window.updateCertPreviewCanvas(forceReload); }, 200);
-    return;
-  }
-  if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-  }
-
-  var renderPreview = function(pdfDoc) {
-    pdfDoc.getPage(1).then(function(page) {
-      var viewport = page.getViewport({ scale: 1.0 });
-      var containerWidth = canvas.parentElement.clientWidth - 20;
-      var scale = containerWidth / viewport.width;
-      if (scale > 1.5) scale = 1.5;
-      
-      var scaledViewport = page.getViewport({ scale: scale });
-      var bg = document.createElement('canvas');
-      bg.width = scaledViewport.width;
-      bg.height = scaledViewport.height;
-      
-      var renderContext = {
-        canvasContext: bg.getContext('2d'),
-        viewport: scaledViewport
-      };
-      page.render(renderContext).promise.then(function() {
-        _certBgCanvas = bg;
-        _certBgUrl = url;
-        _certPreviewScale = scale;
-        canvas.width = bg.width;
-        canvas.height = bg.height;
-        window.redrawCertPreview();
-      });
-    });
-  };
-
-  // Load PDF
-  pdfjsLib.getDocument(url).promise.then(function(pdf) {
-    _activeCertPdfDoc = pdf;
-    renderPreview(pdf);
-  }).catch(function(err) {
-    console.warn('PDF load direct failed, trying fallback:', err.message);
-    if (url.indexOf('data:') === -1 && url.indexOf('http') === -1) {
-      pdfjsLib.getDocument(url).promise.then(function(pdf) {
-        _activeCertPdfDoc = pdf;
-        renderPreview(pdf);
-      }).catch(function(e) {
-        if (placeholder) {
-          placeholder.style.display = 'block';
-          placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(e.message) + '</p>';
-        }
-        if (canvas) canvas.style.display = 'none';
-      });
-    } else {
-      if (placeholder) {
-        placeholder.style.display = 'block';
-        placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(err.message) + '</p>';
-      }
-      if (canvas) canvas.style.display = 'none';
-    }
-  });
-};
-
-var _certHitBoxes = [];
-var _certMedalImgCache = {};
-
-// Cached loader for the medal preview image; triggers a redraw once loaded
-function getCertPreviewMedalImg(url) {
-  if (_certMedalImgCache[url]) return _certMedalImgCache[url];
-  var img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = function() { queueCertRedraw(); };
-  img.onerror = function() { console.warn('Medal preview image failed to load: ' + url); };
-  img.src = url;
-  _certMedalImgCache[url] = img;
-  return img;
-}
-
-function drawCertPlaceholdersOnCanvas(canvas, scale) {
-  var ctx = canvas.getContext('2d');
-  var w = canvas.width;
-  var h = canvas.height;
-  _certHitBoxes = [];
-  
-  document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
-    var key = row.querySelector('.cert-p-key').value.trim() || 'Placeholder';
-    var type = row.querySelector('.cert-p-type').value;
-    var customVal = row.querySelector('.cert-p-custom-val').value.trim();
-    var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
-    var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
-    var size = parseInt(row.querySelector('.cert-p-size').value) || 24;
-    var color = row.querySelector('.cert-p-color').value;
-    var weight = row.querySelector('.cert-p-weight').value;
-    var align = row.querySelector('.cert-p-align').value;
-    
-    var isChecked = row.querySelector('input[name="active-cert-placeholder"]').checked;
     
     if (type === 'medal_image') {
       var boxSize = Math.round(size * scale * 0.5);
