@@ -249,9 +249,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 </div>
 <script src="nav.js"></script>
 <script>
-  var SB_URL='https://jglvwxeaqiswpxzcofmy.supabase.co';
-  var SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
-  var HDR={apikey:SB_ANON,Authorization:'Bearer '+SB_ANON};
+  var SB_URL=SUPABASE_URL;
+  var SB_ANON=SUPABASE_ANON;
   var BACKEND=window.BACKEND_URL;
 
   authGuard();
