@@ -1469,18 +1469,6 @@ window.renderShareCard = function() {
     ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
   };
 
-  var _drawRoundedBar = function(ctx, x, y, w, h, r) {
-    if (h < 2 * r) r = h / 2;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-    ctx.fill();
-  };
-
   // Theme Configurations (Charcoal Grey, Brand Orange, Forest Green, Deep Indigo, Classic Black)
   var isDark = true;
   var bgColor = '#1a1a1a';
@@ -1488,10 +1476,7 @@ window.renderShareCard = function() {
   var textColor = '#ffffff';
   var labelColor = 'rgba(255, 255, 255, 0.55)';
   var routeColor = '#e2e8f0';
-  var barColor = 'rgba(255, 255, 255, 0.4)';
-  var logoColor = 'rgba(255, 255, 255, 0.4)';
-  var badgeBg = 'rgba(255, 255, 255, 0.1)';
-  var badgeTextCol = 'rgba(255, 255, 255, 0.8)';
+  var logoColor = '#E8622A';
   var cardBorderColor = 'rgba(255, 255, 255, 0.05)';
   
   if (window._shareThemeIndex === 1) {
@@ -1501,10 +1486,7 @@ window.renderShareCard = function() {
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.75)';
     routeColor = '#ffffff';
-    barColor = 'rgba(255, 255, 255, 0.5)';
-    logoColor = 'rgba(255, 255, 255, 0.6)';
-    badgeBg = 'rgba(255, 255, 255, 0.15)';
-    badgeTextCol = '#ffffff';
+    logoColor = '#ffffff';
     cardBorderColor = 'rgba(255, 255, 255, 0.15)';
   } else if (window._shareThemeIndex === 2) {
     // Forest Green
@@ -1513,10 +1495,7 @@ window.renderShareCard = function() {
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.55)';
     routeColor = '#e2e8f0';
-    barColor = 'rgba(255, 255, 255, 0.4)';
-    logoColor = 'rgba(255, 255, 255, 0.4)';
-    badgeBg = 'rgba(255, 255, 255, 0.1)';
-    badgeTextCol = 'rgba(255, 255, 255, 0.8)';
+    logoColor = '#E8622A';
     cardBorderColor = 'rgba(255, 255, 255, 0.05)';
   } else if (window._shareThemeIndex === 3) {
     // Deep Indigo
@@ -1525,10 +1504,7 @@ window.renderShareCard = function() {
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.55)';
     routeColor = '#e2e8f0';
-    barColor = 'rgba(255, 255, 255, 0.4)';
-    logoColor = 'rgba(255, 255, 255, 0.4)';
-    badgeBg = 'rgba(255, 255, 255, 0.1)';
-    badgeTextCol = 'rgba(255, 255, 255, 0.8)';
+    logoColor = '#E8622A';
     cardBorderColor = 'rgba(255, 255, 255, 0.05)';
   } else if (window._shareThemeIndex === 4) {
     // Classic Black
@@ -1537,10 +1513,7 @@ window.renderShareCard = function() {
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.5)';
     routeColor = '#d1d5db';
-    barColor = 'rgba(255, 255, 255, 0.3)';
-    logoColor = 'rgba(255, 255, 255, 0.3)';
-    badgeBg = 'rgba(255, 255, 255, 0.08)';
-    badgeTextCol = 'rgba(255, 255, 255, 0.7)';
+    logoColor = '#E8622A';
     cardBorderColor = 'rgba(255, 255, 255, 0.04)';
   }
 
@@ -1561,22 +1534,9 @@ window.renderShareCard = function() {
   ctx.stroke();
   ctx.restore();
   
-  // 1. Draw Tag Pill Badge
-  var badgeText = act.event_name || (act.activity_type ? act.activity_type.toUpperCase() + ' TRAINING PLAN' : 'TRAINING CHALLENGE');
-  ctx.font = "bold 13px 'Outfit', system-ui, sans-serif";
-  var textW = ctx.measureText(badgeText).width;
-  ctx.fillStyle = badgeBg;
-  _crr(ctx, 56, 56, textW + 28, 30, 15);
-  ctx.fill();
-  
-  ctx.fillStyle = badgeTextCol;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(badgeText, 70, 71);
-  
-  // 2. Draw Activity Name (left-aligned)
+  // 1. Draw Activity Name (left-aligned)
   var actName = act.activity_name || 'Activity';
-  ctx.font = "bold 28px 'Outfit', system-ui, sans-serif";
+  ctx.font = "bold 26px 'Poppins', system-ui, sans-serif";
   ctx.fillStyle = textColor;
   var maxNameW = W - 180;
   var actNameTruncated = actName;
@@ -1586,24 +1546,24 @@ window.renderShareCard = function() {
     }
     actNameTruncated += '...';
   }
-  ctx.fillText(actNameTruncated, 56, 118);
+  ctx.fillText(actNameTruncated, 56, 85);
   
-  // 3. Draw Location (left-aligned)
+  // 2. Draw Location (left-aligned)
   var locText = act.location || 'Udaipur, RJ, India';
-  ctx.font = "500 16px 'Outfit', system-ui, sans-serif";
+  ctx.font = "500 16px 'Poppins', system-ui, sans-serif";
   ctx.fillStyle = labelColor;
-  ctx.fillText(locText, 56, 152);
+  ctx.fillText(locText, 56, 120);
   
-  // 4. Draw Logo Icon (top right)
+  // 3. Draw Custom Chevron Logo (top right)
   ctx.save();
-  ctx.translate(W - 84, 56);
+  ctx.translate(W - 84, 65);
   ctx.scale(32/24, 32/24);
   ctx.fillStyle = logoColor;
-  var logoPath = new Path2D("M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.7 3.42L7 10.2v3.8c0 .55.45 1 1 1s1-.45 1-1v-2.7l1.5-.7 1.8 1.8c.38.38.9.6 1.48.6h3.22c.55 0 1-.45 1-1s-.45-1-1-1h-2.5l-1.9-1.9c-.38-.38-.9-.6-1.48-.6H11c-.55 0-1.05.25-1.21.5L9.79 8.9zm3.7 3.58l-1.3 5.4-3.7-3.3c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41l4.8 4.3c.38.38.97.45 1.42.24l3-1.2c.51-.21.81-.71.81-1.25v-5.65h-3.6z");
+  var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
   ctx.fill(logoPath);
   ctx.restore();
   
-  // 5. Draw GPS Route Line
+  // 4. Draw GPS Route Line (Smoothly drawn)
   var coords = [];
   if (act.summary_polyline) {
     try {
@@ -1613,10 +1573,10 @@ window.renderShareCard = function() {
     }
   }
   
-  var mapX = 80;
-  var mapY = 190;
-  var mapW = W - 160;
-  var mapH = H - 490;
+  var mapX = 56;
+  var mapY = 155;
+  var mapW = W - 112;
+  var mapH = H - 325;
   
   if (coords && coords.length > 0) {
     ctx.save();
@@ -1630,41 +1590,15 @@ window.renderShareCard = function() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(W/2 - 100, H/2 - 140);
-    ctx.bezierCurveTo(W/2 - 50, H/2 - 190, W/2 + 50, H/2 - 90, W/2 + 100, H/2 - 140);
+    ctx.moveTo(W/2 - 100, H/2 - 90);
+    ctx.bezierCurveTo(W/2 - 50, H/2 - 140, W/2 + 50, H/2 - 40, W/2 + 100, H/2 - 90);
     ctx.stroke();
     ctx.restore();
     ctx.font = '64px system-ui';
-    ctx.fillText('🏃', W/2, H/2 - 140);
+    ctx.fillText('🏃', W/2, H/2 - 90);
   }
   
-  // 6. Draw Split Performance Bar Chart
-  ctx.save();
-  var barCount = 38;
-  var barW = 8;
-  var gap = 4;
-  var chartH = 64;
-  var startX = 56;
-  var startY = H - 340;
-  
-  var seed = (act.distance_meters || 10000) + (act.moving_time_seconds || 3600);
-  var random = function() {
-    var x = Math.sin(seed++) * 10000;
-    return x - Math.floor(x);
-  };
-  
-  for (var b = 0; b < barCount; b++) {
-    var progress = b / barCount;
-    var wave = 0.4 + 0.6 * Math.sin(progress * Math.PI * 1.8) * Math.cos(progress * Math.PI * 3.5);
-    wave = Math.max(0.15, Math.min(1.0, wave + (random() * 0.15 - 0.075)));
-    var barH = wave * chartH;
-    
-    ctx.fillStyle = barColor;
-    _drawRoundedBar(ctx, startX + b * (barW + gap), startY + (chartH - barH), barW, barH, barW/2);
-  }
-  ctx.restore();
-  
-  // 7. Draw Stats Grid (2x3 Left-aligned layout)
+  // 5. Draw Stats Grid (Left-aligned, omitting heart rate)
   var kmVal = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
   var movingSec = act.moving_time_seconds||0;
   
@@ -1691,7 +1625,6 @@ window.renderShareCard = function() {
   var paceSec = Math.round(paceSecPerKm%60);
   var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
   
-  var hrVal = act.average_heartrate ? Math.round(act.average_heartrate) + 'bpm' : '161bpm';
   var elevVal = (act.total_elevation_gain || act.elevation_gain_meters) ? Math.round(act.total_elevation_gain || act.elevation_gain_meters) + 'm' : '19m';
   var cadVal = act.average_cadence ? Math.round(act.average_cadence) + 'spm' : '136spm';
   
@@ -1702,14 +1635,14 @@ window.renderShareCard = function() {
       { label: 'Time', value: durationStr }
     ],
     [
-      { label: 'Heart rate', value: hrVal },
       { label: 'Elevation gain', value: elevVal },
-      { label: 'Cadence', value: cadVal }
+      { label: 'Cadence', value: cadVal },
+      { label: '', value: '' }
     ]
   ];
   
   var cols = [56, W/2 - 32, W - 188];
-  var rows = [H - 180, H - 100];
+  var rows = [H - 130, H - 65];
   
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
@@ -1717,16 +1650,17 @@ window.renderShareCard = function() {
   for (var r = 0; r < 2; r++) {
     for (var c = 0; c < 3; c++) {
       var item = grid[r][c];
+      if (!item.label) continue;
       var cx = cols[c];
       var cy = rows[r];
       
       // Label
-      ctx.font = "500 14px 'Outfit', system-ui, sans-serif";
+      ctx.font = "500 14px 'Poppins', system-ui, sans-serif";
       ctx.fillStyle = labelColor;
       ctx.fillText(item.label, cx, cy - 26);
       
       // Value
-      ctx.font = "bold 28px 'Outfit', system-ui, sans-serif";
+      ctx.font = "bold 28px 'Poppins', system-ui, sans-serif";
       ctx.fillStyle = textColor;
       ctx.fillText(item.value, cx, cy);
     }
@@ -1740,11 +1674,34 @@ function drawRunningSilhouette(ctx, x, y, size, color) {
 function drawRouteOnCanvas(ctx, coords, boxX, boxY, boxW, boxH, strokeColor, strokeWidth) {
   if (!coords || coords.length === 0) return;
   
+  // Chaikin's algorithm for smooth route map drawing
+  var smoothCoords = function(pts, iterations) {
+    if (pts.length < 3) return pts;
+    var current = pts;
+    for (var iter = 0; iter < iterations; iter++) {
+      var next = [];
+      next.push(current[0]);
+      for (var i = 0; i < current.length - 1; i++) {
+        var p0 = current[i];
+        var p1 = current[i+1];
+        var q = [0.75 * p0[0] + 0.25 * p1[0], 0.75 * p0[1] + 0.25 * p1[1]];
+        var r = [0.25 * p0[0] + 0.75 * p1[0], 0.25 * p0[1] + 0.75 * p1[1]];
+        next.push(q);
+        next.push(r);
+      }
+      next.push(current[current.length - 1]);
+      current = next;
+    }
+    return current;
+  };
+  
+  var smoothed = smoothCoords(coords, 2);
+  
   let minLat = Infinity, maxLat = -Infinity;
   let minLng = Infinity, maxLng = -Infinity;
-  for (let i = 0; i < coords.length; i++) {
-    const lat = coords[i][0];
-    const lng = coords[i][1];
+  for (let i = 0; i < smoothed.length; i++) {
+    const lat = smoothed[i][0];
+    const lng = smoothed[i][1];
     if (lat < minLat) minLat = lat;
     if (lat > maxLat) maxLat = lat;
     if (lng < minLng) minLng = lng;
@@ -1771,9 +1728,9 @@ function drawRouteOnCanvas(ctx, coords, boxX, boxY, boxW, boxH, strokeColor, str
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   
-  for (let i = 0; i < coords.length; i++) {
-    const lat = coords[i][0];
-    const lng = coords[i][1];
+  for (let i = 0; i < smoothed.length; i++) {
+    const lat = smoothed[i][0];
+    const lng = smoothed[i][1];
     const px = offsetX + (lng - minLng) * scale;
     const py = offsetY + (maxLat - lat) * scale;
     
