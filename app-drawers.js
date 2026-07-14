@@ -1488,60 +1488,64 @@ window.renderShareCard = function() {
     ctx.fill();
   };
 
-  // Theme Configurations (Glassmorphic)
+  // Theme Configurations (Satin-Matte Eye-Friendly Styles)
   var isDark = true;
-  var bgColor = '#0b0f19';
-  var cardBgColor = 'rgba(15, 23, 42, 0.65)'; // Frosted Slate Glass
-  var textColor = '#ffffff';
-  var labelColor = 'rgba(255, 255, 255, 0.55)';
-  var routeColor = '#E8622A'; // Brand Orange Route
-  var logoColor = '#ffffff'; // White Logo
-  var cardBorderColor = 'rgba(255, 255, 255, 0.12)';
-  var blob1Col = 'rgba(99, 102, 241, 0.25)'; // Indigo blob
-  var blob2Col = 'rgba(232, 98, 42, 0.22)'; // Brand Orange blob
+  var bgColor = '#1e1f22'; // Deep matte slate
+  var cardBgColor = '#2b2d31'; // Soft charcoal grey
+  var textColor = '#f1f5f9'; // Soft off-white
+  var labelColor = 'rgba(255, 255, 255, 0.45)'; // Muted silver-grey labels
+  var routeColor = '#cccccc'; // Muted silver route line
+  var logoColor = 'rgba(255, 255, 255, 0.45)'; // Muted logo
+  var cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+  var blob1Col = 'rgba(255, 255, 255, 0.02)'; // Softest ambient silver glow
+  var blob2Col = 'rgba(232, 98, 42, 0.04)'; // Softest ambient brand glow
   var gridVisible = true;
   
   if (window._shareThemeIndex === 1) {
-    // Brand Orange Sunrise Theme
-    bgColor = '#7c2d12';
-    cardBgColor = 'rgba(255, 255, 255, 0.15)'; // Frosted White Glass
+    // Muted Sienna Orange
+    bgColor = '#4a1d0b';
+    cardBgColor = '#8c3b1a';
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.75)';
-    routeColor = '#ffffff';
-    cardBorderColor = 'rgba(255, 255, 255, 0.25)';
-    blob1Col = 'rgba(251, 146, 60, 0.35)'; // Vibrant peach blob
-    blob2Col = 'rgba(239, 68, 68, 0.25)'; // Red blob
+    labelColor = 'rgba(255, 255, 255, 0.65)';
+    routeColor = '#fbd5c6';
+    logoColor = 'rgba(255, 255, 255, 0.65)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.08)';
+    blob1Col = 'rgba(255, 255, 255, 0.02)';
+    blob2Col = 'rgba(255, 255, 255, 0.03)';
     gridVisible = false;
   } else if (window._shareThemeIndex === 2) {
-    // Forest Green Theme
-    bgColor = '#06170f';
-    cardBgColor = 'rgba(15, 23, 42, 0.65)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#E8622A';
-    cardBorderColor = 'rgba(255, 255, 255, 0.12)';
-    blob1Col = 'rgba(16, 185, 129, 0.25)'; // Emerald Green blob
-    blob2Col = 'rgba(232, 98, 42, 0.2)'; // Brand Orange blob
+    // Muted Sage Green
+    bgColor = '#13201a';
+    cardBgColor = '#263c32';
+    textColor = '#f1f5f9';
+    labelColor = 'rgba(255, 255, 255, 0.45)';
+    routeColor = '#d1d5db';
+    logoColor = 'rgba(255, 255, 255, 0.45)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+    blob1Col = 'rgba(255, 255, 255, 0.01)';
+    blob2Col = 'rgba(255, 255, 255, 0.02)';
   } else if (window._shareThemeIndex === 3) {
-    // Tech Indigo Theme
-    bgColor = '#0a0d1d';
-    cardBgColor = 'rgba(15, 23, 42, 0.65)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.55)';
-    routeColor = '#E8622A';
-    cardBorderColor = 'rgba(255, 255, 255, 0.12)';
-    blob1Col = 'rgba(99, 102, 241, 0.3)'; // Indigo blob
-    blob2Col = 'rgba(232, 98, 42, 0.2)'; // Brand Orange blob
+    // Muted Dusk Blue
+    bgColor = '#131622';
+    cardBgColor = '#24293e';
+    textColor = '#f1f5f9';
+    labelColor = 'rgba(255, 255, 255, 0.45)';
+    routeColor = '#d1d5db';
+    logoColor = 'rgba(255, 255, 255, 0.45)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
+    blob1Col = 'rgba(255, 255, 255, 0.01)';
+    blob2Col = 'rgba(255, 255, 255, 0.02)';
   } else if (window._shareThemeIndex === 4) {
-    // Pure Black Theme
-    bgColor = '#000000';
-    cardBgColor = 'rgba(24, 24, 27, 0.8)';
-    textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.5)';
-    routeColor = '#E8622A';
-    cardBorderColor = 'rgba(232, 98, 42, 0.25)'; // Subtle orange-glass boundary
-    blob1Col = 'rgba(232, 98, 42, 0.15)';
-    blob2Col = 'rgba(255, 255, 255, 0.05)';
+    // Minimal Satin Black
+    bgColor = '#09090b';
+    cardBgColor = '#18181b';
+    textColor = '#f1f5f9';
+    labelColor = 'rgba(255, 255, 255, 0.4)';
+    routeColor = '#b8babc';
+    logoColor = 'rgba(255, 255, 255, 0.45)';
+    cardBorderColor = 'rgba(255, 255, 255, 0.03)';
+    blob1Col = 'rgba(255, 255, 255, 0.01)';
+    blob2Col = 'rgba(255, 255, 255, 0.01)';
     gridVisible = false;
   }
 
@@ -1550,19 +1554,19 @@ window.renderShareCard = function() {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, W, H);
     
-    // Draw background glassmorphism blobs
+    // Draw extremely soft background ambient glows
     drawBlob(80, 120, 380, blob1Col);
     drawBlob(W - 80, H - 200, 420, blob2Col);
   }
   
   // Draw outer rounded card (frosted glass pane)
   ctx.save();
-  ctx.fillStyle = window._shareBgTransparent ? 'rgba(24, 24, 27, 0.85)' : cardBgColor;
+  ctx.fillStyle = window._shareBgTransparent ? 'rgba(43, 45, 49, 0.85)' : cardBgColor;
   
-  // Draw shadow on card for depth
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
-  ctx.shadowBlur = 30;
-  ctx.shadowOffsetY = 15;
+  // Draw soft, wide drop shadow on card for depth
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetY = 10;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.fill();
   ctx.restore();
@@ -1570,7 +1574,7 @@ window.renderShareCard = function() {
   // Draw card border
   ctx.save();
   ctx.strokeStyle = cardBorderColor;
-  ctx.lineWidth = 1.8;
+  ctx.lineWidth = 1.5;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.stroke();
   ctx.restore();
@@ -1582,7 +1586,7 @@ window.renderShareCard = function() {
     _crr(ctx, 24, 24, W - 48, H - 48, 36);
     ctx.clip();
     
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.01)';
     ctx.lineWidth = 1;
     for (var x = 24 + 24; x < W - 24; x += 24) {
       ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, H - 24); ctx.stroke();
