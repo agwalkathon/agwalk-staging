@@ -1983,11 +1983,11 @@ function buildRow(row, i) {
     +     (scoringMode()==='raw' ? '' : '<span class="medal-pill '+medal.cls+'">'+medal.label+'</span>')
     +   '</div>'
     +   '<div class="lb-meta">'
-    +     ''<span>🏃 '+(p.leaderboard_team||'—')+'</span>'
-    +     ''<span>👟 <strong>'+pts.distKm.toFixed(2)+' KM</strong></span>'
+    +     '<span>🏃 '+(p.leaderboard_team||'—')+'</span>'
+    +     '<span>👟 <strong>'+pts.distKm.toFixed(2)+' KM</strong></span>'
     +     (scoringMode()==='raw' ? '' :
-          '<span>? <strong>+'+pts.bonusPts+'</strong></span>'
-          + (pts.challengePts > 0 ? ''<span>🔥 <strong>+'+pts.challengePts+'</strong></span>' : ''))
+          '<span>⭐ <strong>+'+pts.bonusPts+'</strong></span>'
+          + (pts.challengePts > 0 ? '<span>🔥 <strong>+'+pts.challengePts+'</strong></span>' : ''))
     +   '</div>'
     + '</div>'
     + '<div style="text-align:right">'
