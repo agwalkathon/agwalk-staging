@@ -1,5 +1,5 @@
 // Global Configuration and State Variables
-var SUPABASE_URL = 'https://jglvwxeaqiswpxzcofmy.supabase.co';
+var SUPABASE_URL = 'https://jhdgkncpkrttvemvwukc.supabase.co';
 var BACKEND      = window.BACKEND_URL || 'https://agwalk-backend.onrender.com';
 var _currentTab  = 'dashboard';
 var _feedData    = [];
@@ -56,7 +56,7 @@ var CURRENT_ACTS = null;
 var CURRENT_DAY_BREAKDOWN = null;
 var CURRENT_ACT_BREAKDOWN = null;
 var CURRENT_GENDER = null;
-var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnbHZ3eGVhcWlzd3B4emNvZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NjI5ODEsImV4cCI6MjA5NzUzODk4MX0.ghLYJDq0LsUMtjQ0_qrSrNAkEIRdeF_Na5gT9GAjzGg';
+var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZGdrbmNwa3J0dHZlbXZ3dWtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzgyNjMsImV4cCI6MjA5NzI1NDI2M30.d7mvXOYDq5G4aqs1Mbc6HFNgTBlQk4B6ah0eahE_yZE';
 var HDR = { apikey: ANON, Authorization: 'Bearer ' + ANON };
 var currentSession = null;
 
