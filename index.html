@@ -67,6 +67,7 @@
               return 'rgba(' + rVal + ',' + gVal + ',' + bVal + ',' + alpha + ')';
             };
             document.write('<style id="sync-branding-style">' +
+              ':root { --brand: ' + b.accent_color + '; }' +
               '.login-btn { background: ' + b.accent_color + ' !important; box-shadow: 0 4px 20px ' + hexToRgba(b.accent_color, 0.28) + ' !important; }' +
               '.login-link, .login-terms a { color: ' + b.accent_color + ' !important; }' +
               '#br-app-name { color: ' + b.accent_color + ' !important; }' +
