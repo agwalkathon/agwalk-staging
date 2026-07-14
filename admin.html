@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -50,14 +50,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Arcgate Walkathon 2026</title>
+  <title>Admin Dashboard � Arcgate Walkathon 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
-    /* ─── Reset & Base ─── */
+    /* --- Reset & Base --- */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -90,7 +90,7 @@
       display: flex;
     }
 
-    /* ─── Sidebar ─── */
+    /* --- Sidebar --- */
     
     /* Sidebar styling */
     
@@ -139,7 +139,7 @@
       flex-direction: column;
     }
 
-    /* ─── Top bar ─── */
+    /* --- Top bar --- */
     .topbar {
       background: var(--card-bg);
       border-bottom: 1px solid var(--border);
@@ -187,14 +187,14 @@
     #realtime-badge.error { background: #FEF2F2; color: #DC2626; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-    /* ─── Content ─── */
+    /* --- Content --- */
     .content {
       flex: 1;
       padding: 28px 32px;
       width: 100%;
     }
 
-    /* ─── Stats Grid ─── */
+    /* --- Stats Grid --- */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -253,7 +253,7 @@
 
     .stat-bottom { display: flex; flex-direction: column; }
 
-    /* ─── Nav Cards ─── */
+    /* --- Nav Cards --- */
     .section-title {
       font-size: 12px;
       font-weight: 600;
@@ -328,7 +328,7 @@
     .badge-warning { background: #FFFBEB; color: #D97706; }
 
 
-    /* ─── Recent Activities Card ─── */
+    /* --- Recent Activities Card --- */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius-md);
@@ -373,7 +373,7 @@
     }
     .btn-ghost:hover { background: #EAECF0; color: var(--text-primary); }
 
-    /* ─── Activity Feed ─── */
+    /* --- Activity Feed --- */
     .activity-feed { padding: 8px 0; }
 
     .act-row {
@@ -462,7 +462,7 @@
     }
     .feed-state i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.3; }
 
-    /* ─── Footer ─── */
+    /* --- Footer --- */
     .site-footer {
       width: 100%;
       box-sizing: border-box;
@@ -480,7 +480,7 @@
     .site-footer a { color: var(--brand); text-decoration: none; margin-left: 14px; }
     .site-footer a:hover { text-decoration: underline; }
 
-    /* ─── Responsive ─── */
+    /* --- Responsive --- */
     @media (max-width: 1100px) {
       .stats-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -683,7 +683,7 @@
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
+<!-- -- Sidebar -- -->
                   <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
@@ -706,6 +706,7 @@
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -718,7 +719,7 @@
     <button class="sb-signout" onclick="logout()"><i class="ti ti-logout"></i><span class="sb-label">Sign out</span></button>
   </aside>
 
-<!-- ── Main ── -->
+<!-- -- Main -- -->
 <div class="main">
 
   <!-- Top bar -->
@@ -729,7 +730,7 @@
     </div>
     <div class='topbar-right' style='display:flex;align-items:center;gap:12px;'>
       
-      <span id="realtime-badge">Connecting…</span>
+      <span id="realtime-badge">Connecting�</span>
      <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button></div>
   </header>
 
@@ -745,47 +746,47 @@
       <select id="ev-select" style="padding:8px 12px; border:1px solid rgba(0,0,0,.1); border-radius:8px; font-family:inherit; font-size:13px; background:#fff; max-width:260px; width:100%;"></select>
     </div>
 
-    <!-- ── Stats ── -->
+    <!-- -- Stats -- -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-icon orange"><i class="ti ti-users"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val orange" id="s-participants">—</div>
+          <div class="stat-val orange" id="s-participants">�</div>
           <div class="stat-lbl">Participants</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon green"><i class="ti ti-run"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val green" id="s-activities">—</div>
+          <div class="stat-val green" id="s-activities">�</div>
           <div class="stat-lbl">Total activities</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon blue"><i class="ti ti-map-pin"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val blue" id="s-km">—</div>
+          <div class="stat-val blue" id="s-km">�</div>
           <div class="stat-lbl">Distance covered</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon purple"><i class="ti ti-brand-strava"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val purple" id="s-connected">—</div>
+          <div class="stat-val purple" id="s-connected">�</div>
           <div class="stat-lbl">Strava connected</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon orange"><i class="ti ti-calendar-check"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val orange" id="s-today">—</div>
+          <div class="stat-val orange" id="s-today">�</div>
           <div class="stat-lbl">Today's activities</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon red"><i class="ti ti-flag"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val red" id="s-flagged">—</div>
+          <div class="stat-val red" id="s-flagged">�</div>
           <div class="stat-lbl">Flagged</div>
         </div>
       </div>
@@ -860,7 +861,7 @@
       </div>
     </div>
 
-    <!-- ── System Health & Monitoring ── -->
+    <!-- -- System Health & Monitoring -- -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
         <div class="card-header-left">
@@ -1041,7 +1042,7 @@
 
   <!-- Footer -->
   <footer class="site-footer">
-    <span>© 2026 Arcgate Walkathon</span>
+    <span>� 2026 Arcgate Walkathon</span>
     <div>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms of Service</a>
@@ -1059,7 +1060,7 @@ function toggleQuickAccess() {
   var chev = document.getElementById('quick-access-chevron');
   var open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
-  chev.textContent = open ? '▼' : '▲';
+  chev.textContent = open ? '?' : '?';
 }
 
 const _BACKEND_URL = window.BACKEND_URL;
@@ -1084,7 +1085,7 @@ function logout() {
   window.location.href = 'admin-login.html';
 }
 
-// ── Date in topbar ──
+// -- Date in topbar --
 (function() {
   const d = new Date();
   const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
@@ -1143,7 +1144,7 @@ async function loadEmailStatus() {
         }
 
         if (d.error) {
-          document.getElementById('brevo-usage-remaining').textContent = '⚠️';
+          document.getElementById('brevo-usage-remaining').textContent = '??';
           document.getElementById('brevo-usage-plan').textContent = 'Connection Error';
           document.getElementById('brevo-usage-plan').style.background = 'rgba(211,47,47,0.2)';
           document.getElementById('brevo-usage-plan').style.color = '#d32f2f';
@@ -1157,7 +1158,7 @@ async function loadEmailStatus() {
   }
 }
 
-// ── Helpers ──
+// -- Helpers --
 function fmtDate(d) {
   if (!d) return '';
   try {
@@ -1182,7 +1183,7 @@ function fmtTime(d, startTime) {
   }
 }
 function fmtDist(m) {
-  if (!m) return '—';
+  if (!m) return '�';
   return (m / 1000).toFixed(2) + ' km';
 }
 function fmtPS(ms, t) {
@@ -1380,12 +1381,12 @@ async function updateRateLimitDashboard() {
       const ksBtn = document.getElementById('kill-switch-btn');
       if (ksBtn) {
         if (currentKillSwitchState) {
-          ksBtn.textContent = '▶️ Resume Strava API Calls';
+          ksBtn.textContent = '?? Resume Strava API Calls';
           ksBtn.style.background = 'rgba(16, 185, 129, 0.1)';
           ksBtn.style.color = '#10B981';
           ksBtn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
         } else {
-          ksBtn.textContent = '🛑 Stop Strava API Calls';
+          ksBtn.textContent = '?? Stop Strava API Calls';
           ksBtn.style.background = 'rgba(239, 68, 68, 0.1)';
           ksBtn.style.color = '#EF4444';
           ksBtn.style.border = '1px solid rgba(239, 68, 68, 0.2)';
@@ -1444,13 +1445,13 @@ async function updateRateLimitDashboard() {
           banner.style.background = 'rgba(245, 158, 11, 0.08)';
           banner.style.border = '1px solid rgba(245, 158, 11, 0.15)';
           banner.style.color = '#F59E0B';
-          icon.textContent = '⚠';
+          icon.textContent = '?';
           text.textContent = 'Strava API calls are suspended by Administrator';
         } else if (status.state === 'error') {
           banner.style.background = 'rgba(239, 68, 68, 0.08)';
           banner.style.border = '1px solid rgba(239, 68, 68, 0.15)';
           banner.style.color = '#EF4444';
-          icon.textContent = '❌';
+          icon.textContent = '?';
           
           const dateStr = status.lastErrorTime ? new Date(status.lastErrorTime).toLocaleTimeString() : '';
           text.textContent = `API Call Failed: ${status.lastError || 'Unknown error'} ${dateStr ? 'at ' + dateStr : ''}`;
@@ -1458,7 +1459,7 @@ async function updateRateLimitDashboard() {
           banner.style.background = 'rgba(16, 185, 129, 0.08)';
           banner.style.border = '1px solid rgba(16, 185, 129, 0.15)';
           banner.style.color = '#10B981';
-          icon.textContent = '✓';
+          icon.textContent = '?';
           text.textContent = 'Strava API calls are working fine';
         }
       }
@@ -1554,7 +1555,7 @@ async function checkAllSystemsHealth() {
           badge.className = 'health-status-badge badge-ok';
         }
       }
-      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : '—';
+      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : '�';
       
       const lastDown = localStorage.getItem(`health_${service}_last_down`);
       if (downEl) downEl.textContent = lastDown || 'None';
@@ -1681,7 +1682,7 @@ async function checkAllSystemsHealth() {
   updateUI('github', githubOk, latencyGithub, githubReason);
 
   // 4. Check Strava API Status via Backend
-  let stravaOk = false, stravaReason = '', queueInfo = '—';
+  let stravaOk = false, stravaReason = '', queueInfo = '�';
   const token = sessionStorage.getItem('wk_admin_token');
   if (!token) {
     stravaReason = 'Admin token missing or not logged in';
@@ -1890,7 +1891,7 @@ function renderStandardHistoryLogs(service) {
     [...logs].reverse().forEach(log => {
       const statusText = log.ok ? 'ONLINE' : 'OFFLINE';
       const statusClass = log.ok ? 'log-status-ok' : 'log-status-err';
-      const latencyText = log.latency !== null ? `${log.latency}ms` : '—';
+      const latencyText = log.latency !== null ? `${log.latency}ms` : '�';
       
       const item = document.createElement('div');
       item.className = 'log-item';
@@ -1982,7 +1983,7 @@ function getTroubleshootingHTML(service, isOffline) {
       <ul>
         <li><strong>Cold Start (Sleep Mode)</strong>: The Render free tier spins down the server after 15 minutes of inactivity. Close this modal and click <strong>"Wake Up Backend"</strong> on the backend status card. It takes about 50 seconds to boot up.</li>
         <li><strong>Local File CORS Blocker</strong>: If your browser URL starts with <code>file:///</code>, modern browsers block AJAX requests to external APIs due to security/CORS restrictions.
-          <br><em style="font-size:11px;color:#7c2d12;">👉 Fix: Run a local web server (e.g. VS Code Live Server or run <code>npx serve</code> in the folder) and open the page via <code>http://localhost</code>.</em>
+          <br><em style="font-size:11px;color:#7c2d12;">?? Fix: Run a local web server (e.g. VS Code Live Server or run <code>npx serve</code> in the folder) and open the page via <code>http://localhost</code>.</em>
         </li>
         <li><strong>Local Port CORS Mismatch</strong>: If you are using a local web server (e.g. <code>localhost:5500</code>), ensure the backend has the updated CORS configuration to allow local ports.</li>
         <li><strong>Render Service Outage</strong>: Check if the backend is down by navigating directly to <a href="${_BACKEND_URL}/" target="_blank" style="color:var(--brand);font-weight:600;text-decoration:underline;">Backend Ping URL</a> in a new tab. If it loads "Walkathon backend running", the server is online.</li>
@@ -2008,7 +2009,7 @@ function closeHealthLogsModal() {
   if (modal) modal.classList.remove('show');
 }
 
-// ── Realtime ──
+// -- Realtime --
 (function startRealtime() {
   const wsUrl = 'wss://jhdgkncpkrttvemvwukc.supabase.co/realtime/v1/websocket?vsn=1.0.0&apikey=' + SUPABASE_ANON;
   let ws, ping, ref = 0;
@@ -2058,7 +2059,7 @@ function closeHealthLogsModal() {
           }
           if (msg.event === 'postgres_changes' ||
               (msg.payload && msg.payload.data && (msg.payload.data.type === 'INSERT' || msg.payload.data.type === 'UPDATE'))) {
-            setBadge('new-act', '⚡ New activity!');
+            setBadge('new-act', '? New activity!');
             setTimeout(function() { load(); setBadge('live', 'Live'); }, 1200);
           }
         } catch(e) {}
@@ -2066,7 +2067,7 @@ function closeHealthLogsModal() {
 
       ws.onclose = function() {
         clearInterval(ping);
-        setBadge('error', 'Reconnecting…');
+        setBadge('error', 'Reconnecting�');
         setTimeout(connect, 5000);
       };
 
