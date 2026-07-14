@@ -2021,11 +2021,13 @@ async function saveEvent() {
         var family = row.querySelector('.cert-p-font').value || 'Poppins';
         var imgUrlEl = row.querySelector('.cert-p-imgurl');
         if (key) {
+          var transpEl = row.querySelector('.cert-p-transparent');
           certPlaceholders.push({
             key: key,
             type: type,
             custom_val: customVal,
             image_url: imgUrlEl ? imgUrlEl.value.trim() : '',
+            transparent_bg: transpEl ? transpEl.checked : false,
             x: x,
             y: y,
             font_size: size,
@@ -2385,6 +2387,7 @@ window.addCertPlaceholderRow = function(data) {
       '<button type="button" class="btn btn-ghost btn-xs" style="padding:6px 9px; font-size:11px;" onclick="this.nextElementSibling.click()"><i class="ti ti-upload"></i></button>' +
       '<input type="file" accept="image/*" style="display:none;" onchange="handleCertElementImageUpload(event)">' +
     '</div>' +
+    '<label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; color:#475569;"><input type="checkbox" class="cert-p-transparent"' + (p.transparent_bg ? ' checked' : '') + ' onchange="updateCertPreviewCanvas()"> Transparent background (no white cover box)</label>' +
     '<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">X (0-1)</label><input type="number" class="cert-p-x" value="' + p.x + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Y (0-1)</label><input type="number" class="cert-p-y" value="' + p.y + '" min="0" max="1" step="0.01" oninput="updateCertPreviewCanvas()"></div>' +
@@ -2778,7 +2781,9 @@ function drawCertPlaceholdersOnCanvas(canvas, scale) {
     
     var paddingX = 8;
     var isBlankPrev = document.getElementById('cert-canvas-mode') && document.getElementById('cert-canvas-mode').value === 'blank';
-    if (!isBlankPrev) {
+    var transpEl = row.querySelector('.cert-p-transparent');
+    var isTransparent = transpEl && transpEl.checked;
+    if (!isBlankPrev && !isTransparent) {
       ctx.fillStyle = _certCleanRender ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
       ctx.fillRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
     }
