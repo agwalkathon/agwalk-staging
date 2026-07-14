@@ -1476,17 +1476,33 @@ window.renderShareCard = function() {
     }
   }
   
-  var brandText = 'ARCGATE';
-  if (typeof CONFIG_LB !== 'undefined' && CONFIG_LB.display_name) {
-    brandText = CONFIG_LB.display_name.toUpperCase();
-  }
+  // Activity Name (e.g. "Evening Run")
+  var actName = act.activity_name || 'Activity';
   ctx.font = "800 24px 'Outfit', system-ui, -apple-system, sans-serif";
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.letterSpacing = '6px';
-  ctx.fillText(brandText, W/2, 60);
-  ctx.letterSpacing = '0px';
+  ctx.fillText(actName.toUpperCase(), W/2, 48);
+  
+  // Date and Time below activity name
+  var dateObj = act.activity_date ? new Date(act.activity_date) : null;
+  if (act.activity_date_time_ist) {
+    try { dateObj = new Date(act.activity_date_time_ist); } catch(e) {}
+  }
+  var dateTimeStr = '';
+  if (dateObj) {
+    var day = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    var time = '';
+    if (act.activity_date_time_ist || act.start_date_local) {
+      time = ' · ' + dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    dateTimeStr = day + time;
+  } else {
+    dateTimeStr = act.activity_date || '';
+  }
+  ctx.font = "500 13px 'Outfit', system-ui, -apple-system, sans-serif";
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(dateTimeStr, W/2, 76);
   
   var coords = [];
   if (act.summary_polyline) {
@@ -1582,49 +1598,30 @@ window.renderShareCard = function() {
       ctx.stroke();
     }
   });
+  
+  // Draw footer branding "Arcgatians App"
+  ctx.font = "600 11px 'Outfit', system-ui, -apple-system, sans-serif";
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('ARCGATIANS APP', W/2, H - 24);
+  ctx.letterSpacing = '0px';
 };
 
 function drawRunningSilhouette(ctx, x, y, size, color) {
   ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 4;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  
-  ctx.beginPath();
-  ctx.arc(x, y - size*0.35, size*0.09, 0, Math.PI*2);
+  ctx.translate(x - size/2, y - size/2);
+  var scale = size / 24;
+  ctx.scale(scale, scale);
   ctx.fillStyle = color;
-  ctx.fill();
   
-  ctx.beginPath();
-  ctx.moveTo(x - size*0.04, y - size*0.22);
-  ctx.lineTo(x + size*0.04, y - size*0.05);
-  ctx.stroke();
+  // Glowing effect on the sport flat icon
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 8;
   
-  ctx.beginPath();
-  ctx.moveTo(x - size*0.02, y - size*0.2);
-  ctx.lineTo(x + size*0.14, y - size*0.14);
-  ctx.lineTo(x + size*0.08, y - size*0.04);
-  ctx.stroke();
-  
-  ctx.beginPath();
-  ctx.moveTo(x - size*0.02, y - size*0.2);
-  ctx.lineTo(x - size*0.14, y - size*0.16);
-  ctx.lineTo(x - size*0.16, y - size*0.05);
-  ctx.stroke();
-  
-  ctx.beginPath();
-  ctx.moveTo(x + size*0.04, y - size*0.05);
-  ctx.lineTo(x - size*0.08, y + size*0.06);
-  ctx.lineTo(x - size*0.03, y + size*0.18);
-  ctx.stroke();
-  
-  ctx.beginPath();
-  ctx.moveTo(x + size*0.04, y - size*0.05);
-  ctx.lineTo(x + size*0.11, y + size*0.08);
-  ctx.lineTo(x + size*0.02, y + size*0.22);
-  ctx.stroke();
-  
+  var path = new Path2D("M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.7 3.42L7 10.2v3.8c0 .55.45 1 1 1s1-.45 1-1v-2.7l1.5-.7 1.8 1.8c.38.38.9.6 1.48.6h3.22c.55 0 1-.45 1-1s-.45-1-1-1h-2.5l-1.9-1.9c-.38-.38-.9-.6-1.48-.6H11c-.55 0-1.05.25-1.21.5L9.79 8.9zm3.7 3.58l-1.3 5.4-3.7-3.3c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41l4.8 4.3c.38.38.97.45 1.42.24l3-1.2c.51-.21.81-.71.81-1.25v-5.65h-3.6z");
+  ctx.fill(path);
   ctx.restore();
 }
 
