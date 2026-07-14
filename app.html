@@ -1339,22 +1339,90 @@
 
 
 <!-- Share Activity Sheet -->
-<div id="share-sheet" style="display:none;position:fixed;inset:0;z-index:20001;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;" onclick="hideShareSheet()">
-  <div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:540px;box-sizing:border-box;" onclick="event.stopPropagation()">
-    <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 20px;"></div>
-    <div style="text-align:center;font-size:16px;font-weight: 700;color:#fff;margin-bottom:6px;">Share Activity</div>
-    <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;">Choose a format to share or save</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <button onclick="shareActivityCard('whatsapp')" style="padding:16px 12px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:12px;color:#25D366;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:24px;">&#128241;</span>WhatsApp Card
-        <span style="font-size:10px;color:var(--muted);font-weight:600;">4:3 &middot; 900&times;675px</span>
-      </button>
-      <button onclick="shareActivityCard('story')" style="padding:16px 12px;background:rgba(232,98,42,0.1);border:1px solid rgba(232,98,42,0.25);border-radius:12px;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;">
-        <span style="font-size:24px;">&#128248;</span>Instagram Story
-        <span style="font-size:10px;color:var(--muted);font-weight:600;">9:16 &middot; 540&times;960px</span>
-      </button>
+<div id="share-sheet" style="display:none;position:fixed;inset:0;z-index:20001;background:rgba(15, 23, 42, 0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:flex-end;justify-content:center;" onclick="hideShareSheet()">
+  <div style="background:#111827;border-radius:28px 28px 0 0;border:1px solid rgba(255,255,255,0.08);border-bottom:none;padding:16px 24px 32px;width:100%;max-width:480px;box-sizing:border-box;color:#fff;font-family:'Outfit',system-ui,sans-serif;" onclick="event.stopPropagation()">
+    
+    <!-- Drag indicator / Grab handle -->
+    <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 24px;cursor:pointer;" onclick="hideShareSheet()"></div>
+    
+    <!-- Title -->
+    <div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:24px;text-align:left;">Share</div>
+    
+    <!-- Card Preview Area with custom dark checkerboard for transparency preview -->
+    <div style="display:flex;justify-content:center;align-items:center;margin-bottom:16px;position:relative;">
+      <div style="border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.5);width:280px;height:373px;background-image:radial-gradient(circle,#27272a 10%,transparent 11%),radial-gradient(circle,#27272a 10%,transparent 11%);background-size:16px 16px;background-position:0 0,8px 8px;background-color:#18181b;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;">
+        <canvas id="share-card-canvas" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
+      </div>
     </div>
-    <button onclick="hideShareSheet()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+    
+    <!-- Carousel Indicators (Dots) -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:24px;">
+      <span class="share-dot" onclick="setShareTheme(0)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:1;transition:opacity 0.2s;"></span>
+      <span class="share-dot" onclick="setShareTheme(1)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:0.3;transition:opacity 0.2s;"></span>
+      <span class="share-dot" onclick="setShareTheme(2)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:0.3;transition:opacity 0.2s;"></span>
+    </div>
+    
+    <!-- Toggle Switch Section -->
+    <style>
+      .premium-switch input:checked + span {
+        background-color: #3b82f6 !important;
+      }
+      .premium-switch span::before {
+        content: "";
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.2s;
+      }
+      .premium-switch input:checked + span::before {
+        transform: translateX(22px);
+      }
+    </style>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;background:rgba(255,255,255,0.02);padding:12px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.04);">
+      <span style="font-size:14px;font-weight:500;color:#e2e8f0;">Remove Background From Image</span>
+      <label class="premium-switch" style="position:relative;display:inline-block;width:50px;height:28px;margin:0;">
+        <input type="checkbox" id="share-bg-toggle" onchange="toggleShareBg()" style="opacity:0;width:0;height:0;">
+        <span style="position:absolute;cursor:pointer;inset:0;background-color:#334155;border-radius:34px;transition:background-color 0.2s;"></span>
+      </label>
+    </div>
+    
+    <!-- Action Header -->
+    <div style="display:flex;align-items:center;margin-bottom:20px;">
+      <span style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;margin-right:12px;">Share Via</span>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+    </div>
+    
+    <!-- Actions Grid (Copy, Download, Message, More) -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center;margin-bottom:8px;">
+      <div onclick="performShareAction('copy')" style="cursor:pointer;">
+        <div style="background:#1f2937;border-radius:16px;width:56px;height:56px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#1f2937'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e2e8f0;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </div>
+        <div style="font-size:12px;font-weight:500;color:#94a3b8;">Copy</div>
+      </div>
+      <div onclick="performShareAction('download')" style="cursor:pointer;">
+        <div style="background:#1f2937;border-radius:16px;width:56px;height:56px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#1f2937'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e2e8f0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div style="font-size:12px;font-weight:500;color:#94a3b8;">Download</div>
+      </div>
+      <div onclick="performShareAction('message')" style="cursor:pointer;">
+        <div style="background:#1f2937;border-radius:16px;width:56px;height:56px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#1f2937'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e2e8f0;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <div style="font-size:12px;font-weight:500;color:#94a3b8;">Message</div>
+      </div>
+      <div onclick="performShareAction('more')" style="cursor:pointer;">
+        <div style="background:#1f2937;border-radius:16px;width:56px;height:56px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#1f2937'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e2e8f0;"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+        </div>
+        <div style="font-size:12px;font-weight:500;color:#94a3b8;">More</div>
+      </div>
+    </div>
   </div>
 </div>
 </body>
