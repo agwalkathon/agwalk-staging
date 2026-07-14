@@ -3108,12 +3108,13 @@
 #login-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(32px,env(safe-area-inset-top)) 24px max(32px,env(safe-area-inset-bottom));position:relative;overflow:hidden}
 #login-screen::before{content:'';position:fixed;top:-160px;left:50%;transform:translateX(-50%);width:520px;height:520px;background:radial-gradient(circle,rgba(232,98,42,0.13) 0%,transparent 65%);pointer-events:none}
 .login-card{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
-.login-logo{width:min(120px,40vw);margin:0 auto 20px}
+.login-logo{width:min(120px,40vw);margin:0 auto 10px}
 .login-logo img{width:100%;height:auto;object-fit:contain}
 .login-logo .fallback{width:72px;height:72px;border-radius:20px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto}
+.login-pulse{display:block;margin:0 auto 14px;opacity:.85}
 .login-title{font-size:clamp(20px, 6.2vw, 26px);font-weight:900;text-align:center;line-height:1.2;letter-spacing:-0.5px;margin-bottom:8px;white-space:nowrap;}
-.login-sub{font-size:var(--fs-xs);color:rgba(255,255,255,0.4);text-align:center;line-height:1.5;margin-bottom:24px;max-width:280px}
-.login-glass{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:24px 20px 20px}
+.login-sub{font-size:var(--fs-xs);color:rgba(255,255,255,0.35);text-align:center;line-height:1.5;margin-bottom:26px;max-width:280px}
+.login-glass{width:100%;background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:26px 22px 22px;box-shadow:0 20px 44px -20px rgba(0,0,0,.55)}
 .login-field-label{display:block;font-size:var(--fs-xs);font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px}
 .login-field{width:100%;padding:13px 15px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:11px;color:#fff;font-size:var(--fs-md);font-weight:500;font-family:inherit;margin-bottom:0;outline:none;transition:border-color .15s}
 .login-field:focus{border-color:rgba(232,98,42,0.6)}
