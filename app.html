@@ -1355,11 +1355,27 @@
       </div>
     </div>
     
-    <!-- Carousel Indicators (Dots) -->
-    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:24px;">
-      <span class="share-dot" onclick="setShareTheme(0)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:1;transition:opacity 0.2s;"></span>
-      <span class="share-dot" onclick="setShareTheme(1)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:0.3;transition:opacity 0.2s;"></span>
-      <span class="share-dot" onclick="setShareTheme(2)" style="width:6px;height:6px;border-radius:50%;background:#fff;cursor:pointer;opacity:0.3;transition:opacity 0.2s;"></span>
+    <!-- Background Options Selector -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;text-align:left;">Card Background</div>
+      <div style="display:flex;gap:14px;align-items:center;justify-content:flex-start;">
+        <!-- Theme 0: Classic Dark -->
+        <button onclick="setShareTheme(0)" id="theme-btn-0" style="width:36px;height:36px;border-radius:50%;background:#111827;border:2px solid #3b82f6;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;outline:none;position:relative;">
+          <span style="color:#fff;font-size:12px;font-weight:bold;">✓</span>
+        </button>
+        <!-- Theme 1: Brand Orange -->
+        <button onclick="setShareTheme(1)" id="theme-btn-1" style="width:36px;height:36px;border-radius:50%;background:#E8622A;border:2px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;outline:none;position:relative;">
+          <span style="color:#fff;font-size:12px;font-weight:bold;display:none;">✓</span>
+        </button>
+        <!-- Theme 2: Pure White -->
+        <button onclick="setShareTheme(2)" id="theme-btn-2" style="width:36px;height:36px;border-radius:50%;background:#ffffff;border:2px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;outline:none;position:relative;">
+          <span style="color:#111827;font-size:12px;font-weight:bold;display:none;">✓</span>
+        </button>
+        <!-- Theme 3: Charcoal Grid -->
+        <button onclick="setShareTheme(3)" id="theme-btn-3" style="width:36px;height:36px;border-radius:50%;background:#1e293b;border:2px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;outline:none;position:relative;">
+          <span style="color:#fff;font-size:12px;font-weight:bold;display:none;">✓</span>
+        </button>
+      </div>
     </div>
     
     <!-- Toggle Switch Section -->
