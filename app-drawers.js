@@ -1641,7 +1641,7 @@ window.renderShareCard = function() {
   ctx.translate(W - 90, 78); // Right corner aligned at x = 510, y = 78
   ctx.scale(26/24, 26/24);
   ctx.fillStyle = logoColor;
-  var logoPath = new Path2D("M12 3.5L22.5 14L18.5 18L12 11.5L5.5 18L1.5 14Z");
+  var logoPath = new Path2D("M10 2L14 2L23 22L19 22L12 6.5L5 22L1 22Z");
   ctx.fill(logoPath);
   ctx.restore();
   
