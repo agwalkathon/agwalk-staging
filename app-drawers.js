@@ -1495,7 +1495,7 @@ window.renderShareCard = function() {
   var textColor = '#ffffff'; // Crisp white values
   var labelColor = 'rgba(255, 255, 255, 0.55)'; // Semi-transparent white labels
   var routeColor = '#E8622A'; // Brand Orange Route Core
-  var logoColor = '#E8622A'; // Original Brand Orange Logo in top right
+  var logoColor = '#ffffff'; // Inverted white logo (white filter!)
   var blob1Col = 'rgba(99, 102, 241, 0.32)'; // Vivid Indigo ambient glow
   var blob2Col = 'rgba(232, 98, 42, 0.32)'; // Vivid Brand Orange ambient glow
   var gridVisible = true;
@@ -1506,7 +1506,7 @@ window.renderShareCard = function() {
     textColor = '#ffffff';
     labelColor = 'rgba(255, 255, 255, 0.75)';
     routeColor = '#7c2d12'; // Dark terracotta core
-    logoColor = '#ffffff'; // White logo for orange contrast
+    logoColor = '#ffffff';
     blob1Col = 'rgba(251, 146, 60, 0.4)';
     blob2Col = 'rgba(239, 68, 68, 0.3)';
     gridVisible = false;
@@ -1530,7 +1530,7 @@ window.renderShareCard = function() {
     // Frosted Obsidian Black
     cardBgColor = 'rgba(255, 255, 255, 0.03)';
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.5)';
+    labelColor = 'rgba(255, 255, 255, 0.55)';
     routeColor = '#E8622A';
     blob1Col = 'rgba(232, 98, 42, 0.25)';
     blob2Col = 'rgba(255, 255, 255, 0.02)';
@@ -1618,7 +1618,7 @@ window.renderShareCard = function() {
   
   // 1. Draw Activity Name (left-aligned)
   var actName = act.activity_name || 'Activity';
-  ctx.font = "bold 23px 'Poppins', system-ui, sans-serif"; // Slightly smaller white text (26px -> 23px)
+  ctx.font = "bold 23px 'Poppins', system-ui, sans-serif"; // Slightly smaller white text
   ctx.fillStyle = textColor;
   var maxNameW = W - 200;
   var actNameTruncated = actName;
@@ -1632,11 +1632,11 @@ window.renderShareCard = function() {
   
   // 2. Draw Location (left-aligned)
   var locText = act.location || 'Udaipur, RJ, India';
-  ctx.font = "500 14px 'Poppins', system-ui, sans-serif"; // Slightly smaller gray text (16px -> 14px)
+  ctx.font = "500 14px 'Poppins', system-ui, sans-serif"; // Slightly smaller gray text
   ctx.fillStyle = labelColor;
   ctx.fillText(locText, 56, 126);
   
-  // 3. Draw Original Brand Orange Logo in Right Top Corner
+  // 3. Draw Inverted White Logo in Right Top Corner (show in white filter!)
   ctx.save();
   ctx.translate(W - 90, 78); // Right corner aligned at x = 510, y = 78
   ctx.scale(26/24, 26/24);
@@ -1645,7 +1645,22 @@ window.renderShareCard = function() {
   ctx.fill(logoPath);
   ctx.restore();
   
-  // 4. Draw GPS Route Line (Smoothly drawn)
+  // 4. Map in Card Format (Enclosed in a beautiful rounded glass card container)
+  var mapX = 40;
+  var mapY = 160;
+  var mapW = W - 80;
+  var mapH = H - 210 - 160 - 20; // 676px tall
+  
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  _crr(ctx, mapX, mapY, mapW, mapH, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+  
+  // Draw GPS Route inside the Map Card
   var coords = [];
   if (act.summary_polyline) {
     try {
@@ -1655,14 +1670,15 @@ window.renderShareCard = function() {
     }
   }
   
-  var mapX = 56;
-  var mapY = 165;
-  var mapW = W - 112;
-  var mapH = H - 345;
+  var innerMapX = mapX + 16;
+  var innerMapY = mapY + 16;
+  var innerMapW = mapW - 32;
+  var innerMapH = mapH - 32;
+  
   if (coords && coords.length > 0) {
     ctx.save();
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, 'rgba(255, 255, 255, 0.95)', 6.5);
-    drawRouteOnCanvas(ctx, coords, mapX, mapY, mapW, mapH, routeColor, 2.2);
+    drawRouteOnCanvas(ctx, coords, innerMapX, innerMapY, innerMapW, innerMapH, 'rgba(255, 255, 255, 0.95)', 6.5);
+    drawRouteOnCanvas(ctx, coords, innerMapX, innerMapY, innerMapW, innerMapH, routeColor, 2.2);
     ctx.restore();
   } else {
     ctx.save();
@@ -1679,7 +1695,22 @@ window.renderShareCard = function() {
     ctx.fillText('🏃', W/2, H/2 - 90);
   }
   
-  // 5. Draw Stats Grid (Left-aligned, omitting heart rate)
+  // 5. Stats in Card Format (Enclosed in a beautiful rounded glass card container)
+  var statsCardX = 40;
+  var statsCardY = H - 210;
+  var statsCardW = W - 80;
+  var statsCardH = 170;
+  
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  _crr(ctx, statsCardX, statsCardY, statsCardW, statsCardH, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+  
+  // Compile stats depending on Sport Type and Heart Rate availability
   var kmVal = parseFloat(((act.distance_meters||0)/1000).toFixed(2));
   var movingSec = act.moving_time_seconds||0;
   
@@ -1701,50 +1732,79 @@ window.renderShareCard = function() {
     durationStr = fHrs > 0 ? fHrs + ':' + (fMins<10?'0':'') + fMins + ':00' : fMins + ':00';
   }
   
-  var paceSecPerKm = kmVal>0 ? movingSec/kmVal : 0;
-  var paceMin = Math.floor(paceSecPerKm/60);
-  var paceSec = Math.round(paceSecPerKm%60);
-  var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
+  var sportType = (act.sport_type || act.type || 'walk').toLowerCase();
+  var isRide = sportType === 'ride' || sportType === 'virtualride' || sportType === 'cycling';
   
   var elevVal = (act.total_elevation_gain || act.elevation_gain_meters) ? Math.round(act.total_elevation_gain || act.elevation_gain_meters) + 'm' : '19m';
-  var cadVal = act.average_cadence ? Math.round(act.average_cadence) + 'spm' : '136spm';
+  var hrVal = act.average_heartrate || act.avg_hr;
   
-  var grid = [
-    [
-      { label: 'Distance', value: kmVal.toFixed(2) + 'km' },
-      { label: 'Pace', value: paceStr },
-      { label: 'Time', value: durationStr }
-    ],
-    [
-      { label: 'Elevation gain', value: elevVal },
-      { label: 'Cadence', value: cadVal },
-      { label: '', value: '' }
-    ]
-  ];
+  var items = [];
+  if (isRide) {
+    // Ride stats: Speed, Time, Elevation, Distance + HR (if available)
+    items.push({ label: 'Distance', value: kmVal.toFixed(2) + 'km' });
+    var speedVal = movingSec > 0 ? (kmVal / (movingSec / 3600)) : 0;
+    items.push({ label: 'Speed', value: speedVal.toFixed(1) + ' km/h' });
+    items.push({ label: 'Time', value: durationStr });
+    items.push({ label: 'Elevation', value: elevVal });
+    if (hrVal) {
+      items.push({ label: 'Heart rate', value: Math.round(hrVal) + 'bpm' });
+    }
+  } else {
+    // Walk/Run stats: Distance, Pace, Time, Steps, Cadence, Elevation + HR (if available)
+    var paceSecPerKm = kmVal>0 ? movingSec/kmVal : 0;
+    var paceMin = Math.floor(paceSecPerKm/60);
+    var paceSec = Math.round(paceSecPerKm%60);
+    var paceStr = kmVal>0 ? paceMin+':'+(paceSec<10?'0':'')+paceSec+'/km' : '--';
+    
+    var stepsCount = act.steps || act.strava_steps || Math.round(kmVal * 1350);
+    var cadVal = act.average_cadence ? Math.round(act.average_cadence) + 'spm' : '136spm';
+    
+    items.push({ label: 'Distance', value: kmVal.toFixed(2) + 'km' });
+    items.push({ label: 'Pace', value: paceStr });
+    items.push({ label: 'Time', value: durationStr });
+    items.push({ label: 'Steps', value: Math.round(stepsCount).toLocaleString('en-IN') });
+    items.push({ label: 'Cadence', value: cadVal });
+    items.push({ label: 'Elevation', value: elevVal });
+    if (hrVal) {
+      items.push({ label: 'Heart rate', value: Math.round(hrVal) + 'bpm' });
+    }
+  }
   
-  var cols = [56, W/2 - 32, W - 188];
-  var rows = [H - 130, H - 65];
+  // Arrange grid columns dynamically depending on item counts
+  var numCols = 3;
+  if (items.length <= 4) {
+    numCols = 2;
+  } else if (items.length >= 7) {
+    numCols = 4;
+  }
+  
+  var colW = (statsCardW - 40) / numCols;
+  var cols = [];
+  for (var i = 0; i < numCols; i++) {
+    cols.push(statsCardX + 24 + i * colW);
+  }
+  
+  var rows = [statsCardY + 50, statsCardY + 120];
   
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   
-  for (var r = 0; r < 2; r++) {
-    for (var c = 0; c < 3; c++) {
-      var item = grid[r][c];
-      if (!item.label) continue;
-      var cx = cols[c];
-      var cy = rows[r];
-      
-      // Label (Slightly smaller text size)
-      ctx.font = "500 12px 'Poppins', system-ui, sans-serif";
-      ctx.fillStyle = labelColor;
-      ctx.fillText(item.label, cx, cy - 26);
-      
-      // Value (Slightly smaller text size)
-      ctx.font = "bold 25px 'Poppins', system-ui, sans-serif";
-      ctx.fillStyle = textColor;
-      ctx.fillText(item.value, cx, cy);
-    }
+  for (var idx = 0; idx < items.length; idx++) {
+    var r = Math.floor(idx / numCols);
+    var c = idx % numCols;
+    var item = items[idx];
+    var cx = cols[c];
+    var cy = rows[r];
+    
+    // Label
+    ctx.font = "500 12px 'Poppins', system-ui, sans-serif";
+    ctx.fillStyle = labelColor;
+    ctx.fillText(item.label, cx, cy - 26);
+    
+    // Value
+    ctx.font = "bold 23px 'Poppins', system-ui, sans-serif";
+    ctx.fillStyle = textColor;
+    ctx.fillText(item.value, cx, cy);
   }
 };
 
