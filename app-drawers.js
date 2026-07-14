@@ -1488,93 +1488,110 @@ window.renderShareCard = function() {
     ctx.fill();
   };
 
-  // Theme Configurations (Satin-Matte Eye-Friendly Styles)
+  // Theme Configurations (Frosted Glassmorphic & Card Styles)
   var isDark = true;
-  var bgColor = '#1e1f22'; // Deep matte slate
-  var cardBgColor = '#2b2d31'; // Soft charcoal grey
-  var textColor = '#f1f5f9'; // Soft off-white
-  var labelColor = 'rgba(255, 255, 255, 0.45)'; // Muted silver-grey labels
-  var routeColor = '#cccccc'; // Muted silver route line
-  var logoColor = 'rgba(255, 255, 255, 0.45)'; // Muted logo
-  var cardBorderColor = 'rgba(255, 255, 255, 0.04)';
-  var blob1Col = 'rgba(255, 255, 255, 0.02)'; // Softest ambient silver glow
-  var blob2Col = 'rgba(232, 98, 42, 0.04)'; // Softest ambient brand glow
+  var cardBgColor = 'rgba(30, 41, 59, 0.45)'; // Frosted Slate Glass
+  var textColor = '#ffffff'; // Crisp white values
+  var labelColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white labels
+  var routeColor = '#E8622A'; // Brand Orange Route
+  var logoColor = '#ffffff'; // Inverted white logo
+  var blob1Col = 'rgba(99, 102, 241, 0.16)'; // Indigo ambient glow
+  var blob2Col = 'rgba(232, 98, 42, 0.14)'; // Brand Orange ambient glow
   var gridVisible = true;
   
   if (window._shareThemeIndex === 1) {
-    // Muted Sienna Orange
-    bgColor = '#4a1d0b';
-    cardBgColor = '#8c3b1a';
+    // Frosted Terracotta Sunrise
+    cardBgColor = 'rgba(255, 255, 255, 0.15)'; // Frosted White Glass
     textColor = '#ffffff';
-    labelColor = 'rgba(255, 255, 255, 0.65)';
-    routeColor = '#fbd5c6';
-    logoColor = 'rgba(255, 255, 255, 0.65)';
-    cardBorderColor = 'rgba(255, 255, 255, 0.08)';
-    blob1Col = 'rgba(255, 255, 255, 0.02)';
-    blob2Col = 'rgba(255, 255, 255, 0.03)';
+    labelColor = 'rgba(255, 255, 255, 0.7)';
+    routeColor = '#ffffff';
+    blob1Col = 'rgba(251, 146, 60, 0.22)';
+    blob2Col = 'rgba(239, 68, 68, 0.16)';
     gridVisible = false;
   } else if (window._shareThemeIndex === 2) {
-    // Muted Sage Green
-    bgColor = '#13201a';
-    cardBgColor = '#263c32';
-    textColor = '#f1f5f9';
-    labelColor = 'rgba(255, 255, 255, 0.45)';
-    routeColor = '#d1d5db';
-    logoColor = 'rgba(255, 255, 255, 0.45)';
-    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
-    blob1Col = 'rgba(255, 255, 255, 0.01)';
-    blob2Col = 'rgba(255, 255, 255, 0.02)';
+    // Frosted Emerald Jade
+    cardBgColor = 'rgba(16, 26, 21, 0.5)';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.5)';
+    routeColor = '#E8622A';
+    blob1Col = 'rgba(16, 185, 129, 0.18)';
+    blob2Col = 'rgba(232, 98, 42, 0.1)';
   } else if (window._shareThemeIndex === 3) {
-    // Muted Dusk Blue
-    bgColor = '#131622';
-    cardBgColor = '#24293e';
-    textColor = '#f1f5f9';
-    labelColor = 'rgba(255, 255, 255, 0.45)';
-    routeColor = '#d1d5db';
-    logoColor = 'rgba(255, 255, 255, 0.45)';
-    cardBorderColor = 'rgba(255, 255, 255, 0.04)';
-    blob1Col = 'rgba(255, 255, 255, 0.01)';
-    blob2Col = 'rgba(255, 255, 255, 0.02)';
+    // Frosted Tech Indigo
+    cardBgColor = 'rgba(17, 24, 39, 0.55)';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.5)';
+    routeColor = '#E8622A';
+    blob1Col = 'rgba(99, 102, 241, 0.22)';
+    blob2Col = 'rgba(232, 98, 42, 0.12)';
   } else if (window._shareThemeIndex === 4) {
-    // Minimal Satin Black
-    bgColor = '#09090b';
-    cardBgColor = '#18181b';
-    textColor = '#f1f5f9';
-    labelColor = 'rgba(255, 255, 255, 0.4)';
-    routeColor = '#b8babc';
-    logoColor = 'rgba(255, 255, 255, 0.45)';
-    cardBorderColor = 'rgba(255, 255, 255, 0.03)';
-    blob1Col = 'rgba(255, 255, 255, 0.01)';
-    blob2Col = 'rgba(255, 255, 255, 0.01)';
+    // Frosted Obsidian Black
+    cardBgColor = 'rgba(15, 15, 18, 0.78)';
+    textColor = '#ffffff';
+    labelColor = 'rgba(255, 255, 255, 0.45)';
+    routeColor = '#E8622A';
+    blob1Col = 'rgba(232, 98, 42, 0.14)';
+    blob2Col = 'rgba(255, 255, 255, 0.02)';
     gridVisible = false;
   }
 
   if (!window._shareBgTransparent) {
-    // Draw background color
-    ctx.fillStyle = bgColor;
+    // Draw background linear gradient
+    var bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    if (window._shareThemeIndex === 1) {
+      bgGrad.addColorStop(0, '#3f1b0d');
+      bgGrad.addColorStop(1, '#63270e');
+    } else if (window._shareThemeIndex === 2) {
+      bgGrad.addColorStop(0, '#05120c');
+      bgGrad.addColorStop(1, '#122419');
+    } else if (window._shareThemeIndex === 3) {
+      bgGrad.addColorStop(0, '#050814');
+      bgGrad.addColorStop(1, '#11162d');
+    } else if (window._shareThemeIndex === 4) {
+      bgGrad.addColorStop(0, '#050507');
+      bgGrad.addColorStop(1, '#111115');
+    } else {
+      bgGrad.addColorStop(0, '#0d0e12');
+      bgGrad.addColorStop(1, '#1e2029');
+    }
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
     
-    // Draw extremely soft background ambient glows
-    drawBlob(80, 120, 380, blob1Col);
-    drawBlob(W - 80, H - 200, 420, blob2Col);
+    // Draw ambient background glassmorphism glows
+    drawBlob(60, 100, 420, blob1Col);
+    drawBlob(W - 60, H - 180, 460, blob2Col);
   }
   
   // Draw outer rounded card (frosted glass pane)
   ctx.save();
-  ctx.fillStyle = window._shareBgTransparent ? 'rgba(43, 45, 49, 0.85)' : cardBgColor;
+  ctx.fillStyle = window._shareBgTransparent ? 'rgba(30, 41, 59, 0.85)' : cardBgColor;
   
-  // Draw soft, wide drop shadow on card for depth
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 10;
+  // Draw premium soft, wide drop shadow on card for depth
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+  ctx.shadowBlur = 32;
+  ctx.shadowOffsetY = 15;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.fill();
   ctx.restore();
   
-  // Draw card border
+  // Draw card border (Linear gradient glass edge highlight)
   ctx.save();
-  ctx.strokeStyle = cardBorderColor;
-  ctx.lineWidth = 1.5;
+  var borderGrad = ctx.createLinearGradient(24, 24, W - 24, H - 24);
+  if (window._shareThemeIndex === 4) {
+    borderGrad.addColorStop(0, 'rgba(232, 98, 42, 0.28)');
+    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
+    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+  } else if (window._shareThemeIndex === 1) {
+    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.04)');
+  } else {
+    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)');
+    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+  }
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth = 1.8;
   _crr(ctx, 24, 24, W - 48, H - 48, 36);
   ctx.stroke();
   ctx.restore();
