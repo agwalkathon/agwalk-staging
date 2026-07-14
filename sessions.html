@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -50,7 +50,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Participant Sessions â€” Arcgate Celebrate</title>
+  <title>Participant Sessions — Arcgate Celebrate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -225,6 +225,7 @@
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item active"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -588,7 +589,7 @@
         var activeStr = formatIST(s.last_active_at);
 
         // Session Duration
-        var durStr = 'â€”';
+        var durStr = '—';
         if (s.login_at) {
           var start = new Date(s.login_at).getTime();
           var end = s.logout_at ? new Date(s.logout_at).getTime() : new Date(s.last_active_at).getTime();
@@ -617,7 +618,7 @@
           + '<td>' + durStr + '</td>'
           + '<td>' + activeStr + '</td>'
           + '<td><span class="ip-text">' + esc(s.ip_address) + '</span></td>'
-          + '<td><span class="ua-text" title="' + esc(s.device_uuid) + '">' + esc(s.device_uuid.substring(0, 10)) + 'â€¦</span></td>'
+          + '<td><span class="ua-text" title="' + esc(s.device_uuid) + '">' + esc(s.device_uuid.substring(0, 10)) + '…</span></td>'
           + '</tr>';
       });
 
@@ -625,13 +626,13 @@
     }
 
     function formatIST(isoStr) {
-      if (!isoStr) return 'â€”';
+      if (!isoStr) return '—';
       try {
         var d = new Date(isoStr);
-        if (isNaN(d.getTime())) return 'â€”';
+        if (isNaN(d.getTime())) return '—';
         return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) + ' | ' + d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
       } catch(e) {
-        return 'â€”';
+        return '—';
       }
     }
 
