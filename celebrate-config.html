@@ -55,7 +55,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
-<title>Celebrate — Arcgate Admin</title>
+<title>Celebrate â€” Arcgate Admin</title>
 <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--radius-sm:8px;--radius-md:14px;--font:'Poppins',-apple-system,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -215,11 +215,11 @@ input[type=checkbox].sw:checked::after{left:21px}
 <div class="panel active" id="panel-moderation">
   <div class="card">
     <div class="subhead">Pending Posts</div>
-    <div id="pending-posts"><div class="empty">Loading…</div></div>
+    <div id="pending-posts"><div class="empty">Loadingâ€¦</div></div>
   </div>
   <div class="card">
     <div class="subhead">Pending Wishes</div>
-    <div id="pending-wishes"><div class="empty">Loading…</div></div>
+    <div id="pending-wishes"><div class="empty">Loadingâ€¦</div></div>
   </div>
 </div>
 
@@ -249,7 +249,7 @@ input[type=checkbox].sw:checked::after{left:21px}
   <div class="card">
     <div class="subhead">Post an Announcement ??</div>
     <div class="fld" style="margin-bottom:10px"><label>Title</label><input id="an-title" maxlength="120" placeholder="Happy Diwali to the Arcgate family! ??"></div>
-    <div class="fld" style="margin-bottom:10px"><label>Message (optional)</label><input id="an-msg" maxlength="2000" placeholder="Wishing everyone light, joy and prosperity…"></div>
+    <div class="fld" style="margin-bottom:10px"><label>Message (optional)</label><input id="an-msg" maxlength="2000" placeholder="Wishing everyone light, joy and prosperityâ€¦"></div>
     <div class="row-end"><span style="color:#DC2626;font-size:12.5px;margin-right:auto" id="an-err"></span><span class="saved-msg" id="saved-announce">? Posted to feed</span><button class="btn btn-primary btn-sm" id="btn-announce">Post Announcement</button></div>
   </div>
 </div>
@@ -260,15 +260,15 @@ input[type=checkbox].sw:checked::after{left:21px}
     <div class="subhead">Channels</div>
     <div class="toggle-row"><div><div class="t-lbl">In-app notifications</div><div class="t-sub">Bell icon inside the employee app</div></div><input type="checkbox" class="sw" id="nt-inapp"></div>
     <div class="toggle-row"><div><div class="t-lbl">Push notifications</div><div class="t-sub">Browser/PWA push (uses existing VAPID setup)</div></div><input type="checkbox" class="sw" id="nt-push"></div>
-    <div class="toggle-row"><div><div class="t-lbl">WhatsApp <span class="pill off">Scope — not connected</span></div><div class="t-sub">Requires WhatsApp Business API below</div></div><input type="checkbox" class="sw" id="nt-wa"></div>
+    <div class="toggle-row"><div><div class="t-lbl">WhatsApp <span class="pill off">Scope â€” not connected</span></div><div class="t-sub">Requires WhatsApp Business API below</div></div><input type="checkbox" class="sw" id="nt-wa"></div>
     <div class="row-end"><span class="saved-msg" id="saved-channels">? Saved</span><button class="btn btn-primary btn-sm" data-save="channels">Save Channels</button></div>
   </div>
   <div class="card">
-    <div class="subhead">WhatsApp Business API — Scope</div>
+    <div class="subhead">WhatsApp Business API â€” Scope</div>
     <div class="scope-note">Placeholder configuration. WhatsApp requires pre-approved message templates; map their names here once your provider account is ready.</div>
     <div class="grid">
       <div class="fld"><label>Provider</label><select id="wa-provider"><option value="meta">Meta Cloud API</option><option value="twilio">Twilio</option><option value="gupshup">Gupshup</option></select></div>
-      <div class="fld"><label>API Key / Token</label><input id="wa-key" type="password" placeholder="••••••••"></div>
+      <div class="fld"><label>API Key / Token</label><input id="wa-key" type="password" placeholder="Â•Â•Â•Â•Â•Â•Â•Â•"></div>
       <div class="fld"><label>Phone Number ID</label><input id="wa-phone" placeholder="1234567890"></div>
       <div class="fld"><label>Birthday template name</label><input id="wa-tpl-bday" placeholder="birthday_wish_v1"></div>
       <div class="fld"><label>Approval template name</label><input id="wa-tpl-approve" placeholder="post_approved_v1"></div>
@@ -391,7 +391,7 @@ function renderPending(boxId,items,kind){
     body.appendChild(t);
     if(kind==='post'&&it.message){var m=document.createElement('div');m.className='mod-msg';m.textContent=it.message;body.appendChild(m);}
     var meta=document.createElement('div');meta.className='mod-meta';
-    meta.textContent='By '+((it.employee&&it.employee.full_name)||it.emp_code||'?')+((it.employee&&it.employee.department)?' · '+it.employee.department:'')+' · '+String(it.created_at||'').slice(0,16).replace('T',' ');
+    meta.textContent='By '+((it.employee&&it.employee.full_name)||it.emp_code||'?')+((it.employee&&it.employee.department)?' Â· '+it.employee.department:'')+' Â· '+String(it.created_at||'').slice(0,16).replace('T',' ');
     body.appendChild(meta);
     var acts=document.createElement('div');acts.className='mod-actions';
     var ap=document.createElement('button');ap.className='btn btn-green btn-sm';ap.textContent='? Approve';
