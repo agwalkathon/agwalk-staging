@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Events — Arcgate Walkathon</title>
+  <title>Events â€” Arcgate Walkathon</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -262,7 +262,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
         <div id="banner-preview-wrap" style="margin-top: 8px; display: none; align-items: center; gap: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px 12px; width: fit-content;">
           <span style="font-size: 11px; font-weight: 600; color: #64748b;">Preview:</span>
           <img id="banner-preview-img" src="" style="max-height: 60px; width: auto; border-radius: 4px;">
-          <button type="button" id="btn-banner-filter" onclick="toggleBannerFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">⬛→⬜ Invert</button>
+          <button type="button" id="btn-banner-filter" onclick="toggleBannerFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">â¬›â†’â¬œ Invert</button>
           <button type="button" class="btn btn-ghost btn-xs" onclick="clearBannerPreview()" style="color: #ef4444; padding: 2px 6px; font-size: 10px; border: 1px solid #fecaca; background: #fef2f2; cursor: pointer; border-radius: 4px;">Remove</button>
         </div>
       </div>
@@ -276,9 +276,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="grid" style="margin-bottom:14px">
       <div class="fld"><label>Tracking Mode</label>
         <select id="f-tracking">
-          <option value="strava" selected>Strava — auto-fetch activities via API</option>
-          <option value="manual">Manual — organizers enter results (cricket, quiz…)</option>
-          <option value="none">None — no leaderboard, participation only</option>
+          <option value="strava" selected>Strava â€” auto-fetch activities via API</option>
+          <option value="manual">Manual â€” organizers enter results (cricket, quizâ€¦)</option>
+          <option value="none">None â€” no leaderboard, participation only</option>
         </select>
       </div>
       <div class="fld" id="wrap-fetch-start"><label>Fetch Data From <span style="font-weight:400;text-transform:none">(blank = event start)</span></label><input type="date" id="f-fetch-start"></div>
@@ -288,7 +288,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="chips" id="sport-chips"></div>
   </div>
 
-  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">📋 Manual events don't track Strava activity — no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
+  <div id="manual-event-note" class="scope-note" style="display:none;margin-bottom:14px; background: #FFFBEB; color: #B45309; padding: 12px; border-radius: 8px; border: 1px solid #FDE68A;">ðŸ“‹ Manual events don't track Strava activity â€” no dashboard, scoring, or leaderboard needed. This event will only appear as an announcement card with registration.</div>
 
   </div>
 
@@ -312,9 +312,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div class="grid" style="margin-bottom:14px" id="scoring-grid">
       <div class="fld"><label>Scoring Mode</label>
         <select id="f-smode">
-          <option value="raw">Raw Metric — rank by total directly, no points</option>
-          <option value="single_metric" selected>Single Metric → Points (walkathon style)</option>
-          <option value="composite">Composite — points from multiple metrics</option>
+          <option value="raw">Raw Metric â€” rank by total directly, no points</option>
+          <option value="single_metric" selected>Single Metric â†’ Points (walkathon style)</option>
+          <option value="composite">Composite â€” points from multiple metrics</option>
         </select>
       </div>
       <div class="fld" id="wrap-metric"><label>Primary Metric</label>
@@ -375,9 +375,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     <div style="display:flex; flex-direction:column; gap:16px;">
       <!-- Gold Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Male Goal)</label><input type="number" id="gold-male" value="300" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">🥇 Gold (Female Goal)</label><input type="number" id="gold-female" value="250" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥇 Gold Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">ðŸ¥‡ Gold (Male Goal)</label><input type="number" id="gold-male" value="300" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#d97706;">ðŸ¥‡ Gold (Female Goal)</label><input type="number" id="gold-female" value="250" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥‡ Gold Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="gold-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('gold-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -388,9 +388,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <!-- Silver Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Male Goal)</label><input type="number" id="silver-male" value="200" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">🥈 Silver (Female Goal)</label><input type="number" id="silver-female" value="150" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥈 Silver Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">ðŸ¥ˆ Silver (Male Goal)</label><input type="number" id="silver-male" value="200" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#4b5563;">ðŸ¥ˆ Silver (Female Goal)</label><input type="number" id="silver-female" value="150" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥ˆ Silver Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="silver-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('silver-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -401,9 +401,9 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
       <!-- Bronze Medal Row -->
       <div style="background:#fff; border:1px solid #edf0f5; border-radius:8px; padding:12px; display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; align-items:center;">
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Male Goal)</label><input type="number" id="bronze-male" value="125" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">🥉 Bronze (Female Goal)</label><input type="number" id="bronze-female" value="100" style="padding:6px 10px;font-size:13px;width:100%;"></div>
-        <div class="fld" style="margin:0;"><label style="font-size:11px;">🥉 Bronze Badge Image</label>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">ðŸ¥‰ Bronze (Male Goal)</label><input type="number" id="bronze-male" value="125" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;font-weight:700;color:#b45309;">ðŸ¥‰ Bronze (Female Goal)</label><input type="number" id="bronze-female" value="100" style="padding:6px 10px;font-size:13px;width:100%;"></div>
+        <div class="fld" style="margin:0;"><label style="font-size:11px;">ðŸ¥‰ Bronze Badge Image</label>
           <div style="display:flex; gap:6px; align-items:center;">
             <input type="text" id="bronze-img-url" placeholder="Default Image URL (optional)" style="flex:1; padding:6px; font-size:12px;">
             <button type="button" class="btn btn-ghost btn-xs" onclick="document.getElementById('bronze-img-file').click()"><i class="ti ti-upload"></i> Upload</button>
@@ -454,7 +454,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <!-- Locked Config Info message for new events -->
   <div id="new-event-subconfig-lock" style="padding:14px; background:#EFF6FF; color:#1E40AF; border-radius:8px; border:1px solid #BFDBFE; font-size:12.5px; margin-bottom:20px;">
-    ℹ️ Special Days and Challenges can be configured after you save and create this event.
+    â„¹ï¸ Special Days and Challenges can be configured after you save and create this event.
   </div>
 
   <!-- Group 4c: Special Days -->
@@ -514,14 +514,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       <div class="grid" style="margin-bottom:18px">
         <div class="fld"><label>Event Logo (shown above rings)</label>
           <div style="display:flex;gap:8px;align-items:center">
-            <input id="f-logo-url" placeholder="https://... or upload →" style="flex:1" oninput="updateLogoPreview(this.value)">
+            <input id="f-logo-url" placeholder="https://... or upload â†’" style="flex:1" oninput="updateLogoPreview(this.value)">
             <button type="button" class="btn btn-ghost btn-sm" id="btn-logo-up">Upload</button>
             <input type="file" id="logo-file" accept="image/*" style="display:none">
           </div>
           <div id="logo-preview-wrap" style="margin-top: 8px; display: none; align-items: center; gap: 8px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px 12px; width: fit-content;">
             <span style="font-size: 11px; font-weight: 600; color: #64748b;">Preview:</span>
             <img id="logo-preview-img" src="" style="max-height: 40px; width: auto; border-radius: 4px; background: #888; padding: 4px;">
-            <button type="button" id="btn-logo-filter" onclick="toggleLogoFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">⬛→⬜ Invert</button>
+            <button type="button" id="btn-logo-filter" onclick="toggleLogoFilter()" style="padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; background: #1e293b; color: #fff; white-space: nowrap;">â¬›â†’â¬œ Invert</button>
             <button type="button" class="btn btn-ghost btn-xs" onclick="clearLogoPreview()" style="color: #ef4444; padding: 2px 6px; font-size: 10px; border: 1px solid #fecaca; background: #fef2f2; cursor: pointer; border-radius: 4px;">Remove</button>
           </div>
         </div>
@@ -662,7 +662,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn btn-primary" onclick="saveManualBonus()"><i class="ti ti-check"></i> Apply Manual Bonus</button>
-        <span class="saved-msg" id="manual-saved" style="display:none; color: #10B981; font-weight: 600;">✅ Applied!</span>
+        <span class="saved-msg" id="manual-saved" style="display:none; color: #10B981; font-weight: 600;">âœ… Applied!</span>
       </div>
       <div id="manual-result" class="msg info" style="margin-top: 10px; font-size: 13px; color: #555;"></div>
     </div>
@@ -680,13 +680,13 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   <div class="row-end" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px;">
     <span class="err-msg" id="ed-err"></span>
-    <span class="saved-msg" id="ed-saved">✅ Saved</span>
+    <span class="saved-msg" id="ed-saved">âœ… Saved</span>
     <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
     <button type="button" class="btn btn-primary" id="btn-save"><i class="ti ti-device-floppy"></i> Save Event</button>
   </div>
 </div>
 
-<div id="ev-list"><div class="empty">Loading events…</div></div>
+<div id="ev-list"><div class="empty">Loading eventsâ€¦</div></div>
 </div>
 </div>
 <script>
@@ -702,7 +702,7 @@ var SPORTS=['Walk','Run','Ride','Hike','Swim','Yoga','Workout','WeightTraining',
 var EVENTS=[], editId=null;
 
 /* ---------- list ---------- */
-function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fmtD(d){if(!d)return 'â€”';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 async function loadEvents(){
   var r=await fetch(SB_URL+'/rest/v1/events?select=*&order=start_date.desc',{headers:HDR});
   EVENTS=await r.json();
@@ -764,7 +764,7 @@ function renderList(){
     
     var mt=document.createElement('div');mt.className='ev-meta';
     var rc=(ev.rules_config||{});
-    mt.textContent=fmtD(ev.start_date)+' → '+fmtD(ev.end_date)+'  ·  '+(ev.event_type||'')+'  ·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
+    mt.textContent=fmtD(ev.start_date)+' â†’ '+fmtD(ev.end_date)+'  Â·  '+(ev.event_type||'')+'  Â·  '+(rc.scoring_mode||'single_metric')+(rc.metric?' ('+rc.metric+')':'');
     info.appendChild(nm);info.appendChild(mt);body.appendChild(info);
     var acts=document.createElement('div');acts.className='ev-actions';
     [['ti-pencil','Edit','edit'],['ti-certificate','Certificate','cert'],['ti-copy','Clone','clone'],['ti-arrows-exchange','Status','status']].forEach(function(a){
@@ -997,14 +997,14 @@ function setLogoFilter(on) {
   if (_logoFilterOn) {
     img.style.filter = 'invert(1) hue-rotate(180deg)';
     img.style.background = '#333';
-    btn.textContent = '↩ Revert';
+    btn.textContent = 'â†© Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
     img.style.background = '#888';
-    btn.textContent = '⬛ → ⬜ Black to White';
+    btn.textContent = 'â¬› â†’ â¬œ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
@@ -1040,13 +1040,13 @@ function setBannerFilter(on) {
   var btn = document.getElementById('btn-banner-filter');
   if (_bannerFilterOn) {
     img.style.filter = 'invert(1) hue-rotate(180deg)';
-    btn.textContent = '↩ Revert';
+    btn.textContent = 'â†© Revert';
     btn.style.background = '#f8fafc';
     btn.style.color = '#1e293b';
     btn.style.border = '1px solid #94a3b8';
   } else {
     img.style.filter = '';
-    btn.textContent = '⬛ → ⬜ Black to White';
+    btn.textContent = 'â¬› â†’ â¬œ Black to White';
     btn.style.background = '#1e293b';
     btn.style.color = '#fff';
     btn.style.border = '1px solid #cbd5e1';
@@ -1176,7 +1176,7 @@ function addFFRow(f){
   var ed=document.createElement('input');ed.type='checkbox';ed.className='ff-editable';ed.checked=f.editable!==false;
   edLabel.appendChild(ed);edLabel.appendChild(document.createTextNode(' Editable'));
   
-  var del=document.createElement('button');del.type='button';del.className='ff-del';del.textContent='✕';
+  var del=document.createElement('button');del.type='button';del.className='ff-del';del.textContent='âœ•';
   del.style.cssText='height:34px;border:none;background:#FEF2F2;color:#DC2626;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:all 0.15s;';
   del.addEventListener('click',function(){row.remove();});
   
@@ -1221,7 +1221,7 @@ function renderMilestonesUI() {
     var delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'btn btn-ghost btn-sm';
-    delBtn.innerHTML = '✕';
+    delBtn.innerHTML = 'âœ•';
     delBtn.addEventListener('click', function() {
       row.remove();
     });
@@ -1250,7 +1250,7 @@ function renderSpecialDaysUI() {
     pill.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-bottom: 6px;';
     
     var left = document.createElement('div');
-    left.innerHTML = '<strong>' + esc(sd.special_date) + '</strong> — <span style="color:var(--text-secondary);">' + esc(sd.label || 'Special Day') + '</span>';
+    left.innerHTML = '<strong>' + esc(sd.special_date) + '</strong> â€” <span style="color:var(--text-secondary);">' + esc(sd.label || 'Special Day') + '</span>';
     
     var del = document.createElement('button');
     del.type = 'button';
@@ -1320,18 +1320,18 @@ function renderChallengesUI() {
         '<div style="flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
           statusDot +
           '<strong style="font-size:13.5px">' + esc(c.name) + '</strong>' +
-          '<span style="font-size:11.5px;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px">' + c.start_date + (c.end_date !== c.start_date ? ' → ' + c.end_date : '') + '</span>' +
-          '<span style="font-size:11.5px;color:#666">📏 ' + c.distance_min + '–' + c.distance_max + ' km</span>' +
+          '<span style="font-size:11.5px;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px">' + c.start_date + (c.end_date !== c.start_date ? ' â†’ ' + c.end_date : '') + '</span>' +
+          '<span style="font-size:11.5px;color:#666">ðŸ“ ' + c.distance_min + 'â€“' + c.distance_max + ' km</span>' +
           '<span style="font-size:11.5px;font-weight:700;color:#1565c0">+' + c.bonus_points + ' pts</span>' +
         '</div>' +
         '<div style="display:flex;gap:12px;align-items:center">' +
-          '<button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleChallengeActive(' + c.id + ',' + c.is_active + ')">' + (c.is_active ? '⏸ Pause' : '▶️ Activate') + '</button>' +
-          '<span style="font-size:12px;color:#bbb">▼</span>' +
+          '<button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleChallengeActive(' + c.id + ',' + c.is_active + ')">' + (c.is_active ? 'â¸ Pause' : 'â–¶ï¸ Activate') + '</button>' +
+          '<span style="font-size:12px;color:#bbb">â–¼</span>' +
         '</div>' +
       '</div>' +
       '<div class="ch-detail" id="chd-' + c.id + '" style="display:none;padding:18px;border-top:1px solid #f0f0f0;background:#fafafa">' +
         '<!-- Group 1: Basic Info -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">📋 Basic Info</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸ“‹ Basic Info</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           chField('Challenge name', 'ch-name-' + c.id, 'text', c.name) +
           chField('Start date', 'ch-start-' + c.id, 'date', c.start_date) +
@@ -1340,7 +1340,7 @@ function renderChallengesUI() {
         '</div>' +
         
         '<!-- Group 2: Qualifying Criteria -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎯 Qualifying Criteria</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸŽ¯ Qualifying Criteria</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           chField('Distance type', 'ch-dtype-' + c.id, 'select-dtype', c.distance_type) +
           chField('Min distance (km)', 'ch-dmin-' + c.id, 'number', c.distance_min) +
@@ -1353,7 +1353,7 @@ function renderChallengesUI() {
         '</div>' +
         
         '<!-- Group 3: Awards & Scoring -->' +
-        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">🎁 Awards & Scoring</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:4px;text-align:left;">ðŸŽ Awards & Scoring</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
           '<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:8px">' +
             chField('Award type', 'ch-atype-' + c.id, 'select-atype-dep', c.award_type || (c.range_split ? 'range-split' : c.per_activity_points > 0 ? 'per-act' : 'one-time')) +
@@ -1364,8 +1364,8 @@ function renderChallengesUI() {
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;border-top:1px solid #eee;padding-top:12px;margin-top:16px">' +
-          '<button type="button" class="btn btn-primary btn-sm" onclick="saveChallengeCard(' + c.id + ')">💾 Save</button>' +
-          '<button type="button" class="btn btn-ghost btn-sm" style="color: #ff4d4d; border-color: rgba(255,77,77,0.3);" onclick="deleteChallengeCard(' + c.id + ')">🗑️ Delete</button>' +
+          '<button type="button" class="btn btn-primary btn-sm" onclick="saveChallengeCard(' + c.id + ')">ðŸ’¾ Save</button>' +
+          '<button type="button" class="btn btn-ghost btn-sm" style="color: #ff4d4d; border-color: rgba(255,77,77,0.3);" onclick="deleteChallengeCard(' + c.id + ')">ðŸ—‘ï¸ Delete</button>' +
         '</div>' +
       '</div>';
       
@@ -1396,7 +1396,7 @@ function chField(label, id, type, val) {
   } else if (type === 'select-scope') {
     input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="single"' + (val === 'single' ? ' selected' : '') + '>Single activity</option><option value="daily"' + (val === 'daily' ? ' selected' : '') + '>Entire day total</option></select>';
   } else if (type === 'select-dtype') {
-    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="fixed"' + (val === 'fixed' ? ' selected' : '') + '>Fixed (±0.1 km)</option><option value="range"' + (val === 'range' ? ' selected' : '') + '>Range (strict)</option><option value="extended"' + (val === 'extended' ? ' selected' : '') + '>Extended (min km+)</option></select>';
+    input = '<select id="' + id + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"><option value="fixed"' + (val === 'fixed' ? ' selected' : '') + '>Fixed (Â±0.1 km)</option><option value="range"' + (val === 'range' ? ' selected' : '') + '>Range (strict)</option><option value="extended"' + (val === 'extended' ? ' selected' : '') + '>Extended (min km+)</option></select>';
   } else if (type === 'select-atype-dep') {
     var atypeDescs = {
       'one-time': 'Award bonus_points ONCE if any qualifying activity meets criteria.',
@@ -1924,7 +1924,7 @@ async function saveEvent() {
     document.getElementById('editor').classList.remove('open');editId=null;
     await loadEvents();
   } catch(e) {
-    err.textContent='❌ '+e.message;
+    err.textContent='âŒ '+e.message;
   } finally {
     btnBottom.disabled=false;
     btnTop.disabled=false;
@@ -1935,7 +1935,7 @@ async function saveEvent() {
 async function cycleStatus(ev){
   var order=['draft','upcoming','live','ended','archived'];
   var next=order[(order.indexOf(ev.status)+1)%order.length];
-  if(!confirm('Change "'+ev.name+'" status: '+ev.status+' → '+next+' ?'))return;
+  if(!confirm('Change "'+ev.name+'" status: '+ev.status+' â†’ '+next+' ?'))return;
   var r=await fetch(SB_URL+'/rest/v1/events?id=eq.'+ev.id,{method:'PATCH',headers:HDR,body:JSON.stringify({status:next})});
   if(!r.ok){alert('Status change failed '+r.status);return;}
   loadEvents();
@@ -1961,7 +1961,7 @@ async function cloneEvent(ev){
       await fetch(SB_URL+'/rest/v1/challenges',{method:'POST',headers:HDR,body:JSON.stringify(c)});
     }
     report.push(chs.length+' challenges copied (inactive).');
-  }catch(e){report.push('⚠️ challenges copy failed');}
+  }catch(e){report.push('âš ï¸ challenges copy failed');}
   // copy special days
   try{
     var sr=await fetch(SB_URL+'/rest/v1/special_scoring_days?event_id=eq.'+ev.id+'&select=*',{headers:HDR});
@@ -1971,7 +1971,7 @@ async function cloneEvent(ev){
       await fetch(SB_URL+'/rest/v1/special_scoring_days',{method:'POST',headers:HDR,body:JSON.stringify(s)});
     }
     report.push(sds.length+' special days copied.');
-  }catch(e){report.push('⚠️ special days copy failed');}
+  }catch(e){report.push('âš ï¸ special days copy failed');}
   alert(report.join('\n'));
   loadEvents();
 }
@@ -2057,7 +2057,7 @@ async function saveManualBonus() {
     }
   }
   
-  resultEl.innerHTML = '✅ Applied to ' + success + ' activities and created challenge' + (failed ? ' | ❌ ' + failed + ' not found' : '');
+  resultEl.innerHTML = 'âœ… Applied to ' + success + ' activities and created challenge' + (failed ? ' | âŒ ' + failed + ' not found' : '');
   
   var el = document.getElementById('manual-saved');
   if (el) {
@@ -2091,7 +2091,7 @@ async function loadManualBonuses() {
       rows.map(function(row) {
         return '<tr style="border-bottom:1px solid #f5f5f5">' +
           '<td style="padding:8px 12px"><a href="https://www.strava.com/activities/' + row.strava_activity_id + '" target="_blank" style="color:#E8622A;text-decoration:none;font-weight:500;">' + row.strava_activity_id + '</a></td>' +
-          '<td style="padding:8px 12px">' + esc(row.activity_name || '—') + '</td>' +
+          '<td style="padding:8px 12px">' + esc(row.activity_name || 'â€”') + '</td>' +
           '<td style="padding:8px 12px;font-weight:700;color:#1565c0">+' + row.manual_bonus + '</td>' +
           '<td style="padding:8px 12px"><button type="button" style="padding:4px 10px;background:#ffebee;color:#c62828;border:none;border-radius:6px;font-size:12px;cursor:pointer" onclick="clearManualBonus(' + row.strava_activity_id + ')">Clear</button></td>' +
         '</tr>';
@@ -2119,423 +2119,6 @@ async function clearManualBonus(activityId) {
     alert('Failed to clear manual bonus: ' + e.message);
   }
 }
-
-window.toggleCertCustomVal = function(select) {
-  var row = select.closest('.cert-placeholder-row');
-  var wrap = row.querySelector('.cert-custom-val-wrap');
-  if (wrap) {
-    wrap.style.display = select.value === 'custom' ? 'block' : 'none';
-  }
-  var imgWrap = row.querySelector('.cert-img-wrap');
-  if (imgWrap) {
-    imgWrap.style.display = select.value === 'static_image' ? 'flex' : 'none';
-  }
-};
-
-window.toggleCertMode = function() {
-  var mode = document.getElementById('cert-canvas-mode').value;
-  document.getElementById('cert-pdf-wrap').style.display = mode === 'pdf' ? 'flex' : 'none';
-  document.getElementById('cert-blank-wrap').style.display = mode === 'blank' ? 'flex' : 'none';
-};
-
-window.handleCertElementImageUpload = function(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  var rowEl = event.target.closest('.cert-placeholder-row');
-  var urlInput = rowEl ? rowEl.querySelector('.cert-p-imgurl') : null;
-  var rd = new FileReader();
-  rd.onload = async function() {
-    try {
-      var r = await fetch(BACKEND + '/admin/upload-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token') },
-        body: JSON.stringify({ data: rd.result })
-      });
-      var d2 = await r.json();
-      if (d2.success && urlInput) {
-        urlInput.value = d2.url;
-        updateCertPreviewCanvas();
-    
-    if (type === 'medal_image') {
-      var boxSize = Math.round(size * scale * 0.5);
-      if (boxSize < 20) boxSize = 20;
-      
-      var textX = w * x;
-      var textY = h * y;
-      
-      ctx.save();
-      if (!_certCleanRender) {
-        ctx.fillStyle = 'rgba(232, 98, 42, 0.12)';
-        ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
-        ctx.lineWidth = isChecked ? 2 : 1;
-        ctx.setLineDash(isChecked ? [] : [2, 2]);
-        
-        ctx.beginPath();
-        ctx.arc(textX, textY, boxSize / 2, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.stroke();
-      }
-      
-      // Draw the actual configured medal image (gold shown in preview); fall back to gold emoji
-      var goldUrlEl = document.getElementById('gold-img-url');
-      var goldUrl = goldUrlEl ? goldUrlEl.value.trim() : '';
-      var previewImg = goldUrl ? getCertPreviewMedalImg(goldUrl) : null;
-      if (previewImg && previewImg.complete && previewImg.naturalWidth > 0) {
-        ctx.setLineDash([]);
-        ctx.drawImage(previewImg, textX - boxSize/2, textY - boxSize/2, boxSize, boxSize);
-      } else {
-        ctx.fillStyle = '#E8622A';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = Math.round(boxSize * 0.7) + 'px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
-        ctx.fillText('🥇', textX, textY);
-      }
-
-      var hitEntry = { row: row, x0: textX - boxSize/2, y0: textY - boxSize/2, x1: textX + boxSize/2, y1: textY + boxSize/2, anchorX: textX, anchorY: textY, isImage: true };
-
-      // Resize handle (bottom-right corner) when this placeholder is selected
-      if (isChecked && !_certCleanRender) {
-        var hs = 12;
-        var hx = textX + boxSize/2;
-        var hy = textY + boxSize/2;
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#E8622A';
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.fillRect(hx - hs/2, hy - hs/2, hs, hs);
-        ctx.strokeRect(hx - hs/2, hy - hs/2, hs, hs);
-        hitEntry.handle = { x0: hx - hs, y0: hy - hs, x1: hx + hs, y1: hy + hs };
-      }
-      ctx.restore();
-      _certHitBoxes.push(hitEntry);
-      return;
-    }
-
-    if (type === 'static_image') {
-      var imgW = Math.round(size * scale * 0.5);
-      if (imgW < 20) imgW = 20;
-      var imgH = imgW;
-      var imgUrlEl = row.querySelector('.cert-p-imgurl');
-      var imgUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
-      var cx = w * x, cy = h * y;
-      var elImg = imgUrl ? getCertPreviewMedalImg(imgUrl) : null;
-      ctx.save();
-      if (elImg && elImg.complete && elImg.naturalWidth > 0) {
-        imgH = Math.round(imgW * (elImg.naturalHeight / elImg.naturalWidth));
-        ctx.drawImage(elImg, cx - imgW/2, cy - imgH/2, imgW, imgH);
-        if (isChecked && !_certCleanRender) {
-          ctx.strokeStyle = '#E8622A'; ctx.lineWidth = 2; ctx.setLineDash([]);
-          ctx.strokeRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
-        }
-      } else if (!_certCleanRender) {
-        ctx.fillStyle = 'rgba(148,163,184,0.15)';
-        ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
-        ctx.lineWidth = isChecked ? 2 : 1;
-        ctx.setLineDash([4, 3]);
-        ctx.fillRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
-        ctx.strokeRect(cx - imgW/2, cy - imgH/2, imgW, imgH);
-        ctx.fillStyle = '#94a3b8';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = 'bold ' + Math.max(10, Math.round(imgW * 0.14)) + 'px Poppins, sans-serif';
-        ctx.setLineDash([]);
-        ctx.fillText('IMAGE', cx, cy);
-      }
-      var imgHit = { row: row, x0: cx - imgW/2, y0: cy - imgH/2, x1: cx + imgW/2, y1: cy + imgH/2, anchorX: cx, anchorY: cy, isImage: true };
-      if (isChecked && !_certCleanRender) {
-        var hs2 = 12;
-        var hx2 = cx + imgW/2, hy2 = cy + imgH/2;
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#E8622A'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-        ctx.fillRect(hx2 - hs2/2, hy2 - hs2/2, hs2, hs2);
-        ctx.strokeRect(hx2 - hs2/2, hy2 - hs2/2, hs2, hs2);
-        imgHit.handle = { x0: hx2 - hs2, y0: hy2 - hs2, x1: hx2 + hs2, y1: hy2 + hs2 };
-      }
-      ctx.restore();
-      _certHitBoxes.push(imgHit);
-      return;
-    }
-
-    var statLabels = { distance: 'DISTANCE', rank: 'RANK', points: 'POINTS', medal_title: 'MEDAL' };
-    var statValues = { distance: '300.5 KM', rank: '#3 of 487', points: '350', medal_title: '\ud83e\udd47 Gold' };
-    var isStat = !!statLabels[type];
-
-    var previewText = key;
-    if (type === 'participant_name') previewText = 'Prakash Mali';
-    else if (isStat) previewText = statValues[type];
-    else if (type === 'custom') previewText = customVal || key;
-    
-    ctx.save();
-    ctx.textAlign = align;
-    ctx.textBaseline = 'middle';
-    
-    var family = row.querySelector('.cert-p-font').value || 'Poppins';
-    var scaledSize = Math.round(size * scale * 0.5);
-    if (scaledSize < 6) scaledSize = 6;
-    ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
-    
-    var textX = w * x;
-    var textY = h * y;
-    
-    var valWidth = ctx.measureText(previewText).width;
-    var templateWidth = ctx.measureText(key).width;
-    var textWidth = Math.max(valWidth, templateWidth);
-    var labelSize = Math.max(7, Math.round(scaledSize * 0.42));
-    if (isStat) {
-      ctx.font = labelSize + 'px "' + family + '", sans-serif';
-      textWidth = Math.max(textWidth, ctx.measureText(statLabels[type]).width);
-    }
-    
-    var boxHeight = isStat ? scaledSize * 2.05 : scaledSize * 1.5;
-    var boxTop = isStat ? textY - scaledSize * 1.1 : textY - boxHeight/2;
-    var boxX = textX;
-    if (align === 'center') boxX = textX - textWidth/2;
-    else if (align === 'right') boxX = textX - textWidth;
-    
-    var paddingX = 8;
-    var isBlankPrev = document.getElementById('cert-canvas-mode') && document.getElementById('cert-canvas-mode').value === 'blank';
-    var transpEl = row.querySelector('.cert-p-transparent');
-    var isTransparent = transpEl && transpEl.checked;
-    if (!isBlankPrev && !isTransparent) {
-      ctx.fillStyle = _certCleanRender ? '#ffffff' : 'rgba(255, 255, 255, 0.75)';
-      ctx.fillRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
-    }
-    
-    ctx.fillStyle = color;
-    if (isStat) {
-      ctx.globalAlpha = 0.55;
-      ctx.font = labelSize + 'px "' + family + '", sans-serif';
-      ctx.fillText(statLabels[type], textX, textY - scaledSize * 0.68);
-      ctx.globalAlpha = 1;
-      ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
-      ctx.fillText(statValues[type], textX, textY + scaledSize * 0.32);
-    } else {
-      ctx.font = (weight === 'bold' ? 'bold ' : '') + scaledSize + 'px "' + family + '", "Georgia", sans-serif';
-      ctx.fillText(previewText, textX, textY);
-    }
-    
-    if (!_certCleanRender) {
-      ctx.lineWidth = isChecked ? 2 : 1;
-      ctx.strokeStyle = isChecked ? '#E8622A' : '#94a3b8';
-      ctx.setLineDash(isChecked ? [] : [2, 2]);
-      ctx.strokeRect(boxX - paddingX, boxTop, textWidth + (paddingX * 2), boxHeight);
-    }
-    
-    ctx.restore();
-    _certHitBoxes.push({ row: row, x0: boxX - paddingX, y0: boxTop, x1: boxX - paddingX + textWidth + (paddingX * 2), y1: boxTop + boxHeight, anchorX: textX, anchorY: textY });
-  });
-}
-
-// ===== Drag & drop, click-to-place, keyboard nudge for certificate placeholders =====
-(function() {
-  var _dragRow = null;
-  var _dragOffX = 0, _dragOffY = 0;
-  var _dragMoved = false;
-  var _downPx = 0, _downPy = 0;
-
-  function canvasCoords(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-      px: (event.clientX - rect.left) * (canvas.width / rect.width),
-      py: (event.clientY - rect.top) * (canvas.height / rect.height)
-    };
-  }
-
-  function selectRow(row) {
-    var radio = row.querySelector('input[name="active-cert-placeholder"]');
-    if (radio && !radio.checked) radio.checked = true;
-    row.style.boxShadow = '0 0 0 2px #E8622A inset';
-    var det = row.querySelector('details');
-    if (det && !det.open) det.open = true;
-    row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
-      if (r !== row) {
-        r.style.boxShadow = '';
-        var d = r.querySelector('details');
-        if (d) d.open = false;
-      }
-    });
-  }
-
-  function getActiveRow() {
-    var active = null;
-    document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
-      if (row.querySelector('input[name="active-cert-placeholder"]').checked) active = row;
-    });
-    return active;
-  }
-
-  function setRowXY(row, xFrac, yFrac) {
-    if (xFrac < 0) xFrac = 0; if (xFrac > 1) xFrac = 1;
-    if (yFrac < 0) yFrac = 0; if (yFrac > 1) yFrac = 1;
-    row.querySelector('.cert-p-x').value = xFrac.toFixed(3);
-    row.querySelector('.cert-p-y').value = yFrac.toFixed(3);
-  }
-
-  function initCertCanvasInteraction() {
-    var canvas = document.getElementById('cert-preview-canvas');
-    if (!canvas || canvas._certDragWired) return;
-    canvas._certDragWired = true;
-
-    var _resizeRow = null;
-    var _resizeAnchorX = 0, _resizeAnchorY = 0;
-
-    canvas.addEventListener('pointerdown', function(e) {
-      var c = canvasCoords(canvas, e);
-      _downPx = c.px; _downPy = c.py;
-      _dragMoved = false;
-      _dragRow = null;
-      _resizeRow = null;
-
-      // 1st pass: resize handles win over drag (topmost first)
-      for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
-        var b = _certHitBoxes[i];
-        if (b.handle && c.px >= b.handle.x0 && c.px <= b.handle.x1 && c.py >= b.handle.y0 && c.py <= b.handle.y1) {
-          _resizeRow = b.row;
-          _resizeAnchorX = b.anchorX;
-          _resizeAnchorY = b.anchorY;
-          canvas.setPointerCapture(e.pointerId);
-          canvas.style.cursor = 'nwse-resize';
-          canvas.focus();
-          e.preventDefault();
-          return;
-        }
-      }
-
-      // 2nd pass: body drag (topmost placeholder wins)
-      for (var i = _certHitBoxes.length - 1; i >= 0; i--) {
-        var b = _certHitBoxes[i];
-        if (c.px >= b.x0 && c.px <= b.x1 && c.py >= b.y0 && c.py <= b.y1) {
-          _dragRow = b.row;
-          _dragOffX = c.px - b.anchorX;
-          _dragOffY = c.py - b.anchorY;
-          selectRow(b.row);
-          canvas.setPointerCapture(e.pointerId);
-          canvas.style.cursor = 'grabbing';
-          queueCertRedraw();
-          break;
-        }
-      }
-      canvas.focus();
-      e.preventDefault();
-    });
-
-    canvas.addEventListener('pointermove', function(e) {
-      var c = canvasCoords(canvas, e);
-      if (_resizeRow) {
-        // Distance from placeholder center = new radius; diameter -> size value
-        var dx = c.px - _resizeAnchorX;
-        var dy = c.py - _resizeAnchorY;
-        var r = Math.sqrt(dx * dx + dy * dy);
-        var newSize = Math.round((2 * r) / (_certPreviewScale * 0.5));
-        if (newSize < 8) newSize = 8;
-        if (newSize > 999) newSize = 999;
-        _resizeRow.querySelector('.cert-p-size').value = newSize;
-        queueCertRedraw();
-        return;
-      }
-      if (!_dragRow) return;
-      if (Math.abs(c.px - _downPx) > 2 || Math.abs(c.py - _downPy) > 2) _dragMoved = true;
-
-      // Alignment snapping: canvas center + other placeholders' anchors
-      var wantX = c.px - _dragOffX;
-      var wantY = c.py - _dragOffY;
-      var SNAP = 6;
-      _certSnapGuides = [];
-      var candX = [canvas.width / 2];
-      var candY = [canvas.height / 2];
-      document.querySelectorAll('.cert-placeholder-row').forEach(function(r) {
-        if (r === _dragRow) return;
-        var rx = parseFloat(r.querySelector('.cert-p-x').value);
-        var ry = parseFloat(r.querySelector('.cert-p-y').value);
-        if (!isNaN(rx)) candX.push(rx * canvas.width);
-        if (!isNaN(ry)) candY.push(ry * canvas.height);
-      });
-      for (var ci = 0; ci < candX.length; ci++) {
-        if (Math.abs(wantX - candX[ci]) < SNAP) { wantX = candX[ci]; _certSnapGuides.push({ type: 'v', pos: candX[ci] }); break; }
-      }
-      for (var cj = 0; cj < candY.length; cj++) {
-        if (Math.abs(wantY - candY[cj]) < SNAP) { wantY = candY[cj]; _certSnapGuides.push({ type: 'h', pos: candY[cj] }); break; }
-      }
-
-      setRowXY(_dragRow, wantX / canvas.width, wantY / canvas.height);
-      queueCertRedraw();
-    });
-
-    canvas.addEventListener('pointerup', function(e) {
-      canvas.style.cursor = 'grab';
-      if (_certSnapGuides.length) { _certSnapGuides = []; queueCertRedraw(); }
-      if (_resizeRow) {
-        _resizeRow = null;
-        return;
-      }
-      if (!_dragRow && !_dragMoved) {
-        // Clicked empty space: place the active radio row there (legacy click-to-place)
-        var activeRow = getActiveRow();
-        if (activeRow) {
-          var c = canvasCoords(canvas, e);
-          setRowXY(activeRow, c.px / canvas.width, c.py / canvas.height);
-          queueCertRedraw();
-        }
-      }
-      _dragRow = null;
-      _dragMoved = false;
-    });
-
-    // Scroll wheel over the canvas resizes the selected placeholder (any type)
-    canvas.addEventListener('wheel', function(e) {
-      var row = getActiveRow();
-      if (!row) return;
-      e.preventDefault();
-      var sizeInput = row.querySelector('.cert-p-size');
-      var cur = parseInt(sizeInput.value) || 24;
-      var step = e.shiftKey ? 10 : 3;
-      var next = cur + (e.deltaY < 0 ? step : -step);
-      if (next < 8) next = 8;
-      if (next > 999) next = 999;
-      sizeInput.value = next;
-      queueCertRedraw();
-    }, { passive: false });
-
-    canvas.addEventListener('keydown', function(e) {
-      var step = e.shiftKey ? 0.02 : 0.005;
-      var dx = 0, dy = 0;
-      if (e.key === 'ArrowLeft') dx = -step;
-      else if (e.key === 'ArrowRight') dx = step;
-      else if (e.key === 'ArrowUp') dy = -step;
-      else if (e.key === 'ArrowDown') dy = step;
-      else return;
-      var row = getActiveRow();
-      if (!row) return;
-      e.preventDefault();
-      var x = parseFloat(row.querySelector('.cert-p-x').value) || 0;
-      var y = parseFloat(row.querySelector('.cert-p-y').value) || 0;
-      setRowXY(row, x + dx, y + dy);
-      queueCertRedraw();
-    });
-  }
-
-  // Wire up once DOM is ready (script runs at end of body, canvas exists)
-  initCertCanvasInteraction();
-  window.initCertCanvasInteraction = initCertCanvasInteraction;
-})();
-
-// One-click preset placeholders (incl. Rank)
-window.addCertPreset = function(type) {
-  var presets = {
-    participant_name: { key: '<Participant Name>', type: 'participant_name', x: 0.22, y: 0.31, font_size: 52, color: '#E8622A', font_style: 'bold', align: 'left' },
-    medal_title:      { key: '<MEDAL>', type: 'medal_title', x: 0.55, y: 0.69, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
-    distance:         { key: '<Distance>', type: 'distance', x: 0.55, y: 0.48, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
-    rank:             { key: '<Rank>', type: 'rank', x: 0.55, y: 0.55, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
-    points:           { key: '<Points>', type: 'points', x: 0.55, y: 0.62, font_size: 30, color: '#1A1D20', font_style: 'normal', align: 'left' },
-    medal_image:      { key: '<Medal Image>', type: 'medal_image', x: 0.28, y: 0.75, font_size: 120, color: '#1A1D20', font_style: 'normal', align: 'center' },
-    static_image:     { key: '<Image>', type: 'static_image', x: 0.5, y: 0.15, font_size: 200, color: '#1A1D20', font_style: 'normal', align: 'center', image_url: '' },
-    custom:           { key: 'Your text here', type: 'custom', x: 0.5, y: 0.5, font_size: 24, color: '#1A1D20', font_style: 'normal', align: 'center', custom_val: 'Your text here' }
-  };
-  var p = presets[type];
-  if (!p) return;
-  addCertPlaceholderRow(p);
-  updateCertPreviewCanvas();
-};
 
 window.uploadMedalImage = async function(event, tier) {
   var file = event.target.files[0];
