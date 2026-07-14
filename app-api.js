@@ -2189,6 +2189,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
       var showDownloadBtn = hasEnded && certCfg && (certCfg.template_url || certCfg.canvas_mode === 'blank');
 
       var athleteRank = null;
+      var totalParticipants = rankMap[pastEventId] ? rankMap[pastEventId].length : 0;
       if (rankMap[pastEventId]) {
         var idx = rankMap[pastEventId].indexOf(String(pReg.strava_athlete_id));
         if (idx > -1) athleteRank = idx + 1;
@@ -2201,6 +2202,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
           distance: totalKm,
           points: totalPts,
           rank: athleteRank,
+          totalParticipants: totalParticipants,
           eventName: pastEventName,
           config: certCfg,
           medals: medalsCfg
@@ -2706,24 +2708,26 @@ window.downloadPastCertAction = function(type, pastEventId) {
       if (isBlankMode) return;
       if (p.type === 'medal_image' || p.type === 'static_image') return;
       
+      var isStat = certStatLabel(p.type) !== null;
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
-      else if (p.type === 'medal_title') textVal = 'Medal Achieved: ' + String(certData.medal || '').replace(' Medal', '');
-      else if (p.type === 'distance') textVal = 'Distance: ' + certData.distance.toFixed(1) + ' KM';
-      else if (p.type === 'points') textVal = 'Total Points: ' + certData.points.toFixed(0);
-      else if (p.type === 'rank') textVal = 'Rank: ' + (certData.rank ? certData.rank : '-');
+      else if (isStat) textVal = certStatValue(p.type, certData);
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
       var templateText = p.key || '';
 
       ctx.save();
       var family = p.font_family || 'Poppins';
-      ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + Math.round(p.font_size * (w / 2000)) + 'px "' + family + '", "Georgia", sans-serif';
+      var fontSize = Math.round(p.font_size * (w / 2000));
+      ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + fontSize + 'px "' + family + '", "Georgia", sans-serif';
       var valWidth = ctx.measureText(textVal).width;
       var templateWidth = ctx.measureText(templateText).width;
       var textWidth = Math.max(valWidth, templateWidth);
+      if (isStat) {
+        ctx.font = Math.round(fontSize * 0.42) + 'px "' + family + '", sans-serif';
+        textWidth = Math.max(textWidth, ctx.measureText(certStatLabel(p.type)).width);
+      }
       
-      var boxHeight = p.font_size * (w / 2000) * 1.5;
       var textX = w * p.x;
       var textY = h * p.y;
       var boxX = textX;
@@ -2733,29 +2737,48 @@ window.downloadPastCertAction = function(type, pastEventId) {
       
       ctx.fillStyle = '#ffffff';
       var paddingX = Math.round(25 * (w / 2000));
-      ctx.fillRect(boxX - paddingX, textY - boxHeight / 2, textWidth + (paddingX * 2), boxHeight);
+      if (isStat) {
+        ctx.fillRect(boxX - paddingX, textY - fontSize * 1.1, textWidth + (paddingX * 2), fontSize * 2.05);
+      } else {
+        var boxHeight = fontSize * 1.5;
+        ctx.fillRect(boxX - paddingX, textY - boxHeight / 2, textWidth + (paddingX * 2), boxHeight);
+      }
       ctx.restore();
     });
 
-    // 2. Draw actual text values
+    // 2. Draw actual text values (stat types render as small label + big value pair)
     placeholders.forEach(function(p) {
       if (p.type === 'medal_image' || p.type === 'static_image') return;
 
-      var textVal = p.key;
-      if (p.type === 'participant_name') textVal = name;
-      else if (p.type === 'medal_title') textVal = 'Medal Achieved: ' + String(certData.medal || '').replace(' Medal', '');
-      else if (p.type === 'distance') textVal = 'Distance: ' + certData.distance.toFixed(1) + ' KM';
-      else if (p.type === 'points') textVal = 'Total Points: ' + certData.points.toFixed(0);
-      else if (p.type === 'rank') textVal = 'Rank: ' + (certData.rank ? certData.rank : '-');
-      else if (p.type === 'custom') textVal = p.custom_val || '';
+      var family = p.font_family || 'Poppins';
+      var fontSize = Math.round(p.font_size * (w / 2000));
+      var textX = w * p.x;
+      var textY = h * p.y;
+      var statLbl = certStatLabel(p.type);
 
       ctx.save();
-      var family = p.font_family || 'Poppins';
-      ctx.fillStyle = p.color || '#000000';
       ctx.textAlign = p.align || 'left';
       ctx.textBaseline = 'middle';
-      ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + Math.round(p.font_size * (w / 2000)) + 'px "' + family + '", "Georgia", sans-serif';
-      ctx.fillText(textVal, w * p.x, h * p.y);
+
+      if (statLbl !== null) {
+        var labelSize = Math.max(10, Math.round(fontSize * 0.42));
+        ctx.fillStyle = p.color || '#000000';
+        ctx.globalAlpha = 0.55;
+        ctx.font = labelSize + 'px "' + family + '", sans-serif';
+        try { ctx.letterSpacing = Math.round(labelSize * 0.14) + 'px'; } catch(e) {}
+        ctx.fillText(statLbl, textX, textY - fontSize * 0.68);
+        try { ctx.letterSpacing = '0px'; } catch(e) {}
+        ctx.globalAlpha = 1;
+        ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + fontSize + 'px "' + family + '", "Georgia", sans-serif';
+        ctx.fillText(certStatValue(p.type, certData), textX, textY + fontSize * 0.32);
+      } else {
+        var textVal = p.key;
+        if (p.type === 'participant_name') textVal = name;
+        else if (p.type === 'custom') textVal = p.custom_val || '';
+        ctx.fillStyle = p.color || '#000000';
+        ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + fontSize + 'px "' + family + '", "Georgia", sans-serif';
+        ctx.fillText(textVal, textX, textY);
+      }
       ctx.restore();
     });
 
@@ -2865,6 +2888,25 @@ window.downloadPastCertAction = function(type, pastEventId) {
     }
   });
 };
+
+function certStatLabel(type) {
+  if (type === 'distance') return 'DISTANCE';
+  if (type === 'rank') return 'RANK';
+  if (type === 'points') return 'POINTS';
+  if (type === 'medal_title') return 'MEDAL';
+  return null;
+}
+
+function certStatValue(type, certData) {
+  if (type === 'distance') return certData.distance.toFixed(1) + ' KM';
+  if (type === 'points') return certData.points.toFixed(0);
+  if (type === 'rank') {
+    if (!certData.rank) return '-';
+    return '#' + certData.rank + (certData.totalParticipants ? ' of ' + certData.totalParticipants : '');
+  }
+  if (type === 'medal_title') return String(certData.medal || '').replace(' Medal', '') || '-';
+  return '';
+}
 
 function formatOrdinalRank(n) {
   n = parseInt(n, 10);
