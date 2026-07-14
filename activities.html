@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Session Sync Block -->
@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Activities — Arcgate Walkathon 2026</title>
+  <title>Activities � Arcgate Walkathon 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -637,6 +637,7 @@ td button.btn:last-child { margin-right: 0; }
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+      <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item active"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
       <a href="sessions.html" class="sb-item"><i class="ti ti-device-laptop"></i><span class="sb-label">Active Sessions</span></a>
@@ -661,12 +662,12 @@ td button.btn:last-child { margin-right: 0; }
 
     <div class="section-tabs-wrapper" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:24px; width:100%;">
       <div class="section-tabs" style="border-bottom:none; margin-bottom:0;">
-        <button class="stab active" id="tab-all" onclick="switchTab('all')">🏃 All Workouts</button>
-        <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">🔍 Bulk Flag Scanner</button>
-        <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">🗑️ Deleted</button>
-        <button class="stab" id="tab-rules" onclick="switchTab('rules')">🚩 Flag Reasons</button>
+        <button class="stab active" id="tab-all" onclick="switchTab('all')">?? All Workouts</button>
+        <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">?? Bulk Flag Scanner</button>
+        <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">??? Deleted</button>
+        <button class="stab" id="tab-rules" onclick="switchTab('rules')">?? Flag Reasons</button>
       </div>
-      <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()">🔍 Re-run Auto-flag</button>
+      <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()">?? Re-run Auto-flag</button>
     </div>
 
     <!-- Tab 1: All Workouts -->
@@ -675,9 +676,9 @@ td button.btn:last-child { margin-right: 0; }
         <div class="filter-grid" style="margin-bottom: 12px;">
           <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div>
           <div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
-          <div class="filter-group"><label>Status</label><select id="status-filter"><option value="">All statuses</option><option value="valid">✅ Valid</option><option value="invalid">🚩 Invalid / Flagged</option><option value="deleted">🗑️ Deleted</option></select></div>
-          <div class="filter-group"><label>Review State</label><select id="review-filter"><option value="">All</option><option value="pending">⏳ Pending Review</option><option value="reviewed">✓ Reviewed</option></select></div>
-          <div class="filter-group"><label>Flag reason</label><select id="flag-reason-filter"><option value="">All reasons</option><optgroup label="── Manual Review ──"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="── Auto Flags ──"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="── Manual Flags ──"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select></div>
+          <div class="filter-group"><label>Status</label><select id="status-filter"><option value="">All statuses</option><option value="valid">? Valid</option><option value="invalid">?? Invalid / Flagged</option><option value="deleted">??? Deleted</option></select></div>
+          <div class="filter-group"><label>Review State</label><select id="review-filter"><option value="">All</option><option value="pending">? Pending Review</option><option value="reviewed">? Reviewed</option></select></div>
+          <div class="filter-group"><label>Flag reason</label><select id="flag-reason-filter"><option value="">All reasons</option><optgroup label="-- Manual Review --"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="-- Auto Flags --"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="-- Manual Flags --"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select></div>
           <div class="filter-group"><label>Activity type</label><select id="sport-filter"><option value="">All types</option><option value="Walk">Walk</option><option value="Run">Run</option><option value="Ride">Ride</option><option value="Hike">Hike</option><option value="VirtualRun">Virtual Run</option><option value="VirtualRide">Virtual Ride</option><option value="MountainBikeRide">Mountain Bike Ride</option></select></div>
         </div>
         <div class="filter-grid">
@@ -694,21 +695,21 @@ td button.btn:last-child { margin-right: 0; }
           <span id="searching-indicator" style="display:none;align-items:center;gap:8px;font-size:13px;color:#888"><div class="spinner" style="width:18px;height:18px;border-width:2px"></div>Searching...</span>
         </div>
       </div>
-      <div class="stats-grid" id="stats-row" style="display:none"><div class="stat-card"><div class="val" id="total-activities">—</div><div class="lbl">Activities found</div></div><div class="stat-card"><div class="val" id="total-distance">—</div><div class="lbl">Total km</div></div><div class="stat-card dark"><div class="val" id="total-participants">—</div><div class="lbl">Participants</div></div><div class="stat-card green"><div class="val" id="total-valid">—</div><div class="lbl">Valid</div></div><div class="stat-card red"><div class="val" id="total-flagged">—</div><div class="lbl">Flagged</div></div></div>
+      <div class="stats-grid" id="stats-row" style="display:none"><div class="stat-card"><div class="val" id="total-activities">�</div><div class="lbl">Activities found</div></div><div class="stat-card"><div class="val" id="total-distance">�</div><div class="lbl">Total km</div></div><div class="stat-card dark"><div class="val" id="total-participants">�</div><div class="lbl">Participants</div></div><div class="stat-card green"><div class="val" id="total-valid">�</div><div class="lbl">Valid</div></div><div class="stat-card red"><div class="val" id="total-flagged">�</div><div class="lbl">Flagged</div></div></div>
       <div id="flag-counts" style="display:none;margin-bottom:18px;gap:8px;flex-wrap:wrap"></div>
       
       <!-- Bulk actions bar for All Workouts -->
       <div class="bulk-bar" id="bulk-actions-bar-all" style="display:none; margin-bottom:12px;">
         <span id="bulk-count-msg-all"><span class="bulk-selected-count" id="bulk-selected-num-all">0</span> items selected</span>
         <div style="margin-left:auto; display:flex; gap:8px;">
-          <button class="btn btn-danger" id="btn-bulk-flag-all" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkActionAll('flag')">🚩 Flag Selected</button>
-          <button class="btn btn-success" id="btn-bulk-clear-all" onclick="doBulkActionAll('unflag')">✅ Clear Selected</button>
-          <button class="btn btn-primary" id="btn-bulk-review-all" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkActionAll('review')">👁️ Review Selected</button>
-          <button class="btn btn-danger" id="btn-bulk-delete-all" onclick="doBulkActionAll('delete')">🗑️ Delete Selected</button>
+          <button class="btn btn-danger" id="btn-bulk-flag-all" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkActionAll('flag')">?? Flag Selected</button>
+          <button class="btn btn-success" id="btn-bulk-clear-all" onclick="doBulkActionAll('unflag')">? Clear Selected</button>
+          <button class="btn btn-primary" id="btn-bulk-review-all" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkActionAll('review')">??? Review Selected</button>
+          <button class="btn btn-danger" id="btn-bulk-delete-all" onclick="doBulkActionAll('delete')">??? Delete Selected</button>
         </div>
       </div>
 
-      <div class="card"><div id="placeholder" class="empty"><div class="icon">🔍</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Audit Trail</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
+      <div class="card"><div id="placeholder" class="empty"><div class="icon">??</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Audit Trail</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
     </div>
 
     <!-- Tab 2 & 4: Under Review / Deleted Workouts -->
@@ -736,11 +737,11 @@ td button.btn:last-child { margin-right: 0; }
             <label>Flag Reason</label>
             <select id="flagged-reason-filter" onchange="applyFlaggedFilters()">
               <option value="">All reasons</option>
-              <optgroup label="── Manual Review ──">
+              <optgroup label="-- Manual Review --">
                 <option>Manual Review - Distance Issue</option>
                 <option>Manual Review - Pace Issue</option>
               </optgroup>
-              <optgroup label="── Auto Flags ──">
+              <optgroup label="-- Auto Flags --">
                 <option>Distance below min limit</option>
                 <option>Distance above max limit</option>
                 <option>Pace too fast</option>
@@ -751,7 +752,7 @@ td button.btn:last-child { margin-right: 0; }
                 <option>Pace Deviation Issue</option>
                 <option>Shared Activity (auto-detected)</option>
               </optgroup>
-              <optgroup label="── Manual Flags ──">
+              <optgroup label="-- Manual Flags --">
                 <option>Not Our Participant</option>
                 <option>Less than 1 km</option>
                 <option>Treadmill</option>
@@ -799,12 +800,12 @@ td button.btn:last-child { margin-right: 0; }
         <div class="bulk-bar" id="bulk-actions-bar" style="display:none">
           <span id="bulk-count-msg"><span class="bulk-selected-count" id="bulk-selected-num">0</span> items selected</span>
           <div style="margin-left:auto; display:flex; gap:8px;">
-            <button class="btn btn-danger" id="btn-bulk-flag" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkAction('flag')">🚩 Flag Selected</button>
-            <button class="btn btn-success" id="btn-bulk-clear" onclick="doBulkAction('unflag')">✅ Clear Selected</button>
-            <button class="btn btn-primary" id="btn-bulk-review" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkAction('review')">👁️ Review Selected</button>
-            <button class="btn btn-danger" id="btn-bulk-delete" onclick="doBulkAction('delete')">🗑️ Delete Selected</button>
-            <button class="btn btn-primary" id="btn-bulk-restore" style="display:none" onclick="doBulkAction('restore')">↩️ Restore Selected</button>
-            <button class="btn btn-danger" id="btn-bulk-perm-delete" style="display:none; background:#b91c1c; border-color:#b91c1c;" onclick="doBulkPermanentDelete()">🔥 Permanent Delete Selected</button>
+            <button class="btn btn-danger" id="btn-bulk-flag" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkAction('flag')">?? Flag Selected</button>
+            <button class="btn btn-success" id="btn-bulk-clear" onclick="doBulkAction('unflag')">? Clear Selected</button>
+            <button class="btn btn-primary" id="btn-bulk-review" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkAction('review')">??? Review Selected</button>
+            <button class="btn btn-danger" id="btn-bulk-delete" onclick="doBulkAction('delete')">??? Delete Selected</button>
+            <button class="btn btn-primary" id="btn-bulk-restore" style="display:none" onclick="doBulkAction('restore')">?? Restore Selected</button>
+            <button class="btn btn-danger" id="btn-bulk-perm-delete" style="display:none; background:#b91c1c; border-color:#b91c1c;" onclick="doBulkPermanentDelete()">?? Permanent Delete Selected</button>
           </div>
         </div>
 
@@ -845,7 +846,7 @@ td button.btn:last-child { margin-right: 0; }
             <button class="btn btn-primary" onclick="openAddReasonModal()" style="padding:6px 14px; font-size:12.5px;">+ Add Reason</button>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">📋 Copy to event…</button>
+            <button class="btn btn-ghost" onclick="openCopyReasonsModal()" style="padding:6px 12px; font-size:12px;">?? Copy to event�</button>
             <select id="fr-type-filter" onchange="renderFlagReasons()" style="padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
               <option value="">All Types</option>
               <option value="auto">Auto</option>
@@ -859,7 +860,7 @@ td button.btn:last-child { margin-right: 0; }
             <input id="fr-search" oninput="renderFlagReasons()" placeholder="Search reasons..." style="flex:1; min-width:140px; padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--page-bg);">
           </div>
           <div id="fr-orphan-note" style="display:none; font-size:11.5px; color:#B45309; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:8px 10px;"></div>
-          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">💡 Header toggle = show/hide in flag dropdowns. For <span style="color:#2563EB;font-weight:600;">AUTO</span> reasons, the rule inside the card separately controls auto-flagging of new activities. Toggles never change already-flagged activities.</div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">?? Header toggle = show/hide in flag dropdowns. For <span style="color:#2563EB;font-weight:600;">AUTO</span> reasons, the rule inside the card separately controls auto-flagging of new activities. Toggles never change already-flagged activities.</div>
           <div id="flag-reason-cards" style="display:flex; flex-direction:column; gap:6px;">
             <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Loading flag reasons...</div>
           </div>
@@ -878,7 +879,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-exclude-rides')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                🚴 Exclude Rides / Cycling
+                ?? Exclude Rides / Cycling
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -913,7 +914,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-exclude-workouts')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                🏋️ Exclude Non-Foot Workouts
+                ??? Exclude Non-Foot Workouts
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -932,7 +933,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-min-distance')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                📏 Minimum Distance Check
+                ?? Minimum Distance Check
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -968,7 +969,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-max-gap')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                ⏱️ Max Moving/Elapsed Time Gap Check
+                ?? Max Moving/Elapsed Time Gap Check
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -1004,7 +1005,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-max-speed')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                ⚡ Min/Max Pace and Speed Check
+                ? Min/Max Pace and Speed Check
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -1062,7 +1063,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-pace')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                📈 Pace Deviation Rule
+                ?? Pace Deviation Rule
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -1101,7 +1102,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-steps')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                👣 Steps Count Validation
+                ?? Steps Count Validation
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <label class="toggle-switch" onclick="event.stopPropagation();" style="position:relative; display:inline-block; width:34px; height:18px; margin-right:8px;">
@@ -1140,7 +1141,7 @@ td button.btn:last-child { margin-right: 0; }
           <div class="card collapsible-card" style="margin-bottom:0px;">
             <div class="card-header" onclick="toggleCollapse('card-custom')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none;">
               <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0; display:flex; align-items:center; gap:8px;">
-                💡 Dynamic Custom Rules
+                ?? Dynamic Custom Rules
               </h3>
               <div style="display:flex; align-items:center; gap:10px;">
                 <button class="btn btn-orange btn-sm" onclick="event.stopPropagation(); addCustomRuleRow();" style="font-size:11px; font-weight:600; padding:4px 10px; border-radius:4px; height:auto; width:auto; line-height:1.2;">+ Add Custom Rule</button>
@@ -1166,11 +1167,11 @@ td button.btn:last-child { margin-right: 0; }
     <!-- Tab 5: Bulk Flag Scanner -->
     <div id="scanner-container" style="display:none">
 
-      <!-- ── Shared Activity Detection Card ── -->
+      <!-- -- Shared Activity Detection Card -- -->
       <div class="card" style="margin-bottom:20px; border-left:4px solid #E8622A;">
         <div class="card-header" onclick="toggleCollapse('card-shared')" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:16px; user-select:none; background:linear-gradient(135deg,#fff9f7 0%,#fff 100%);">
           <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:20px;">🔗</span>
+            <span style="font-size:20px;">??</span>
             <div>
               <h3 style="font-size:14px; font-weight:700; color:#0F1117; margin:0;">Shared Activity Detection</h3>
               <p style="font-size:11px; color:#6B7280; margin:4px 0 0; line-height:1.4;">Cross-participant scan: finds activities from different participants with identical field values (Strava sharing detection)</p>
@@ -1193,29 +1194,29 @@ td button.btn:last-child { margin-right: 0; }
               <label style="display:block; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px;">Match Fields (exact match on ALL checked fields)</label>
               <div style="display:flex; gap:16px; flex-wrap:wrap;">
                 <label style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; user-select:none;">
-                  <input type="checkbox" id="shared-chk-date" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> 📅 Activity Date
+                  <input type="checkbox" id="shared-chk-date" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ?? Activity Date
                 </label>
                 <label style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; user-select:none;">
-                  <input type="checkbox" id="shared-chk-starttime" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ⏰ Start Time (HH:MM)
+                  <input type="checkbox" id="shared-chk-starttime" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ? Start Time (HH:MM)
                 </label>
                 <label style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; user-select:none;">
-                  <input type="checkbox" id="shared-chk-distance" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> 📏 Distance (m)
+                  <input type="checkbox" id="shared-chk-distance" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ?? Distance (m)
                 </label>
                 <label style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; user-select:none;">
-                  <input type="checkbox" id="shared-chk-movingtime" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ⏱️ Moving Time (s)
+                  <input type="checkbox" id="shared-chk-movingtime" checked style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ?? Moving Time (s)
                 </label>
                 <label style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:500; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:8px; background:#fafafa; user-select:none;">
-                  <input type="checkbox" id="shared-chk-pace" style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ⚡ Avg Pace (min/km)
+                  <input type="checkbox" id="shared-chk-pace" style="cursor:pointer; width:14px; height:14px; accent-color:#E8622A;"> ? Avg Pace (min/km)
                 </label>
               </div>
             </div>
 
             <!-- Auto-flag on sync -->
             <div style="background:#fff8f0; border:1px solid #ffd3b0; border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px;">
-              <span style="font-size:18px; flex-shrink:0;">🤖</span>
+              <span style="font-size:18px; flex-shrink:0;">??</span>
               <div style="flex:1;">
                 <div style="font-size:13px; font-weight:700; color:#92400e; margin-bottom:4px;">Auto-Flag on Incoming Activity</div>
-                <div style="font-size:12px; color:#78350f; line-height:1.5; margin-bottom:10px;">When enabled, any new activity that exactly matches an existing participant's activity on all selected fields will be <strong>automatically flagged</strong> with reason: <em>"Shared Activity (auto-detected) — identical [fields] as [Participant Name]"</em></div>
+                <div style="font-size:12px; color:#78350f; line-height:1.5; margin-bottom:10px;">When enabled, any new activity that exactly matches an existing participant's activity on all selected fields will be <strong>automatically flagged</strong> with reason: <em>"Shared Activity (auto-detected) � identical [fields] as [Participant Name]"</em></div>
                 <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer;">
                   <input type="checkbox" id="shared-auto-flag" style="cursor:pointer; width:15px; height:15px; accent-color:#E8622A;">
                   Enable auto-flag on activity sync
@@ -1231,7 +1232,7 @@ td button.btn:last-child { margin-right: 0; }
               <button class="btn btn-orange" onclick="previewSharedActivities()" style="gap:6px; display:flex; align-items:center;">
                 <i class="ti ti-search" style="font-size:14px;"></i> Preview Shared Activities
               </button>
-              <span id="shared-rule-save-status" style="font-size:12px; color:#059669; display:none; font-weight:600;">✅ Saved!</span>
+              <span id="shared-rule-save-status" style="font-size:12px; color:#059669; display:none; font-weight:600;">? Saved!</span>
             </div>
 
             <!-- Preview results -->
@@ -1240,7 +1241,7 @@ td button.btn:last-child { margin-right: 0; }
                 <div style="font-size:13px; font-weight:600; color:#0F1117;" id="shared-preview-count"></div>
                 <div style="display:flex; gap:8px;">
                   <a href="#" style="font-size:12px; color:#E8622A; text-decoration:none; font-weight:500;" onclick="toggleAllSharedChecks(true);return false;">Select all</a>
-                  <span style="color:#ccc;">·</span>
+                  <span style="color:#ccc;">�</span>
                   <a href="#" style="font-size:12px; color:#6B7280; text-decoration:none;" onclick="toggleAllSharedChecks(false);return false;">None</a>
                 </div>
               </div>
@@ -1255,7 +1256,7 @@ td button.btn:last-child { margin-right: 0; }
           </div>
         </div>
       </div>
-      <!-- ── END Shared Activity Detection Card ── -->
+      <!-- -- END Shared Activity Detection Card -- -->
       <div class="filter-bar">
         <h3>Filter Candidate Activities to Flag</h3>
         <div class="filter-grid">
@@ -1285,10 +1286,10 @@ td button.btn:last-child { margin-right: 0; }
         </div>
         
         <div class="filter-actions" style="margin-top:16px;">
-          <button class="btn btn-primary" onclick="previewFlagRules()">👁️ Preview matches</button>
-          <button class="btn btn-danger" id="btn-apply-flags" onclick="applyFlagRules()" disabled>🚩 Flag Selected</button>
+          <button class="btn btn-primary" onclick="previewFlagRules()">??? Preview matches</button>
+          <button class="btn btn-danger" id="btn-apply-flags" onclick="applyFlagRules()" disabled>?? Flag Selected</button>
           <span id="flag-preview-count" style="font-size:13px; color:var(--text-secondary); margin-left: 8px;"></span>
-          <span id="flag-selected-count" style="font-size:13px; color:var(--text-secondary); display:none;">— <strong id="flag-selected-num">0</strong> selected</span>
+          <span id="flag-selected-count" style="font-size:13px; color:var(--text-secondary); display:none;">� <strong id="flag-selected-num">0</strong> selected</span>
         </div>
       </div>
 
@@ -1296,7 +1297,7 @@ td button.btn:last-child { margin-right: 0; }
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding: 0 4px;">
           <h3 style="font-size:14px; font-weight:600; color:var(--text-primary); margin:0;">Matching Activities</h3>
           <div style="font-size:13px; color:var(--text-secondary);">
-            <a href="#" style="color:var(--brand); text-decoration:none; font-weight:500;" onclick="toggleAllPreviewCheckboxes(true);return false;">Select all</a> &nbsp;·&nbsp; 
+            <a href="#" style="color:var(--brand); text-decoration:none; font-weight:500;" onclick="toggleAllPreviewCheckboxes(true);return false;">Select all</a> &nbsp;�&nbsp; 
             <a href="#" style="color:var(--text-secondary); text-decoration:none;" onclick="toggleAllPreviewCheckboxes(false);return false;">None</a>
           </div>
         </div>
@@ -1324,17 +1325,17 @@ td button.btn:last-child { margin-right: 0; }
 <div class="modal-overlay" id="shared-confirm-modal" style="display:none; align-items:center; justify-content:center;">
   <div class="modal" style="max-width:500px; width:100%; padding:28px;">
     <div style="text-align:center; margin-bottom:20px;">
-      <div style="font-size:36px; margin-bottom:8px;">🚩</div>
+      <div style="font-size:36px; margin-bottom:8px;">??</div>
       <h3 style="font-size:17px; font-weight:700; color:#0F1117; margin:0 0 6px;">Confirm Shared Activity Flags</h3>
       <p style="font-size:13px; color:#6B7280; margin:0;" id="shared-modal-summary"></p>
     </div>
     <div id="shared-modal-detail" style="background:#fff8f0; border:1px solid #ffd3b0; border-radius:10px; padding:14px; font-size:12px; color:#78350f; margin-bottom:20px; max-height:200px; overflow-y:auto; line-height:1.6;"></div>
     <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:12px 14px; font-size:12px; color:#991b1b; margin-bottom:20px;">
-      ⚠️ This action will flag the selected activities. They will be excluded from scoring until an admin reviews and clears the flag.
+      ?? This action will flag the selected activities. They will be excluded from scoring until an admin reviews and clears the flag.
     </div>
     <div id="shared-modal-step1" style="display:flex; gap:10px; justify-content:flex-end;">
       <button class="btn" style="background:#f5f5f5; color:#555;" onclick="closeSharedModal()">Cancel</button>
-      <button class="btn btn-danger" onclick="sharedModalStep2()">I Understand — Proceed</button>
+      <button class="btn btn-danger" onclick="sharedModalStep2()">I Understand � Proceed</button>
     </div>
     <div id="shared-modal-step2" style="display:none; flex-direction:column; gap:10px;">
       <div style="font-size:13px; font-weight:600; color:#991b1b; text-align:center;">Are you absolutely sure? This cannot be undone automatically.</div>
@@ -1345,7 +1346,7 @@ td button.btn:last-child { margin-right: 0; }
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="flag-modal"><div class="modal"><h3>Update Status</h3><p class="sub" id="modal-sub"></p><label>Flag reason</label><select id="modal-flag-reason" onchange="checkModalDist()"><option value="">— Mark as Valid (clear flag) —</option><optgroup label="── Manual Review ──"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="── Auto Flags ──"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="── Manual Flags ──"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select><div class="dist-field" id="modal-dist-field"><label>Corrected distance (meters)</label><input type="number" id="modal-corrected-dist" placeholder="e.g. 3500"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-confirm" onclick="confirmStatus()">Save</button></div></div></div>
+<div class="modal-overlay" id="flag-modal"><div class="modal"><h3>Update Status</h3><p class="sub" id="modal-sub"></p><label>Flag reason</label><select id="modal-flag-reason" onchange="checkModalDist()"><option value="">� Mark as Valid (clear flag) �</option><optgroup label="-- Manual Review --"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="-- Auto Flags --"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="-- Manual Flags --"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select><div class="dist-field" id="modal-dist-field"><label>Corrected distance (meters)</label><input type="number" id="modal-corrected-dist" placeholder="e.g. 3500"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-confirm" onclick="confirmStatus()">Save</button></div></div></div>
 
 <!-- Custom Edit Activity Modal -->
 <div class="modal-overlay" id="edit-activity-modal">
@@ -1359,8 +1360,8 @@ td button.btn:last-child { margin-right: 0; }
       <div class="filter-group" style="margin-bottom:0;">
         <label style="font-weight:700;">Status</label>
         <select id="edit-status">
-          <option value="valid">✅ Valid</option>
-          <option value="flagged">🚩 Invalid / Flagged</option>
+          <option value="valid">? Valid</option>
+          <option value="flagged">?? Invalid / Flagged</option>
         </select>
       </div>
       
@@ -1368,8 +1369,8 @@ td button.btn:last-child { margin-right: 0; }
       <div class="filter-group" style="margin-bottom:0;">
         <label style="font-weight:700;">Is Reviewed</label>
         <select id="edit-reviewed">
-          <option value="false">❌ Pending</option>
-          <option value="true">✅ Reviewed</option>
+          <option value="false">? Pending</option>
+          <option value="true">? Reviewed</option>
         </select>
       </div>
 
@@ -1378,11 +1379,11 @@ td button.btn:last-child { margin-right: 0; }
         <label style="font-weight:700;">Flag Reason</label>
         <select id="edit-flag-reason-select" onchange="onEditFlagReasonSelectChange()">
           <option value="">- None (Valid) -</option>
-          <optgroup label="── Manual Review ──">
+          <optgroup label="-- Manual Review --">
             <option value="Manual Review - Distance Issue">Manual Review - Distance Issue</option>
             <option value="Manual Review - Pace Issue">Manual Review - Pace Issue</option>
           </optgroup>
-          <optgroup label="── Auto Flags ──">
+          <optgroup label="-- Auto Flags --">
             <option value="Distance below min limit">Distance below min limit</option>
             <option value="Distance above max limit">Distance above max limit</option>
             <option value="Pace too fast">Pace too fast</option>
@@ -1393,7 +1394,7 @@ td button.btn:last-child { margin-right: 0; }
             <option value="Pace Deviation Issue">Pace Deviation Issue</option>
             <option value="Shared Activity (auto-detected)">Shared Activity (auto-detected)</option>
           </optgroup>
-          <optgroup label="── Manual Flags ──">
+          <optgroup label="-- Manual Flags --">
             <option value="Not Our Participant">Not Our Participant</option>
             <option value="Less than 1 km">Less than 1 km</option>
             <option value="Treadmill">Treadmill</option>
@@ -1485,7 +1486,7 @@ td button.btn:last-child { margin-right: 0; }
     </div>
   </div>
 </div>
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+<footer class="site-footer"><span>� 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 <script>
 
@@ -1512,7 +1513,7 @@ async function loadEventSelector() {
     sel.innerHTML = evs.map(e => {
       const isLive = e.status === 'live';
       const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
-      const prefix = isLive ? '🟢 ' : '';
+      const prefix = isLive ? '?? ' : '';
       return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
     }).join('');
     
@@ -1575,32 +1576,32 @@ function getActDate(a) {
   }
   return getISTDate(a.activity_date);
 }function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}function localDateValue(d){var dt=d?new Date(d):new Date();dt.setMinutes(dt.getMinutes()-dt.getTimezoneOffset());return dt.toISOString().slice(0,10)}function fmtUTCDateTime(d, startTime){
-  if(!d) return '—';
-  if(!startTime) return '—';
+  if(!d) return '�';
+  if(!startTime) return '�';
   try {
     var dt = new Date(d);
-    if(isNaN(dt.getTime())) return '—';
+    if(isNaN(dt.getTime())) return '�';
     return dt.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'UTC'}) + ' UTC';
   } catch(e) {
     return d;
   }
 }
 function fmtISTDateTime(d, startTime){
-  if(!d) return '—';
+  if(!d) return '�';
   if(!startTime){
     var naive = d ? d.replace(/[Zz]$/, '').replace(/\+00:00$/, '') : d;
     return new Date(naive).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
   }
   try {
     var dt = new Date(d);
-    if(isNaN(dt.getTime())) return '—';
+    if(isNaN(dt.getTime())) return '�';
     return dt.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'}) + ' IST';
   } catch(e) {
     return d;
   }
 }
 function fmtActivityIST(a) {
-  if (!a) return '—';
+  if (!a) return '�';
   if (a.activity_date_time_ist) {
     try {
       var dt = new Date(a.activity_date_time_ist.replace(' ', 'T') + '+05:30');
@@ -1619,7 +1620,7 @@ function fmtActivityIST(a) {
     }
   }
   return fmtISTDateTime(a.activity_date, a.start_time);
-}function fmtDur(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m'}function fmtPS(ms,t){if(!ms)return'—';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}function bc(t){if(t==='Walk')return'badge-walk';if(t==='Run'||t==='VirtualRun')return'badge-run';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return'badge-ride';return'badge-hike'}
+}function fmtDur(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m'}function fmtPS(ms,t){if(!ms)return'�';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return(ms*3.6).toFixed(1)+' km/h';var p=1000/ms,min=Math.floor(p/60),sec=Math.round(p%60);return min+':'+sec.toString().padStart(2,'0')+' /km'}function bc(t){if(t==='Walk')return'badge-walk';if(t==='Run'||t==='VirtualRun')return'badge-run';if(t==='Ride'||t==='VirtualRide'||t==='MountainBikeRide')return'badge-ride';return'badge-hike'}
 
 var regMap = {};
 async function loadRegistrations() {
@@ -1681,10 +1682,10 @@ async function confirmStatus(){
     var statusCell=document.getElementById('status-cell-'+currentId);
     if(statusCell){
       if(reason){
-        statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')">🚩 '+esc(reason)+'</span>';
+        statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')">?? '+esc(reason)+'</span>';
         statusCell.setAttribute('data-reason',reason);
       }else{
-        statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')">✅ Valid</span>';
+        statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')">? Valid</span>';
         statusCell.setAttribute('data-reason','');
       }
     }
@@ -1764,14 +1765,14 @@ async function saveDist(cell,actId,val){
 function startEditType(cell,actId,current){
   var types=['Walk','Run','Hike','Ride','VirtualRun','VirtualRide','MountainBikeRide'];
   var opts=types.map(function(t){return'<option value="'+t+'"'+(t===current?' selected':'')+'>'+t+'</option>'}).join('');
-  cell.innerHTML='<select class="edit-select"><option value="">— Select —</option>'+opts+'</select>';
+  cell.innerHTML='<select class="edit-select"><option value="">� Select �</option>'+opts+'</select>';
   var sel=cell.querySelector('select');
   sel.focus();
   sel.addEventListener('blur',function(){saveType(cell,actId,sel.value)});
   sel.addEventListener('change',function(){sel.blur()});
 }
 async function saveType(cell,actId,newType){
-  if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'—';return}
+  if(!newType){cell.innerHTML=cell.getAttribute('data-val')||'�';return}
   cell.innerHTML='<span style="color:#E8622A;font-size:11px">Saving...</span>';
   try{
     var adminEmail = 'Unknown Admin';
@@ -1873,7 +1874,7 @@ function renderAuditTrail(a) {
   if (a.flagged_at && a.flagged_by) {
     list.push({
       action: 'Flagged',
-      icon: '🚩',
+      icon: '??',
       by: a.flagged_by,
       at: a.flagged_at
     });
@@ -1881,7 +1882,7 @@ function renderAuditTrail(a) {
   if (a.cleared_at && a.cleared_by) {
     list.push({
       action: 'Cleared',
-      icon: '✅',
+      icon: '?',
       by: a.cleared_by,
       at: a.cleared_at
     });
@@ -1889,7 +1890,7 @@ function renderAuditTrail(a) {
   if (a.reviewed_at && a.reviewed_by) {
     list.push({
       action: 'Reviewed',
-      icon: '👁️',
+      icon: '???',
       by: a.reviewed_by,
       at: a.reviewed_at
     });
@@ -1897,7 +1898,7 @@ function renderAuditTrail(a) {
   if (a.deleted_at && a.deleted_by) {
     list.push({
       action: 'Deleted',
-      icon: '🗑️',
+      icon: '???',
       by: a.deleted_by,
       at: a.deleted_at
     });
@@ -2048,7 +2049,7 @@ async function loadActivities(){
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
       var rawReason = a.flag_reason || 'Flagged';
       var displayReason = rawReason.length > 27 ? rawReason.substring(0, 27) + '...' : rawReason;
-      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">🚩 '+esc(displayReason)+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">✅ Valid</span>';
+      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">?? '+esc(displayReason)+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">? Valid</span>';
       
       var reviewBtnHtml = '';
       var clearBtnHtml = '';
@@ -2071,15 +2072,15 @@ async function loadActivities(){
         
       var chkHtml = '<td data-label="Select" style="text-align:center"><input type="checkbox" class="row-chk-all" data-id="'+a.id+'" onchange="toggleRowAll('+a.id+', this.checked)" '+(bulkSelected[a.id]?'checked':'')+' style="cursor:pointer; width:15px; height:15px"></td>';
       
-      return'<tr class="activity-row" id="activity-row-'+a.id+'" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'—')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'—')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'—')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'—')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'—')+'" data-steps="'+(a.steps||'—')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'—')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points">'
+      return'<tr class="activity-row" id="activity-row-'+a.id+'" data-strava-id="'+a.strava_activity_id+'" data-device="'+esc(a.device_name||'�')+'" data-elapsed="'+(a.elapsed_time_seconds?fmtDur(a.elapsed_time_seconds):'�')+'" data-avg-hr="'+(a.avg_heart_rate?a.avg_heart_rate.toFixed(0)+' bpm':'�')+'" data-max-hr="'+(a.max_heart_rate?a.max_heart_rate.toFixed(0)+' bpm':'�')+'" data-calories="'+(a.calories?a.calories.toFixed(0)+' kcal':'�')+'" data-steps="'+(a.steps||'�')+'" data-flagged="'+(a.is_flagged?'Yes':'No')+'" data-flag-reason="'+esc(a.flag_reason||'�')+'" data-deleted="'+(a.is_deleted?'Yes':'No')+'" data-bonus="'+(a.manual_bonus||0)+' points">'
         + chkHtml
         + '<td data-label="Status" id="status-cell-'+a.id+'" data-reason="'+esc(a.flag_reason||'')+'">'+statusBadge+'</td>'
         + '<td data-label="IST Time">'+fmtActivityIST(a)+'</td>'
         + '<td data-label="Participant"><a href="https://www.strava.com/athletes/'+a.strava_athlete_id+'" target="_blank" class="ath">'+esc(athleteName)+'</a></td>'
-        + '<td data-label="Activity" style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'—')+'</a></td>'
-        + '<td data-label="Type" class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'—')+'</span></td>'
-        + '<td data-label="Distance" class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'—')+'</td>'
-        + '<td data-label="Moving Time">'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'—')+'</td>'
+        + '<td data-label="Activity" style="max-width:120px"><a href="'+actUrl+'" target="_blank" class="act-link" title="'+esc(a.activity_name||'')+'" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.activity_name||'�')+'</a></td>'
+        + '<td data-label="Type" class="editable" data-edit="type" data-id="'+a.id+'" data-val="'+esc(a.sport_type||'')+'" title="Double-click to edit"><span class="badge '+bc(a.sport_type)+'">'+esc(a.sport_type||'�')+'</span></td>'
+        + '<td data-label="Distance" class="editable" data-edit="dist" data-id="'+a.id+'" data-val="'+(a.distance_meters||0)+'" title="Double-click to edit">'+(a.distance_meters?(a.distance_meters/1000).toFixed(2)+' km':'�')+'</td>'
+        + '<td data-label="Moving Time">'+(a.moving_time_seconds?fmtDur(a.moving_time_seconds):'�')+'</td>'
         + '<td data-label="Pace/Speed">'+fmtPS(a.avg_speed,a.sport_type)+'</td>'
         + '<td data-label="Deleted">' + ((a.is_deleted === true || a.is_deleted === 'true') ? '<span class="badge badge-invalid" style="background:#FFE4E6; color:#E11D48; border-color:#FDA4AF;">Yes</span>' : '<span class="badge badge-valid">No</span>') + '</td>'
         + '<td data-label="Audit Trail">' + renderAuditTrail(a) + '</td>'
@@ -2148,7 +2149,7 @@ async function toggleRowSplits(row) {
   function isValEmpty(val) {
     if (val === null || val === undefined) return true;
     var s = String(val).trim();
-    return s === '' || s === '-' || s === '—' || s === 'null' || s === '0 points';
+    return s === '' || s === '-' || s === '�' || s === 'null' || s === '0 points';
   }
 
   var metaItems = [];
@@ -2195,7 +2196,7 @@ async function toggleRowSplits(row) {
         var dist = (s.distance_meters / 1000).toFixed(2) + ' km';
         var time = fmtDurSplit(s.moving_time_seconds);
         var pace = fmtPSSplit(s.avg_speed, 'metric');
-        var elev = s.elevation_difference ? (s.elevation_difference > 0 ? '+' : '') + s.elevation_difference.toFixed(0) + ' m' : '—';
+        var elev = s.elevation_difference ? (s.elevation_difference > 0 ? '+' : '') + s.elevation_difference.toFixed(0) + ' m' : '�';
         html += '<tr><td>' + s.split_number + '</td><td>' + dist + '</td><td>' + time + '</td><td>' + pace + '</td><td>' + elev + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
@@ -2211,7 +2212,7 @@ async function toggleRowSplits(row) {
 }
 
 function fmtDurSplit(s) {
-  if (!s) return '—';
+  if (!s) return '�';
   var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   var out = '';
   if (h > 0) out += h + ':';
@@ -2220,7 +2221,7 @@ function fmtDurSplit(s) {
 }
 
 function fmtPSSplit(ms, system) {
-  if (!ms) return '—';
+  if (!ms) return '�';
   var dist = system === 'metric' ? 1000 : 1609.34;
   var p = dist / ms;
   var min = Math.floor(p/60), sec = Math.round(p%60);
@@ -2257,7 +2258,7 @@ function switchTab(t){
 
   if (t === 'rules') {
     document.getElementById('page-title').textContent = 'Flag Reasons';
-    document.getElementById('page-subtitle').textContent = 'Manage all flag reasons — auto rules and manual flags in one place';
+    document.getElementById('page-subtitle').textContent = 'Manage all flag reasons � auto rules and manual flags in one place';
     document.getElementById('all-workouts-container').style.display = 'none';
     document.getElementById('flagged-data-container').style.display = 'none';
     document.getElementById('rules-container').style.display = 'block';
@@ -2400,10 +2401,10 @@ function applyFlaggedFilters() {
   var sum = document.getElementById('summary');
   if (currentTab === 'review') {
     sum.className = filteredFlaggedActivities.length ? 'summary warn' : 'summary ok';
-    sum.textContent = filteredFlaggedActivities.length ? '⚠️ ' + filteredFlaggedActivities.length + ' activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + ' flagged for review' : '✅ No flagged activities match the filters!';
+    sum.textContent = filteredFlaggedActivities.length ? '?? ' + filteredFlaggedActivities.length + ' activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + ' flagged for review' : '? No flagged activities match the filters!';
   } else {
     sum.className = 'summary info';
-    sum.textContent = '🗑️ ' + filteredFlaggedActivities.length + ' deleted activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + '— can be restored anytime';
+    sum.textContent = '??? ' + filteredFlaggedActivities.length + ' deleted activit' + (filteredFlaggedActivities.length === 1 ? 'y' : 'ies') + '� can be restored anytime';
   }
 
   // Adjust table checkboxes
@@ -2428,49 +2429,49 @@ function applyFlaggedFilters() {
     if (currentTab === 'review') {
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
       reviewBtn = isRev
-        ? '<button class="btn" style="background:#e5e7eb; color:#374151;" onclick="toggleReviewStatus(' + a.id + ', false)">👁️ Unreview</button>'
-        : '<button class="btn btn-success" style="background:#3b82f6; border-color:#3b82f6;" onclick="toggleReviewStatus(' + a.id + ', true)">👁️ Reviewed</button>';
+        ? '<button class="btn" style="background:#e5e7eb; color:#374151;" onclick="toggleReviewStatus(' + a.id + ', false)">??? Unreview</button>'
+        : '<button class="btn btn-success" style="background:#3b82f6; border-color:#3b82f6;" onclick="toggleReviewStatus(' + a.id + ', true)">??? Reviewed</button>';
     }
 
     var actions = currentTab === 'review'
-      ? '<button class="btn btn-orange" onclick="openReviewModal(' + a.id + ',\'' + name.replace(/'/g, "\\'") + '\',\'' + safeReason + '\')">✏️ Edit</button>'
+      ? '<button class="btn btn-orange" onclick="openReviewModal(' + a.id + ',\'' + name.replace(/'/g, "\\'") + '\',\'' + safeReason + '\')">?? Edit</button>'
         + reviewBtn
-        + '<button class="btn btn-success" onclick="doAction(' + a.id + ',\'unflag\',\'\')">✅ Clear</button>'
-        + '<button class="btn btn-danger" onclick="doAction(' + a.id + ',\'delete\',\'' + safeReason + '\')">🗑️ Delete</button>'
-      : '<button class="btn btn-primary" onclick="doAction(' + a.id + ',\'restore\',\'\')">↩️ Restore</button>'
-        + '<button class="btn btn-danger" style="margin-left:6px; background:#b91c1c; border-color:#b91c1c;" onclick="doPermanentDelete(' + a.id + ')">🔥 Permanent Delete</button>';
+        + '<button class="btn btn-success" onclick="doAction(' + a.id + ',\'unflag\',\'\')">? Clear</button>'
+        + '<button class="btn btn-danger" onclick="doAction(' + a.id + ',\'delete\',\'' + safeReason + '\')">??? Delete</button>'
+      : '<button class="btn btn-primary" onclick="doAction(' + a.id + ',\'restore\',\'\')">?? Restore</button>'
+        + '<button class="btn btn-danger" style="margin-left:6px; background:#b91c1c; border-color:#b91c1c;" onclick="doPermanentDelete(' + a.id + ')">?? Permanent Delete</button>';
       
     var isChecked = bulkSelected[a.id] ? ' checked' : '';
 
     var statusCellHtml = '';
     if (currentTab === 'deleted') {
-      statusCellHtml = '<td data-label="Status"><span class="badge" style="background:#FEF3C7; color:#D97706; border:1px solid #FCD34D; font-weight:600;">🗑️ Deleted</span></td>';
+      statusCellHtml = '<td data-label="Status"><span class="badge" style="background:#FEF3C7; color:#D97706; border:1px solid #FCD34D; font-weight:600;">??? Deleted</span></td>';
     } else {
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
       statusCellHtml = '<td data-label="Status">' +
-        '<span class="badge badge-invalid" style="background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '">🚩 ' + (isRev ? 'Reviewed' : 'Pending Review') + '</span>' +
+        '<span class="badge badge-invalid" style="background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '">?? ' + (isRev ? 'Reviewed' : 'Pending Review') + '</span>' +
         '</td>';
     }
 
     return '<tr id="row-' + a.id + '" class="activity-row" data-strava-id="' + a.strava_activity_id + '"'
-      + ' data-device="' + esc(a.device_name || '—') + '"'
-      + ' data-elapsed="' + (a.elapsed_time_seconds ? fmtDur(a.elapsed_time_seconds) : '—') + '"'
-      + ' data-avg-hr="' + (a.avg_heart_rate ? a.avg_heart_rate.toFixed(0) + ' bpm' : '—') + '"'
-      + ' data-max-hr="' + (a.max_heart_rate ? a.max_heart_rate.toFixed(0) + ' bpm' : '—') + '"'
-      + ' data-calories="' + (a.calories ? a.calories.toFixed(0) + ' kcal' : '—') + '"'
-      + ' data-steps="' + (a.steps || '—') + '"'
+      + ' data-device="' + esc(a.device_name || '�') + '"'
+      + ' data-elapsed="' + (a.elapsed_time_seconds ? fmtDur(a.elapsed_time_seconds) : '�') + '"'
+      + ' data-avg-hr="' + (a.avg_heart_rate ? a.avg_heart_rate.toFixed(0) + ' bpm' : '�') + '"'
+      + ' data-max-hr="' + (a.max_heart_rate ? a.max_heart_rate.toFixed(0) + ' bpm' : '�') + '"'
+      + ' data-calories="' + (a.calories ? a.calories.toFixed(0) + ' kcal' : '�') + '"'
+      + ' data-steps="' + (a.steps || '�') + '"'
       + ' data-flagged="' + (a.is_flagged ? 'Yes' : 'No') + '"'
-      + ' data-flag-reason="' + esc(a.flag_reason || '—') + '"'
+      + ' data-flag-reason="' + esc(a.flag_reason || '�') + '"'
       + ' data-deleted="' + (a.is_deleted ? 'Yes' : 'No') + '"'
       + ' data-bonus="' + (a.manual_bonus || 0) + ' points">'
       + '<td data-label="Select" style="text-align:center"><input type="checkbox" class="row-chk" data-id="' + a.id + '"' + isChecked + ' onchange="toggleRowSelect(' + a.id + ', this.checked)" style="cursor:pointer; width:15px; height:15px"></td>'
       + '<td data-label="Athlete"><a href="https://www.strava.com/athletes/' + a.strava_athlete_id + '" target="_blank" class="ath">' + name + '</a></td>'
-      + '<td data-label="Activity" style="max-width:120px"><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link" title="' + esc(a.activity_name || '') + '" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(a.activity_name || '—') + '</a></td>'
-      + '<td data-label="Type"><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '—') + '</span></td>'
+      + '<td data-label="Activity" style="max-width:120px"><a href="https://www.strava.com/activities/' + a.strava_activity_id + '" target="_blank" class="act-link" title="' + esc(a.activity_name || '') + '" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(a.activity_name || '�') + '</a></td>'
+      + '<td data-label="Type"><span class="badge ' + bc(a.sport_type) + '">' + (a.sport_type || '�') + '</span></td>'
       + '<td data-label="Date & time">' + fmtActivityIST(a) + '</td>'
-      + '<td data-label="Distance">' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '—') + '</td>'
+      + '<td data-label="Distance">' + (a.distance_meters ? (a.distance_meters / 1000).toFixed(2) + ' km' : '�') + '</td>'
       + '<td data-label="Pace">' + fmtPS(a.avg_speed, a.sport_type) + '</td>'
-      + '<td data-label="Flag reason"><span class="flag-reason" title="' + esc(a.flag_reason || '—') + '">' + esc(a.flag_reason || '—') + '</span></td>'
+      + '<td data-label="Flag reason"><span class="flag-reason" title="' + esc(a.flag_reason || '�') + '">' + esc(a.flag_reason || '�') + '</span></td>'
       + statusCellHtml
       + '<td data-label="Actions">' + actions + '</td>'
       + '</tr>';
@@ -2564,7 +2565,7 @@ async function doBulkAction(action) {
   
   var bar = document.getElementById('bulk-actions-bar');
   var origHtml = bar.innerHTML;
-  bar.innerHTML = '<span>⏳ Processing bulk action... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
+  bar.innerHTML = '<span>? Processing bulk action... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
   
   var success = 0;
   var failed = [];
@@ -2615,7 +2616,7 @@ async function doBulkAction(action) {
 }
 
 async function doPermanentDelete(id) {
-  var msg = "⚠️ WARNING: This will permanently and physically delete this activity record from the database.\n\n" +
+  var msg = "?? WARNING: This will permanently and physically delete this activity record from the database.\n\n" +
             "If this activity STILL exists on the athlete's Strava account, it WILL be re-imported in the following situations:\n" +
             "1. When the athlete logs in or re-connects their Strava account.\n" +
             "2. When an admin runs a bulk re-sync.\n" +
@@ -2649,7 +2650,7 @@ async function doBulkPermanentDelete() {
   var ids = Object.keys(bulkSelected);
   if (!ids.length) return;
   
-  var msg = "⚠️ WARNING: This will permanently and physically delete the " + ids.length + " selected activity records from the database.\n\n" +
+  var msg = "?? WARNING: This will permanently and physically delete the " + ids.length + " selected activity records from the database.\n\n" +
             "If these activities STILL exist on the athletes' Strava accounts, they WILL be re-imported in the following situations:\n" +
             "1. When the athlete logs in or re-connects their Strava account.\n" +
             "2. When an admin runs a bulk re-sync.\n" +
@@ -2661,7 +2662,7 @@ async function doBulkPermanentDelete() {
   
   var bar = document.getElementById('bulk-actions-bar');
   var origHtml = bar.innerHTML;
-  bar.innerHTML = '<span>⏳ Processing permanent delete... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
+  bar.innerHTML = '<span>? Processing permanent delete... <span class="bulk-selected-count" id="bulk-prog">0</span> / ' + ids.length + '</span>';
   
   var success = 0, failed = 0;
   var token = sessionStorage.getItem('wk_admin_token');
@@ -2698,7 +2699,7 @@ async function recheckAll(){
   var btn=document.getElementById('btn-recheck-outer');
   btn.innerHTML='<span class="spinner-inline"></span>Running...'; btn.disabled=true;
   await fetch(BACKEND_URL+'/recheck-flags',{method:'POST',headers:{'Content-Type':'application/json'}});
-  setTimeout(function(){ btn.innerHTML='🔍 Re-run Auto-flag'; btn.disabled=false; loadFlaggedData(); },6000);
+  setTimeout(function(){ btn.innerHTML='?? Re-run Auto-flag'; btn.disabled=false; loadFlaggedData(); },6000);
 }
 
 function openReviewModal(id, name, reason) {
@@ -2709,14 +2710,14 @@ function openReviewModal(id, name, reason) {
   document.getElementById('flag-modal').classList.add('show');
 }
 
-// ── Auto-Flag Rules Tab Javascript ──
+// -- Auto-Flag Rules Tab Javascript --
 var flagPreviewData = [];
 
 function fmtPace(avgSpeed) {
   return fmtPS(avgSpeed, 'Walk');
 }
 
-// ── Shared Activity Detection (exact match cross-participant scan) ──
+// -- Shared Activity Detection (exact match cross-participant scan) --
 var _sharedGroups = [];
 
 function getSharedRuleConfig() {
@@ -2831,7 +2832,7 @@ function findSharedActivityGroups(acts) {
     return true;
   }
 
-  // Build exact grouping key — no empty-string fallbacks
+  // Build exact grouping key � no empty-string fallbacks
   function makeKey(a) {
     var parts = [];
     if (cfg.checkDate) parts.push('D:' + getActDate(a));
@@ -2842,7 +2843,7 @@ function findSharedActivityGroups(acts) {
     return parts.join('|');
   }
 
-  // Group by key — only include activities passing full validation
+  // Group by key � only include activities passing full validation
   var keyMap = {};
   acts.forEach(function(a) {
     if (!isValidForGrouping(a)) return;
@@ -2875,7 +2876,7 @@ async function previewSharedActivities() {
   var sectionEl = document.getElementById('shared-preview-section');
   var flagBtn = document.getElementById('btn-flag-shared');
   
-  countEl.textContent = '⏳ Scanning all activities...';
+  countEl.textContent = '? Scanning all activities...';
   groupsEl.innerHTML = '';
   sectionEl.style.display = 'block';
   flagBtn.disabled = true;
@@ -2891,19 +2892,19 @@ async function previewSharedActivities() {
     _sharedGroups = findSharedActivityGroups(acts);
 
     if (_sharedGroups.length === 0) {
-      countEl.textContent = '✅ No shared activities detected with current rule settings';
+      countEl.textContent = '? No shared activities detected with current rule settings';
       return;
     }
 
     var totalActs = _sharedGroups.reduce(function(s, g) { return s + g.activities.length; }, 0);
     var fieldLabels = { date: 'Date', starttime: 'Start Time', distance: 'Distance', movingtime: 'Moving Time', pace: 'Pace' };
     var matchedOn = _sharedGroups[0].checkedFields.map(function(f) { return fieldLabels[f] || f; }).join(', ');
-    countEl.textContent = '🔗 Found ' + _sharedGroups.length + ' shared group' + (_sharedGroups.length === 1 ? '' : 's') + ' (' + totalActs + ' activities) — matched on: ' + matchedOn;
+    countEl.textContent = '?? Found ' + _sharedGroups.length + ' shared group' + (_sharedGroups.length === 1 ? '' : 's') + ' (' + totalActs + ' activities) � matched on: ' + matchedOn;
 
     groupsEl.innerHTML = _sharedGroups.map(function(g, gi) {
       var sample = g.activities[0];
       var date = getActDate(sample);
-      var startTime = getActStartTimeKey(sample) || '—';
+      var startTime = getActStartTimeKey(sample) || '�';
       var km = ((parseFloat(sample.distance_meters) || 0) / 1000).toFixed(2);
       var moving = fmtDur(parseFloat(sample.moving_time_seconds) || 0);
       var pace = fmtPace(sample.avg_speed);
@@ -2915,16 +2916,16 @@ async function previewSharedActivities() {
         '<div style="flex:1;">' +
         '<span style="font-size:12px; font-weight:700; color:#E8622A;">Group ' + (gi + 1) + '</span>' +
         '<span style="margin:0 8px; color:#e0e0e0;">|</span>' +
-        '<span style="font-size:12px; color:#444;">📅 ' + date + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
-        '<span style="font-size:12px; color:#444;">⏰ ' + startTime + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
-        '<span style="font-size:12px; color:#444;">📏 ' + km + ' km</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
-        '<span style="font-size:12px; color:#444;">⏱️ ' + moving + '</span>' +
-        '<span style="margin:0 8px; color:#e0e0e0;">·</span>' +
-        '<span style="font-size:12px; color:#444;">⚡ ' + pace + '</span>' +
-        (allFlagged ? '<span style="margin-left:10px; font-size:11px; color:#059669; font-weight:600;">✓ All already flagged</span>' : '') +
+        '<span style="font-size:12px; color:#444;">?? ' + date + '</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">�</span>' +
+        '<span style="font-size:12px; color:#444;">? ' + startTime + '</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">�</span>' +
+        '<span style="font-size:12px; color:#444;">?? ' + km + ' km</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">�</span>' +
+        '<span style="font-size:12px; color:#444;">?? ' + moving + '</span>' +
+        '<span style="margin:0 8px; color:#e0e0e0;">�</span>' +
+        '<span style="font-size:12px; color:#444;">? ' + pace + '</span>' +
+        (allFlagged ? '<span style="margin-left:10px; font-size:11px; color:#059669; font-weight:600;">? All already flagged</span>' : '') +
         '</div>' +
         '<span style="font-size:11px; background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:12px; font-weight:600;">' + g.activities.length + ' participants</span>' +
         '</div>' +
@@ -2944,8 +2945,8 @@ async function previewSharedActivities() {
             : '<span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:10px; font-weight:600;">Active</span>';
           return '<tr style="border-bottom:1px solid #f5f5f5;">' +
             '<td style="padding:9px 16px; font-weight:600; color:#0F1117;">' + esc(name) + '</td>' +
-            '<td style="padding:9px 16px;"><a href="' + actUrl + '" target="_blank" style="color:#E8622A; text-decoration:none;">' + esc(a.activity_name || '—') + '</a></td>' +
-            '<td style="padding:9px 16px; color:#6B7280;">' + esc(a.sport_type || '—') + '</td>' +
+            '<td style="padding:9px 16px;"><a href="' + actUrl + '" target="_blank" style="color:#E8622A; text-decoration:none;">' + esc(a.activity_name || '�') + '</a></td>' +
+            '<td style="padding:9px 16px; color:#6B7280;">' + esc(a.sport_type || '�') + '</td>' +
             '<td style="padding:9px 16px;">' + statusBadge + '</td>' +
             '</tr>';
         }).join('') +
@@ -2956,7 +2957,7 @@ async function previewSharedActivities() {
     flagBtn.disabled = false;
 
   } catch(e) {
-    countEl.textContent = '❌ Error: ' + e.message;
+    countEl.textContent = '? Error: ' + e.message;
   }
 }
 
@@ -3007,13 +3008,13 @@ function flagSharedSelected() {
     if (!grp) return;
     var names = grp.activities.filter(function(a) { return !a.is_flagged; }).map(function(a) {
       var reg = regMap[String(a.strava_athlete_id).trim()];
-      return (reg ? reg.full_name : 'Unknown') + ' — ' + esc(a.activity_name || a.strava_activity_id);
+      return (reg ? reg.full_name : 'Unknown') + ' � ' + esc(a.activity_name || a.strava_activity_id);
     });
     participantLines.push('Group ' + (gi + 1) + ': ' + names.join(', '));
   });
 
-  document.getElementById('shared-modal-summary').textContent = selectedGis.length + ' group' + (selectedGis.length === 1 ? '' : 's') + ' — ' + actCount + ' activities will be flagged';
-  document.getElementById('shared-modal-detail').innerHTML = '<strong>Matched on: ' + matchedOn + '</strong><br><br>' + participantLines.map(function(l) { return '• ' + l; }).join('<br>');
+  document.getElementById('shared-modal-summary').textContent = selectedGis.length + ' group' + (selectedGis.length === 1 ? '' : 's') + ' � ' + actCount + ' activities will be flagged';
+  document.getElementById('shared-modal-detail').innerHTML = '<strong>Matched on: ' + matchedOn + '</strong><br><br>' + participantLines.map(function(l) { return '� ' + l; }).join('<br>');
   document.getElementById('shared-modal-step1').style.display = 'flex';
   document.getElementById('shared-modal-step2').style.display = 'none';
   document.getElementById('shared-confirm-modal').style.display = 'flex';
@@ -3043,7 +3044,7 @@ async function executeSharedFlag() {
       var reg = regMap[String(a.strava_athlete_id).trim()];
       return reg ? reg.full_name : 'Unknown';
     }).join(', ');
-    var reason = 'Shared Activity (auto-detected) — identical ' + matchedOn + ' as: ' + otherNames;
+    var reason = 'Shared Activity (auto-detected) � identical ' + matchedOn + ' as: ' + otherNames;
     try {
       var r = await fetch(SUPABASE_URL + '/rest/v1/activities?id=eq.' + item.act.id, {
         method: 'PATCH',
@@ -3060,7 +3061,7 @@ async function executeSharedFlag() {
   _pendingSharedToFlag = [];
 
   var countEl = document.getElementById('shared-preview-count');
-  countEl.textContent = '✅ Done — ' + success + ' flagged' + (failed ? ' | ❌ ' + failed + ' failed' : '');
+  countEl.textContent = '? Done � ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
   showToast(success + ' activities flagged as Shared Activity', false);
   // Refresh the preview to show updated states
   previewSharedActivities();
@@ -3205,7 +3206,7 @@ async function previewFlagRules() {
   var listEl = document.getElementById('flag-preview-list');
   var btn = document.getElementById('btn-apply-flags');
   
-  countEl.textContent = '⏳ Scanning activities...';
+  countEl.textContent = '? Scanning activities...';
   bodyEl.innerHTML = '';
   listEl.style.display = 'none';
   btn.disabled = true;
@@ -3223,15 +3224,15 @@ async function previewFlagRules() {
       var already = a.is_flagged ? ' style="opacity:0.5"' : '';
       var athleteUrl = 'https://www.strava.com/athletes/' + a.strava_athlete_id;
       var actUrl = 'https://www.strava.com/activities/' + (a.strava_activity_id || a.id);
-      var actName = esc(a.activity_name || '—');
+      var actName = esc(a.activity_name || '�');
       var chkDisabled = a.is_flagged ? ' disabled title="Already flagged"' : '';
       var chkChecked = a.is_flagged ? '' : ' checked';
       
       return '<tr' + already + ' data-idx="' + flagPreviewData.indexOf(m) + '"' + (a.is_flagged ? ' class="row-already-flagged"' : '') + '>'
         + ' <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="row-preview-chk" data-idx="' + flagPreviewData.indexOf(m) + '"' + chkChecked + chkDisabled + ' onchange="updateSelectedPreviewCount()" style="cursor:pointer;width:15px;height:15px"></td>'
-        + '<td style="padding:8px 12px">' + (a.is_flagged ? '<span style="color:#bbb;font-size:11px">✓ already</span> ' : '') + '<a href="' + athleteUrl + '" target="_blank" style="color:#E8622A;font-weight:600;text-decoration:none">' + esc(m.name) + '</a></td>'
+        + '<td style="padding:8px 12px">' + (a.is_flagged ? '<span style="color:#bbb;font-size:11px">? already</span> ' : '') + '<a href="' + athleteUrl + '" target="_blank" style="color:#E8622A;font-weight:600;text-decoration:none">' + esc(m.name) + '</a></td>'
         + '<td style="padding:8px 12px; max-width:24ch; width:24ch;"><a href="' + actUrl + '" target="_blank" title="' + actName + '" style="color:#1A1A1A;text-decoration:none; display:inline-block; max-width:22ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + actName + '</a></td>'
-        + '<td style="padding:8px 12px">' + esc(a.sport_type || '—') + '</td>'
+        + '<td style="padding:8px 12px">' + esc(a.sport_type || '�') + '</td>'
         + '<td style="padding:8px 12px">' + dt + '</td>'
         + '<td style="padding:8px 12px">' + km + ' km</td>'
         + '<td style="padding:8px 12px">' + fmtPace(a.avg_speed) + '</td>'
@@ -3245,7 +3246,7 @@ async function previewFlagRules() {
     listEl.style.display = 'block';
     updateSelectedPreviewCount();
   } catch(e) {
-    countEl.textContent = '❌ Error: ' + e.message;
+    countEl.textContent = '? Error: ' + e.message;
   }
 }
 
@@ -3292,9 +3293,9 @@ async function applyFlagRules() {
     if (i % 10 === 0) countEl.textContent = 'Flagging... ' + (i + 1) + ' / ' + toFlag.length;
   }
   
-  btn.textContent = '🚩 Flag Selected';
+  btn.textContent = '?? Flag Selected';
   btn.disabled = false;
-  countEl.textContent = '✅ Done — ' + success + ' flagged' + (failed ? ' | ❌ ' + failed + ' failed' : '');
+  countEl.textContent = '? Done � ' + success + ' flagged' + (failed ? ' | ? ' + failed + ' failed' : '');
   updateSelectedPreviewCount();
 }
 
@@ -3809,7 +3810,7 @@ function showToast(message, isError) {
   }, 3000);
 }
 
-// ── Startup ──
+// -- Startup --
 loadEventSelector().then(function(){
   loadRegistrations().then(function(){
     loadAutoFlagConfig().then(function(){
@@ -4221,7 +4222,7 @@ async function doBulkActionAll(action) {
   
   var bar = document.getElementById('bulk-actions-bar-all');
   var origHtml = bar.innerHTML;
-  bar.innerHTML = '<span>⏳ Processing bulk action... <span class="bulk-selected-count" id="bulk-prog-all">0</span> / ' + ids.length + '</span>';
+  bar.innerHTML = '<span>? Processing bulk action... <span class="bulk-selected-count" id="bulk-prog-all">0</span> / ' + ids.length + '</span>';
   
   var success = 0;
   var failed = [];
@@ -4334,12 +4335,12 @@ function updateRowStatusLocally(id, action, reason) {
         var statusCell = document.getElementById('status-cell-' + id);
         if (statusCell) {
           if (!act.is_flagged) {
-            statusCell.innerHTML = '<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal(' + id + ')">✅ Valid</span>';
+            statusCell.innerHTML = '<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal(' + id + ')">? Valid</span>';
             statusCell.setAttribute('data-reason', '');
           } else {
             var rawReason = act.flag_reason || 'Flagged';
             var displayReason = rawReason.length > 27 ? rawReason.substring(0, 27) + '...' : rawReason;
-            statusCell.innerHTML = '<span class="badge badge-invalid" style="cursor:pointer; background:' + (act.is_reviewed ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(act.flag_reason || 'Flagged') + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal(' + id + ')">🚩 ' + esc(displayReason) + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '</span>';
+            statusCell.innerHTML = '<span class="badge badge-invalid" style="cursor:pointer; background:' + (act.is_reviewed ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(act.flag_reason || 'Flagged') + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal(' + id + ')">?? ' + esc(displayReason) + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '</span>';
             statusCell.setAttribute('data-reason', act.flag_reason || '');
           }
         }
@@ -4377,7 +4378,7 @@ function updateRowStatusLocally(id, action, reason) {
   }
 }
 
-// ══════════════ FLAG REASONS MANAGEMENT (unified tab) ══════════════
+// -------------- FLAG REASONS MANAGEMENT (unified tab) --------------
 var FR_DATA = [];
 var FR_ORPHANS = [];
 var FR_LOADED = false;
@@ -4392,7 +4393,7 @@ var FR_RULE_CARD_MAP = {
   steps_rule:          'card-steps',
   shared_detect:       null
 };
-var FR_ICONS = { exclude_rides:'🚴', exclude_workouts:'🏋️', min_distance:'📏', elapsed_time:'⏱️', speed_limits:'⚡', pace_limits:'🏃', pace_deviation_rule:'📈', steps_rule:'👣', shared_detect:'👥' };
+var FR_ICONS = { exclude_rides:'??', exclude_workouts:'???', min_distance:'??', elapsed_time:'??', speed_limits:'?', pace_limits:'??', pace_deviation_rule:'??', steps_rule:'??', shared_detect:'??' };
 
 // Flag Reasons tab follows the page-level Active Event selector (EV_ID / EV_ALL).
 function frEventId(){ return (typeof EV_ID !== 'undefined' && EV_ID) ? EV_ID : 1; }
@@ -4410,8 +4411,8 @@ async function loadFlagReasons(){
     var orphanEl = document.getElementById('fr-orphan-note');
     if (FR_ORPHANS.length) {
       orphanEl.style.display = 'block';
-      orphanEl.innerHTML = '⚠️ <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
-        FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' · ');
+      orphanEl.innerHTML = '?? <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
+        FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' � ');
     } else { orphanEl.style.display = 'none'; }
     renderFlagReasons();
   } catch(e) {
@@ -4447,7 +4448,7 @@ function renderFlagReasons(){
 
     var head = document.createElement('div');
     head.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;user-select:none;';
-    var icon = FR_ICONS[r.rule_key] || (r.flag_type === 'auto' ? '🔄' : '✋');
+    var icon = FR_ICONS[r.rule_key] || (r.flag_type === 'auto' ? '??' : '?');
     var typeChip = r.flag_type === 'auto'
       ? '<span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#2563EB;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;">Auto</span>'
       : '<span style="font-size:10px;font-weight:600;background:#F5F3FF;color:#7C3AED;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;">Manual</span>';
@@ -4489,7 +4490,7 @@ function expandFlagReason(r, body){
   var meta = document.createElement('div');
   meta.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-bottom:8px;';
   meta.innerHTML = 'Type: <strong>' + (r.flag_type === 'auto' ? 'Auto (fraud engine)' : 'Manual') + '</strong>' +
-    (r.is_engine_rule ? ' · <span style="color:var(--text-muted)">engine rule — name locked</span>' : '');
+    (r.is_engine_rule ? ' � <span style="color:var(--text-muted)">engine rule � name locked</span>' : '');
   body.appendChild(meta);
 
   if (!r.is_engine_rule) {
@@ -4508,7 +4509,7 @@ function expandFlagReason(r, body){
       if (ruleCard) {
         var help = document.createElement('div');
         help.style.cssText = 'font-size:11.5px;color:#374151;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.55;';
-        help.innerHTML = '<strong>ℹ️ Two toggles, two jobs:</strong> The toggle on <em>this card\'s header</em> controls whether the reason appears in flag dropdowns. The toggle on the <em>rule card below</em> controls whether the fraud engine auto-flags new activities. Rule OFF + reason ON = no auto-flagging, but admins can still apply it manually. Existing flagged activities are never changed by either toggle.';
+        help.innerHTML = '<strong>?? Two toggles, two jobs:</strong> The toggle on <em>this card\'s header</em> controls whether the reason appears in flag dropdowns. The toggle on the <em>rule card below</em> controls whether the fraud engine auto-flags new activities. Rule OFF + reason ON = no auto-flagging, but admins can still apply it manually. Existing flagged activities are never changed by either toggle.';
         body.appendChild(help);
         var note = document.createElement('div');
         note.style.cssText = 'font-size:11px;color:var(--text-muted);margin-bottom:6px;';
@@ -4531,15 +4532,15 @@ function expandFlagReason(r, body){
   } else {
     var hint = document.createElement('div');
     hint.style.cssText = 'font-size:11.5px;color:var(--text-muted);line-height:1.5;';
-    hint.innerHTML = 'Manual flag — applied by admins from the flag dropdowns. No automatic rule. The header toggle controls whether it appears in dropdowns; turning it off never changes already-flagged activities.';
+    hint.innerHTML = 'Manual flag � applied by admins from the flag dropdowns. No automatic rule. The header toggle controls whether it appears in dropdowns; turning it off never changes already-flagged activities.';
     body.appendChild(hint);
   }
 
-  // Delete — only offered when nothing is attached (server re-verifies too)
+  // Delete � only offered when nothing is attached (server re-verifies too)
   if (r.applied_count === 0 && !(r.is_engine_rule && frEventId() === 1)) {
     var delBar = document.createElement('div');
     delBar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:10px;';
-    delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')">🗑️ Delete (no activities attached)</button>';
+    delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')">??? Delete (no activities attached)</button>';
     body.appendChild(delBar);
   }
 }
@@ -4571,7 +4572,7 @@ function openCopyReasonsModal(){
   modal.style.cssText = 'background:#fff;border-radius:16px;padding:24px;width:100%;max-width:460px;max-height:80vh;overflow-y:auto;';
   modal.innerHTML =
     '<h3 style="font-size:16px;font-weight:600;margin:0 0 4px;">Copy flag reasons</h3>' +
-    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">From <strong>' + escFR(srcName) + '</strong> — auto rule thresholds are copied too if the target has none yet.</p>' +
+    '<p style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">From <strong>' + escFR(srcName) + '</strong> � auto rule thresholds are copied too if the target has none yet.</p>' +
     '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Target event</label>' +
     '<select id="fr-copy-target" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin:4px 0 14px;">' +
       targets.map(function(e){ return '<option value="' + e.id + '">' + escFR(e.name) + ' (' + e.status.toUpperCase() + ')</option>'; }).join('') +
@@ -4607,9 +4608,9 @@ async function executeCopyReasons(){
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Copy failed');
     document.getElementById('fr-copy-overlay').remove();
-    alert('✅ Copied ' + d.copied + ' reason' + (d.copied === 1 ? '' : 's') +
-      (d.skipped ? ' · ' + d.skipped + ' already existed on target' : '') +
-      (d.rules_copied ? ' · rule thresholds copied' : ''));
+    alert('? Copied ' + d.copied + ' reason' + (d.copied === 1 ? '' : 's') +
+      (d.skipped ? ' � ' + d.skipped + ' already existed on target' : '') +
+      (d.rules_copied ? ' � rule thresholds copied' : ''));
   } catch(e){ alert('Failed: ' + e.message); }
 }
 
@@ -4636,7 +4637,7 @@ async function toggleFlagReason(id, checked){
     var row = FR_DATA.find(function(x){ return x.id === id; });
     if (row) row.is_active = checked;
     if (row && !checked && row.applied_count > 0) {
-      alert('"' + row.reason + '" is applied on ' + row.applied_count + ' activities. They stay flagged — this reason just won\'t appear in dropdowns for new use.');
+      alert('"' + row.reason + '" is applied on ' + row.applied_count + ' activities. They stay flagged � this reason just won\'t appear in dropdowns for new use.');
     }
     populateFlagReasonDropdowns();
     renderFlagReasons();
@@ -4692,8 +4693,8 @@ async function populateFlagReasonDropdowns(){
       var current = sel.value;
       var first = sel.querySelector('option') ? sel.querySelector('option').outerHTML : '<option value="">All reasons</option>';
       var html = first;
-      if (autoOpts.length)   html += '<optgroup label="── Auto Flags ──">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
-      if (manualOpts.length) html += '<optgroup label="── Manual Flags ──">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (autoOpts.length)   html += '<optgroup label="-- Auto Flags --">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (manualOpts.length) html += '<optgroup label="-- Manual Flags --">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
       sel.innerHTML = html;
       sel.value = current;
     }
@@ -4705,8 +4706,8 @@ async function populateFlagReasonDropdowns(){
       var cur = editSel.value;
       var firstOpt = editSel.querySelector('option') ? editSel.querySelector('option').outerHTML : '<option value="">- None (Valid) -</option>';
       var opts = firstOpt;
-      if (autoOpts.length)   opts += '<optgroup label="── Auto Flags ──">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
-      if (manualOpts.length) opts += '<optgroup label="── Manual Flags ──">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (autoOpts.length)   opts += '<optgroup label="-- Auto Flags --">'   + autoOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
+      if (manualOpts.length) opts += '<optgroup label="-- Manual Flags --">' + manualOpts.map(function(o){ return '<option>' + escFR(o.reason) + '</option>'; }).join('') + '</optgroup>';
       opts += '<option value="custom">Custom...</option>';
       editSel.innerHTML = opts;
       editSel.value = cur;
