@@ -3476,7 +3476,7 @@ window.renderParticipantProfile = async function(athleteId) {
   try {
     var [regRes, actsRes, pastRes] = await Promise.all([
       fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=full_name,email,gender,shift,leaderboard_team,profile_photo,emp_code', { headers: HDR }).then(r => r.json()),
-      fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + athleteId + '&event_id=eq.' + EVENT_ROW.id + '&is_deleted=eq.false&order=activity_date.desc', { headers: HDR }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + athleteId + '&is_deleted=eq.false&order=activity_date.desc', { headers: HDR }).then(r => r.json()),
       fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&event_id=neq.' + EVENT_ROW.id + '&select=event_name,leaderboard_team', { headers: HDR }).then(r => r.json())
     ]);
 
@@ -3486,7 +3486,8 @@ window.renderParticipantProfile = async function(athleteId) {
       return;
     }
 
-    var validActs = actsRes.filter(function(a) { return !a.is_flagged; });
+    var eventActs = actsRes.filter(function(a) { return String(a.event_id) === String(EVENT_ROW.id); });
+    var validActs = eventActs.filter(function(a) { return !a.is_flagged; });
     var totalDistM = validActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
     var currentKm = totalDistM / 1000;
 
@@ -3587,61 +3588,22 @@ window.renderParticipantProfile = async function(athleteId) {
            '  </div>' +
            '</div>';
 
-    // 3. Activity Metrics Grid
-    var totalMovingSec = validActs.reduce(function(s, a) { return s + (a.moving_time_seconds || 0); }, 0);
-    
-    // Check if dominant activity is Ride
-    var rideActs = validActs.filter(function(a) {
-      var st = (a.sport_type || '').toLowerCase();
-      return st.indexOf('ride') > -1 || st.indexOf('cycling') > -1;
-    });
-    var isPrimaryRide = rideActs.length > (validActs.length / 2);
-    
-    var metricTitle = 'Avg Pace';
-    var avgPaceStr = '—';
-    if (totalMovingSec > 0 && totalDistM > 0) {
-      if (isPrimaryRide) {
-        metricTitle = 'Avg Speed';
-        var speedKmh = (totalDistM / 1000) / (totalMovingSec / 3600);
-        avgPaceStr = speedKmh.toFixed(1) + ' km/h';
-      } else {
-        metricTitle = 'Avg Pace';
-        var paceMinKm = (totalMovingSec / 60) / (totalDistM / 1000);
-        var mins = Math.floor(paceMinKm);
-        var secs = Math.round((paceMinKm - mins) * 60);
-        if (secs === 60) { mins++; secs = 0; }
-        avgPaceStr = mins + ':' + (secs < 10 ? '0' : '') + secs + ' /km';
-      }
-    }
-    var hours = Math.floor(totalMovingSec / 3600);
-    var minutes = Math.floor((totalMovingSec % 3600) / 60);
-    var timeStr = hours + 'h ' + minutes + 'm';
-    var totalElevation = validActs.reduce(function(s, a) { return s + (a.elevation_gain || 0); }, 0);
-
+    // 3. Activity Metrics Section with Period Switching Tabs
+    var tabBtnStyle = 'flex:1; background:none; border:none; color:rgba(255,255,255,0.4); padding:6px 10px; font-size:11px; font-weight:700; border-radius:8px; cursor:pointer; transition:all 0.2s ease; text-align:center; font-family:var(--font);';
     html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
-           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">ACTIVITY METRICS</div>' +
-           '  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' +
-           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
-           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Distance</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + currentKm.toFixed(1) + ' km</div>' +
-           '    </div>' +
-           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
-           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">' + metricTitle + '</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: #22c55e; margin-top: 4px;">' + avgPaceStr + '</div>' +
-           '    </div>' +
-           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
-           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Moving Time</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + timeStr + '</div>' +
-           '    </div>' +
-           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
-           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Elevation</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: #8b5cf6; margin-top: 4px;">' + totalElevation.toFixed(0) + ' m</div>' +
-           '    </div>' +
+           '  <div class="profile-stats-tabs" style="display:flex; gap:6px; background:rgba(255,255,255,0.04); padding:4px; border-radius:10px; margin-bottom:14px;">' +
+           '    <button id="profile-tab-week" onclick="switchProfilePeriod(\'week\')" class="profile-tab-btn" style="' + tabBtnStyle + '">Week</button>' +
+           '    <button id="profile-tab-month" onclick="switchProfilePeriod(\'month\')" class="profile-tab-btn" style="' + tabBtnStyle + '">Month</button>' +
+           '    <button id="profile-tab-3months" onclick="switchProfilePeriod(\'3months\')" class="profile-tab-btn" style="' + tabBtnStyle + '">3 Months</button>' +
+           '    <button id="profile-tab-year" onclick="switchProfilePeriod(\'year\')" class="profile-tab-btn" style="' + tabBtnStyle + '">Yearly</button>' +
+           '  </div>' +
+           '  <div id="profile-period-metrics" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' +
+              // Populated dynamically
            '  </div>' +
            '</div>';
 
     // 4. Points breakdown
-    var fullPts = calcFullPts(actsRes, reg.gender, reg.shift);
+    var fullPts = calcFullPts(eventActs, reg.gender, reg.shift);
     html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
            '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">POINTS BREAKDOWN</div>' +
            '  <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px;">' + esc(EVENT_ROW.name) + '</div>' +
@@ -3665,91 +3627,11 @@ window.renderParticipantProfile = async function(athleteId) {
            '  </div>' +
            '</div>';
 
-    // 5. Last 7 Days Activities & Bar Graph
-    var chartDays = [];
-    var maxVal = 1;
-    for (var i = 6; i >= 0; i--) {
-      var d = new Date();
-      d.setDate(d.getDate() - i);
-      var dStr = d.toISOString().split('T')[0];
-      var label = d.toLocaleDateString('en-IN', { weekday: 'short' })[0];
-      var km = 0;
-      validActs.forEach(function(a) {
-        var aDate = a.activity_date ? a.activity_date.split('T')[0] : null;
-        if (aDate === dStr) km += (a.distance_meters || 0) / 1000;
-      });
-      if (km > maxVal) maxVal = km;
-      chartDays.push({ label: label, val: km, str: dStr });
-    }
-
-    var svgHtml = '<svg viewBox="0 0 300 90" style="width: 100%; height: 90px; overflow: visible;">';
-    chartDays.forEach(function(cd, idx) {
-      var x = 15 + idx * 40;
-      var barH = (cd.val / maxVal) * 55;
-      var y = 70 - barH;
-      svgHtml += '<rect x="' + x + '" y="15" width="16" height="55" rx="4" fill="rgba(255,255,255,0.03)" />';
-      if (barH > 0) {
-        svgHtml += '<rect x="' + x + '" y="' + y + '" width="16" height="' + barH + '" rx="4" fill="url(#p-char-grad)" />';
-      }
-      svgHtml += '<text x="' + (x + 8) + '" y="84" fill="rgba(255,255,255,0.4)" font-size="9" font-weight="700" text-anchor="middle">' + cd.label + '</text>';
-      if (cd.val > 0) {
-        svgHtml += '<text x="' + (x + 8) + '" y="' + (y - 3) + '" fill="#fff" font-size="8" font-weight="700" text-anchor="middle">' + cd.val.toFixed(1) + '</text>';
-      }
-    });
-    svgHtml += '<defs><linearGradient id="p-char-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ea580c" /><stop offset="100%" stop-color="#f97316" /></linearGradient></defs>';
-    svgHtml += '</svg>';
-
-    var last7Acts = validActs.filter(function(a) {
-      return new Date(a.activity_date) >= sevenDaysAgo;
-    });
-
-    var actsListHtml = '';
-    if (last7Acts.length > 0) {
-      last7Acts.forEach(function(act) {
-        var actDist = (act.distance_meters || 0) / 1000;
-        var actDate = new Date(act.activity_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-        
-        var isRide = (act.sport_type || '').toLowerCase().indexOf('ride') > -1 || (act.sport_type || '').toLowerCase().indexOf('cycling') > -1;
-        var actMetricStr = '—';
-        if (act.moving_time_seconds && act.distance_meters) {
-          if (isRide) {
-            var speedKmh = (act.distance_meters / 1000) / (act.moving_time_seconds / 3600);
-            actMetricStr = speedKmh.toFixed(1) + ' km/h';
-          } else {
-            var paceMin = (act.moving_time_seconds / 60) / (act.distance_meters / 1000);
-            var m = Math.floor(paceMin);
-            var s = Math.round((paceMin - m) * 60);
-            if (s === 60) { m++; s = 0; }
-            actMetricStr = m + ':' + (s < 10 ? '0' : '') + s + ' /km';
-          }
-        }
-        
-        var actTitle = act.description || (act.sport_type || 'Activity');
-        if (!act.description && isRide) {
-          actTitle = 'Ride';
-        }
-        
-        actsListHtml += '<div onclick="openActivityDetail(\'' + (act.strava_activity_id || act.id) + '\', null, ' + !!act.strava_activity_id + ')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.02)\'">' +
-                       '  <div style="text-align: left;">' +
-                       '    <div style="font-size: 13px; font-weight: 700; color: #fff;">' + esc(actTitle) + '</div>' +
-                       '    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">' + actDate + ' · ' + actMetricStr + '</div>' +
-                       '  </div>' +
-                       '  <div style="display: flex; align-items: center; gap: 8px;">' +
-                       '    <div style="font-size: 14px; font-weight: 800; color: var(--brand);">' + actDist.toFixed(1) + ' km</div>' +
-                       '    <span style="color: rgba(255,255,255,0.2); font-size: 12px;">➔</span>' +
-                       '  </div>' +
-                       '</div>';
-      });
-    } else {
-      actsListHtml = '<p style="color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; padding: 10px 0; margin: 0;">No activities logged in the last 7 days</p>';
-    }
-
+    // 5. Dynamic Activities List & Chart Container
     html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
-           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">LAST 7 DAYS ACTIVITIES</div>' +
-           '  ' + svgHtml +
-           '  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">' +
-                actsListHtml +
-           '  </div>' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PERIOD ACTIVITIES</div>' +
+           '  <div id="profile-period-chart"></div>' +
+           '  <div id="profile-period-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;"></div>' +
            '</div>';
 
     // 6. Past Events Participated
@@ -3773,8 +3655,250 @@ window.renderParticipantProfile = async function(athleteId) {
            '</div>';
 
     contentEl.innerHTML = html;
+
+    // Cache unflagged all-time activities for period switcher
+    window._currentProfileActs = actsRes.filter(function(a) { return !a.is_flagged; });
+    
+    // Switch to default Week period on load
+    switchProfilePeriod('week');
+
   } catch (err) {
     console.error('renderParticipantProfile error:', err);
     contentEl.innerHTML = '<p style="color:#ef4444; text-align:center; padding:20px;">Failed to load profile details.</p>';
   }
 };
+
+window.switchProfilePeriod = function(period) {
+  document.querySelectorAll('.profile-tab-btn').forEach(function(btn) {
+    btn.style.background = 'none';
+    btn.style.color = 'rgba(255,255,255,0.4)';
+    btn.style.boxShadow = 'none';
+  });
+  var activeBtn = document.getElementById('profile-tab-' + period);
+  if (activeBtn) {
+    activeBtn.style.background = 'rgba(255,255,255,0.1)';
+    activeBtn.style.color = '#fff';
+    activeBtn.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.2)';
+  }
+
+  var validActs = window._currentProfileActs || [];
+  var now = new Date();
+  var cutoffDate = new Date();
+  
+  if (period === 'week') {
+    cutoffDate.setDate(now.getDate() - 7);
+  } else if (period === 'month') {
+    cutoffDate.setDate(now.getDate() - 30);
+  } else if (period === '3months') {
+    cutoffDate.setDate(now.getDate() - 90);
+  } else if (period === 'year') {
+    cutoffDate.setDate(now.getDate() - 365);
+  }
+  cutoffDate.setHours(0,0,0,0);
+
+  var periodActs = validActs.filter(function(a) {
+    return new Date(a.activity_date) >= cutoffDate;
+  });
+
+  renderProfilePeriodStats(period, periodActs);
+};
+
+function renderProfilePeriodStats(period, periodActs) {
+  var metricsEl = document.getElementById('profile-period-metrics');
+  var chartEl = document.getElementById('profile-period-chart');
+  var listEl = document.getElementById('profile-period-list');
+  if (!metricsEl || !chartEl || !listEl) return;
+
+  var totalDistM = periodActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
+  var currentKm = totalDistM / 1000;
+  var totalMovingSec = periodActs.reduce(function(s, a) { return s + (a.moving_time_seconds || 0); }, 0);
+
+  var rideActs = periodActs.filter(function(a) {
+    var st = (a.sport_type || '').toLowerCase();
+    return st.indexOf('ride') > -1 || st.indexOf('cycling') > -1;
+  });
+  var isPrimaryRide = rideActs.length > (periodActs.length / 2);
+
+  var metricTitle = 'Avg Pace';
+  var avgPaceStr = '—';
+  if (totalMovingSec > 0 && totalDistM > 0) {
+    if (isPrimaryRide) {
+      metricTitle = 'Avg Speed';
+      var speedKmh = (totalDistM / 1000) / (totalMovingSec / 3600);
+      avgPaceStr = speedKmh.toFixed(1) + ' km/h';
+    } else {
+      metricTitle = 'Avg Pace';
+      var paceMinKm = (totalMovingSec / 60) / (totalDistM / 1000);
+      var mins = Math.floor(paceMinKm);
+      var secs = Math.round((paceMinKm - mins) * 60);
+      if (secs === 60) { mins++; secs = 0; }
+      avgPaceStr = mins + ':' + (secs < 10 ? '0' : '') + secs + ' /km';
+    }
+  }
+
+  var hours = Math.floor(totalMovingSec / 3600);
+  var minutes = Math.floor((totalMovingSec % 3600) / 60);
+  var timeStr = hours + 'h ' + minutes + 'm';
+  var totalElevation = periodActs.reduce(function(s, a) { return s + (a.elevation_gain || 0); }, 0);
+
+  metricsEl.innerHTML = 
+    '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+    '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Distance</div>' +
+    '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + currentKm.toFixed(1) + ' km</div>' +
+    '    </div>' +
+    '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+    '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">' + metricTitle + '</div>' +
+    '      <div style="font-size: 18px; font-weight: 800; color: #22c55e; margin-top: 4px;">' + avgPaceStr + '</div>' +
+    '    </div>' +
+    '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+    '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Moving Time</div>' +
+    '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + timeStr + '</div>' +
+    '    </div>' +
+    '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+    '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Elevation</div>' +
+    '      <div style="font-size: 18px; font-weight: 800; color: #8b5cf6; margin-top: 4px;">' + totalElevation.toFixed(0) + ' m</div>' +
+    '    </div>';
+
+  var chartDays = [];
+  var maxVal = 1;
+  var viewWidth = 300;
+
+  if (period === 'week') {
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var dStr = d.toISOString().split('T')[0];
+      var label = d.toLocaleDateString('en-IN', { weekday: 'short' })[0];
+      var km = 0;
+      periodActs.forEach(function(a) {
+        var aDate = a.activity_date ? a.activity_date.split('T')[0] : null;
+        if (aDate === dStr) km += (a.distance_meters || 0) / 1000;
+      });
+      if (km > maxVal) maxVal = km;
+      chartDays.push({ label: label, val: km });
+    }
+  } else if (period === 'month') {
+    for (var i = 29; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var dStr = d.toISOString().split('T')[0];
+      var label = d.getDate();
+      var km = 0;
+      periodActs.forEach(function(a) {
+        var aDate = a.activity_date ? a.activity_date.split('T')[0] : null;
+        if (aDate === dStr) km += (a.distance_meters || 0) / 1000;
+      });
+      if (km > maxVal) maxVal = km;
+      chartDays.push({ label: label, val: km });
+    }
+  } else if (period === '3months') {
+    for (var i = 11; i >= 0; i--) {
+      var wStart = new Date();
+      wStart.setDate(wStart.getDate() - (i * 7 + 6));
+      var wEnd = new Date();
+      wEnd.setDate(wEnd.getDate() - (i * 7));
+      wStart.setHours(0,0,0,0); wEnd.setHours(23,59,59,999);
+      
+      var label = 'W' + (12 - i);
+      var km = 0;
+      periodActs.forEach(function(a) {
+        var aDate = new Date(a.activity_date);
+        if (aDate >= wStart && aDate <= wEnd) km += (a.distance_meters || 0) / 1000;
+      });
+      if (km > maxVal) maxVal = km;
+      chartDays.push({ label: label, val: km });
+    }
+  } else if (period === 'year') {
+    for (var i = 11; i >= 0; i--) {
+      var d = new Date();
+      d.setMonth(d.getMonth() - i);
+      var mIndex = d.getMonth();
+      var yIndex = d.getFullYear();
+      
+      var labelsShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var label = labelsShort[mIndex];
+      var km = 0;
+      periodActs.forEach(function(a) {
+        if (a.activity_date) {
+          var aDate = new Date(a.activity_date);
+          if (aDate.getMonth() === mIndex && aDate.getFullYear() === yIndex) {
+            km += (a.distance_meters || 0) / 1000;
+          }
+        }
+      });
+      if (km > maxVal) maxVal = km;
+      chartDays.push({ label: label[0], val: km, fullLabel: label });
+    }
+  }
+
+  var svgHtml = '<svg viewBox="0 0 300 90" style="width: 100%; height: 90px; overflow: visible;">';
+  var numBars = chartDays.length;
+  var colWidth = (viewWidth - 30) / numBars;
+  var barWidth = Math.max(2, colWidth - 4);
+  
+  chartDays.forEach(function(cd, idx) {
+    var x = 15 + idx * colWidth;
+    var barH = (cd.val / maxVal) * 55;
+    var y = 70 - barH;
+    svgHtml += '<rect x="' + x + '" y="15" width="' + barWidth + '" height="55" rx="' + (barWidth > 4 ? 4 : 1) + '" fill="rgba(255,255,255,0.03)" />';
+    if (barH > 0) {
+      svgHtml += '<rect x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="' + (barWidth > 4 ? 4 : 1) + '" fill="url(#p-char-grad)" />';
+    }
+    var showLabel = true;
+    if (period === 'month') {
+      showLabel = (idx % 5 === 0 || idx === numBars - 1);
+    }
+    if (showLabel) {
+      svgHtml += '<text x="' + (x + barWidth/2) + '" y="84" fill="rgba(255,255,255,0.4)" font-size="8" font-weight="700" text-anchor="middle">' + cd.label + '</text>';
+    }
+    if (cd.val > 0 && period !== 'month') {
+      svgHtml += '<text x="' + (x + barWidth/2) + '" y="' + (y - 3) + '" fill="#fff" font-size="8" font-weight="700" text-anchor="middle">' + cd.val.toFixed(0) + '</text>';
+    }
+  });
+  svgHtml += '<defs><linearGradient id="p-char-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ea580c" /><stop offset="100%" stop-color="#f97316" /></linearGradient></defs>';
+  svgHtml += '</svg>';
+  chartEl.innerHTML = svgHtml;
+
+  var actsListHtml = '';
+  var displayActs = periodActs.slice(0, 15);
+  if (displayActs.length > 0) {
+    displayActs.forEach(function(act) {
+      var actDist = (act.distance_meters || 0) / 1000;
+      var actDate = new Date(act.activity_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+      
+      var isRide = (act.sport_type || '').toLowerCase().indexOf('ride') > -1 || (act.sport_type || '').toLowerCase().indexOf('cycling') > -1;
+      var actMetricStr = '—';
+      if (act.moving_time_seconds && act.distance_meters) {
+        if (isRide) {
+          var speedKmh = (act.distance_meters / 1000) / (act.moving_time_seconds / 3600);
+          actMetricStr = speedKmh.toFixed(1) + ' km/h';
+        } else {
+          var paceMin = (act.moving_time_seconds / 60) / (act.distance_meters / 1000);
+          var m = Math.floor(paceMin);
+          var s = Math.round((paceMin - m) * 60);
+          if (s === 60) { m++; s = 0; }
+          actMetricStr = m + ':' + (s < 10 ? '0' : '') + s + ' /km';
+        }
+      }
+      
+      var actTitle = act.description || (act.sport_type || 'Activity');
+      if (!act.description && isRide) {
+        actTitle = 'Ride';
+      }
+      
+      actsListHtml += '<div onclick="openActivityDetail(\'' + (act.strava_activity_id || act.id) + '\', null, ' + !!act.strava_activity_id + ')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.02)\'">' +
+                     '  <div style="text-align: left;">' +
+                     '    <div style="font-size: 13px; font-weight: 700; color: #fff;">' + esc(actTitle) + '</div>' +
+                     '    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">' + actDate + ' · ' + actMetricStr + '</div>' +
+                     '  </div>' +
+                     '  <div style="display: flex; align-items: center; gap: 8px;">' +
+                     '    <div style="font-size: 14px; font-weight: 800; color: var(--brand);">' + actDist.toFixed(1) + ' km</div>' +
+                     '    <span style="color: rgba(255,255,255,0.2); font-size: 12px;">➔</span>' +
+                     '  </div>' +
+                     '</div>';
+    });
+  } else {
+    actsListHtml = '<p style="color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; padding: 10px 0; margin: 0;">No activities logged in this period</p>';
+  }
+  listEl.innerHTML = actsListHtml;
+}
