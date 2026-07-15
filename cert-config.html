@@ -103,8 +103,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 <body>
   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -261,7 +261,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
 
   async function loadEventsList() {
     try {
-      var r = await fetch(SB_URL + '/rest/v1/events?select=id,name&order=start_date.desc', { headers: HDR });
+      var r = await fetch(SB_URL + '/rest/v1/events?select=id,name,status&order=start_date.desc', { headers: HDR });
       var events = await r.json();
       var sel = document.getElementById('event-selector');
       sel.innerHTML = '';
@@ -274,7 +274,14 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
       events.forEach(function(ev) {
         var opt = document.createElement('option');
         opt.value = ev.id;
-        opt.textContent = ev.name;
+        var isLive = ev.status === 'live';
+        if (isLive) {
+          opt.textContent = "\uD83D\uDD25 " + ev.name + " (LIVE)";
+          opt.style.color = "#16a34a";
+          opt.style.fontWeight = "bold";
+        } else {
+          opt.textContent = ev.name + " (" + (ev.status || '').toUpperCase() + ")";
+        }
         sel.appendChild(opt);
       });
 
