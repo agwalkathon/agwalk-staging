@@ -2559,8 +2559,20 @@ window.renderDashHybridExtras = function(opts) {
       if (d.km > 0) {
         cell.style.cursor = 'pointer';
         cell.onclick = function() {
-          if (typeof showDateDetails === 'function') {
-            showDateDetails(d.str);
+          var myActs = window._myActsGlobal || [];
+          var dayActs = myActs.filter(function(a) {
+            var datePart = a.activity_date ? a.activity_date.split('T')[0] : null;
+            return datePart === d.str && !a.is_flagged;
+          });
+          if (dayActs.length > 0) {
+            var act = dayActs[0];
+            if (typeof openActivityDetail === 'function') {
+              openActivityDetail(act.strava_activity_id || act.id, null, !!act.strava_activity_id);
+            }
+          } else {
+            if (typeof showDateDetails === 'function') {
+              showDateDetails(d.str);
+            }
           }
         };
       }
