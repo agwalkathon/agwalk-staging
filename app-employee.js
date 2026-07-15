@@ -211,24 +211,7 @@ function formatCelebDateTime(isoStr) {
   return mo + ' ' + dt.getDate() + ', ' + dt.getFullYear() + ' at ' + hr + ':' + min + ' ' + ampm;
 }
 function getGlassmorphicAvatarStyle(name) {
-  var colors = [
-    { r: 232, g: 98, b: 42, r2: 252, g2: 97, b2: 0 },    // Orange
-    { r: 79, g: 70, b: 229, r2: 124, g2: 58, b2: 237 },  // Indigo/Purple
-    { r: 13, g: 148, b: 136, r2: 20, g2: 184, b2: 166 }, // Teal
-    { r: 219, g: 39, b: 119, r2: 236, g2: 72, b2: 153 }, // Pink
-    { r: 37, g: 99, b: 235, r2: 96, g2: 165, b2: 250 }   // Blue
-  ];
-  var hash = 0;
-  var str = name || '';
-  for (var i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  var index = Math.abs(hash) % colors.length;
-  var c = colors[index];
-  var bg = 'linear-gradient(135deg, rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.35) 0%, rgba(' + c.r2 + ',' + c.g2 + ',' + c.b2 + ',0.15) 100%)';
-  var border = '1px solid rgba(255,255,255,0.18)';
-  var shadow = 'inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 15px rgba(0,0,0,0.25)';
-  return 'background:' + bg + '; border:' + border + '; color:#ffffff; box-shadow:' + shadow + '; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); text-shadow:0 1px 2px rgba(0,0,0,0.3); font-weight:800; text-transform:uppercase;';
+  return 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; border: none; font-weight: 700; font-family: var(--font); text-shadow: none; text-transform: uppercase;';
 }
 var TYPE_META = { birthday: ['🎂','#F59E0B'], anniversary: ['🎉','#8B5CF6'], custom: ['📣','#E8622A'], welcome: ['👋','#22C55E'], announcement: ['📢','#3B82F6'], medal: ['🏅','#F4A84A'] };
 var EMOJIS = ['🎉','❤️','👏'];
