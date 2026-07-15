@@ -50,7 +50,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Push Notifications — Arcgate Walkathon Admin</title>
+  <title>Push Notifications â€” Arcgate Walkathon Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -161,8 +161,8 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 <body>
                   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -181,6 +181,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+
       <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
@@ -206,15 +207,15 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 
 <!-- Stats -->
 <div class="stat-row">
-  <div class="stat-box"><div class="stat-val" id="stat-subs">—</div><div class="stat-lbl">Subscribed devices</div></div>
-  <div class="stat-box"><div class="stat-val" id="stat-enabled" style="color:#16a34a">—</div><div class="stat-lbl">Rules enabled</div></div>
-  <div class="stat-box"><div class="stat-val" id="stat-disabled" style="color:#9ca3af">—</div><div class="stat-lbl">Rules disabled</div></div>
+  <div class="stat-box"><div class="stat-val" id="stat-subs">â€”</div><div class="stat-lbl">Subscribed devices</div></div>
+  <div class="stat-box"><div class="stat-val" id="stat-enabled" style="color:#16a34a">â€”</div><div class="stat-lbl">Rules enabled</div></div>
+  <div class="stat-box"><div class="stat-val" id="stat-disabled" style="color:#9ca3af">â€”</div><div class="stat-lbl">Rules disabled</div></div>
 </div>
 
 <!-- Tabs Navigation -->
 <div class="section-tabs">
-  <button class="stab active" data-target="broadcast_devices" onclick="switchPushTab('broadcast_devices')">?? Broadcast & Devices</button>
-  <button class="stab" data-target="triggers_channels" onclick="switchPushTab('triggers_channels')">?? Notification Channels & Templates</button>
+  <button class="stab active" data-target="broadcast_devices" onclick="switchPushTab('broadcast_devices')"><i class="ti ti-broadcast"></i> Broadcast & Devices</button>
+  <button class="stab" data-target="triggers_channels" onclick="switchPushTab('triggers_channels')"><i class="ti ti-adjustments"></i> Notification Channels & Templates</button>
 </div>
 
 <!-- Tab Panel: Broadcast & Devices -->
@@ -395,7 +396,7 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
 </div>
 
 </div><!-- /content -->
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+<footer class="site-footer"><span>Â© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 
 <script>
@@ -456,7 +457,7 @@ async function loadRules() {
     renderRules();
     loadStats();
   } catch(e) {
-    document.getElementById('rules-list-container').innerHTML = '<p style="color:#c62828;font-size:13px;padding:8px 0">Could not load rules — backend may be starting up. Refresh in a moment.</p>';
+    document.getElementById('rules-list-container').innerHTML = '<p style="color:#c62828;font-size:13px;padding:8px 0">Could not load rules â€” backend may be starting up. Refresh in a moment.</p>';
   }
 }
 
@@ -553,7 +554,7 @@ function renderRules() {
              '        <input type="text" id="title-rule-' + idx + '" value="' + esc(rule.title) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff; color:var(--text);">' +
              '      </div>' +
              '      <div class="fld" style="margin:0; display:flex; flex-direction:column; gap:4px;">' +
-             '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Body — use {distance} {name} {rank} {medal}</label>' +
+             '        <label style="font-size: 11px; text-transform: uppercase; font-weight:600; color:var(--text-muted); display:block;">Notification Body â€” use {distance} {name} {rank} {medal}</label>' +
              '        <input type="text" id="body-rule-' + idx + '" value="' + esc(rule.body) + '" onblur="autoSaveText(' + idx + ')" style="width: 100%; padding: 8px 12px; border: 1px solid #e8e8e8; border-radius: 6px; font-size:13px; outline:none; background:#fff; color:var(--text);">' +
              '      </div>' +
              '    </div>' +
@@ -656,7 +657,7 @@ async function loadStats() {
     var r = await fetch(BU + '/push/stats');
     var j = await r.json();
     document.getElementById('stat-subs').textContent = j.total || 0;
-  } catch(e) { document.getElementById('stat-subs').textContent = '—'; }
+  } catch(e) { document.getElementById('stat-subs').textContent = 'â€”'; }
 }
 
 async function sendBroadcast() {
@@ -676,9 +677,9 @@ async function sendBroadcast() {
       res.innerHTML = 
         '<div style="margin-top:8px; font-weight:600; color:#16a34a;">Broadcast Completed!</div>' +
         '<div style="font-size:12px; color:var(--sub); margin-top:4px; line-height:1.5;">' +
-          '?? <strong>Public Announcement</strong>: ' + (j.announcement_created ? '<span style="color:#16a34a;font-weight:600;">Sent successfully ?</span>' : '<span style="color:#dc2626;font-weight:600;">Failed ?</span>') + '<br>' +
-          '?? <strong>In-App Feed</strong>: ' + (j.in_app_sent || 0) + ' / ' + (j.in_app_total || 0) + ' saved successfully<br>' +
-          '?? <strong>Push Notifications</strong>: ' + j.sent + ' / ' + j.total + ' sent successfully' + (j.failed ? ' (' + j.failed + ' failed)' : '') +
+          '<strong>Public Announcement</strong>: ' + (j.announcement_created ? '<span style="color:#16a34a;font-weight:600;">Sent successfully</span>' : '<span style="color:#dc2626;font-weight:600;">Failed</span>') + '<br>' +
+          '<strong>In-App Feed</strong>: ' + (j.in_app_sent || 0) + ' / ' + (j.in_app_total || 0) + ' saved successfully<br>' +
+          '<strong>Push Notifications</strong>: ' + j.sent + ' / ' + j.total + ' sent successfully' + (j.failed ? ' (' + j.failed + ' failed)' : '') +
         '</div>';
       
       document.getElementById('bc-title').value = '';
@@ -703,9 +704,9 @@ async function sendTest() {
       res.innerHTML = 
         '<div style="margin-top:8px; font-weight:600; color:#16a34a;">Test Sent!</div>' +
         '<div style="font-size:12px; color:var(--sub); margin-top:4px; line-height:1.5;">' +
-          '?? <strong>Public Announcement</strong>: ' + (j.announcement_created ? '<span style="color:#16a34a;font-weight:600;">Sent successfully ?</span>' : '<span style="color:#dc2626;font-weight:600;">Failed ?</span>') + '<br>' +
-          '?? <strong>In-App Feed</strong>: ' + (j.in_app_sent || 0) + ' / ' + (j.in_app_total || 0) + ' saved successfully<br>' +
-          '?? <strong>Push Notifications</strong>: ' + j.sent + ' / ' + j.total + ' sent successfully' + (j.failed ? ' (' + j.failed + ' failed)' : '') +
+          '<strong>Public Announcement</strong>: ' + (j.announcement_created ? '<span style="color:#16a34a;font-weight:600;">Sent successfully</span>' : '<span style="color:#dc2626;font-weight:600;">Failed</span>') + '<br>' +
+          '<strong>In-App Feed</strong>: ' + (j.in_app_sent || 0) + ' / ' + (j.in_app_total || 0) + ' saved successfully<br>' +
+          '<strong>Push Notifications</strong>: ' + j.sent + ' / ' + j.total + ' sent successfully' + (j.failed ? ' (' + j.failed + ' failed)' : '') +
         '</div>';
       
       loadSubscribers();
@@ -723,7 +724,7 @@ async function loadSubscribers() {
     if (j.success && Array.isArray(j.subscribers)) {
       if (j.subscribers.length > 0) {
         tbody.innerHTML = j.subscribers.map(function(s) {
-          var dateStr = s.created_at ? new Date(s.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+          var dateStr = s.created_at ? new Date(s.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'â€”';
           return '<tr style="border-bottom: 1px solid #f5f5f5;">' +
             '<td style="padding: 12px 16px; font-weight: 600;">' + esc(s.name) + '</td>' +
             '<td style="padding: 12px 16px; color: var(--sub);">' + esc(s.email) + '</td>' +
@@ -774,7 +775,7 @@ async function loadBroadcasts() {
     if (j.success && Array.isArray(j.broadcasts)) {
       if (j.broadcasts.length > 0) {
         tbody.innerHTML = j.broadcasts.map(function(b) {
-          var dateStr = b.created_at ? new Date(b.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+          var dateStr = b.created_at ? new Date(b.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'â€”';
           var desc = b.body || b.description || '';
           return '<tr style="border-bottom: 1px solid #f5f5f5;">' +
             '<td style="padding: 12px 16px; color: var(--sub); white-space: nowrap;">' + dateStr + '</td>' +
@@ -893,7 +894,7 @@ async function deleteTrigger(idx) {
   
   var msg = 'Are you sure you want to delete the trigger "' + rule.trigger_key + '"?';
   if (isSystem) {
-    msg += '\n\n?? WARNING: This is a core system trigger. Deleting it may prevent participants from receiving automated notifications for this event type!';
+    msg += '\n\nWARNING: This is a core system trigger. Deleting it may prevent participants from receiving automated notifications for this event type!';
   }
   if (!confirm(msg)) return;
   
@@ -1078,7 +1079,7 @@ async function bulkDelete() {
   
   var msg = 'Are you sure you want to delete the ' + idxs.length + ' selected triggers?';
   if (hasSystem) {
-    msg += '\n\n?? WARNING: One or more selected triggers are core system triggers. Deleting them may prevent automated notifications from working!';
+    msg += '\n\nWARNING: One or more selected triggers are core system triggers. Deleting them may prevent automated notifications from working!';
   }
   if (!confirm(msg)) return;
   
@@ -1147,19 +1148,19 @@ loadFrequencySettings();
         <label style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--sub);">Suggested Presets (Optional)</label>
         <select id="new-trigger-preset" onchange="applyTriggerPreset()" style="width: 100%; padding: 8px 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; background: #fff; color: var(--text);">
           <option value="">-- Choose a Preset or type below --</option>
-          <option value="club_50" data-title="50 KM Club!" data-body="Congratulations! You joined the 50 KM Club!">?? 50 KM Club (club_50)</option>
-          <option value="club_500" data-title="500 KM Club!" data-body="Incredible! You joined the 500 KM Club!">?? 500 KM Club (club_500)</option>
-          <option value="club_1000" data-title="1000 KM Club!" data-body="Unstoppable! You joined the 1000 KM Club!">?? 1000 KM Club (club_1000)</option>
-          <option value="streak_5" data-title="5-Day Active Streak!" data-body="Awesome! You achieved a 5-Day Active Streak!">?? 5-Day Streak (streak_5)</option>
-          <option value="streak_10" data-title="10-Day Active Streak!" data-body="Incredible! You achieved a 10-Day Active Streak!">?? 10-Day Streak (streak_10)</option>
-          <option value="streak_30" data-title="30-Day Active Streak!" data-body="Legendary! You achieved a 30-Day Active Streak!">?? 30-Day Streak (streak_30)</option>
-          <option value="single_5k" data-title="5 KM Completed!" data-body="You completed a single activity of {distance} KM!">?? 5 KM Single Walk (single_5k)</option>
-          <option value="single_30k" data-title="30 KM Ultra-Walk!" data-body="Incredible! You completed a single activity of {distance} KM!">?? 30 KM Single Walk (single_30k)</option>
-          <option value="daily_5k_3" data-title="5 KM Daily Streak!" data-body="You walked 5+ KM daily for 3 consecutive days!">?? 5 KM Daily Streak (3 Days) (daily_5k_3)</option>
-          <option value="event_started" data-title="Togethera Walkathon is Live! ??" data-body="The event has officially started! Sync your first activity now and hit the ground running.">?? Event Started (event_started)</option>
-          <option value="event_ending_soon" data-title="Only 48 Hours Left! ?" data-body="The final stretch is here. Sync all your pending Strava activities before the leaderboard freezes!">?? Event Ending Soon (event_ending_soon)</option>
-          <option value="event_ended" data-title="Congratulations! Event Completed ??" data-body="Togethera Walkathon has concluded. Check out the final standings and Hall of Fame!">?? Event Ended (event_ended)</option>
-          <option value="daily_summary" data-title="Daily Leaderboard Update ??" data-body="See who holds the top spots today. Tap here to check the standings!">?? Daily summary (daily_summary)</option>
+          <option value="club_50" data-title="50 KM Club!" data-body="Congratulations! You joined the 50 KM Club!">50 KM Club (club_50)</option>
+          <option value="club_500" data-title="500 KM Club!" data-body="Incredible! You joined the 500 KM Club!">500 KM Club (club_500)</option>
+          <option value="club_1000" data-title="1000 KM Club!" data-body="Unstoppable! You joined the 1000 KM Club!">1000 KM Club (club_1000)</option>
+          <option value="streak_5" data-title="5-Day Active Streak!" data-body="Awesome! You achieved a 5-Day Active Streak!">5-Day Streak (streak_5)</option>
+          <option value="streak_10" data-title="10-Day Active Streak!" data-body="Incredible! You achieved a 10-Day Active Streak!">10-Day Streak (streak_10)</option>
+          <option value="streak_30" data-title="30-Day Active Streak!" data-body="Legendary! You achieved a 30-Day Active Streak!">30-Day Streak (streak_30)</option>
+          <option value="single_5k" data-title="5 KM Completed!" data-body="You completed a single activity of {distance} KM!">5 KM Single Walk (single_5k)</option>
+          <option value="single_30k" data-title="30 KM Ultra-Walk!" data-body="Incredible! You completed a single activity of {distance} KM!">30 KM Single Walk (single_30k)</option>
+          <option value="daily_5k_3" data-title="5 KM Daily Streak!" data-body="You walked 5+ KM daily for 3 consecutive days!">5 KM Daily Streak (3 Days) (daily_5k_3)</option>
+          <option value="event_started" data-title="Togethera Walkathon is Live!" data-body="The event has officially started! Sync your first activity now and hit the ground running.">Event Started (event_started)</option>
+          <option value="event_ending_soon" data-title="Only 48 Hours Left!" data-body="The final stretch is here. Sync all your pending Strava activities before the leaderboard freezes!">Event Ending Soon (event_ending_soon)</option>
+          <option value="event_ended" data-title="Congratulations! Event Completed" data-body="Togethera Walkathon has concluded. Check out the final standings and Hall of Fame!">Event Ended (event_ended)</option>
+          <option value="daily_summary" data-title="Daily Leaderboard Update" data-body="See who holds the top spots today. Tap here to check the standings!">Daily summary (daily_summary)</option>
         </select>
       </div>
       <div style="display: flex; flex-direction: column; gap: 6px;">
