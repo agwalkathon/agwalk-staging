@@ -161,7 +161,7 @@
         var txtEl = document.createElement('div');
         txtEl.id = 'app-logo-text';
         txtEl.textContent = (ev.rules_config && ev.rules_config.display_name) ? ev.rules_config.display_name : ev.name;
-        txtEl.style.cssText = "font-family:var(--font); font-size:24px; font-weight:800; color:#ffffff; text-align:center; text-transform:uppercase; letter-spacing:1.5px;";
+        txtEl.style.cssText = "font-family:var(--font); font-size:28px; font-weight:300; color:#ffffff; text-align:center; text-transform:uppercase; letter-spacing:5px; opacity:0.95;";
         logoWrap.appendChild(txtEl);
       }
     }
