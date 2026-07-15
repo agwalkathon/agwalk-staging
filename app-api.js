@@ -927,6 +927,11 @@ async function load(isBackgroundRefresh) {
         // Find total elevation
         var totalElevation = validActs.reduce(function(sum, a) { return sum + (parseFloat(a.elevation_gain) || 0); }, 0);
         
+        // Calculate average metrics for comparisons
+        var avgActDistM = validActs.length > 0 ? (totalDistM / validActs.length) : 0;
+        var totalMovingSec = validActs.reduce(function(s,a){return s+(a.moving_time_seconds||0);},0);
+        var avgSpeedKMH = totalMovingSec > 0 ? (totalDistM / 1000) / (totalMovingSec / 3600) : 0;
+        
         var statDefs = {
           longest_activity: {
             label: 'Longest Activity',
@@ -934,7 +939,14 @@ async function load(isBackgroundRefresh) {
             color: '#ffae00',
             bg: 'rgba(255, 174, 0, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 4 4-8 4 8"/></svg>',
-            val: maxDistM > 0 ? (maxDistM / 1000).toFixed(2) + ' km' : '—'
+            val: maxDistM > 0 ? (maxDistM / 1000).toFixed(2) + ' km' : '—',
+            insight: (function() {
+              if (maxDistM > 0 && avgActDistM > 0) {
+                var factor = (maxDistM / avgActDistM);
+                return factor > 1.05 ? factor.toFixed(1) + 'x your average activity distance! 👟' : 'Personal best distance session!';
+              }
+              return 'Peak distance achievement!';
+            })()
           },
           best_pace: {
             label: 'Best Pace',
@@ -942,7 +954,8 @@ async function load(isBackgroundRefresh) {
             color: '#6366f1',
             bg: 'rgba(99, 102, 241, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-            val: maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—'
+            val: maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—',
+            insight: 'Fastest average pace logged!'
           },
           longest_session: {
             label: 'Longest Session',
@@ -950,7 +963,8 @@ async function load(isBackgroundRefresh) {
             color: '#3b82f6',
             bg: 'rgba(59, 130, 246, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-            val: maxTimeSec > 0 ? fmtDur(maxTimeSec) : '—'
+            val: maxTimeSec > 0 ? fmtDur(maxTimeSec) : '—',
+            insight: 'Maximum time spent active in one session!'
           },
           best_day: {
             label: 'Best Day',
@@ -964,7 +978,14 @@ async function load(isBackgroundRefresh) {
             color: '#22c55e',
             bg: 'rgba(34, 197, 94, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-            val: maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—'
+            val: maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—',
+            insight: (function() {
+              if (maxDayKm > 0 && totalDistM > 0) {
+                var pct = ((maxDayKm * 1000) / totalDistM * 100);
+                return 'Contributed ' + pct.toFixed(1) + '% of your total event distance! 🌟';
+              }
+              return 'Peak daily output achieved!';
+            })()
           },
           max_elevation: {
             label: 'Max Elevation Gain',
@@ -972,7 +993,14 @@ async function load(isBackgroundRefresh) {
             color: '#8b5cf6',
             bg: 'rgba(139, 92, 246, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
-            val: maxElevation > 0 ? maxElevation.toFixed(0) + ' m' : '—'
+            val: maxElevation > 0 ? maxElevation.toFixed(0) + ' m' : '—',
+            insight: (function() {
+              if (maxElevation > 0) {
+                var stories = (maxElevation / 3);
+                return 'Equivalent to climbing a ' + stories.toFixed(0) + '-story building! 🏙️';
+              }
+              return 'Peak elevation gain logged!';
+            })()
           },
           max_speed: {
             label: 'Max Avg Speed',
@@ -980,7 +1008,14 @@ async function load(isBackgroundRefresh) {
             color: '#ec4899',
             bg: 'rgba(236, 72, 153, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></svg>',
-            val: maxAvgSpeed > 0 ? (maxAvgSpeed * 3.6).toFixed(1) + ' km/h' : '—'
+            val: maxAvgSpeed > 0 ? (maxAvgSpeed * 3.6).toFixed(1) + ' km/h' : '—',
+            insight: (function() {
+              if (maxAvgSpeed > 0 && avgSpeedKMH > 0) {
+                var factor = ((maxAvgSpeed * 3.6) / avgSpeedKMH);
+                return factor > 1.05 ? factor.toFixed(1) + 'x faster than your overall average speed! ⚡' : 'Peak average session speed!';
+              }
+              return 'Fastest overall speed logged!';
+            })()
           },
           total_distance: {
             label: 'Total Distance',
@@ -988,7 +1023,8 @@ async function load(isBackgroundRefresh) {
             color: '#3b82f6',
             bg: 'rgba(59, 130, 246, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
-            val: totalDistM > 0 ? (totalDistM / 1000).toFixed(1) + ' km' : '—'
+            val: totalDistM > 0 ? (totalDistM / 1000).toFixed(1) + ' km' : '—',
+            insight: 'Your total accumulated event distance.'
           },
           total_elevation: {
             label: 'Total Elevation',
@@ -996,7 +1032,8 @@ async function load(isBackgroundRefresh) {
             color: '#10b981',
             bg: 'rgba(16, 185, 129, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22l-4-4h8l-4 4zM12 2l-4 4h8l-4-4z"/></svg>',
-            val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—'
+            val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—',
+            insight: 'Total vertical height climbed overall.'
           },
           total_activities: {
             label: 'Total Activities',
@@ -1004,7 +1041,8 @@ async function load(isBackgroundRefresh) {
             color: '#64748b',
             bg: 'rgba(100, 116, 139, 0.12)',
             svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
-            val: validActs.length + ' acts'
+            val: validActs.length + ' acts',
+            insight: 'Total count of activities sync\'d.'
           }
         };
         
@@ -1028,18 +1066,23 @@ async function load(isBackgroundRefresh) {
               clickAttr = ' onclick="showDateDetails(\'' + bestDayDate + '\')"';
              }
 
-            drawerHtml += '<div class="pb-detail-card"' + clickAttr + ' style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
-              '<div style="display: flex; align-items: center;">' +
-                '<div style="width: 38px; height: 38px; border-radius: 10px; background: ' + d.bg + '; color: ' + d.color + '; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0;">' +
-                  d.svg +
-                '</div>' +
-                '<div>' +
-                  '<div style="font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-transform: uppercase;">' + d.label + '</div>' +
-                  '<div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; font-weight: 500;">' + d.sub + '</div>' +
-                '</div>' +
-              '</div>' +
-              '<div style="font-size: 19px; font-weight: 800; color: ' + d.color + '; letter-spacing: -0.2px;">' + d.val + '</div>' +
-            '</div>';
+            drawerHtml += '<div class="pb-detail-card"' + clickAttr + ' style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px 18px; display: flex; flex-direction: column; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'; this.style.borderColor=\'' + d.color + '40\'; this.style.transform=\'translateY(-2px)\';" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'; this.style.borderColor=\'rgba(255,255,255,0.05)\'; this.style.transform=\'translateY(0)\';">' +
+             '  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">' +
+             '    <div style="display: flex; align-items: center;">' +
+             '      <div style="width: 38px; height: 38px; border-radius: 10px; background: ' + d.bg + '; color: ' + d.color + '; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; box-shadow: 0 0 8px ' + d.color + '15;">' +
+             '        ' + d.svg +
+             '      </div>' +
+             '      <div style="text-align: left;">' +
+             '        <div style="font-size: 13.5px; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-transform: uppercase;">' + d.label + '</div>' +
+             '        <div style="font-size: 11.5px; color: rgba(255,255,255,0.4); margin-top: 2px; font-weight: 500;">' + d.sub + '</div>' +
+             '      </div>' +
+             '    </div>' +
+             '    <div style="font-size: 18px; font-weight: 800; color: ' + d.color + '; letter-spacing: -0.2px;">' + d.val + '</div>' +
+             '  </div>' +
+             '  <div style="margin-top: 10px; padding: 6px 12px; background: rgba(255,255,255,0.02); border-left: 2.5px solid ' + d.color + '; border-radius: 4px; font-size: 11.5px; color: rgba(255,255,255,0.65); font-weight: 500; text-align: left; display: flex; align-items: center; gap: 6px; line-height: 1.3;">' +
+             '    ' + d.insight +
+             '  </div>' +
+             '</div>';
           }
         });
         
@@ -3007,3 +3050,198 @@ window.loadGoogleFont = function(fontName) {
 // Fallbacks for older references
 window.toggleCertMenu = function(e) { togglePastCertMenu(e, 1); };
 window.downloadCertAction = function(type, eventName) { downloadPastCertAction(type, 1); };
+
+window.renderMedalInsights = function() {
+  var contentEl = document.getElementById('medal-insights-content');
+  if (!contentEl) return;
+
+  var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
+  var bronzeLimit = rules.bronze_medal_distance_meters || 100000;
+  var silverLimit = rules.silver_medal_distance_meters || 200000;
+  var goldLimit = rules.gold_medal_distance_meters || 300000;
+
+  var totalDistM = validActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
+  var currentKm = totalDistM / 1000;
+
+  // Find max single day distance
+  var dayKm = {};
+  validActs.forEach(function(a) {
+    var km = (a.distance_meters || 0) / 1000;
+    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    if (d) dayKm[d] = (dayKm[d] || 0) + km;
+  });
+  
+  var maxDayKm = 0;
+  var bestDayDate = '';
+  Object.keys(dayKm).forEach(function(d){
+    if (dayKm[d] > maxDayKm) {
+      maxDayKm = dayKm[d];
+      bestDayDate = d;
+    }
+  });
+
+  // Calculate active streak
+  var activeDays = {};
+  validActs.forEach(function(a) {
+    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    if (d) activeDays[d] = true;
+  });
+  var sortedActive = Object.keys(activeDays).sort();
+  var streakBest = 0, cur = 0, prevD = null;
+  sortedActive.forEach(function(d) {
+    if (prevD) {
+      var diff = Math.round((new Date(d + 'T12:00:00') - new Date(prevD + 'T12:00:00')) / 86400000);
+      cur = diff === 1 ? cur + 1 : 1;
+    } else cur = 1;
+    streakBest = Math.max(streakBest, cur);
+    prevD = d;
+  });
+
+  // Days left calculation
+  var daysRemaining = 1;
+  if (EVENT_ROW && EVENT_ROW.end_date) {
+    var diff = new Date(EVENT_ROW.end_date) - new Date();
+    daysRemaining = Math.max(1, Math.ceil(diff / 86400000));
+  }
+
+  // Calculate 7-day average pace
+  var sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  sevenDaysAgo.setHours(0,0,0,0);
+  var last7DaysActs = validActs.filter(function(a) {
+    return new Date(a.activity_date) >= sevenDaysAgo;
+  });
+  var last7DaysDistKM = last7DaysActs.reduce(function(s,a){return s + (a.distance_meters || 0);}, 0) / 1000;
+  var avg7DayPace = last7DaysDistKM / 7;
+
+  var activeDaysCount = Object.keys(dayKm).length || 1;
+  var avgActivePace = currentKm / activeDaysCount;
+  var assumedPace = Math.max(avg7DayPace, avgActivePace);
+  if (assumedPace < 0.5) assumedPace = 1.0;
+
+  var projectedDistance = currentKm + (assumedPace * daysRemaining);
+
+  // Projections
+  var projectedMedal = 'None';
+  var projectedEmoji = '⚪';
+  var projectedColor = '#9ca3af';
+  if (projectedDistance >= (goldLimit / 1000)) {
+    projectedMedal = 'GOLD';
+    projectedEmoji = '🥇';
+    projectedColor = '#f59e0b';
+  } else if (projectedDistance >= (silverLimit / 1000)) {
+    projectedMedal = 'SILVER';
+    projectedEmoji = '🥈';
+    projectedColor = '#9ca3af';
+  } else if (projectedDistance >= (bronzeLimit / 1000)) {
+    projectedMedal = 'BRONZE';
+    projectedEmoji = '🥉';
+    projectedColor = '#c57f35';
+  }
+
+  // Needed daily paces
+  var remainingSilver = Math.max(0, (silverLimit / 1000) - currentKm);
+  var remainingGold = Math.max(0, (goldLimit / 1000) - currentKm);
+  var neededPaceSilver = remainingSilver / daysRemaining;
+  var neededPaceGold = remainingGold / daysRemaining;
+
+  var paceColorSilver = neededPaceSilver <= assumedPace ? '#22c55e' : '#f97316';
+  var paceColorGold = neededPaceGold <= assumedPace ? '#22c55e' : '#f97316';
+
+  // Last 10 days chart
+  var chartDays = [];
+  for (var i = 9; i >= 0; i--) {
+    var dObj = new Date();
+    dObj.setDate(dObj.getDate() - i);
+    var dStr = dObj.toISOString().split('T')[0];
+    chartDays.push({
+      dateStr: dStr,
+      label: dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+      km: dayKm[dStr] || 0
+    });
+  }
+
+  var maxVal = Math.max.apply(null, chartDays.map(function(d){return d.km;})) || 5;
+  
+  var svgHtml = '<svg viewBox="0 0 340 160" style="width: 100%; height: auto; font-family: var(--font);">';
+  svgHtml += '<line x1="30" y1="20" x2="330" y2="20" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
+  svgHtml += '<line x1="30" y1="70" x2="330" y2="70" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
+  svgHtml += '<line x1="30" y1="120" x2="330" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>';
+  svgHtml += '<text x="22" y="24" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + maxVal.toFixed(1) + '</text>';
+  svgHtml += '<text x="22" y="74" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + (maxVal/2).toFixed(1) + '</text>';
+  svgHtml += '<text x="22" y="124" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">0</text>';
+  
+  chartDays.forEach(function(day, index) {
+    var x = 36 + (index * 29);
+    var barHeight = Math.round(day.km * (100 / maxVal));
+    var y = 120 - barHeight;
+    svgHtml += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="16" height="' + Math.max(2, barHeight) + '" rx="4" fill="' + (day.km > 0 ? 'url(#bar-grad)' : 'rgba(255,255,255,0.05)') + '" style="transition: all 0.3s ease; cursor: pointer;" title="' + day.label + ': ' + day.km.toFixed(1) + ' km"/>';
+    if (index % 2 === 0) {
+      svgHtml += '<text x="' + (x + 8) + '" y="' + 138 + '" fill="rgba(255,255,255,0.4)" font-size="8.5" text-anchor="middle">' + day.label + '</text>';
+    }
+  });
+  svgHtml += '<defs><linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--brand)"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>';
+  svgHtml += '</svg>';
+
+  var html = '';
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
+         '  <div style="font-size: 26px; font-weight: 800; color: ' + projectedColor + '; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
+              projectedEmoji + ' ' + projectedMedal +
+         '  </div>' +
+         '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
+         '    Projected Event Distance: <strong style="color: #fff;">' + projectedDistance.toFixed(1) + ' km</strong>' +
+         '  </div>' +
+         '  <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic;">' +
+         '    Based on your average pace of ' + assumedPace.toFixed(1) + ' km/day over ' + daysRemaining + ' remaining days.' +
+         '  </div>' +
+         '</div>';
+
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">Daily Target Pace (' + daysRemaining + ' Days Left)</div>' +
+         '  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04);">' +
+         '    <div style="display: flex; align-items: center; gap: 8px;">' +
+         '      <span style="font-size: 16px;">🥈</span>' +
+         '      <div style="text-align: left;">' +
+         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">SILVER MEDAL (200 km)</div>' +
+         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + remainingSilver.toFixed(1) + ' km remaining</div>' +
+         '      </div>' +
+         '    </div>' +
+         '    <div style="text-align: right;">' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + (neededPaceSilver > 0 ? neededPaceSilver.toFixed(2) + ' km/day' : 'Achieved! ✔') + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
+         '    <div style="display: flex; align-items: center; gap: 8px;">' +
+         '      <span style="font-size: 16px;">🥇</span>' +
+         '      <div style="text-align: left;">' +
+         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">GOLD MEDAL (300 km)</div>' +
+         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + remainingGold.toFixed(1) + ' km remaining</div>' +
+         '      </div>' +
+         '    </div>' +
+         '    <div style="text-align: right;">' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + (neededPaceGold > 0 ? neededPaceGold.toFixed(2) + ' km/day' : 'Achieved! ✔') + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         '</div>';
+
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; text-align: left;">LAST 10 DAYS DISTANCE</div>' +
+            svgHtml +
+         '</div>';
+
+  html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' +
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; text-align: center;">' +
+         '    <div style="font-size: 20px; margin-bottom: 4px;">🔥</div>' +
+         '    <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Active Streak</div>' +
+         '    <div style="font-size: 16px; font-weight: 800; color: #fff; margin-top: 2px;">' + streakBest + ' days</div>' +
+         '  </div>' +
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; text-align: center;">' +
+         '    <div style="font-size: 20px; margin-bottom: 4px;">👑</div>' +
+         '    <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Best Day</div>' +
+         '    <div style="font-size: 16px; font-weight: 800; color: #22c55e; margin-top: 2px;">' + maxDayKm.toFixed(1) + ' km</div>' +
+         '  </div>' +
+         '</div>';
+
+  contentEl.innerHTML = html;
+};
