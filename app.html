@@ -311,7 +311,7 @@
     <!-- 7-day mini-ring strip (WHOOP hybrid, Phase 2b) -->
     <div class="day-strip" id="day-strip" style="display:none;"></div>
     <!-- Unified Medal Arc (WHOOP hybrid redesign) -->
-    <div id="hero-arc-wrap" style="display:none;">
+    <div id="hero-arc-wrap" style="display:none; cursor:pointer;" onclick="openMedalInsightsDrawer()">
       <div class="hero-arc-svgbox">
         <svg id="hero-arc-svg" viewBox="0 0 280 175" aria-hidden="true"></svg>
         <div class="hero-arc-center">
@@ -320,6 +320,7 @@
         </div>
       </div>
       <div class="hero-arc-legend" id="hero-arc-legend"></div>
+      <div style="font-size: 11px; color: rgba(255,255,255,0.35); text-align: center; margin-top: -6px; margin-bottom: 12px; font-weight: 500; font-family: var(--font);">📊 Tap arc for detailed progress & predictions</div>
       <div class="hero-next" id="hero-next-banner" style="display:none;">
         <div class="hero-next-ic" id="hero-next-ic">🥈</div>
         <div class="hero-next-txt">
@@ -1352,6 +1353,27 @@
       <div class="max-w" style="padding:0 16px;">
         <div id="pbs-detail-list" style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
           <div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>Loading personal bests...</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medal Insights Detail Modal Drawer -->
+  <div id="medal-insights-drawer" class="detail-modal">
+    <!-- Top Nav Bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; padding-top:calc(16px + env(safe-area-inset-top)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; background:rgba(14,16,18,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); z-index:10002;">
+      <button class="btn-back" onclick="closeMedalInsightsDrawer()" style="background:none; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; width:40px; height:40px; border-radius:50%; transition:background 0.2s;" title="Back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div style="font-size:16px; font-weight: 700; color:#fff; text-align:center;">Performance Insights</div>
+      <div style="width:50px;"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="detail-content" style="padding-top:20px; padding-bottom: 40px;">
+      <div class="max-w" style="padding:0 16px;">
+        <div id="medal-insights-content" style="display:flex; flex-direction:column; gap:16px; margin-bottom:16px;">
+          <p style="color:rgba(255,255,255,0.5); text-align:center; padding:20px;">Loading performance insights...</p>
         </div>
       </div>
     </div>
