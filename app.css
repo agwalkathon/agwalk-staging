@@ -1,7 +1,7 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     :root{
       --brand:#E8622A; --brand-dim:rgba(232,98,42,0.15);
-      --bg:#14181B; --surface:#1E2428; --surface2:#262D32;
+      --bg:#12161a; --surface:#22262d; --surface2:#2c323c;
       --border:rgba(255,255,255,0.05);
       --text:#FFFFFF; --muted:rgba(255,255,255,0.65); --label:rgba(255,255,255,0.55); --dim:rgba(255,255,255,0.20);
       --green:#22C55E; --green-dim:rgba(34,197,94,0.12);
