@@ -3902,3 +3902,53 @@ function renderProfilePeriodStats(period, periodActs) {
   }
   listEl.innerHTML = actsListHtml;
 }
+
+window.initSwipeBack = function() {
+  var startX = 0;
+  var startY = 0;
+  var startTime = 0;
+
+  document.querySelectorAll('.detail-modal').forEach(function(modal) {
+    if (modal._swipeHooked) return;
+    modal._swipeHooked = true;
+
+    modal.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 1) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+      }
+    }, { passive: true });
+
+    modal.addEventListener('touchend', function(e) {
+      if (e.changedTouches.length === 1) {
+        var deltaX = e.changedTouches[0].clientX - startX;
+        var deltaY = e.changedTouches[0].clientY - startY;
+        var duration = Date.now() - startTime;
+
+        var isSwipeBack = false;
+        // Swipe left-to-right (standard right swipe back: deltaX > 75)
+        // Also support right-to-left swipe (deltaX < -75) to be fully user-intent tolerant
+        if (duration < 400 && Math.abs(deltaY) < 65) {
+          if (deltaX > 75 || deltaX < -75) {
+            isSwipeBack = true;
+          }
+        }
+
+        if (isSwipeBack) {
+          var backBtn = modal.querySelector('.btn-back');
+          if (backBtn) {
+            console.log('Swipe back detected on modal:', modal.id);
+            backBtn.click();
+          }
+        }
+      }
+    }, { passive: true });
+  });
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initSwipeBack);
+} else {
+  window.initSwipeBack();
+}
