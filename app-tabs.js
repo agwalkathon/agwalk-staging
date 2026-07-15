@@ -506,33 +506,29 @@ function renderTodayActivities(acts) {
   var html = '';
   last5Acts.forEach(function(a) {
     var kmVal = (a.distance_meters || 0) / 1000;
-    var kmStr = kmVal.toFixed(1) + ' KM';
+    var kmStr = kmVal.toFixed(1);
 
     var sport = (a.sport_type || 'Walk').toLowerCase();
-    var pillColor = 'var(--brand)';
-    var sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
-    var sportTitle = 'WALKING';
+    var pillColor = '#64748b'; // Slate grey for unknown
+    var sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
+    var sportTitle = (a.sport_type || 'Workout').toUpperCase();
 
     if (sport === 'run') {
-      pillColor = 'var(--brand)';
-      sportIcon = '<i class="fa-solid fa-person-running" style="color:#fff; font-size:12px;"></i>';
+      pillColor = '#008cee'; // Vibrant electric blue
+      sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'RUNNING';
     } else if (sport === 'walk') {
-      pillColor = 'var(--green)';
-      sportIcon = '<i class="fa-solid fa-person-walking" style="color:#fff; font-size:12px;"></i>';
+      pillColor = '#ab47bc'; // Purple
+      sportIcon = '<i class="fa-solid fa-walking" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'WALKING';
     } else if (sport === 'ride' || sport === 'cycling') {
-      pillColor = 'var(--blue)';
-      sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:12px;"></i>';
+      pillColor = '#ff9100'; // Orange
+      sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'CYCLING';
     } else if (sport === 'hike') {
-      pillColor = 'var(--purple)';
-      sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:12px;"></i>';
+      pillColor = '#10b981'; // Green
+      sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'HIKING';
-    } else {
-      pillColor = 'var(--brand)';
-      sportIcon = '<i class="fa-solid fa-heartbeat" style="color:#fff; font-size:12px;"></i>';
-      sportTitle = (a.sport_type || 'Workout').toUpperCase();
     }
 
     var startTime = null;
@@ -544,33 +540,39 @@ function renderTodayActivities(acts) {
 
     var dateStr = '—';
     var timeStr = '—';
+    var endTimeStr = '—';
+    var dayPrefix = '';
+    
     if (startTime && !isNaN(startTime.getTime())) {
-      var parts = (a.activity_date_time_ist || a.activity_date || '').split('T')[0].split('-');
-      if (parts.length === 3) {
-        var fmtDate = new Date(parts[0], parts[1]-1, parts[2]);
-        dateStr = fmtDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
-      } else {
-        dateStr = startTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
-      }
+      var isToday = new Date().toDateString() === startTime.toDateString();
+      dayPrefix = isToday ? '' : '[' + startTime.toLocaleDateString('en-US', { weekday: 'short' }) + '] ';
       timeStr = formatTime12h(startTime);
+      
+      var endTime = new Date(startTime.getTime() + (a.elapsed_time_seconds || a.moving_time_seconds || 0) * 1000);
+      endTimeStr = formatTime12h(endTime);
     }
 
-    html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
-              '<div style="display:flex; align-items:center; gap:14px;">' +
-                '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:8px; min-width:84px; height:30px; box-sizing:border-box; color:#fff; font-weight:600; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
+    html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:#22262f; border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'#2a2f3b\'" onmouseleave="this.style.background=\'#22262f\'">' +
+              '<div style="display:flex; align-items:center; gap:16px;">' +
+                '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:8px; padding:6px 16px; border-radius:12px; min-width:92px; height:38px; box-sizing:border-box; color:#fff; font-weight:500; font-size:17px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
                   sportIcon +
                   '<span>' + kmStr + '</span>' +
                 '</div>' +
-                '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.5px; text-transform:uppercase;">' +
+                '<div style="font-size:14px; font-weight:600; color:#fff; letter-spacing:0.8px; text-transform:uppercase;">' +
                   sportTitle +
                 '</div>' +
               '</div>' +
               '<div style="display:flex; align-items:center; gap:10px;">' +
-                '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:rgba(255,255,255,0.65); font-weight:600; line-height:1.3; font-family:var(--font);">' +
-                  '<div>' + dateStr + '</div>' +
-                  '<div style="color:rgba(255,255,255,0.4); font-size:10px;">' + timeStr + '</div>' +
+                '<div style="display:flex; flex-direction:column; align-items:flex-end; font-size:12px; color:rgba(255,255,255,0.7); font-weight:500; line-height:1.4; font-family:var(--font);">' +
+                  '<div>' + dayPrefix + timeStr + '</div>' +
+                  '<div style="color:rgba(255,255,255,0.4);">' + endTimeStr + '</div>' +
                 '</div>' +
-                '<div style="width:3px; height:26px; background:' + pillColor + '; border-radius:2px;"></div>' +
+                '<!-- Vertical line with top/bottom dots -->' +
+                '<div style="position: relative; width: 6px; height: 32px; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">' +
+                  '<div style="width: 4px; height: 4px; border-radius: 50%; background: ' + pillColor + ';"></div>' +
+                  '<div style="width: 2px; flex: 1; background: ' + pillColor + ';"></div>' +
+                  '<div style="width: 4px; height: 4px; border-radius: 50%; background: ' + pillColor + ';"></div>' +
+                '</div>' +
               '</div>' +
             '</div>';
   });
