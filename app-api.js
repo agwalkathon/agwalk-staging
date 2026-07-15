@@ -1832,10 +1832,12 @@ async function load(isBackgroundRefresh) {
       function renderDashboardChallenges(items){
         var container = document.getElementById('dashboard-challenges-list');
         if(!container) return;
+        var card = document.getElementById('challenges-card-container');
         if(!items.length){
-          container.innerHTML = '<div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">No challenges yet</div>';
+          if(card) card.style.display = 'none';
           return;
         }
+        if(card) card.style.display = 'block';
         var html = '';
         items.forEach(function(ch){
           var pillColor = ch.earned ? 'var(--green)' : ch.missed ? 'rgba(255,255,255,0.15)' : 'var(--brand)';
