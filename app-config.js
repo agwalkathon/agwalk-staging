@@ -249,29 +249,7 @@ function get2Initials(name) {
 }
 
 function getWhoopAvatarStyle(name) {
-  var colors = [
-    { r: 232, g: 98, b: 42, border: 'rgba(232, 98, 42, 0.45)', glow: 'rgba(232, 98, 42, 0.15)' },   // Orange
-    { r: 59, g: 130, b: 246, border: 'rgba(59, 130, 246, 0.45)', glow: 'rgba(59, 130, 246, 0.15)' },  // Blue
-    { r: 16, g: 185, b: 129, border: 'rgba(16, 185, 129, 0.45)', glow: 'rgba(16, 185, 129, 0.15)' },  // Green
-    { r: 139, g: 92, b: 246, border: 'rgba(139, 92, 246, 0.45)', glow: 'rgba(139, 92, 246, 0.15)' },  // Violet
-    { r: 239, g: 68, b: 68, border: 'rgba(239, 68, 68, 0.45)', glow: 'rgba(239, 68, 68, 0.15)' },    // Red
-    { r: 255, g: 208, b: 0, border: 'rgba(255, 208, 0, 0.45)', glow: 'rgba(255, 208, 0, 0.15)' }     // Gold
-  ];
-  var hash = 0;
-  var str = name || '';
-  for (var i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  var idx = Math.abs(hash) % colors.length;
-  var c = colors[idx];
-  
-  // Light gradient glassmorphic style
-  return 'background: linear-gradient(135deg, rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.35) 0%, rgba(255, 255, 255, 0.12) 100%); ' +
-         'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); ' +
-         'border: 1.5px solid ' + c.border + '; ' +
-         'box-shadow: 0 4px 18px ' + c.glow + ', inset 0 1px 1px rgba(255,255,255,0.25); ' +
-         'color: #ffffff; font-weight: 800; font-family: var(--font); ' +
-         'text-shadow: 0 1px 2px rgba(0,0,0,0.3); text-transform: uppercase;';
+  return 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; border: none; font-weight: 700; font-family: var(--font); text-shadow: none; text-transform: uppercase;';
 }
 
 function norm(s){return String(s||'').trim().toLowerCase();}
@@ -1088,7 +1066,7 @@ function applyEffectiveAccentColor() {
 }
 
 function getFallbackAvatarStyle() {
-  return 'background:#282e36; border:2px solid ' + getBrandingOverrideColor('avatar_accent_color', 'accent_color') + '; color:#fff;';
+  return 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; border: none; font-weight: 700; font-family: var(--font); text-shadow: none;';
 }
 
 // Apply immediately on script execution (uses cache; no need to wait for any network fetch)
