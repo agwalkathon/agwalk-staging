@@ -2902,8 +2902,8 @@ function renderNotifications() {
     var icon = '📢';
     if (n.type === 'challenge') icon = '🎯';
     if (n.type === 'medal') icon = '🏆';
-    if (n.type === 'kudos') icon = '👏';
-    if (n.type === 'comment') icon = '💬';
+    if (n.type === 'kudos' || n.type === 'reaction_received') icon = '👏';
+    if (n.type === 'comment' || n.type === 'wish_received' || n.type === 'comment_approved') icon = '💬';
     if (n.type === 'like') icon = '👍';
     if (n.type === 'heart') icon = '❤️';
 
