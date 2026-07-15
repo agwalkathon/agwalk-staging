@@ -311,8 +311,8 @@ tr:hover td{background:#FAFAFA}
 <body>
           <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon" style="background:#ffffff;"><img src="logo-icon-black.png" alt="Arcgate" style="width:22px;height:22px;object-fit:contain;display:block;"></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -840,7 +840,7 @@ async function loadEventSelector(){
       var o=document.createElement("option");
       o.value=e.id;
       if (e.status === "live") {
-        o.textContent = "?? " + e.name + " (LIVE)";
+        o.textContent = "\uD83D\uDD25 " + e.name + " (LIVE)";
         o.style.color = "#16a34a";
         o.style.fontWeight = "bold";
       } else {
