@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Feed Settings — Arcgate Walkathon 2026</title>
+  <title>Feed Settings | Arcgatians 2026</title>
   <style>
     :root {
       --brand: #E8622A;
@@ -393,12 +393,11 @@
           </div>
           
           <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-title">Allow Flagged Activities</div>
-              <div class="toggle-desc">Allow activities marked as flagged or invalid to be visible in the Feed. (Recommended: Off)</div>
+              <div class="toggle-title">Milestone Achievements</div>
+              <div class="toggle-desc">Announce whenever a participant achieves major distance clubs (50K, 500K) or streaks.</div>
             </div>
             <label class="switch">
-              <input type="checkbox" id="rule-flagged">
+              <input type="checkbox" id="rule-milestones">
               <span class="slider"></span>
             </label>
           </div>
@@ -410,7 +409,7 @@
       <div class="feed-tab-panel" id="panel-filters">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>??</span><h2>Feed Content Filters</h2></div>
+          <div class="card-head-left"><div class="card-head-icon"><i class="ti ti-filter"></i></div><h2>Content Filters</h2></div>
         </div>
         <div class="card-body">
           <div class="form-group">
@@ -424,19 +423,19 @@
             <div class="check-grid">
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Walk" checked>
-                <span>Walk ?????</span>
+                <span>Walk</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Run" checked>
-                <span>Run ?????</span>
+                <span>Run</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Hike" checked>
-                <span>Hike ??</span>
+                <span>Hike</span>
               </label>
               <label class="check-item">
                 <input type="checkbox" class="sport-check" value="Ride" checked>
-                <span>Ride ?????</span>
+                <span>Ride</span>
               </label>
             </div>
           </div>
@@ -448,7 +447,7 @@
       <div class="feed-tab-panel" id="panel-customization">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>??</span><h2>Global Feed Customization</h2></div>
+          <div class="card-head-left"><div class="card-head-icon"><i class="ti ti-palette"></i></div><h2>Global Feed Customization</h2></div>
         </div>
         <div class="card-body">
           <div class="toggle-row">
@@ -458,6 +457,17 @@
             </div>
             <label class="switch">
               <input type="checkbox" id="rule-smart-pace">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-title">Medal Count Highlights</div>
+              <div class="toggle-desc">Highlight participants' medal counts (Gold/Silver/Bronze) directly on post banners.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="rule-medal-highlights">
               <span class="slider"></span>
             </label>
           </div>
@@ -511,7 +521,7 @@
       </div>
 
       <div style="display:flex;align-items:center;margin-top:20px;">
-        <button class="btn btn-primary" onclick="saveSettings()">?? Save Settings</button>
+        <button class="btn btn-primary" onclick="saveSettings()"><i class="ti ti-device-floppy"></i> Save Settings</button>
         <span id="status-msg" class="status-msg"></span>
       </div>
       </div>
@@ -520,7 +530,7 @@
       <div class="feed-tab-panel" id="panel-posts">
       <div class="card">
         <div class="card-head" style="cursor: default; background: none;">
-          <div class="card-head-left"><span>??</span><h2>Manage Social Feed Posts</h2></div>
+          <div class="card-head-left"><div class="card-head-icon"><i class="ti ti-messages"></i></div><h2>Manage Social Feed Posts</h2></div>
         </div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
@@ -554,7 +564,7 @@
     </div>
 
     <footer class="site-footer">
-      <span>© 2026 Arcgate Walkathon</span>
+      <span>Â© 2026 Arcgate Walkathon</span>
       <div>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
@@ -602,7 +612,7 @@
         sel.innerHTML = evs.map(e => {
           const isLive = e.status === 'live';
           const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
-          const prefix = isLive ? '?? ' : '';
+          const prefix = isLive ? '\uD83D\uDD25 ' : '';
           return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
         }).join('');
         
@@ -838,7 +848,7 @@
         }
         
         tbody.innerHTML = filtered.map(function(ann) {
-          var dateStr = '—';
+          var dateStr = 'â€”';
           if (ann.created_at) {
             try {
               var d = new Date(ann.created_at);
@@ -852,7 +862,7 @@
             } catch(e) {}
           }
           
-          var userName = '—';
+          var userName = 'â€”';
           if (ann.type === 'broadcast') {
             userName = '<strong style="color:var(--brand);">Organizers (Broadcast)</strong>';
           } else {
