@@ -837,17 +837,11 @@ function openProfileDetail(athleteId, event) {
 
           var pName = p.full_name || 'Participant';
           var pInitials = (function(){var pts=(pName||'').trim().split(/\s+/);if(pts.length>=2)return(pts[0][0]+(pts[pts.length-1][0])).toUpperCase();return(pts[0]||'?')[0].toUpperCase();})();
-          var pStyle = getAvatarStyle(pName);
+          var avStyle = 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; font-weight: 700; font-family: var(--font); text-shadow: none;';
           var avEl = document.getElementById('prof-avatar');
           if (avEl) {
-            var hasPhoto = profilePhoto && profilePhoto !== 'null' && profilePhoto !== 'undefined' && !profilePhoto.includes('large.png') && !profilePhoto.includes('avatar/athlete');
-            if (hasPhoto) {
-              avEl.textContent = '';
-              avEl.setAttribute('style', `background: url('${profilePhoto}') no-repeat center center; background-size: cover; width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);`);
-            } else {
-              avEl.textContent = pInitials;
-              avEl.setAttribute('style', pStyle + '; width:90px; height:90px; border-radius:50%; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);');
-            }
+            avEl.textContent = pInitials;
+            avEl.setAttribute('style', avStyle + '; width:90px; height:90px; border-radius:50%; font-size:32px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:none;');
           }
         }
       }).catch(function(err) {
@@ -1164,60 +1158,90 @@ function openProfileDetail(athleteId, event) {
         validActs.slice(0, 10).forEach(function(a) {
           var card = document.createElement('div');
           card.className = 'prof-recent-act-card';
-          card.style.display = 'flex';
-          card.style.flexDirection = 'column';
-          card.style.alignItems = 'stretch';
-          card.style.cursor = 'pointer';
-          
-          var dateLabel = '';
-          try {
-            var adt = new Date(a.activity_date);
-            if (!isNaN(adt.getTime())) {
-              dateLabel = adt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' at ' + adt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-            }
-          } catch (e) {}
+          card.style.cssText = 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer; margin-bottom:8px;';
+          card.addEventListener('mouseenter', function() { this.style.background = 'rgba(255,255,255,0.06)'; });
+          card.addEventListener('mouseleave', function() { this.style.background = 'rgba(255,255,255,0.03)'; });
 
-          var distVal = ((a.distance_meters || 0) / 1000).toFixed(2);
-          var movingMins = Math.round((a.moving_time_seconds || 0) / 60);
-          var stepsVal = Math.round(((a.distance_meters || 0) / 1000) * 1350);
-          var paceValStr = (a.distance_meters > 0 && a.moving_time_seconds > 0) ? fmtPS(a.distance_meters / a.moving_time_seconds, a.sport_type) : '—';
-          var elevVal = a.elevation_gain || 0;
-          var deviceVal = a.device_name || 'Strava';
+          var kmVal = (a.distance_meters || 0) / 1000;
+          var kmStr = kmVal.toFixed(1);
+
+          var sport = (a.sport_type || 'Walk').toLowerCase();
+          var pillColor = '#64748b'; // Slate grey for unknown
+          var sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
+          var sportTitle = (a.sport_type || 'Workout').toUpperCase();
+
+          if (sport === 'run') {
+            pillColor = '#008cee'; // Vibrant electric blue
+            sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
+            sportTitle = 'RUNNING';
+          } else if (sport === 'walk') {
+            pillColor = '#ab47bc'; // Purple
+            sportIcon = '<i class="fa-solid fa-walking" style="color:#fff; font-size:15px;"></i>';
+            sportTitle = 'WALKING';
+          } else if (sport === 'ride' || sport === 'cycling') {
+            pillColor = '#ff9100'; // Orange
+            sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:15px;"></i>';
+            sportTitle = 'CYCLING';
+          } else if (sport === 'hike') {
+            pillColor = '#10b981'; // Green
+            sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:15px;"></i>';
+            sportTitle = 'HIKING';
+          }
+
+          var startTime = null;
+          if (a.activity_date_time_ist) {
+            startTime = new Date(a.activity_date_time_ist);
+          } else if (a.activity_date) {
+            startTime = new Date(a.activity_date);
+          }
+
+          var formatTime12hLocal = function(dt) {
+            var hours = dt.getHours();
+            var minutes = dt.getMinutes();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+          };
+
+          var timeStr = '—';
+          var endTimeStr = '—';
+          var dayPrefix = '';
+          
+          if (startTime && !isNaN(startTime.getTime())) {
+            var isToday = new Date().toDateString() === startTime.toDateString();
+            dayPrefix = isToday ? '' : '[' + startTime.toLocaleDateString('en-US', { weekday: 'short' }) + '] ';
+            timeStr = formatTime12hLocal(startTime);
+            
+            var endTime = new Date(startTime.getTime() + (a.elapsed_time_seconds || a.moving_time_seconds || 0) * 1000);
+            endTimeStr = formatTime12hLocal(endTime);
+          }
 
           card.addEventListener('click', function(e) {
-            if (e.target.closest('.view-full-btn')) {
-              return;
-            }
-            e.preventDefault();
-            var coll = card.querySelector('.act-card-collapse');
-            if (coll) {
-              var isCollapsed = coll.style.display === 'none';
-              coll.style.display = isCollapsed ? 'block' : 'none';
-              card.style.borderColor = isCollapsed ? 'rgba(232, 98, 42, 0.4)' : 'rgba(255,255,255,0.06)';
-            }
+            openActivityDetail(a.strava_activity_id || a.id, e, true);
           });
           
           card.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-              <div>
-                <div style="font-size:14px; font-weight:800; color:#fff;">${esc(a.activity_name || 'Activity')}</div>
-                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">${dateLabel} &middot; ${movingMins} mins &middot; ${stepsVal.toLocaleString('en-IN')} steps</div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div style="background:${pillColor}; display:flex; align-items:center; justify-content:center; gap:8px; padding:6px 16px; border-radius:12px; min-width:92px; height:38px; box-sizing:border-box; color:#fff; font-weight:500; font-size:17px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                ${sportIcon}
+                <span>${kmStr}</span>
               </div>
-              <div style="font-size:14px; font-weight:800; color:var(--brand); display:flex; align-items:center; gap:2px; flex-shrink:0;">
-                <span>${distVal}</span> <span style="font-size:10px; color:var(--muted); font-weight:700;">KM</span>
+              <div style="font-size:14px; font-weight:600; color:#fff; letter-spacing:0.8px; text-transform:uppercase;">
+                ${sportTitle}
               </div>
             </div>
-            <div class="act-card-collapse" style="display: none; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.08); margin-top: 10px; width: 100%;">
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px; color: rgba(255,255,255,0.7);">
-                <div><span style="color: var(--muted); font-weight: 700;">Pace:</span> ${paceValStr}</div>
-                <div><span style="color: var(--muted); font-weight: 700;">Elapsed:</span> ${fmtDur(a.elapsed_time_seconds || 0)}</div>
-                <div><span style="color: var(--muted); font-weight: 700;">Elevation:</span> ${Math.round(elevVal)} m</div>
-                <div><span style="color: var(--muted); font-weight: 700;">Device:</span> ${esc(deviceVal)}</div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="display:flex; flex-direction:column; align-items:flex-end; font-size:12px; color:rgba(255,255,255,0.7); font-weight:500; line-height:1.4; font-family:var(--font);">
+                <div>${dayPrefix}${timeStr}</div>
+                <div style="color:rgba(255,255,255,0.4);">${endTimeStr}</div>
               </div>
-              <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                <button class="view-full-btn" onclick="openActivityDetail('${a.strava_activity_id}', event, true)" style="background: rgba(232, 98, 42, 0.1); border: 1px solid rgba(232, 98, 42, 0.25); color: var(--brand); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                  Full Stats &amp; Map ↗
-                </button>
+              <!-- Vertical line with top/bottom dots -->
+              <div style="position: relative; width: 6px; height: 32px; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                <div style="width: 4px; height: 4px; border-radius: 50%; background: ${pillColor};"></div>
+                <div style="width: 2px; flex: 1; background: ${pillColor};"></div>
+                <div style="width: 4px; height: 4px; border-radius: 50%; background: ${pillColor};"></div>
               </div>
             </div>
           `;
