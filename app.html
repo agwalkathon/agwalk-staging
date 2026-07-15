@@ -238,56 +238,62 @@
 <!-- ──────────────────────────────────────────────────────────────────────── -->
 
 <div id="app-screen" class="hidden">
-<header class="header">
-  <div class="hdr-inner">
-  <div class="hdr-left" style="display: flex; align-items: center; gap: 8px;">
-    <div class="hdr-avatar" id="hdr-avatar" onclick="showTab('you');return false;"></div>
+<header class="header" style="padding: max(10px, env(safe-area-inset-top)) 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); background: #12161a;">
+  <div class="hdr-inner" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
     
-    <div style="position: relative; display: inline-block;">
-      <button class="hdr-btn" id="notification-btn" onclick="toggleNotificationDropdown(event)" title="Notifications" style="position: relative;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    <!-- Left: Profile Avatar & Notifications -->
+    <div class="hdr-left" style="display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-start;">
+      <div class="hdr-avatar" id="hdr-avatar" onclick="showTab('you');return false;"></div>
+      <div style="position: relative; display: inline-block;">
+        <button class="hdr-btn" id="notification-btn" onclick="toggleNotificationDropdown(event)" title="Notifications" style="position: relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-badge" id="notification-badge" style="position: absolute; top: -2px; right: -2px; background: #FC6100; color: white; border-radius: 50%; width: 14px; height: 14px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8px; font-weight: 700; line-height: 1;"></span>
+        </button>
+        
+        <!-- Notification Dropdown -->
+        <div id="notification-dropdown" class="notification-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 280px; background: rgba(30, 30, 30, 0.95); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(10px); z-index: 1000; padding: 12px 14px; font-family: var(--font); color: var(--text);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <span style="font-size: 13px; font-weight: 700; color: #fff;">Notifications</span>
+            <span id="notif-clear-all" onclick="clearNotifications(event)" style="font-size: 11px; color: var(--brand); cursor: pointer; font-weight: 600;">Clear all</span>
+          </div>
+          <div id="notif-list" style="max-height: 240px; overflow-y: auto;"></div>
+          <div id="notif-empty" style="display: block; text-align: center; padding: 16px 0; color: var(--muted); font-size: 11px;">No new notifications</div>
+        </div>
+      </div>
+      <button class="hdr-btn" id="strava-sync-btn" onclick="triggerParticipantStravaSync(event)" title="Sync Strava Activities" style="display: none; color: #FC6100;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;">
+          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
         </svg>
-        <span class="notification-badge" id="notification-badge" style="position: absolute; top: 0px; right: 0px; background: #FC6100; color: white; border-radius: 50%; width: 15px; height: 15px; display: none; border: 1.5px solid var(--surface); justify-content: center; align-items: center; font-size: 8.5px; font-weight: 700; font-family: sans-serif; line-height: 1;"></span>
       </button>
-      
-      <!-- Notification Dropdown -->
-      <div id="notification-dropdown" class="notification-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 280px; background: rgba(30, 30, 30, 0.95); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(10px); z-index: 1000; padding: 12px 14px; font-family: var(--font); color: var(--text);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-          <span style="font-size: 13px; font-weight: 700; color: #fff;">Notifications</span>
-          <span id="notif-clear-all" onclick="clearNotifications(event)" style="font-size: 11px; color: var(--brand); cursor: pointer; font-weight: 600;">Clear all</span>
-        </div>
-        <div id="notif-list" style="max-height: 240px; overflow-y: auto;">
-          <!-- Will be rendered dynamically -->
-        </div>
-        <div id="notif-empty" style="display: block; text-align: center; padding: 16px 0; color: var(--muted); font-size: 11px;">
-          No new notifications
+    </div>
+
+    <!-- Middle: Date Switcher & Logo -->
+    <div class="hdr-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 2;">
+      <!-- Date Switcher Pill -->
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #fff; text-transform: uppercase;">
+        <span onclick="shiftDashboardDate(-1)" style="cursor: pointer; opacity: 0.6; padding: 2px 4px; transition: opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6">❮</span>
+        <span id="hdr-today-date">—</span>
+        <span onclick="shiftDashboardDate(1)" style="cursor: pointer; opacity: 0.6; padding: 2px 4px; transition: opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6">❯</span>
+      </div>
+      <!-- Logo Branding -->
+      <div style="font-size: 15px; font-weight: 300; letter-spacing: 4px; color: rgba(255, 255, 255, 0.7); margin-top: 4px; text-transform: uppercase; font-family: 'Poppins', sans-serif;">WHOOP</div>
+    </div>
+
+    <!-- Right: Goal Completion Battery -->
+    <div class="hdr-right" style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1;">
+      <div id="hdr-battery-wrap" onclick="clearPWACache(this)" title="Clear cache / PWA Status" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+        <span id="hdr-battery-pct" style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); font-family: var(--font);">70%</span>
+        <div style="border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 4px; width: 22px; height: 13px; padding: 1px; display: flex; align-items: center; position: relative; box-sizing: border-box;">
+          <div id="hdr-battery-bar" style="background: #22c55e; height: 100%; width: 70%; border-radius: 1px; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+          <!-- Battery nipple -->
+          <div style="position: absolute; right: -3px; top: 3px; width: 1.5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 0 1px 1px 0;"></div>
         </div>
       </div>
     </div>
-    <button class="hdr-btn" id="strava-sync-btn" onclick="triggerParticipantStravaSync(event)" title="Sync Strava Activities" style="display: none; position: relative; color: #FC6100;">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L11.215 0 5.86 10.518h4.172z"/>
-      </svg>
-    </button>
-  </div>
-  
-  <div class="hdr-center">
-    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">
-      <span id="hdr-today-date" style="color: #fff;">—</span>
-    </div>
-  </div>
-  
-  <div class="hdr-right">
-    <button class="hdr-btn" onclick="clearPWACache(this)" title="Clear cache">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18"/>
-        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-      </svg>
-    </button>
-  </div>
+
   </div>
 </header>
 
