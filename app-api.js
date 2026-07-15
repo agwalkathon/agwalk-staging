@@ -3336,8 +3336,8 @@ window.renderStreakDrawerDetails = function() {
   var peersCount = 50;
   try {
     var sum = typeof cacheGet === 'function' ? (cacheGet('ranking_summaries', 300000) || cacheGet('ranking_summaries', 86400*365*1000)) : null;
-    if (sum && sum.length && typeof REG_JSON_DATA !== 'undefined' && REG_JSON_DATA) {
-      var reg = REG_JSON_DATA;
+    var reg = typeof regJsonData !== 'undefined' ? regJsonData : null;
+    if (sum && sum.length && reg) {
       var gN = (reg.gender || '').toLowerCase(); var isF = gN === 'female' || gN === 'f';
       var sN = (reg.shift || '').toLowerCase(); var isN = sN.indexOf('night') > -1;
       var peers = sum.filter(function(p) {
