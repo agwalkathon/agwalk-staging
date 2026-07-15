@@ -2028,6 +2028,12 @@ async function bootAppUnified() {
   if (isParticipant) {
     currentSession = s;
     loadNotifications();
+    
+    // Refresh notifications every 15 seconds for real-time updates when app is open
+    if (!window._notifPollInterval) {
+      window._notifPollInterval = setInterval(loadNotifications, 15000);
+    }
+
     var _maintBlocked = await checkMaintenanceGate(s.athleteId, s.empCode);
     if (_maintBlocked) return;
     await load(false);
