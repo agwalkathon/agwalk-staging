@@ -174,30 +174,26 @@ function getEventScoreLabel() {
 }
 
 function renderUserAvatar(name, photo, hdrId, youId) {
-  var initials = typeof get2Initials === 'function' ? get2Initials(name) : (name || 'Participant').substring(0, 2).toUpperCase();
-  var styleFunc = typeof getWhoopAvatarStyle === 'function' ? getWhoopAvatarStyle : function() { return 'background:#282e36; border:2px solid #E8622A; color:#fff;'; };
-  var hasPhoto = photo && photo !== 'null' && photo !== 'undefined' && !photo.includes('large.png') && !photo.includes('avatar/athlete');
+  var initials = (name || 'Participant').trim().split(/\s+/);
+  var initStr = '';
+  if (initials.length >= 2) {
+    initStr = (initials[0][0] + initials[initials.length - 1][0]).toUpperCase();
+  } else {
+    initStr = (name || 'AG').substring(0, 2).toUpperCase();
+  }
+  
+  var avStyle = 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; font-weight: 700; font-family: var(--font); text-shadow: none;';
   
   var hdrEl = document.getElementById(hdrId);
   if (hdrEl) {
-    if (hasPhoto) {
-      hdrEl.textContent = '';
-      hdrEl.setAttribute('style', `background: url('${photo}') no-repeat center center; background-size: cover; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.08);`);
-    } else {
-      hdrEl.textContent = initials;
-      hdrEl.setAttribute('style', styleFunc(name) + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px;');
-    }
+    hdrEl.textContent = initStr;
+    hdrEl.setAttribute('style', avStyle + '; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; letter-spacing:0.5px; border:none; box-shadow: 0 2px 8px rgba(0,0,0,0.15);');
   }
 
   var youEl = document.getElementById(youId);
   if (youEl) {
-    if (hasPhoto) {
-      youEl.textContent = '';
-      youEl.setAttribute('style', `background: url('${photo}') no-repeat center center; background-size: cover; width:84px; height:84px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.4); border:2.5px solid rgba(255,255,255,0.08);`);
-    } else {
-      youEl.textContent = initials;
-      youEl.setAttribute('style', styleFunc(name) + '; width:84px; height:84px; border-radius:50%; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:1px;');
-    }
+    youEl.textContent = initStr;
+    youEl.setAttribute('style', avStyle + '; width:84px; height:84px; border-radius:50%; font-size:28px; display:flex; align-items:center; justify-content:center; letter-spacing:0.5px; border:none; box-shadow: 0 4px 16px rgba(0,0,0,0.2);');
   }
 }
 
