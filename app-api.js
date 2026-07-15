@@ -3055,6 +3055,9 @@ window.renderMedalInsights = function() {
   var contentEl = document.getElementById('medal-insights-content');
   if (!contentEl) return;
 
+  var myActs = window._myActsGlobal || [];
+  var validActs = myActs.filter(function(a) { return !a.is_flagged; });
+
   var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
   var bronzeLimit = rules.bronze_medal_distance_meters || 100000;
   var silverLimit = rules.silver_medal_distance_meters || 200000;
