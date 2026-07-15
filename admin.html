@@ -50,7 +50,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Arcgate Walkathon 2026</title>
+  <title>Admin Dashboard | Arcgatians 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -686,8 +686,8 @@
 <!-- -- Sidebar -- -->
                   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -730,7 +730,7 @@
     </div>
     <div class='topbar-right' style='display:flex;align-items:center;gap:12px;'>
       
-      <span id="realtime-badge">Connecting…</span>
+      <span id="realtime-badge">Connectingâ€¦</span>
      <button onclick="logout()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; border-radius:6px; transition:all 0.15s;" title="Logout"><i class="ti ti-logout"></i></button></div>
   </header>
 
@@ -751,42 +751,42 @@
       <div class="stat-card">
         <div class="stat-card-icon orange"><i class="ti ti-users"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val orange" id="s-participants">—</div>
+          <div class="stat-val orange" id="s-participants">â€”</div>
           <div class="stat-lbl">Participants</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon green"><i class="ti ti-run"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val green" id="s-activities">—</div>
+          <div class="stat-val green" id="s-activities">â€”</div>
           <div class="stat-lbl">Total activities</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon blue"><i class="ti ti-map-pin"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val blue" id="s-km">—</div>
+          <div class="stat-val blue" id="s-km">â€”</div>
           <div class="stat-lbl">Distance covered</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon purple"><i class="ti ti-brand-strava"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val purple" id="s-connected">—</div>
+          <div class="stat-val purple" id="s-connected">â€”</div>
           <div class="stat-lbl">Strava connected</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon orange"><i class="ti ti-calendar-check"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val orange" id="s-today">—</div>
+          <div class="stat-val orange" id="s-today">â€”</div>
           <div class="stat-lbl">Today's activities</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card-icon red"><i class="ti ti-flag"></i></div>
         <div class="stat-bottom">
-          <div class="stat-val red" id="s-flagged">—</div>
+          <div class="stat-val red" id="s-flagged">â€”</div>
           <div class="stat-lbl">Flagged</div>
         </div>
       </div>
@@ -1042,7 +1042,7 @@
 
   <!-- Footer -->
   <footer class="site-footer">
-    <span>© 2026 Arcgate Walkathon</span>
+    <span>Â© 2026 Arcgate Walkathon</span>
     <div>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms of Service</a>
@@ -1183,7 +1183,7 @@ function fmtTime(d, startTime) {
   }
 }
 function fmtDist(m) {
-  if (!m) return '—';
+  if (!m) return 'â€”';
   return (m / 1000).toFixed(2) + ' km';
 }
 function fmtPS(ms, t) {
@@ -1238,7 +1238,12 @@ async function loadEventSelector() {
     if (!Array.isArray(evs) || evs.length === 0) return;
     EV_ALL = evs;
     
-    sel.innerHTML = evs.map(e => `<option value="${e.id}">${e.name} (${e.status.toUpperCase()})</option>`).join('');
+    sel.innerHTML = evs.map(e => {
+      const isLive = e.status === 'live';
+      const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
+      const prefix = isLive ? '\uD83D\uDD25 ' : '';
+      return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
+    }).join('');
     
     let savedId = localStorage.getItem('wk_admin_selected_event_id');
     if (!savedId) {
@@ -1381,12 +1386,12 @@ async function updateRateLimitDashboard() {
       const ksBtn = document.getElementById('kill-switch-btn');
       if (ksBtn) {
         if (currentKillSwitchState) {
-          ksBtn.textContent = '?? Resume Strava API Calls';
+          ksBtn.innerHTML = '<i class="ti ti-play"></i> Resume Strava API Calls';
           ksBtn.style.background = 'rgba(16, 185, 129, 0.1)';
           ksBtn.style.color = '#10B981';
           ksBtn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
         } else {
-          ksBtn.textContent = '?? Stop Strava API Calls';
+          ksBtn.innerHTML = '<i class="ti ti-player-pause"></i> Stop Strava API Calls';
           ksBtn.style.background = 'rgba(239, 68, 68, 0.1)';
           ksBtn.style.color = '#EF4444';
           ksBtn.style.border = '1px solid rgba(239, 68, 68, 0.2)';
@@ -1445,13 +1450,13 @@ async function updateRateLimitDashboard() {
           banner.style.background = 'rgba(245, 158, 11, 0.08)';
           banner.style.border = '1px solid rgba(245, 158, 11, 0.15)';
           banner.style.color = '#F59E0B';
-          icon.textContent = '?';
+          icon.innerHTML = '<i class="ti ti-alert-triangle"></i>';
           text.textContent = 'Strava API calls are suspended by Administrator';
         } else if (status.state === 'error') {
           banner.style.background = 'rgba(239, 68, 68, 0.08)';
           banner.style.border = '1px solid rgba(239, 68, 68, 0.15)';
           banner.style.color = '#EF4444';
-          icon.textContent = '?';
+          icon.innerHTML = '<i class="ti ti-alert-circle"></i>';
           
           const dateStr = status.lastErrorTime ? new Date(status.lastErrorTime).toLocaleTimeString() : '';
           text.textContent = `API Call Failed: ${status.lastError || 'Unknown error'} ${dateStr ? 'at ' + dateStr : ''}`;
@@ -1459,7 +1464,7 @@ async function updateRateLimitDashboard() {
           banner.style.background = 'rgba(16, 185, 129, 0.08)';
           banner.style.border = '1px solid rgba(16, 185, 129, 0.15)';
           banner.style.color = '#10B981';
-          icon.textContent = '?';
+          icon.innerHTML = '<i class="ti ti-circle-check"></i>';
           text.textContent = 'Strava API calls are working fine';
         }
       }
@@ -1555,7 +1560,7 @@ async function checkAllSystemsHealth() {
           badge.className = 'health-status-badge badge-ok';
         }
       }
-      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : '—';
+      if (latencyEl) latencyEl.textContent = latency !== null ? `${latency}ms` : 'â€”';
       
       const lastDown = localStorage.getItem(`health_${service}_last_down`);
       if (downEl) downEl.textContent = lastDown || 'None';
@@ -1682,7 +1687,7 @@ async function checkAllSystemsHealth() {
   updateUI('github', githubOk, latencyGithub, githubReason);
 
   // 4. Check Strava API Status via Backend
-  let stravaOk = false, stravaReason = '', queueInfo = '—';
+  let stravaOk = false, stravaReason = '', queueInfo = 'â€”';
   const token = sessionStorage.getItem('wk_admin_token');
   if (!token) {
     stravaReason = 'Admin token missing or not logged in';
@@ -1891,7 +1896,7 @@ function renderStandardHistoryLogs(service) {
     [...logs].reverse().forEach(log => {
       const statusText = log.ok ? 'ONLINE' : 'OFFLINE';
       const statusClass = log.ok ? 'log-status-ok' : 'log-status-err';
-      const latencyText = log.latency !== null ? `${log.latency}ms` : '—';
+      const latencyText = log.latency !== null ? `${log.latency}ms` : 'â€”';
       
       const item = document.createElement('div');
       item.className = 'log-item';
@@ -2067,7 +2072,7 @@ function closeHealthLogsModal() {
 
       ws.onclose = function() {
         clearInterval(ping);
-        setBadge('error', 'Reconnecting…');
+        setBadge('error', 'Reconnectingâ€¦');
         setTimeout(connect, 5000);
       };
 
