@@ -3589,13 +3589,29 @@ window.renderParticipantProfile = async function(athleteId) {
 
     // 3. Activity Metrics Grid
     var totalMovingSec = validActs.reduce(function(s, a) { return s + (a.moving_time_seconds || 0); }, 0);
+    
+    // Check if dominant activity is Ride
+    var rideActs = validActs.filter(function(a) {
+      var st = (a.sport_type || '').toLowerCase();
+      return st.indexOf('ride') > -1 || st.indexOf('cycling') > -1;
+    });
+    var isPrimaryRide = rideActs.length > (validActs.length / 2);
+    
+    var metricTitle = 'Avg Pace';
     var avgPaceStr = '—';
     if (totalMovingSec > 0 && totalDistM > 0) {
-      var paceMinKm = (totalMovingSec / 60) / (totalDistM / 1000);
-      var mins = Math.floor(paceMinKm);
-      var secs = Math.round((paceMinKm - mins) * 60);
-      if (secs === 60) { mins++; secs = 0; }
-      avgPaceStr = mins + ':' + (secs < 10 ? '0' : '') + secs + ' /km';
+      if (isPrimaryRide) {
+        metricTitle = 'Avg Speed';
+        var speedKmh = (totalDistM / 1000) / (totalMovingSec / 3600);
+        avgPaceStr = speedKmh.toFixed(1) + ' km/h';
+      } else {
+        metricTitle = 'Avg Pace';
+        var paceMinKm = (totalMovingSec / 60) / (totalDistM / 1000);
+        var mins = Math.floor(paceMinKm);
+        var secs = Math.round((paceMinKm - mins) * 60);
+        if (secs === 60) { mins++; secs = 0; }
+        avgPaceStr = mins + ':' + (secs < 10 ? '0' : '') + secs + ' /km';
+      }
     }
     var hours = Math.floor(totalMovingSec / 3600);
     var minutes = Math.floor((totalMovingSec % 3600) / 60);
@@ -3610,7 +3626,7 @@ window.renderParticipantProfile = async function(athleteId) {
            '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + currentKm.toFixed(1) + ' km</div>' +
            '    </div>' +
            '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
-           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Avg Pace</div>' +
+           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">' + metricTitle + '</div>' +
            '      <div style="font-size: 18px; font-weight: 800; color: #22c55e; margin-top: 4px;">' + avgPaceStr + '</div>' +
            '    </div>' +
            '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
@@ -3692,19 +3708,31 @@ window.renderParticipantProfile = async function(athleteId) {
       last7Acts.forEach(function(act) {
         var actDist = (act.distance_meters || 0) / 1000;
         var actDate = new Date(act.activity_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-        var actPace = '—';
+        
+        var isRide = (act.sport_type || '').toLowerCase().indexOf('ride') > -1 || (act.sport_type || '').toLowerCase().indexOf('cycling') > -1;
+        var actMetricStr = '—';
         if (act.moving_time_seconds && act.distance_meters) {
-          var paceMin = (act.moving_time_seconds / 60) / (act.distance_meters / 1000);
-          var m = Math.floor(paceMin);
-          var s = Math.round((paceMin - m) * 60);
-          if (s === 60) { m++; s = 0; }
-          actPace = m + ':' + (s < 10 ? '0' : '') + s + ' /km';
+          if (isRide) {
+            var speedKmh = (act.distance_meters / 1000) / (act.moving_time_seconds / 3600);
+            actMetricStr = speedKmh.toFixed(1) + ' km/h';
+          } else {
+            var paceMin = (act.moving_time_seconds / 60) / (act.distance_meters / 1000);
+            var m = Math.floor(paceMin);
+            var s = Math.round((paceMin - m) * 60);
+            if (s === 60) { m++; s = 0; }
+            actMetricStr = m + ':' + (s < 10 ? '0' : '') + s + ' /km';
+          }
         }
+        
         var actTitle = act.description || (act.sport_type || 'Activity');
+        if (!act.description && isRide) {
+          actTitle = 'Ride';
+        }
+        
         actsListHtml += '<div onclick="openActivityDetail(\'' + (act.strava_activity_id || act.id) + '\', null, ' + !!act.strava_activity_id + ')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.02)\'">' +
                        '  <div style="text-align: left;">' +
                        '    <div style="font-size: 13px; font-weight: 700; color: #fff;">' + esc(actTitle) + '</div>' +
-                       '    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">' + actDate + ' · ' + actPace + '</div>' +
+                       '    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">' + actDate + ' · ' + actMetricStr + '</div>' +
                        '  </div>' +
                        '  <div style="display: flex; align-items: center; gap: 8px;">' +
                        '    <div style="font-size: 14px; font-weight: 800; color: var(--brand);">' + actDist.toFixed(1) + ' km</div>' +
