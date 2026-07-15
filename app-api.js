@@ -2556,6 +2556,14 @@ window.renderDashHybridExtras = function(opts) {
       }
       cell.appendChild(dw); cell.appendChild(dn); cell.appendChild(svg);
       cell.title = d.km.toFixed(1) + ' / ' + targetKm.toFixed(1) + ' km';
+      if (d.km > 0) {
+        cell.style.cursor = 'pointer';
+        cell.onclick = function() {
+          if (typeof showDateDetails === 'function') {
+            showDateDetails(d.str);
+          }
+        };
+      }
       strip.appendChild(cell);
     });
     strip.style.display = 'flex';
