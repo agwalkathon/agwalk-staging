@@ -381,6 +381,19 @@ footer.site-footer a{color:#aaa;text-decoration:none;margin-left:16px}
         </div>
       </div>
       
+      <!-- Sub-tabs bar -->
+      <div class="sub-tabs-bar" style="display: flex; gap: 8px; border-bottom: 1px solid #e5e7eb; padding-bottom: 0; margin-bottom: 16px; flex-wrap: wrap;">
+        <button class="sub-tab-btn active" id="sub-tab-event" onclick="switchSubTab('event')" style="padding: 10px 16px; font-size: 13px; font-weight: 600; background: none; border: none; border-bottom: 2px solid var(--brand); color: var(--brand); cursor: pointer; display: flex; align-items: center; gap: 6px; outline: none; transition: all 0.2s;">
+          👟 Event <span class="badge" id="badge-count-event" style="font-size: 10px; font-weight: 700; background: #e5e7eb; color: #4b5563; padding: 2px 6px; border-radius: 20px;">0</span>
+        </button>
+        <button class="sub-tab-btn" id="sub-tab-feed" onclick="switchSubTab('feed')" style="padding: 10px 16px; font-size: 13px; font-weight: 600; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; outline: none; transition: all 0.2s;">
+          📣 Feed <span class="badge" id="badge-count-feed" style="font-size: 10px; font-weight: 700; background: #e5e7eb; color: #4b5563; padding: 2px 6px; border-radius: 20px;">0</span>
+        </button>
+        <button class="sub-tab-btn" id="sub-tab-celebrate" onclick="switchSubTab('celebrate')" style="padding: 10px 16px; font-size: 13px; font-weight: 600; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; outline: none; transition: all 0.2s;">
+          🎉 Celebrate <span class="badge" id="badge-count-celebrate" style="font-size: 10px; font-weight: 700; background: #e5e7eb; color: #4b5563; padding: 2px 6px; border-radius: 20px;">0</span>
+        </button>
+      </div>
+
       <!-- Select All check (visible when bulk action bar is not showing, to allow selecting all) -->
       <div id="select-all-header-wrap" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; font-size: 12.5px; font-weight: 500; color: var(--sub);">
         <input type="checkbox" id="chk-select-all-init" onchange="selectAllTriggers(this.checked)" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--brand);">
@@ -498,14 +511,70 @@ async function autoSaveOnceOnly(idx) {
   await executeAutoSave(idx);
 }
 
+var currentSubTab = 'event';
+
+function getRuleCategory(key) {
+  var celebrateKeys = ['wish_received', 'reaction_received', 'comment_approved', 'post_approved', 'post_rejected'];
+  var feedKeys = ['event_started', 'event_ending_soon', 'event_ended', 'daily_summary'];
+  if (celebrateKeys.indexOf(key) !== -1) return 'celebrate';
+  if (feedKeys.indexOf(key) !== -1) return 'feed';
+  return 'event';
+}
+
+function switchSubTab(tab) {
+  currentSubTab = tab;
+  document.querySelectorAll('.sub-tab-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+    btn.style.borderBottom = '2px solid transparent';
+    btn.style.color = 'var(--text-secondary)';
+  });
+  
+  var activeBtn = document.getElementById('sub-tab-' + tab);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.style.borderBottom = '2px solid var(--brand)';
+    activeBtn.style.color = 'var(--brand)';
+  }
+  
+  // Reset bulk selections when switching tabs
+  var selectAllInit = document.getElementById('chk-select-all-init');
+  var selectAllBulk = document.getElementById('chk-select-all-triggers');
+  if (selectAllInit) selectAllInit.checked = false;
+  if (selectAllBulk) selectAllBulk.checked = false;
+  
+  renderRules();
+}
+
 function renderRules() {
   var on = rulesData.filter(function(r){return r.enabled;}).length;
   document.getElementById('stat-enabled').textContent = on;
   document.getElementById('stat-disabled').textContent = rulesData.length - on;
+
+  // Calculate and update category badges
+  var countEvent = 0;
+  var countFeed = 0;
+  var countCelebrate = 0;
+  
+  rulesData.forEach(function(r) {
+    var cat = getRuleCategory(r.trigger_key);
+    if (cat === 'event') countEvent++;
+    else if (cat === 'feed') countFeed++;
+    else if (cat === 'celebrate') countCelebrate++;
+  });
+  
+  var badgEv = document.getElementById('badge-count-event');
+  var badgFd = document.getElementById('badge-count-feed');
+  var badgCel = document.getElementById('badge-count-celebrate');
+  if (badgEv) badgEv.textContent = countEvent;
+  if (badgFd) badgFd.textContent = countFeed;
+  if (badgCel) badgCel.textContent = countCelebrate;
   
   var container = document.getElementById('rules-list-container');
   if (container) {
-    container.innerHTML = rulesData.map(function(rule, idx) {
+    var html = '';
+    rulesData.forEach(function(rule, idx) {
+      if (getRuleCategory(rule.trigger_key) !== currentSubTab) return;
+      
       var isEnabled = rule.enabled;
       var trackBg = isEnabled ? '#22c55e' : '#d1d5db';
       var thumbTranslate = isEnabled ? 'translateX(18px)' : 'translateX(0)';
@@ -521,10 +590,10 @@ function renderRules() {
       if (ch.inapp !== false) activePills.push('<span style="padding: 2px 6px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 10px; font-weight: 600;">In-App</span>');
       if (ch.feed === true) activePills.push('<span style="padding: 2px 6px; background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; border-radius: 4px; font-size: 10px; font-weight: 600;">Feed Tab</span>');
       if (activePills.length === 0) activePills.push('<span style="padding: 2px 6px; background: #f3f4f6; color: #4b5563; border-radius: 4px; font-size: 10px; font-weight: 600;">None</span>');
-      if (rule.send_once_only === true) activePills.push('<span style="padding: 2px 6px; background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; border-radius: 4px; font-size: 10px; font-weight: 600;">First-Time Only</span>');
+      if (ch.once === true) activePills.push('<span style="padding: 2px 6px; background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; border-radius: 4px; font-size: 10px; font-weight: 600;">First-Time Only</span>');
       var pillsHtml = activePills.join(' ');
 
-      return '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; transition: box-shadow .2s; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
+      html += '<div class="rule-item-row" id="rule-row-' + idx + '" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; transition: box-shadow .2s; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
              '  <div class="rule-row-header" onclick="toggleRowExpand(' + idx + ')" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; background: #fafafa; border-bottom: 1px solid #f3f4f6; user-select: none;">' +
              '    <div style="display: flex; align-items: center; gap: 12px;" onclick="event.stopPropagation()">' +
              '      <input type="checkbox" class="trigger-row-select" data-idx="' + idx + '" onchange="updateBulkActionsBar()" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--brand); margin-right: 4px;">' +
@@ -577,7 +646,14 @@ function renderRules() {
              '    </div>' +
              '  </div>' +
              '</div>';
-    }).join('');
+    });
+    
+    if (!html) {
+      html = '<p style="color:var(--text-muted);font-size:13px;padding:24px;text-align:center;background:#f9fafb;border-radius:12px;border:1px dashed #e5e7eb;">No triggers configured for this category yet.</p>';
+    }
+    container.innerHTML = html;
+  }
+}
   }
 }
 
