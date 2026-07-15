@@ -304,6 +304,10 @@
     <div style="display:flex; justify-content:center; margin-bottom:24px; margin-top:14px;">
       <img id="app-logo" src="logo-white.png" alt="Arcgate Walkathon" style="height:26px; width:auto;">
     </div>
+    <!-- ── In-App Notification Banner (Moved below logo) ── -->
+    <div id="inapp-notification-banner" style="margin-bottom:16px;">
+      <!-- dynamically filled by updateInAppNotificationBanner() -->
+    </div>
     <!-- 7-day mini-ring strip (WHOOP hybrid, Phase 2b) -->
     <div class="day-strip" id="day-strip" style="display:none;"></div>
     <!-- Unified Medal Arc (WHOOP hybrid redesign) -->
@@ -373,11 +377,6 @@
   <!-- Stat chips row (WHOOP hybrid, Phase 2b) -->
   <div class="stat-chips" id="stat-chips" style="display:none;"></div>
 
-  <!-- ── In-App Notification Banner (after rings) ── -->
-  <div id="inapp-notification-banner">
-    <!-- dynamically filled by updateInAppNotificationBanner() -->
-  </div>
-
   <!-- Recovery Suggestion (hidden — data now feeds banner) -->
   <div id="recovery-card-wrap" style="display:none;">
     <div class="sec">Recovery Tips</div>
@@ -393,39 +392,47 @@
     </div>
   </div>
     <!-- My Points -->
-  <div class="card clickable-card" id="my-points-section" onclick="openDashPointsModal()" style="margin-bottom:12px; cursor:pointer;">
-  <div class="sec">My Points</div>
-  <div class="gold-stats" style="padding:0 20px 20px;margin-bottom:0;">
-    <div class="gold-stat">
-      <div class="gold-stat-val" id="s-pts-dist" style="color:var(--blue)">—</div>
-      <div class="gold-stat-lbl">Distance</div>
+  <div class="card clickable-card" id="my-points-section" onclick="openDashPointsModal()" style="margin-bottom:12px; padding:14px 16px; cursor:pointer;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">My Points</div>
+      <button style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
-    <div class="gold-stat">
-      <div class="gold-stat-val" id="s-pts-milestone" style="color:var(--gold)">—</div>
-      <div class="gold-stat-lbl">Milestone Bonus</div>
+    <div class="gold-stats" style="padding:0; margin-bottom:0;">
+      <div class="gold-stat">
+        <div class="gold-stat-val" id="s-pts-dist" style="color:var(--blue)">—</div>
+        <div class="gold-stat-lbl">Distance</div>
+      </div>
+      <div class="gold-stat">
+        <div class="gold-stat-val" id="s-pts-milestone" style="color:var(--gold)">—</div>
+        <div class="gold-stat-lbl">Milestone Bonus</div>
+      </div>
+      <div class="gold-stat">
+        <div class="gold-stat-val" id="s-pts-challenge" style="color:var(--purple)">—</div>
+        <div class="gold-stat-lbl">Challenge Bonus</div>
+      </div>
+      <div class="gold-stat">
+        <div class="gold-stat-val" id="s-pts-total" style="color:var(--brand)">—</div>
+        <div class="gold-stat-lbl">Total Points</div>
+      </div>
     </div>
-    <div class="gold-stat">
-      <div class="gold-stat-val" id="s-pts-challenge" style="color:var(--purple)">—</div>
-      <div class="gold-stat-lbl">Challenge Bonus</div>
-    </div>
-    <div class="gold-stat">
-      <div class="gold-stat-val" id="s-pts-total" style="color:var(--brand)">—</div>
-      <div class="gold-stat-lbl">Total Points</div>
-    </div>
-  </div>
   </div>
 
   <!-- Metrics -->
-  <div class="card clickable-card" id="my-stats-section" onclick="openDashStatsModal()" style="margin-bottom:12px; cursor:pointer;">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px 0; margin-bottom:12px;">
-      <div class="sec" style="margin:0; padding:0;">My Stats</div>
-      <div style="color:rgba(255, 255, 255, 0.4); display:flex; align-items:center;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <div class="card clickable-card" id="my-stats-section" onclick="openDashStatsModal()" style="margin-bottom:12px; padding:14px 16px; cursor:pointer;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">My Stats</div>
+      <button style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
-      </div>
+      </button>
     </div>
-    <div id="mystats-grid-container" style="padding:0 20px 20px;">
+    <div id="mystats-grid-container" style="padding:0;">
       <div class="stat-card-item" id="stat-item-activities">
         <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -451,86 +458,97 @@
   </div>
 
   <!-- My Activities Card with Recent Activities -->
-  <div class="card" style="margin-bottom:8px; padding:0 0 12px 0;">
+  <div class="card" style="margin-bottom:12px; padding:14px 16px;">
     <!-- Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 16px 0; margin-bottom:14px;">
-      <div class="sec" style="margin:0; padding:0; font-family:'Poppins', sans-serif; font-weight:700; font-size:14px; letter-spacing:1px; text-transform:uppercase; color:#fff;">Activities</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">Activities</div>
       <button onclick="openActivitiesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all activities">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
         </svg>
       </button>
     </div>
     <!-- List of recent activities -->
-    <div id="today-activities-list" style="display:flex; flex-direction:column; gap:8px; padding:0 12px;">
+    <div id="today-activities-list" style="display:flex; flex-direction:column; gap:8px; padding:0;">
       <div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">
         Loading activities...
       </div>
     </div>
   </div>
 
-  <div id="pace-goals-section">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:0 4px; margin-bottom:4px; cursor:pointer;" onclick="openDashPaceModal()">
-      <div class="sec" style="margin:0; padding:0;">Pace Goals</div>
-      <div style="color:rgba(255, 255, 255, 0.4); display:flex; align-items:center;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </div>
-    </div>
-    <div class="card clickable-card" id="pace-card" onclick="openDashPaceModal()" style="cursor:pointer;">
-      <!-- dynamically rendered by JS -->
-    </div>
-  </div>
-
-  <div id="streak-section">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:0 4px; margin-bottom:4px; cursor:pointer;" onclick="openDashStreakModal()">
-      <div class="sec" style="margin:0; padding:0;">Activity Streak</div>
-      <div style="color:rgba(255, 255, 255, 0.4); display:flex; align-items:center;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </div>
-    </div>
-    <div class="card clickable-card" onclick="openDashStreakModal()" style="cursor:pointer;">
-      <div class="streak-top">
-        <div>
-          <div class="streak-num" id="streak-num">0</div>
-          <div class="streak-num-lbl">consecutive days</div>
-        </div>
-        <div class="streak-right">
-          <div class="streak-best-val" id="streak-best-val">0</div>
-          <div class="streak-best-lbl">Best streak</div>
-          <div class="streak-msg-txt" id="streak-msg">—</div>
-        </div>
-      </div>
-      <div class="streak-bars-wrap" id="streak-bars"></div>
-      <div class="streak-day-labels" id="streak-labels"></div>
-    </div>
-  </div>
-
-  <!-- Challenges Card with Recent Challenges -->
-  <div class="card" style="margin-bottom:8px; padding:0 0 12px 0;">
+  <div id="pace-goals-section" class="card clickable-card" onclick="openDashPaceModal()" style="margin-bottom:12px; padding:14px 16px; cursor:pointer;">
     <!-- Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 12px 0; margin-bottom:10px;">
-      <div class="sec" style="margin:0; padding:0;">Challenges</div>
-      <button onclick="openChallengesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all challenges">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">Pace Goals</div>
+      <button style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
     </div>
+    <div id="pace-card">
+      <!-- dynamically rendered by JS -->
+    </div>
+  </div>
+
+  <div id="streak-section" class="card clickable-card" onclick="openDashStreakModal()" style="margin-bottom:12px; padding:14px 16px; cursor:pointer;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">Activity Streak</div>
+      <button style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+    <div class="streak-top">
+      <div>
+        <div class="streak-num" id="streak-num">0</div>
+        <div class="streak-num-lbl">consecutive days</div>
+      </div>
+      <div class="streak-right">
+        <div class="streak-best-val" id="streak-best-val">0</div>
+        <div class="streak-best-lbl">Best streak</div>
+        <div class="streak-msg-txt" id="streak-msg">—</div>
+      </div>
+    </div>
+    <div class="streak-bars-wrap" id="streak-bars"></div>
+    <div class="streak-day-labels" id="streak-labels"></div>
+  </div>
+
+  <!-- Challenges Card with Recent Challenges -->
+  <div class="card" id="challenges-card-container" style="margin-bottom:12px; padding:14px 16px;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">Challenges</div>
+      <button onclick="openChallengesDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all challenges">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </button>
+    </div>
     <!-- List of last 3 challenges -->
-    <div id="dashboard-challenges-list" style="display:flex; flex-direction:column; gap:8px; padding:0 12px;">
+    <div id="dashboard-challenges-list" style="display:flex; flex-direction:column; gap:8px; padding:0;">
       <div style="text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); font-size: 13px;">
         Loading challenges...
       </div>
     </div>
   </div>
 
-  <div class="sec">PERSONAL BESTS</div>
-  <div class="pb-grid" id="pb-grid-container">
-    <!-- Rendered dynamically via javascript configuration -->
+  <!-- Personal Bests Card -->
+  <div class="card" id="pb-card-container" style="margin-bottom:12px; padding:14px 16px 12px;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font);">Personal Bests</div>
+      <button onclick="openPBsDrawer();" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,0.4)'" title="View all personal bests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </button>
+    </div>
+    <div id="pb-grid-container">
+      <!-- Rendered dynamically via javascript configuration -->
+    </div>
   </div>
 
 </div>
