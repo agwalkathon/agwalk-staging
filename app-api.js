@@ -933,23 +933,23 @@ async function load(isBackgroundRefresh) {
             sub: 'single session max',
             color: '#ffae00',
             bg: 'rgba(255, 174, 0, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 4 4-8 4 8"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 4 4-8 4 8"/></svg>',
             val: maxDistM > 0 ? (maxDistM / 1000).toFixed(2) + ' km' : '—'
           },
           best_pace: {
             label: 'Best Pace',
             sub: 'min/km · walk/run',
-            color: 'var(--brand)',
-            bg: 'rgba(232, 98, 42, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            color: '#6366f1',
+            bg: 'rgba(99, 102, 241, 0.12)',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
             val: maxSpeed > 0 ? fmtPS(maxSpeed, bestPaceSport) : '—'
           },
           longest_session: {
             label: 'Longest Session',
             sub: 'longest moving duration',
-            color: 'var(--blue)',
-            bg: 'rgba(96, 165, 250, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            color: '#3b82f6',
+            bg: 'rgba(59, 130, 246, 0.12)',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
             val: maxTimeSec > 0 ? fmtDur(maxTimeSec) : '—'
           },
           best_day: {
@@ -961,9 +961,9 @@ async function load(isBackgroundRefresh) {
               }
               return 'daily max';
             })(),
-            color: 'var(--green)',
+            color: '#22c55e',
             bg: 'rgba(34, 197, 94, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
             val: maxDayKm > 0 ? maxDayKm.toFixed(2) + ' km' : '—'
           },
           max_elevation: {
@@ -971,7 +971,7 @@ async function load(isBackgroundRefresh) {
             sub: 'single session max',
             color: '#8b5cf6',
             bg: 'rgba(139, 92, 246, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
             val: maxElevation > 0 ? maxElevation.toFixed(0) + ' m' : '—'
           },
           max_speed: {
@@ -979,7 +979,7 @@ async function load(isBackgroundRefresh) {
             sub: 'single session max',
             color: '#ec4899',
             bg: 'rgba(236, 72, 153, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></svg>',
             val: maxAvgSpeed > 0 ? (maxAvgSpeed * 3.6).toFixed(1) + ' km/h' : '—'
           },
           total_distance: {
@@ -987,7 +987,7 @@ async function load(isBackgroundRefresh) {
             sub: 'overall event distance',
             color: '#3b82f6',
             bg: 'rgba(59, 130, 246, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
             val: totalDistM > 0 ? (totalDistM / 1000).toFixed(1) + ' km' : '—'
           },
           total_elevation: {
@@ -995,7 +995,7 @@ async function load(isBackgroundRefresh) {
             sub: 'overall elevation gain',
             color: '#10b981',
             bg: 'rgba(16, 185, 129, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22l-4-4h8l-4 4zM12 2l-4 4h8l-4-4z"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22l-4-4h8l-4 4zM12 2l-4 4h8l-4-4z"/></svg>',
             val: totalElevation > 0 ? totalElevation.toFixed(0) + ' m' : '—'
           },
           total_activities: {
@@ -1003,13 +1003,13 @@ async function load(isBackgroundRefresh) {
             sub: 'sync\'d sessions',
             color: '#64748b',
             bg: 'rgba(100, 116, 139, 0.12)',
-            svg: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+            svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
             val: validActs.length + ' acts'
           }
         };
         
-        var html = '';
-        var keys = ['longest_activity', 'best_pace', 'longest_session', 'best_day', 'max_elevation', 'max_speed', 'total_distance', 'total_elevation', 'total_activities'];
+        var drawerHtml = '';
+        var keys = ['longest_activity', 'best_day', 'max_elevation', 'max_speed', 'best_pace', 'longest_session', 'total_distance', 'total_elevation', 'total_activities'];
         keys.forEach(function(key) {
           if (pbConfig[key] !== false) {
             var d = statDefs[key];
@@ -1026,25 +1026,44 @@ async function load(isBackgroundRefresh) {
                clickAttr = ' onclick="openActivityDetail(\'' + (maxSpeedAct.strava_activity_id || maxSpeedAct.id) + '\', event, ' + (maxSpeedAct.strava_activity_id ? 'true' : 'false') + ')"';
              } else if (key === 'best_day' && bestDayDate) {
               clickAttr = ' onclick="showDateDetails(\'' + bestDayDate + '\')"';
-            }
+             }
 
-            var styleAttr = clickAttr ? ' style="cursor: pointer;"' : '';
-            html += '<div class="pb-card"' + clickAttr + styleAttr + '>' +
-              '<div class="pb-card-left">' +
-                '<div class="pb-card-header">' +
-                  '<div class="pb-card-icon" style="background: ' + d.bg + '; color: ' + d.color + ';">' +
-                    d.svg +
-                  '</div>' +
-                  '<div class="pb-card-label">' + d.label + '</div>' +
+            drawerHtml += '<div class="pb-detail-card"' + clickAttr + ' style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; transition: background 0.2s;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
+              '<div style="display: flex; align-items: center;">' +
+                '<div style="width: 38px; height: 38px; border-radius: 10px; background: ' + d.bg + '; color: ' + d.color + '; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0;">' +
+                  d.svg +
                 '</div>' +
-                '<div class="pb-card-sub">' + d.sub + '</div>' +
+                '<div>' +
+                  '<div style="font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.5px; text-transform: uppercase;">' + d.label + '</div>' +
+                  '<div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; font-weight: 500;">' + d.sub + '</div>' +
+                '</div>' +
               '</div>' +
-              '<div class="pb-card-val" style="color: ' + d.color + ';">' + d.val + '</div>' +
+              '<div style="font-size: 19px; font-weight: 800; color: ' + d.color + '; letter-spacing: -0.2px;">' + d.val + '</div>' +
             '</div>';
           }
         });
         
-        grid.innerHTML = html || '<div style="color: var(--muted); font-size: 13px; text-align: center; padding: 20px; grid-column: 1/-1;">No personal bests enabled for this event.</div>';
+        var drawerList = document.getElementById('pbs-detail-list');
+        if (drawerList) {
+          drawerList.innerHTML = drawerHtml || '<div class="card" style="margin-bottom:0;"><div class="empty-state" style="padding:18px"><p>No personal bests recorded yet.</p></div></div>';
+        }
+
+        // Render single teaser card on dashboard
+        grid.innerHTML = '<div class="today-act-row" onclick="openPBsDrawer()" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer; width:100%; box-sizing:border-box;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
+          '<div style="display:flex; align-items:center; gap:16px;">' +
+            '<div style="background:linear-gradient(135deg, #facc15, #e8622a); display:flex; align-items:center; justify-content:center; border-radius:12px; width:40px; height:40px; box-shadow:0 2px 8px rgba(0,0,0,0.15); flex-shrink:0;">' +
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>' +
+            '</div>' +
+            '<div style="text-align:left;">' +
+              '<div style="font-size:14px; font-weight:700; color:#fff; letter-spacing:0.5px;">PERSONAL BESTS</div>' +
+              '<div style="font-size:12px; color:rgba(255,255,255,0.4); margin-top:2px;">Tap to view all achievements</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex; align-items:center; gap:12px;">' +
+            '<span style="font-size:12px; font-weight:700; color:#ffae00; background:rgba(255,174,0,0.12); padding:4px 10px; border-radius:8px;">' + (maxDistM > 0 ? (maxDistM / 1000).toFixed(1) + ' km' : '—') + '</span>' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>' +
+          '</div>' +
+        '</div>';
       })();
 
       var typeCounts = {};
