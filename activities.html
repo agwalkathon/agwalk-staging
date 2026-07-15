@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Activities — Arcgate Walkathon 2026</title>
+  <title>Activities | Arcgatians 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -617,8 +617,8 @@ td button.btn:last-child { margin-right: 0; }
 <body>
                     <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -662,12 +662,12 @@ td button.btn:last-child { margin-right: 0; }
 
     <div class="section-tabs-wrapper" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); margin-bottom:24px; width:100%;">
       <div class="section-tabs" style="border-bottom:none; margin-bottom:0;">
-        <button class="stab active" id="tab-all" onclick="switchTab('all')">?? All Workouts</button>
-        <button class="stab" id="tab-scanner" onclick="switchTab('scanner')">?? Bulk Flag Scanner</button>
-        <button class="stab" id="tab-deleted" onclick="switchTab('deleted')">??? Deleted</button>
-        <button class="stab" id="tab-rules" onclick="switchTab('rules')">?? Flag Reasons</button>
+        <button class="stab active" id="tab-all" onclick="switchTab('all')"><i class="ti ti-list"></i> All Workouts</button>
+        <button class="stab" id="tab-scanner" onclick="switchTab('scanner')"><i class="ti ti-scan"></i> Bulk Flag Scanner</button>
+        <button class="stab" id="tab-deleted" onclick="switchTab('deleted')"><i class="ti ti-trash"></i> Deleted</button>
+        <button class="stab" id="tab-rules" onclick="switchTab('rules')"><i class="ti ti-flag"></i> Flag Reasons</button>
       </div>
-      <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()">?? Re-run Auto-flag</button>
+      <button class="btn-recheck" id="btn-recheck-outer" style="display:none; margin-bottom: 2px;" onclick="recheckAll()"><i class="ti ti-refresh"></i> Re-run Auto-flag</button>
     </div>
 
     <!-- Tab 1: All Workouts -->
@@ -676,8 +676,8 @@ td button.btn:last-child { margin-right: 0; }
         <div class="filter-grid" style="margin-bottom: 12px;">
           <div class="filter-group"><label>From date</label><input type="date" id="date-from"></div>
           <div class="filter-group"><label>To date</label><input type="date" id="date-to"></div>
-          <div class="filter-group"><label>Status</label><select id="status-filter"><option value="">All statuses</option><option value="valid">? Valid</option><option value="invalid">?? Invalid / Flagged</option><option value="deleted">??? Deleted</option></select></div>
-          <div class="filter-group"><label>Review State</label><select id="review-filter"><option value="">All</option><option value="pending">? Pending Review</option><option value="reviewed">? Reviewed</option></select></div>
+          <div class="filter-group"><label>Status</label><select id="status-filter"><option value="">All statuses</option><option value="valid">Valid</option><option value="invalid">Invalid / Flagged</option><option value="deleted">Deleted</option></select></div>
+          <div class="filter-group"><label>Review State</label><select id="review-filter"><option value="">All</option><option value="pending">Pending Review</option><option value="reviewed">Reviewed</option></select></div>
           <div class="filter-group"><label>Flag reason</label><select id="flag-reason-filter"><option value="">All reasons</option><optgroup label="-- Manual Review --"><option>Manual Review - Distance Issue</option><option>Manual Review - Pace Issue</option></optgroup><optgroup label="-- Auto Flags --"><option>Distance below min limit</option><option>Distance above max limit</option><option>Pace too fast</option><option>Pace too slow</option><option>Steps Count Issue</option><option>Speed too high</option><option>Elapsed gap too high</option><option>Pace Deviation Issue</option><option>Shared Activity (auto-detected)</option></optgroup><optgroup label="-- Manual Flags --"><option>Not Our Participant</option><option>Less than 1 km</option><option>Treadmill</option><option>Workout</option><option>Elapsed Time Issue</option><option>Pace Issue (Bike/Cycle)</option><option>Shared (no proof)</option><option>Indoor Run/Walk</option><option>More than 2 Activities</option><option>Suspicious Activity</option><option>Ride / Cycling</option><option>Distance Cropped - GPS Glitch</option><option>Distance Issue</option><option>GPS Glitch</option></optgroup></select></div>
           <div class="filter-group"><label>Activity type</label><select id="sport-filter"><option value="">All types</option><option value="Walk">Walk</option><option value="Run">Run</option><option value="Ride">Ride</option><option value="Hike">Hike</option><option value="VirtualRun">Virtual Run</option><option value="VirtualRide">Virtual Ride</option><option value="MountainBikeRide">Mountain Bike Ride</option></select></div>
         </div>
@@ -702,14 +702,14 @@ td button.btn:last-child { margin-right: 0; }
       <div class="bulk-bar" id="bulk-actions-bar-all" style="display:none; margin-bottom:12px;">
         <span id="bulk-count-msg-all"><span class="bulk-selected-count" id="bulk-selected-num-all">0</span> items selected</span>
         <div style="margin-left:auto; display:flex; gap:8px;">
-          <button class="btn btn-danger" id="btn-bulk-flag-all" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkActionAll('flag')">?? Flag Selected</button>
-          <button class="btn btn-success" id="btn-bulk-clear-all" onclick="doBulkActionAll('unflag')">? Clear Selected</button>
-          <button class="btn btn-primary" id="btn-bulk-review-all" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkActionAll('review')">??? Review Selected</button>
-          <button class="btn btn-danger" id="btn-bulk-delete-all" onclick="doBulkActionAll('delete')">??? Delete Selected</button>
+          <button class="btn btn-danger" id="btn-bulk-flag-all" style="background:#b91c1c; border-color:#b91c1c;" onclick="doBulkActionAll('flag')"><i class="ti ti-flag"></i> Flag Selected</button>
+          <button class="btn btn-success" id="btn-bulk-clear-all" onclick="doBulkActionAll('unflag')"><i class="ti ti-circle-check"></i> Clear Selected</button>
+          <button class="btn btn-primary" id="btn-bulk-review-all" style="background:#3b82f6; border-color:#3b82f6;" onclick="doBulkActionAll('review')"><i class="ti ti-eye"></i> Review Selected</button>
+          <button class="btn btn-danger" id="btn-bulk-delete-all" onclick="doBulkActionAll('delete')"><i class="ti ti-trash"></i> Delete Selected</button>
         </div>
       </div>
 
-      <div class="card"><div id="placeholder" class="empty"><div class="icon">??</div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Audit Trail</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
+      <div class="card"><div id="placeholder" class="empty"><div class="icon"><i class="ti ti-search" style="font-size: 40px; color: var(--text-muted);"></i></div><p>Use filters above and click <strong>Search</strong> to load activities.</p></div><div id="results" style="display:none"><div class="result-count"><span id="result-count"></span></div><div class="scroll-top" id="scroll-top"><div class="scroll-top-inner" id="scroll-top-inner"></div></div><div class="table-wrap" id="table-wrap"><table id="main-table"><thead><tr><th style="width:38px; text-align:center"><input type="checkbox" id="chk-all-rows-all" onchange="toggleAllRowsAll(this.checked)" style="cursor:pointer; width:15px; height:15px"></th><th style="min-width: 180px; width: 180px;">Status</th><th>IST Time</th><th>Participant Name</th><th>Activity Name</th><th>Type</th><th>Distance</th><th>Moving Time</th><th>Pace/Speed</th><th>Deleted</th><th>Audit Trail</th><th>Actions</th></tr></thead><tbody id="activities-body"></tbody></table></div></div></div>
     </div>
 
     <!-- Tab 2 & 4: Under Review / Deleted Workouts -->
@@ -1513,7 +1513,7 @@ async function loadEventSelector() {
     sel.innerHTML = evs.map(e => {
       const isLive = e.status === 'live';
       const style = isLive ? 'color:#16a34a; font-weight:bold;' : '';
-      const prefix = isLive ? '?? ' : '';
+      const prefix = isLive ? '\uD83D\uDD25 ' : '';
       return `<option value="${e.id}" style="${style}">${prefix}${e.name} (${e.status.toUpperCase()})</option>`;
     }).join('');
     
@@ -1682,10 +1682,10 @@ async function confirmStatus(){
     var statusCell=document.getElementById('status-cell-'+currentId);
     if(statusCell){
       if(reason){
-        statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')">?? '+esc(reason)+'</span>';
+        statusCell.innerHTML='<span class="badge badge-invalid" style="cursor:pointer" title="'+esc(reason)+' (Pending)" onclick="openModal('+currentId+')"><i class="ti ti-alert-triangle"></i> '+esc(reason)+'</span>';
         statusCell.setAttribute('data-reason',reason);
       }else{
-        statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')">? Valid</span>';
+        statusCell.innerHTML='<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openModal('+currentId+')"><i class="ti ti-circle-check"></i> Valid</span>';
         statusCell.setAttribute('data-reason','');
       }
     }
@@ -2049,7 +2049,7 @@ async function loadActivities(){
       var isRev = a.is_reviewed === true || a.is_reviewed === 'true';
       var rawReason = a.flag_reason || 'Flagged';
       var displayReason = rawReason.length > 27 ? rawReason.substring(0, 27) + '...' : rawReason;
-      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')">?? '+esc(displayReason)+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')">? Valid</span>';
+      var statusBadge=a.is_flagged?'<span class="badge badge-invalid" style="cursor:pointer; background:' + (isRev ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(a.flag_reason || 'Flagged') + (isRev ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal('+a.id+')"><i class="ti ti-alert-triangle"></i> '+esc(displayReason)+(isRev ? ' (Reviewed)' : ' (Pending)')+'</span>':'<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal('+a.id+')"><i class="ti ti-circle-check"></i> Valid</span>';
       
       var reviewBtnHtml = '';
       var clearBtnHtml = '';
@@ -4335,12 +4335,12 @@ function updateRowStatusLocally(id, action, reason) {
         var statusCell = document.getElementById('status-cell-' + id);
         if (statusCell) {
           if (!act.is_flagged) {
-            statusCell.innerHTML = '<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal(' + id + ')">? Valid</span>';
+            statusCell.innerHTML = '<span class="badge badge-valid" style="cursor:pointer" title="Activity is Valid" onclick="openCustomEditModal(' + id + ')"><i class="ti ti-circle-check"></i> Valid</span>';
             statusCell.setAttribute('data-reason', '');
           } else {
             var rawReason = act.flag_reason || 'Flagged';
             var displayReason = rawReason.length > 27 ? rawReason.substring(0, 27) + '...' : rawReason;
-            statusCell.innerHTML = '<span class="badge badge-invalid" style="cursor:pointer; background:' + (act.is_reviewed ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(act.flag_reason || 'Flagged') + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal(' + id + ')">?? ' + esc(displayReason) + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '</span>';
+            statusCell.innerHTML = '<span class="badge badge-invalid" style="cursor:pointer; background:' + (act.is_reviewed ? '#F3F4F6; color:#4B5563; border-color:#D1D5DB;' : '#FFE4E6; color:#E11D48; border-color:#FDA4AF;') + '" title="' + esc(act.flag_reason || 'Flagged') + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '" onclick="openCustomEditModal(' + id + ')"><i class="ti ti-alert-triangle"></i> ' + esc(displayReason) + (act.is_reviewed ? ' (Reviewed)' : ' (Pending)') + '</span>';
             statusCell.setAttribute('data-reason', act.flag_reason || '');
           }
         }
@@ -4393,7 +4393,7 @@ var FR_RULE_CARD_MAP = {
   steps_rule:          'card-steps',
   shared_detect:       null
 };
-var FR_ICONS = { exclude_rides:'??', exclude_workouts:'???', min_distance:'??', elapsed_time:'??', speed_limits:'?', pace_limits:'??', pace_deviation_rule:'??', steps_rule:'??', shared_detect:'??' };
+var FR_ICONS = { exclude_rides:'<i class="ti ti-bike"></i>', exclude_workouts:'<i class="ti ti-barbell"></i>', min_distance:'<i class="ti ti-ruler-2"></i>', elapsed_time:'<i class="ti ti-clock"></i>', speed_limits:'<i class="ti ti-gauge"></i>', pace_limits:'<i class="ti ti-run"></i>', pace_deviation_rule:'<i class="ti ti-activity-heartbeat"></i>', steps_rule:'<i class="ti ti-shoe"></i>', shared_detect:'<i class="ti ti-users"></i>' };
 
 // Flag Reasons tab follows the page-level Active Event selector (EV_ID / EV_ALL).
 function frEventId(){ return (typeof EV_ID !== 'undefined' && EV_ID) ? EV_ID : 1; }
@@ -4411,7 +4411,7 @@ async function loadFlagReasons(){
     var orphanEl = document.getElementById('fr-orphan-note');
     if (FR_ORPHANS.length) {
       orphanEl.style.display = 'block';
-      orphanEl.innerHTML = '?? <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
+      orphanEl.innerHTML = '<i class="ti ti-alert-triangle"></i> <strong>' + FR_ORPHANS.length + ' unmatched reason' + (FR_ORPHANS.length>1?'s':'') + '</strong> found in activity data but not in this list: ' +
         FR_ORPHANS.map(function(o){ return '<span style="white-space:nowrap">"' + escFR(o.reason) + '" (' + o.applied_count + ')' + ' <a href="#" onclick="addOrphanReason(this.getAttribute(\'data-r\'));return false;" data-r="' + escFR(o.reason) + '" style="color:#B45309;font-weight:700;">+ add</a></span>'; }).join(' · ');
     } else { orphanEl.style.display = 'none'; }
     renderFlagReasons();
@@ -4509,7 +4509,7 @@ function expandFlagReason(r, body){
       if (ruleCard) {
         var help = document.createElement('div');
         help.style.cssText = 'font-size:11.5px;color:#374151;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.55;';
-        help.innerHTML = '<strong>?? Two toggles, two jobs:</strong> The toggle on <em>this card\'s header</em> controls whether the reason appears in flag dropdowns. The toggle on the <em>rule card below</em> controls whether the fraud engine auto-flags new activities. Rule OFF + reason ON = no auto-flagging, but admins can still apply it manually. Existing flagged activities are never changed by either toggle.';
+        help.innerHTML = '<strong><i class="ti ti-info-circle"></i> Two toggles, two jobs:</strong> The toggle on <em>this card\'s header</em> controls whether the reason appears in flag dropdowns. The toggle on the <em>rule card below</em> controls whether the fraud engine auto-flags new activities. Rule OFF + reason ON = no auto-flagging, but admins can still apply it manually. Existing flagged activities are never changed by either toggle.';
         body.appendChild(help);
         var note = document.createElement('div');
         note.style.cssText = 'font-size:11px;color:var(--text-muted);margin-bottom:6px;';
@@ -4540,7 +4540,7 @@ function expandFlagReason(r, body){
   if (r.applied_count === 0 && !(r.is_engine_rule && frEventId() === 1)) {
     var delBar = document.createElement('div');
     delBar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:10px;';
-    delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')">??? Delete (no activities attached)</button>';
+    delBar.innerHTML = '<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteFlagReason(' + r.id + ')"><i class="ti ti-trash"></i> Delete (no activities attached)</button>';
     body.appendChild(delBar);
   }
 }
