@@ -2588,6 +2588,14 @@ window.renderDashHybridExtras = function(opts) {
     function chip(val, label, cls) {
       var c = document.createElement('div');
       c.className = 'stat-chip';
+      if (label === 'day streak') {
+        c.style.cursor = 'pointer';
+        c.onclick = function() {
+          if (typeof openStreakDrawer === 'function') {
+            openStreakDrawer();
+          }
+        };
+      }
       var v = document.createElement('div');
       v.className = 'scv' + (cls ? ' ' + cls : '');
       v.textContent = val;
@@ -3263,6 +3271,198 @@ window.renderMedalInsights = function() {
          '    <div style="font-size: 20px; margin-bottom: 4px;">👑</div>' +
          '    <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Best Day</div>' +
          '    <div style="font-size: 16px; font-weight: 800; color: #22c55e; margin-top: 2px;">' + maxDayKm.toFixed(1) + ' km</div>' +
+         '  </div>' +
+         '</div>';
+
+  contentEl.innerHTML = html;
+};
+
+window.renderStreakDrawerDetails = function() {
+  var contentEl = document.getElementById('streak-drawer-content');
+  if (!contentEl) return;
+
+  var myActs = window._myActsGlobal || [];
+  var validActs = myActs.filter(function(a) { return !a.is_flagged; });
+
+  // Calculate active days
+  var activeDays = {};
+  validActs.forEach(function(a) {
+    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    if (d) activeDays[d] = true;
+  });
+  var sortedActive = Object.keys(activeDays).sort();
+
+  // Calculate current streak
+  var curStreak = 0;
+  var streakStartStr = '—';
+  var todayLocal = new Date().toISOString().split('T')[0];
+  var yesterdayLocal = new Date(new Date().getTime() - 86400000).toISOString().split('T')[0];
+  var lastActive = sortedActive[sortedActive.length - 1];
+
+  var streakIsLive = false;
+  if (lastActive === todayLocal || lastActive === yesterdayLocal) {
+    streakIsLive = true;
+  }
+
+  if (streakIsLive && sortedActive.length > 0) {
+    var current = new Date(lastActive + 'T12:00:00');
+    curStreak = 1;
+    while (true) {
+      var prev = new Date(current.getTime() - 86400000);
+      var prevStr = prev.toISOString().split('T')[0];
+      if (sortedActive.indexOf(prevStr) !== -1) {
+        current = prev;
+        curStreak++;
+      } else {
+        break;
+      }
+    }
+    streakStartStr = current.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  // Max Streak (streakBest)
+  var streakBest = 0, cur = 0, prevD = null;
+  sortedActive.forEach(function(d) {
+    if (prevD) {
+      var diff = Math.round((new Date(d + 'T12:00:00') - new Date(prevD + 'T12:00:00')) / 86400000);
+      cur = diff === 1 ? cur + 1 : 1;
+    } else cur = 1;
+    streakBest = Math.max(streakBest, cur);
+    prevD = d;
+  });
+
+  // Calculate Percentile
+  var rankH = null;
+  var peersCount = 50;
+  try {
+    var sum = typeof cacheGet === 'function' ? (cacheGet('ranking_summaries', 300000) || cacheGet('ranking_summaries', 86400*365*1000)) : null;
+    if (sum && sum.length && typeof REG_JSON_DATA !== 'undefined' && REG_JSON_DATA) {
+      var reg = REG_JSON_DATA;
+      var gN = (reg.gender || '').toLowerCase(); var isF = gN === 'female' || gN === 'f';
+      var sN = (reg.shift || '').toLowerCase(); var isN = sN.indexOf('night') > -1;
+      var peers = sum.filter(function(p) {
+        var pg = (p.gender || '').toLowerCase(), ps = (p.shift || '').toLowerCase();
+        return (ps.indexOf('night') > -1) === isN && (pg === 'female' || pg === 'f') === isF;
+      }).sort(function(a, b) { return (b.total_points || 0) - (a.total_points || 0); });
+      peersCount = peers.length || 50;
+      var ix = peers.findIndex(function(p) { return String(p.athlete_id) === String(currentSession && currentSession.athleteId); });
+      if (ix >= 0) rankH = ix + 1;
+    }
+  } catch (eRank) {}
+
+  var percentileStr = 'Top 50%';
+  if (rankH && peersCount) {
+    var percentile = Math.round((1 - (rankH - 1) / peersCount) * 100);
+    var topVal = 101 - percentile;
+    if (topVal < 1) topVal = 1;
+    if (topVal > 100) topVal = 100;
+    percentileStr = 'Top ' + topVal + '%';
+  }
+
+  // THIS WEEK Grid (Mon-Sun)
+  var monday = new Date();
+  var day = monday.getDay();
+  var diff = monday.getDate() - day + (day === 0 ? -6 : 1);
+  monday.setDate(diff);
+  monday.setHours(0,0,0,0);
+
+  var weekDays = [];
+  var weekDaysLabels = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday.getTime() + (i * 86400000));
+    var dStr = d.toISOString().split('T')[0];
+    var isActive = sortedActive.indexOf(dStr) !== -1;
+    weekDays.push({
+      label: weekDaysLabels[i],
+      dayNum: d.getDate(),
+      active: isActive
+    });
+  }
+
+  // Milestones Progress
+  var milestoneTiers = [0, 5, 10, 15, 20, 25, 30, 50, 100, 150, 200, 250, 300];
+  var prevMilestone = 0;
+  var nextMilestone = 5;
+  for (var idx = 0; idx < milestoneTiers.length; idx++) {
+    if (curStreak >= milestoneTiers[idx]) {
+      prevMilestone = milestoneTiers[idx];
+      nextMilestone = milestoneTiers[idx + 1] || (prevMilestone + 50);
+    } else {
+      break;
+    }
+  }
+  var daysNeeded = nextMilestone - curStreak;
+  var progressPct = Math.min(100, Math.max(0, ((curStreak - prevMilestone) / (nextMilestone - prevMilestone) * 100)));
+
+  // SVG Flame Icon
+  var flameSvg = '<svg viewBox="0 0 24 24" width="80" height="80" style="filter: drop-shadow(0 4px 12px rgba(249,115,22,0.35));">' +
+    '<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1-2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z" fill="url(#flame-grad)"/>' +
+    '<path d="M15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" fill="#ffedd5" opacity="0.8"/>' +
+    '<defs><linearGradient id="flame-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ea580c"/><stop offset="50%" stop-color="#f97316"/><stop offset="100%" stop-color="#facc15"/></linearGradient></defs>' +
+    '</svg>';
+
+  // Week Grid HTML
+  var weekGridHtml = '';
+  weekDays.forEach(function(wd) {
+    weekGridHtml += '<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1;">' +
+      '  <span style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4);">' + wd.label + '</span>' +
+      '  <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; ' + 
+           (wd.active ? 'background: rgba(249,115,22,0.15); border: 1.5px solid #f97316;' : 'border: 1.5px dashed rgba(255,255,255,0.15);') + '">' +
+           (wd.active ? '🔥' : '') +
+      '  </div>' +
+      '</div>';
+  });
+
+  var html = '';
+  // Top Flame & Count
+  html += '<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 10px; margin-bottom: 10px;">' +
+         '  ' + flameSvg +
+         '  <div style="font-size: 56px; font-weight: 800; color: #fff; margin-top: -10px; font-family: var(--font); letter-spacing: -1px;">' + curStreak + '</div>' +
+         '  <div style="font-size: 18px; font-weight: 700; color: #fff; margin-top: 2px;">Day Streak</div>' +
+         '  <div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px;">Log activities daily to maintain your streak</div>' +
+         '</div>';
+
+  // Three stats row
+  html += '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+         '  <div>' +
+         '    <div style="font-size: 13.5px; font-weight: 800; color: #fff;">' + (curStreak > 0 ? streakStartStr : '—') + '</div>' +
+         '    <div style="font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 3px;">Streak started</div>' +
+         '  </div>' +
+         '  <div style="border-left: 1px solid rgba(255,255,255,0.08); border-right: 1px solid rgba(255,255,255,0.08);">' +
+         '    <div style="font-size: 13.5px; font-weight: 800; color: #fff;">' + (curStreak > 0 ? percentileStr : '—') + '</div>' +
+         '    <div style="font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 3px;">WHOOP Rank</div>' +
+         '  </div>' +
+         '  <div>' +
+         '    <div style="font-size: 13.5px; font-weight: 800; color: #fff;">' + streakBest + '</div>' +
+         '    <div style="font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 3px;">Max streak</div>' +
+         '  </div>' +
+         '</div>';
+
+  // THIS WEEK
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+         '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; text-align: left;">THIS WEEK</div>' +
+         '  <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">' +
+              weekGridHtml +
+         '  </div>' +
+         '</div>';
+
+  // Milestone Progress
+  var milestoneLabel = daysNeeded === 1 ? '1 more day' : daysNeeded + ' more days';
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+         '  <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 44px;">' +
+         '    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ea580c, #facc15); display: flex; align-items: center; justify-content: center; font-size: 13px;">🔥</div>' +
+         '    <span style="font-size: 14px; font-weight: 800; color: #fff;">' + prevMilestone + '</span>' +
+         '  </div>' +
+         '  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: center;">' +
+         '    <span style="font-size: 12px; font-weight: 700; color: #fff;">' + milestoneLabel + '</span>' +
+         '    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;">' +
+         '      <div style="width: ' + progressPct + '%; height: 100%; background: #ea580c; border-radius: 99px; transition: width 0.4s ease;"></div>' +
+         '    </div>' +
+         '    <span style="font-size: 11px; color: rgba(255,255,255,0.4);">to unlock your next milestone.</span>' +
+         '  </div>' +
+         '  <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 44px;">' +
+         '    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 13px; filter: grayscale(100%);">🔥</div>' +
+         '    <span style="font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.4);">' + nextMilestone + '</span>' +
          '  </div>' +
          '</div>';
 
