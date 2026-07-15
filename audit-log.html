@@ -50,7 +50,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audit Log — Arcgate Walkathon 2026</title>
+  <title>Audit Log | Arcgatians 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -219,8 +219,8 @@
 
                   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -239,6 +239,7 @@
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+
       <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
@@ -266,8 +267,8 @@
   <div class="content">
     <!-- Tab Bar -->
     <div class="section-tabs">
-      <button class="stab active" id="tab-btn-security" onclick="switchAuditTab('security')">??? Security Events</button>
-      <button class="stab" id="tab-btn-suspicious" onclick="switchAuditTab('suspicious')">?? Suspicious Reports</button>
+      <button class="stab active" id="tab-btn-security" onclick="switchAuditTab('security')"><i class="ti ti-shield-check"></i> Security Events</button>
+      <button class="stab" id="tab-btn-suspicious" onclick="switchAuditTab('suspicious')"><i class="ti ti-alert-triangle"></i> Suspicious Reports</button>
     </div>
 
     <!-- Security Events Filters -->
@@ -307,7 +308,7 @@
           <div class="card-header-icon"><i class="ti ti-shield-check"></i></div>
           <div>
             <h2>Security Events</h2>
-            <div class="card-header-sub">Last 500 events · newest first</div>
+            <div class="card-header-sub">Last 500 events Â· newest first</div>
           </div>
         </div>
       </div>
@@ -322,7 +323,7 @@
             </tr>
           </thead>
           <tbody id="log-body">
-            <tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>
+            <tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>
           </tbody>
         </table>
       </div>
@@ -353,7 +354,7 @@
             </tr>
           </thead>
           <tbody id="suspicious-log-body">
-            <tr><td colspan="7"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>
+            <tr><td colspan="7"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>
           </tbody>
         </table>
       </div>
@@ -361,14 +362,14 @@
   </div>
 
   <footer class="site-footer">
-    <span>Arcgate Walkathon 2026 — Admin</span>
+    <span>Arcgate Walkathon 2026 â€” Admin</span>
     <span><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></span>
   </footer>
 </div>
 
 <script>
 /* audit-log v5 */
-// Inline authGuard — no _nav.js dependency
+// Inline authGuard â€” no _nav.js dependency
 var _BU = window.BACKEND_URL;
 function authGuard() {
   var t = sessionStorage.getItem('wk_admin_token');
@@ -399,7 +400,7 @@ var LABELS = { admin_login:'Admin Login', bulk_import:'Bulk Import', participant
 
 async function loadLog() {
   var tbody = document.getElementById('log-body');
-  tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>';
   try {
     var res = await fetch(_BU + '/audit-log', {
       headers: { 'Authorization': 'Bearer ' + ADMIN_SECRET }
@@ -445,10 +446,10 @@ function renderRows(rows) {
     var action  = r.action ? String(r.action) : '';
     var cls     = LABELS[action] ? 'action-' + action : 'action-default';
     var icon    = ICONS[action]  || 'ti-activity';
-    var label   = LABELS[action] || action || '—';
-    var details = r.details ? (typeof r.details === 'string' ? r.details : JSON.stringify(r.details)) : '—';
-    var ip      = r.ip ? String(r.ip).split(',')[0].trim() : '—';
-    var timeStr = '—';
+    var label   = LABELS[action] || action || 'â€”';
+    var details = r.details ? (typeof r.details === 'string' ? r.details : JSON.stringify(r.details)) : 'â€”';
+    var ip      = r.ip ? String(r.ip).split(',')[0].trim() : 'â€”';
+    var timeStr = 'â€”';
     if (r.created_at) {
       try { timeStr = new Date(r.created_at).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }); } catch(ex) {}
     }
@@ -512,7 +513,7 @@ var filteredSuspiciousReports = [];
 
 async function loadSuspiciousReports() {
   var tbody = document.getElementById('suspicious-log-body');
-  tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="ti ti-loader"></i>Loading…</div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="ti ti-loader"></i>Loadingâ€¦</div></td></tr>';
   
   try {
     var resp = await fetch(SUPABASE_URL + '/rest/v1/activity_reports?order=created_at.desc', { headers: HDR });
@@ -613,7 +614,7 @@ function renderSuspiciousTable(regMap, reporterTrend) {
       }
     } catch(e) {}
     
-    var detailsBtn = '<button class="btn-ghost" onclick="showAdminActivityDetails(' + rep.activity_id + ')" style="padding: 4px 8px; font-size: 11px; height:auto; line-height:1.2; font-family:inherit;">?? View Details</button>';
+    var detailsBtn = '<button class="btn-ghost" onclick="showAdminActivityDetails(' + rep.activity_id + ')" style="padding: 4px 8px; font-size: 11px; height:auto; line-height:1.2; font-family:inherit;"><i class="ti ti-eye"></i> View Details</button>';
     
     var safeReason = esc(rep.reason).replace(/'/g, "\\'");
     var actionHtml = '<div style="display:flex; gap:6px;">'
@@ -626,7 +627,7 @@ function renderSuspiciousTable(regMap, reporterTrend) {
       + '<td>' + esc(reporterName) + trendBadge + '</td>'
       + '<td>' + esc(ownerName) + '</td>'
       + '<td><span class="badge badge-silver" style="text-transform:none; font-weight:500; font-size:11px;">' + esc(rep.reason) + '</span></td>'
-      + '<td>' + esc(rep.custom_comments || '—') + '</td>'
+      + '<td>' + esc(rep.custom_comments || 'â€”') + '</td>'
       + '<td>' + detailsBtn + '</td>'
       + '<td>' + actionHtml + '</td>'
       + '</tr>';
@@ -654,12 +655,12 @@ async function showAdminActivityDetails(activityId) {
   }
   
   document.getElementById('adm-det-subtitle').textContent = 'Activity ID: #' + act.id + ' | Strava ID: ' + act.strava_activity_id;
-  document.getElementById('adm-det-name').textContent = act.activity_name || '—';
+  document.getElementById('adm-det-name').textContent = act.activity_name || 'â€”';
   document.getElementById('adm-det-type').textContent = act.sport_type || 'Walk';
   document.getElementById('adm-det-distance').textContent = act.distance_meters ? (act.distance_meters/1000).toFixed(2) + ' km' : '0.00 km';
-  document.getElementById('adm-det-time').textContent = act.moving_time_seconds ? fmtDur(act.moving_time_seconds) : '—';
+  document.getElementById('adm-det-time').textContent = act.moving_time_seconds ? fmtDur(act.moving_time_seconds) : 'â€”';
   
-  var paceStr = '—';
+  var paceStr = 'â€”';
   if (act.distance_meters && act.moving_time_seconds) {
     var speed = act.distance_meters / act.moving_time_seconds;
     if (act.sport_type === 'Run' || act.sport_type === 'Walk' || act.sport_type === 'Hike') {
@@ -672,16 +673,16 @@ async function showAdminActivityDetails(activityId) {
     }
   }
   document.getElementById('adm-det-pace').textContent = paceStr;
-  document.getElementById('adm-det-device').textContent = act.device_name || '—';
+  document.getElementById('adm-det-device').textContent = act.device_name || 'â€”';
   
-  var localDateStr = '—';
+  var localDateStr = 'â€”';
   if (act.activity_date_time_ist) {
     localDateStr = act.activity_date_time_ist.replace('T', ' ');
   } else if (act.activity_date) {
     localDateStr = new Date(act.activity_date).toLocaleString('en-IN');
   }
   document.getElementById('adm-det-date').textContent = localDateStr;
-  document.getElementById('adm-det-desc').textContent = act.description || '—';
+  document.getElementById('adm-det-desc').textContent = act.description || 'â€”';
   
   document.getElementById('admin-activity-detail-modal').style.display = 'flex';
 }
@@ -784,17 +785,17 @@ window.addEventListener('DOMContentLoaded', function() {
 <div id="admin-activity-detail-modal" class="modal-overlay" onclick="closeAdminActivityModal(event)">
   <div style="background: #fff; border-radius: 14px; width: 90%; max-width: 500px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; font-family: inherit;" onclick="event.stopPropagation()">
     <h3 style="font-size: 16px; font-weight: 700; color: #0F1117; margin-bottom: 4px;">Activity Details</h3>
-    <p id="adm-det-subtitle" style="font-size: 12px; color: #6B7280; margin-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">Activity ID: #—</p>
+    <p id="adm-det-subtitle" style="font-size: 12px; color: #6B7280; margin-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">Activity ID: #â€”</p>
     
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px; color: #374151; margin-bottom: 20px;">
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Activity Name</span> <span id="adm-det-name">—</span></div>
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Sport Type</span> <span id="adm-det-type">—</span></div>
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Distance</span> <span id="adm-det-distance">—</span></div>
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Moving Time</span> <span id="adm-det-time">—</span></div>
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Pace/Speed</span> <span id="adm-det-pace">—</span></div>
-      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Device Name</span> <span id="adm-det-device">—</span></div>
-      <div style="grid-column: span 2;"><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Date / Time (IST)</span> <span id="adm-det-date">—</span></div>
-      <div style="grid-column: span 2;"><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Activity Description</span> <span id="adm-det-desc">—</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Activity Name</span> <span id="adm-det-name">â€”</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Sport Type</span> <span id="adm-det-type">â€”</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Distance</span> <span id="adm-det-distance">â€”</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Moving Time</span> <span id="adm-det-time">â€”</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Pace/Speed</span> <span id="adm-det-pace">â€”</span></div>
+      <div><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Device Name</span> <span id="adm-det-device">â€”</span></div>
+      <div style="grid-column: span 2;"><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Date / Time (IST)</span> <span id="adm-det-date">â€”</span></div>
+      <div style="grid-column: span 2;"><span style="font-weight: 600; color: #6B7280; display: block; font-size: 10.5px; text-transform: uppercase;">Activity Description</span> <span id="adm-det-desc">â€”</span></div>
     </div>
     
     <div style="display: flex; justify-content: flex-end; gap: 8px;">
