@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Email Send — Arcgate Walkathon 2026</title>
+  <title>Email Send | Arcgatians 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -324,8 +324,8 @@ tr:hover td{background:#FAFAFA}
 <body>
                   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-trophy"></i></div>
-      <div class="sb-logo-text">Arcgate Walk<span>Organizers</span></div>
+      <div class="sb-logo-icon" style="background: transparent;"><img src="logo-icon-black.png" alt="Arcgate Logo" style="height: 36px; width: 36px; object-fit: contain;"></div>
+      <div class="sb-logo-text">Arcgatians<span>Organizers</span></div>
     </div>
     
     <div class="sb-scroll-area">
@@ -344,6 +344,7 @@ tr:hover td{background:#FAFAFA}
 
       <div class="sb-section">System</div>
       <a href="config.html" class="sb-item"><i class="ti ti-settings-2"></i><span class="sb-label">Configuration</span></a>
+
       <a href="cert-config.html" class="sb-item"><i class="ti ti-certificate"></i><span class="sb-label">Certificates</span></a>
       <a href="activities.html" class="sb-item"><i class="ti ti-run"></i><span class="sb-label">Activities</span></a>
       <a href="data-upload.html" class="sb-item"><i class="ti ti-upload"></i><span class="sb-label">Data Upload</span></a>
@@ -361,10 +362,10 @@ tr:hover td{background:#FAFAFA}
   <div class="content">
 <!-- Tabs -->
   <div class="section-tabs">
-    <button class="stab active" data-tab="smtp" onclick="switchTab('smtp')">?? SMTP Config</button>
-    <button class="stab" data-tab="jobs" onclick="switchTab('jobs')">?? Email Jobs</button>
-    <button class="stab" data-tab="templates" onclick="switchTab('templates')">?? Templates</button>
-    <button class="stab" data-tab="send" onclick="switchTab('send')">?? Send Now</button>
+    <button class="stab active" data-tab="smtp" onclick="switchTab('smtp')"><i class="ti ti-server"></i> SMTP Config</button>
+    <button class="stab" data-tab="jobs" onclick="switchTab('jobs')"><i class="ti ti-list"></i> Email Jobs</button>
+    <button class="stab" data-tab="templates" onclick="switchTab('templates')"><i class="ti ti-file-code"></i> Templates</button>
+    <button class="stab" data-tab="send" onclick="switchTab('send')"><i class="ti ti-send"></i> Send Now</button>
   </div>
 
   <!-- -- TAB 1: Email Config -- -->
@@ -372,7 +373,7 @@ tr:hover td{background:#FAFAFA}
 
     <div class="card">
       <div class="card-head">
-        <div class="card-head-left"><span>??</span><h2>Email Configuration</h2></div>
+        <div class="card-head-left"><div class="card-head-icon"><i class="ti ti-server"></i></div><h2>Email Configuration</h2></div>
       </div>
       <div class="card-body">
         <div style="margin-bottom:20px;">
@@ -438,7 +439,7 @@ tr:hover td{background:#FAFAFA}
       </div>
       <div class="card-body">
         <div class="field-grid">
-          <div class="field"><label>Job Name</label><input type="text" id="job-name" placeholder="Weekly Leaderboard — June 2026"></div>
+          <div class="field"><label>Job Name</label><input type="text" id="job-name" placeholder="Weekly Leaderboard â€” June 2026"></div>
           <div class="field"><label>Event (filter recipients)</label>
             <select id="job-event">
               <option value="">All Events (all participants)</option>
@@ -446,7 +447,7 @@ tr:hover td{background:#FAFAFA}
           </div>
           <div class="field"><label>Email Template</label>
             <select id="job-tpl">
-              <option value="">— Select template —</option>
+              <option value="">â€” Select template â€”</option>
             </select>
           </div>
           <div class="field"><label>Send Frequency</label>
@@ -505,7 +506,7 @@ tr:hover td{background:#FAFAFA}
       <div class="card-body">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <select id="preset-sel" style="flex:1;min-width:240px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font,Poppins)">
-            <option value="">— Choose a preset —</option>
+            <option value="">â€” Choose a preset â€”</option>
             <option value="leaderboard_live">?? Leaderboard Live</option>
             <option value="red_flag">?? Major Red Flag Activities</option>
             <option value="disqualified">? Disqualified from Event</option>
@@ -514,7 +515,7 @@ tr:hover td{background:#FAFAFA}
           </select>
           <button class="btn btn-primary" onclick="loadPreset()">? Load into Editor</button>
         </div>
-        <p style="font-size:12px;color:#aaa;margin-top:8px">Loads the preset into the editor below — edit as needed, then save.</p>
+        <p style="font-size:12px;color:#aaa;margin-top:8px">Loads the preset into the editor below â€” edit as needed, then save.</p>
       </div>
     </div>
 
@@ -530,11 +531,11 @@ tr:hover td{background:#FAFAFA}
           <div class="field span2"><label>Description</label><input type="text" id="tpl-desc" placeholder="Weekly rank and distance summary sent every Monday"></div>
         </div>
         <div class="field" style="margin-bottom:16px">
-          <label>HTML Body <span style="font-size:11px;color:#aaa;font-weight:400;text-transform:none">— edit HTML on the left, live preview on the right</span></label>
+          <label>HTML Body <span style="font-size:11px;color:#aaa;font-weight:400;text-transform:none">â€” edit HTML on the left, live preview on the right</span></label>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;min-height:320px">
             <div style="display:flex;flex-direction:column;border-right:1px solid #e8e8e8">
               <div style="padding:6px 10px;background:#f8f8f8;border-bottom:1px solid #eee;font-size:11px;color:#888;font-weight:600">HTML EDITOR</div>
-              <textarea id="tpl-body" oninput="livePreview()" style="flex:1;min-height:300px;font-family:monospace;font-size:12px;border:none;outline:none;resize:none;padding:12px;background:#fafafa;line-height:1.6" placeholder="Paste or type HTML here — preview updates live ?"></textarea>
+              <textarea id="tpl-body" oninput="livePreview()" style="flex:1;min-height:300px;font-family:monospace;font-size:12px;border:none;outline:none;resize:none;padding:12px;background:#fafafa;line-height:1.6" placeholder="Paste or type HTML here â€” preview updates live ?"></textarea>
             </div>
             <div style="display:flex;flex-direction:column">
               <div style="padding:6px 10px;background:#f8f8f8;border-bottom:1px solid #eee;font-size:11px;color:#888;font-weight:600">LIVE PREVIEW</div>
@@ -543,7 +544,7 @@ tr:hover td{background:#FAFAFA}
           </div>
         </div>
         <div style="margin-bottom:14px">
-          <div style="font-size:12px;color:#888;margin-bottom:6px">Available variables — click to copy:</div>
+          <div style="font-size:12px;color:#888;margin-bottom:6px">Available variables â€” click to copy:</div>
           <div class="vars">
             <span class="var-chip" onclick="insertVar('{{participant_name}}')">{{participant_name}}</span>
             <span class="var-chip" onclick="insertVar('{{rank}}')">{{rank}}</span>
@@ -588,7 +589,7 @@ tr:hover td{background:#FAFAFA}
         <div class="field-grid">
           <div class="field"><label>Select Job</label>
             <select id="send-job">
-              <option value="">— Select a job —</option>
+              <option value="">â€” Select a job â€”</option>
             </select>
           </div>
           <div class="field"><label>Or select Event manually</label>
@@ -598,7 +599,7 @@ tr:hover td{background:#FAFAFA}
           </div>
           <div class="field"><label>Template</label>
             <select id="send-tpl">
-              <option value="">— Select template —</option>
+              <option value="">â€” Select template â€”</option>
             </select>
           </div>
           <div class="field"><label>Test mode (send to 1 address)</label>
@@ -645,7 +646,7 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<footer class="site-footer"><span>© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
+<footer class="site-footer"><span>Â© 2026 Arcgate Walkathon</span><div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></footer>
 </div><!-- /main -->
 <script>
 
@@ -869,7 +870,7 @@ function loadPreset() {
   var PRESETS = {
     leaderboard_live: {
       name: 'Leaderboard Live',
-      subject: '?? Arcgate Walkathon 2026 — Leaderboard Update',
+      subject: '?? Arcgate Walkathon 2026 â€” Leaderboard Update',
       desc: 'Leaderboard update with current rank, km, and points',
       body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
@@ -895,12 +896,12 @@ function loadPreset() {
     </div>
     <p style="color:#888;font-size:12px">Keep walking, keep earning points. Every step counts! ?????</p>
   </div>
-  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 Â· Sent by Admin</div>
 </div></body></html>`
     },
     red_flag: {
       name: 'Red Flag Activities',
-      subject: '?? Action Required — Flagged Activity on Your Walkathon Profile',
+      subject: '?? Action Required â€” Flagged Activity on Your Walkathon Profile',
       desc: 'Inform participant about a flagged/suspicious activity',
       body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
@@ -917,14 +918,14 @@ function loadPreset() {
       <div style="font-size:13px;color:#c62828;margin-top:8px;font-weight:600">Reason: {{flag_reason}}</div>
     </div>
     <p style="color:#555;font-size:14px;line-height:1.6">If you believe this is an error, please reach out to the walkathon admin team with your activity details. We'll review and update the status promptly.</p>
-    <p style="color:#888;font-size:12px;margin-top:24px">This is an automated alert. Please do not reply to this email — contact your admin directly.</p>
+    <p style="color:#888;font-size:12px;margin-top:24px">This is an automated alert. Please do not reply to this email â€” contact your admin directly.</p>
   </div>
-  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 Â· Sent by Admin</div>
 </div></body></html>`
     },
     disqualified: {
       name: 'Disqualified from Event',
-      subject: '? Important — Disqualification Notice | Arcgate Walkathon 2026',
+      subject: '? Important â€” Disqualification Notice | Arcgate Walkathon 2026',
       desc: 'Notify participant they have been disqualified from the event',
       body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
@@ -942,12 +943,12 @@ function loadPreset() {
     <p style="color:#555;font-size:14px;line-height:1.6">This decision was made in accordance with the walkathon's fair-play policy. If you have any questions or would like to appeal, please contact the admin team within 48 hours.</p>
     <p style="color:#888;font-size:12px;margin-top:24px">We appreciate your participation and hope to see you in future events.</p>
   </div>
-  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 Â· Sent by Admin</div>
 </div></body></html>`
     },
     top3: {
       name: 'You Are in Top 3',
-      subject: '?? Congratulations! You\'re in the Top 3 — Arcgate Walkathon 2026',
+      subject: '?? Congratulations! You\'re in the Top 3 â€” Arcgate Walkathon 2026',
       desc: 'Celebrate participant reaching top 3 on the leaderboard',
       body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
@@ -966,27 +967,27 @@ function loadPreset() {
         <div><div style="font-size:18px;font-weight:700;color:#333">{{total_points}} pts</div><div style="font-size:11px;color:#888">Points</div></div>
       </div>
     </div>
-    <p style="color:#555;font-size:14px">Keep going — every step keeps you at the top! ??</p>
+    <p style="color:#555;font-size:14px">Keep going â€” every step keeps you at the top! ??</p>
     <div style="margin:24px 0">
       <a href="{{leaderboard_url}}" style="background:#E8622A;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View Leaderboard ?</a>
     </div>
   </div>
-  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 Â· Sent by Admin</div>
 </div></body></html>`
     },
     registration_approved: {
       name: 'Registration Approved',
-      subject: '? You\'re In! Registration Approved — Arcgate Walkathon 2026',
+      subject: '? You\'re In! Registration Approved â€” Arcgate Walkathon 2026',
       desc: 'Welcome email after registration approval with Strava connect instructions',
       body: `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Poppins,Arial,sans-serif;background:#f5f5f5">
 <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
   <div style="background:#E8622A;padding:28px 32px;text-align:center">
     <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">? Registration Approved!</h1>
-    <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026 — June 2026</p>
+    <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:14px">Arcgate Walkathon 2026 â€” June 2026</p>
   </div>
   <div style="padding:28px 32px">
     <p style="color:#333;font-size:15px">Hi <strong>{{participant_name}}</strong>,</p>
-    <p style="color:#555;font-size:14px;line-height:1.6">Great news — your registration for <strong>Arcgate Walkathon 2026</strong> has been approved! ??</p>
+    <p style="color:#555;font-size:14px;line-height:1.6">Great news â€” your registration for <strong>Arcgate Walkathon 2026</strong> has been approved! ??</p>
     <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:10px;padding:18px;margin:20px 0">
       <div style="font-size:14px;font-weight:700;color:#166534;margin-bottom:8px">Next Step: Connect Your Strava Account</div>
       <p style="font-size:13px;color:#166534;margin:0;line-height:1.6">All your activities are tracked via Strava. Please connect your account to start earning points.</p>
@@ -994,15 +995,15 @@ function loadPreset() {
     <ol style="color:#555;font-size:14px;line-height:2;padding-left:20px">
       <li>Visit the Walkathon portal</li>
       <li>Click <strong>"Connect with Strava"</strong></li>
-      <li>Authorize the app — your walks, runs, and hikes will sync automatically</li>
+      <li>Authorize the app â€” your walks, runs, and hikes will sync automatically</li>
       <li>Track your points on the live leaderboard</li>
     </ol>
     <div style="text-align:center;margin:24px 0">
       <a href="{{leaderboard_url}}" style="background:#E8622A;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open Walkathon Portal ?</a>
     </div>
-    <p style="color:#888;font-size:12px;line-height:1.6">The event runs throughout June 2026. Activities recorded on Strava from June 1 onward will count. Walk, run, hike, or ride — every km earns points!</p>
+    <p style="color:#888;font-size:12px;line-height:1.6">The event runs throughout June 2026. Activities recorded on Strava from June 1 onward will count. Walk, run, hike, or ride â€” every km earns points!</p>
   </div>
-  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 · Sent by Admin</div>
+  <div style="background:#f8f8f8;padding:16px 32px;text-align:center;font-size:11px;color:#aaa">Arcgate Walkathon 2026 Â· Sent by Admin</div>
 </div></body></html>`
     }
   };
@@ -1262,8 +1263,8 @@ async function previewRecipients() {
     var recips = await getRecipients(eventName);
     document.getElementById('recip-count').textContent = recips.length + ' recipients' + (eventName ? ' for: ' + eventName : ' (all events)');
     document.getElementById('recip-body').innerHTML = recips.slice(0, 30).map(function(r, i) {
-      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'—') + '</td><td>' + esc(r.email||'—') + '</td><td>' + esc(r.event_name||'—') + '</td></tr>';
-    }).join('') + (recips.length > 30 ? '<tr><td colspan="4" style="text-align:center;color:#888">…and ' + (recips.length-30) + ' more</td></tr>' : '');
+      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'â€”') + '</td><td>' + esc(r.email||'â€”') + '</td><td>' + esc(r.event_name||'â€”') + '</td></tr>';
+    }).join('') + (recips.length > 30 ? '<tr><td colspan="4" style="text-align:center;color:#888">â€¦and ' + (recips.length-30) + ' more</td></tr>' : '');
     document.getElementById('recip-preview').style.display = 'block';
   } catch(e) { alert('Error: ' + e.message); }
 }
@@ -1275,7 +1276,7 @@ async function previewSend() {
     var recips = await getRecipients(eventName);
     document.getElementById('send-recip-count').textContent = recips.length + ' recipients';
     document.getElementById('send-recip-body').innerHTML = recips.slice(0, 20).map(function(r, i) {
-      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'—') + '</td><td>' + esc(r.email||'—') + '</td><td>' + esc(r.event_name||'—') + '</td></tr>';
+      return '<tr><td style="color:#aaa">' + (i+1) + '</td><td>' + esc(r.full_name||'â€”') + '</td><td>' + esc(r.email||'â€”') + '</td><td>' + esc(r.event_name||'â€”') + '</td></tr>';
     }).join('');
     document.getElementById('send-recip-preview').style.display = 'block';
   } catch(e) { alert('Error: ' + e.message); }
@@ -1348,7 +1349,7 @@ async function loadHistory() {
       + rows.map(function(h) {
         return '<tr>'
           + '<td>' + new Date(h.sent_at || h.created_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td>'
-          + '<td>' + esc(tm[h.template_id] || '—') + '</td>'
+          + '<td>' + esc(tm[h.template_id] || 'â€”') + '</td>'
           + '<td>' + esc(h.event_name || 'All') + '</td>'
           + '<td style="color:#2e7d32;font-weight:600">' + (h.recipients_count || 0) + '</td>'
           + '<td style="color:' + (h.failed_count > 0 ? '#c62828' : '#888') + '">' + (h.failed_count || 0) + '</td>'
@@ -1399,7 +1400,7 @@ function attachPersistListeners() {
       localStorage.setItem('wk_email_' + id, el.value);
     });
   });
-  // tpl-body separately (debounced — don't save on every keypress)
+  // tpl-body separately (debounced â€” don't save on every keypress)
   var bodyEl = document.getElementById('tpl-body');
   if (bodyEl) {
     var bodyTimer;
