@@ -2964,6 +2964,21 @@ function closeChallengesDrawer() {
 }
 window.closeChallengesDrawer = closeChallengesDrawer;
 
+function openPBsDrawer() {
+  var el = document.getElementById('you-panel-pbs');
+  if (el) {
+    el.style.display = 'block';
+    el.classList.add('open');
+  }
+}
+window.openPBsDrawer = openPBsDrawer;
+
+function closePBsDrawer() {
+  var el = document.getElementById('you-panel-pbs');
+  if (el) el.classList.remove('open');
+}
+window.closePBsDrawer = closePBsDrawer;
+
 function clearPWACache(btn) {
   if (btn) {
     btn.style.color = '#10b981';
