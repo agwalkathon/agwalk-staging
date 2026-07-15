@@ -1130,7 +1130,7 @@ function renderRows(rows, prevRanks) {
       '<div class="rank-col ' + rankColCls + '" style="display:flex;flex-direction:column;align-items:center;">' + rankIcon + deltaHtml + '</div>' +
       '<div class="row-body">' +
         '<div class="row-left">' +
-          '<span class="row-name">' + esc(r.p.full_name || '—') + (isMe ? '<span class="you-chip">You</span>' : '') + '</span>' +
+          '<span class="row-name participant-profile-link" style="cursor:pointer; text-decoration:underline; font-weight:700;" onclick="event.stopPropagation(); openParticipantProfile(\'' + athId + '\')">' + esc(r.p.full_name || '—') + '</span>' + (isMe ? '<span class="you-chip">You</span>' : '') +
           (teamName ? '<span style="font-size:12px;color:var(--label);margin-top:2px;display:block;">' + esc(teamName) + '</span>' : '') +
         '</div>' +
         '<div class="row-right" style="display:flex;align-items:center;gap:6px;">' +
@@ -3014,6 +3014,24 @@ function closeStreakDrawer() {
   if (el) el.classList.remove('open');
 }
 window.closeStreakDrawer = closeStreakDrawer;
+
+function openParticipantProfile(athleteId) {
+  var el = document.getElementById('participant-profile-drawer');
+  if (el) {
+    el.style.display = 'block';
+    el.classList.add('open');
+  }
+  if (typeof renderParticipantProfile === 'function') {
+    renderParticipantProfile(athleteId);
+  }
+}
+window.openParticipantProfile = openParticipantProfile;
+
+function closeParticipantProfile() {
+  var el = document.getElementById('participant-profile-drawer');
+  if (el) el.classList.remove('open');
+}
+window.closeParticipantProfile = closeParticipantProfile;
 
 function clearPWACache(btn) {
   if (btn) {
