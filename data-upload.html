@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Data Upload — Arcgate Walkathon 2026</title>
+  <title>Data Upload | Arcgatians 2026</title>
   <style>
 :root{--brand:#E8622A;--brand-light:#FFF0EA;--brand-mid:#f97d4e;--sidebar-bg:#0F1117;--sidebar-w:64px;--sidebar-exp:220px;--page-bg:#F4F6FA;--card-bg:#fff;--text-primary:#0F1117;--text-secondary:#6B7280;--text-muted:#9CA3AF;--border:rgba(0,0,0,.07);--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 12px 40px rgba(0,0,0,.12);--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--font:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -319,7 +319,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
 
     <!-- -----------------------------------------------------------
-         TAB 1 — UPLOAD TO DATABASE
+         TAB 1 â€” UPLOAD TO DATABASE
     ----------------------------------------------------------- -->
     <div id="tab-upload" class="tab-panel active">
 
@@ -329,8 +329,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div class="card-head-left">
             <div class="card-head-icon"><i class="ti ti-file-download"></i></div>
             <div>
-              <h2>Step 1 — Download Template</h2>
-              <p>Fill in the raw template (URLs, km, HH:MM:SS) — the system will auto-convert on upload</p>
+              <h2>Step 1 â€” Download Template</h2>
+              <p>Fill in the raw template (URLs, km, HH:MM:SS) â€” the system will auto-convert on upload</p>
             </div>
           </div>
           <button class="btn btn-teal" onclick="downloadTemplate()">
@@ -359,8 +359,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
                   <tr><td>activity_date</td><td>2026-06-14</td><td>YYYY-MM-DD</td></tr>
                   <tr><td>distance_km</td><td>5.23</td><td>Kilometres (decimal OK)</td></tr>
                   <tr><td>duration</td><td>0:45:30</td><td>H:MM:SS or HH:MM:SS</td></tr>
-                  <tr><td>steps</td><td>7500</td><td>Optional — leave blank if unknown</td></tr>
-                  <tr><td>elevation_m</td><td>45</td><td>Optional — metres</td></tr>
+                  <tr><td>steps</td><td>7500</td><td>Optional â€” leave blank if unknown</td></tr>
+                  <tr><td>elevation_m</td><td>45</td><td>Optional â€” metres</td></tr>
                 </tbody>
               </table>
             </div>
@@ -373,16 +373,16 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
                   <tr><td>athlete_url</td><td>?</td><td>strava_athlete_id (number extracted)</td></tr>
                   <tr><td>activity_url</td><td>?</td><td>strava_activity_id (number extracted)</td></tr>
                   <tr><td>activity_date</td><td>?</td><td>activity_date (T06:30:00 appended)</td></tr>
-                  <tr><td>distance_km</td><td>?</td><td>distance_meters (× 1000)</td></tr>
+                  <tr><td>distance_km</td><td>?</td><td>distance_meters (Ã— 1000)</td></tr>
                   <tr><td>duration (H:MM:SS)</td><td>?</td><td>moving_time_seconds</td></tr>
-                  <tr><td>duration</td><td>?</td><td>avg_speed (distance ÷ seconds, m/s)</td></tr>
+                  <tr><td>duration</td><td>?</td><td>avg_speed (distance Ã· seconds, m/s)</td></tr>
                   <tr><td>steps</td><td>?</td><td>steps (integer)</td></tr>
                   <tr><td>elevation_m</td><td>?</td><td>elevation_gain</td></tr>
                 </tbody>
               </table>
               <div class="conv-note">
                 <strong>?? Tip</strong>
-                You fill exactly what you have from your raw data. The system converts everything automatically — no manual calculation needed.
+                You fill exactly what you have from your raw data. The system converts everything automatically â€” no manual calculation needed.
               </div>
             </div>
           </div>
@@ -397,8 +397,8 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div class="card-head-left">
             <div class="card-head-icon"><i class="ti ti-file-upload"></i></div>
             <div>
-              <h2>Step 2 — Upload &amp; Preview</h2>
-              <p>Drag the filled template here — duplicates auto-detected before import</p>
+              <h2>Step 2 â€” Upload &amp; Preview</h2>
+              <p>Drag the filled template here â€” duplicates auto-detected before import</p>
             </div>
           </div>
         </div>
@@ -462,7 +462,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div><!-- /tab-upload -->
 
     <!-- -----------------------------------------------------------
-         TAB 2 — GENERATE SQL FILE
+         TAB 2 â€” GENERATE SQL FILE
     ----------------------------------------------------------- -->
     <div id="tab-sql" class="tab-panel">
 
@@ -481,15 +481,15 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
           <div class="two-col" style="margin-bottom:20px">
             <div class="tpl-box">
               <div class="tpl-icon">??</div>
-              <h3>Step 1 — Download Template</h3>
+              <h3>Step 1 â€” Download Template</h3>
               <p>Same raw format: Athlete URL, Activity URL, Distance (km), Duration (H:MM:SS). Fill it with your data.</p>
               <button class="btn btn-teal" onclick="downloadTemplate()"><i class="ti ti-download"></i> Download Template CSV</button>
             </div>
             <div class="tpl-box" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-color:#C4B5FD">
               <div class="tpl-icon">???</div>
-              <h3>Step 2 — Upload ? Get SQL</h3>
+              <h3>Step 2 â€” Upload ? Get SQL</h3>
               <p>Drop your filled template here. System converts and generates a complete <strong>.sql</strong> file ready for Supabase.</p>
-              <div style="font-size:11px;color:#6D28D9;margin-top:8px">No database connection needed — pure offline conversion</div>
+              <div style="font-size:11px;color:#6D28D9;margin-top:8px">No database connection needed â€” pure offline conversion</div>
             </div>
           </div>
 
@@ -572,7 +572,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div><!-- /tab-sql -->
 
     <!-- -----------------------------------------------------------
-         TAB 3 — DISTANCE OVERRIDE
+         TAB 3 â€” DISTANCE OVERRIDE
     ----------------------------------------------------------- -->
     <div id="tab-distance" class="tab-panel">
       <div class="card">
@@ -641,7 +641,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
     </div>
 
     <!-- -----------------------------------------------------------
-         TAB 4 — FLAG / STATUS OVERRIDE
+         TAB 4 â€” FLAG / STATUS OVERRIDE
     ----------------------------------------------------------- -->
     <div id="tab-flag" class="tab-panel">
       <div class="card">
@@ -712,7 +712,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
   </div><!-- /content -->
 
   <footer class="site-footer">
-    <span>© 2026 Arcgate Walkathon</span>
+    <span>Â© 2026 Arcgate Walkathon</span>
     <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
   </footer>
 </div><!-- /main -->
@@ -729,7 +729,7 @@ async function loadEventSelector(){
       var o=document.createElement("option");
       o.value=e.id;
       if (e.status === "live") {
-        o.textContent = "?? " + e.name + " (LIVE)";
+        o.textContent = "\uD83D\uDD25 " + e.name + " (LIVE)";
         o.style.color = "#16a34a";
         o.style.fontWeight = "bold";
       } else {
@@ -899,7 +899,7 @@ function parseCSV(text) {
 }
 
 // ---------------------------------------------------------------
-// TAB 1 — UPLOAD TO DATABASE
+// TAB 1 â€” UPLOAD TO DATABASE
 // ---------------------------------------------------------------
 var parsedRows = [];
 var existingIds = new Set();
@@ -928,8 +928,8 @@ async function handleFile(file) {
   }
 
   var raw = isRawFormat(parsed.headers);
-  document.getElementById('dz-text').textContent = '? ' + file.name + (raw ? ' (raw template — will auto-convert)' : ' (standard format)');
-  document.getElementById('dz-sub').textContent  = parsed.rows.length + ' rows found — checking duplicates…';
+  document.getElementById('dz-text').textContent = '? ' + file.name + (raw ? ' (raw template â€” will auto-convert)' : ' (standard format)');
+  document.getElementById('dz-sub').textContent  = parsed.rows.length + ' rows found â€” checking duplicatesâ€¦';
   existingIds = await loadExistingIds();
   var isMiles = false;
   var unitEl = document.querySelector('input[name="csv-unit"]:checked');
@@ -993,7 +993,7 @@ async function loadExistingIds() {
 }
 
 function fmtSecs(s) {
-  if (!s) return '—';
+  if (!s) return 'â€”';
   var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   if (h) return h+'h '+String(m).padStart(2,'0')+'m';
   return m+'m '+String(sec).padStart(2,'0')+'s';
@@ -1036,16 +1036,16 @@ function renderPreview() {
     } else {
       badge = '<span class="badge badge-new">? New</span>';
     }
-    var d   = r.row['activity_date'] ? r.row['activity_date'].split('T')[0] : '—';
-    var km  = r.row['distance_meters'] ? (parseFloat(r.row['distance_meters'])/1000).toFixed(2)+' km' : '—';
-    var dur = r.row['moving_time_seconds'] ? fmtSecs(parseInt(r.row['moving_time_seconds'])) : (r.row['_durationRaw'] || '—');
+    var d   = r.row['activity_date'] ? r.row['activity_date'].split('T')[0] : 'â€”';
+    var km  = r.row['distance_meters'] ? (parseFloat(r.row['distance_meters'])/1000).toFixed(2)+' km' : 'â€”';
+    var dur = r.row['moving_time_seconds'] ? fmtSecs(parseInt(r.row['moving_time_seconds'])) : (r.row['_durationRaw'] || 'â€”');
     return '<tr>'
       + '<td style="color:#9CA3AF">' + r.index + '</td>'
       + '<td>' + badge + '</td>'
-      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_activity_id']||'—') + '</td>'
-      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_athlete_id']||'—') + '</td>'
-      + '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis">' + (r.row['activity_name']||'—') + '</td>'
-      + '<td>' + (r.row['sport_type']||'—') + '</td>'
+      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_activity_id']||'â€”') + '</td>'
+      + '<td style="font-family:monospace;font-size:11px">' + (r.row['strava_athlete_id']||'â€”') + '</td>'
+      + '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis">' + (r.row['activity_name']||'â€”') + '</td>'
+      + '<td>' + (r.row['sport_type']||'â€”') + '</td>'
       + '<td>' + d + '</td>'
       + '<td>' + km + '</td>'
       + '<td>' + dur + '</td>'
@@ -1054,7 +1054,7 @@ function renderPreview() {
   }).join('');
 
   if (parsedRows.length > 50) {
-    document.getElementById('preview-body').innerHTML += '<tr><td colspan="10" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">…and ' + (parsedRows.length - 50) + ' more rows</td></tr>';
+    document.getElementById('preview-body').innerHTML += '<tr><td colspan="10" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">â€¦and ' + (parsedRows.length - 50) + ' more rows</td></tr>';
   }
 
   document.getElementById('preview-section').style.display = 'block';
@@ -1086,7 +1086,7 @@ async function startImport(mode) {
   else if (mode === 'update-only') activeBtn = btnExisting;
   else activeBtn = btnUpdate;
 
-  activeBtn.innerHTML = '<div class="spinner"></div> Importing…';
+  activeBtn.innerHTML = '<div class="spinner"></div> Importingâ€¦';
 
   var pw = document.getElementById('progress-wrap');
   pw.style.display = 'block';
@@ -1108,7 +1108,7 @@ async function startImport(mode) {
     return act;
   });
 
-  addLog('?? Starting import of ' + allActivities.length + ' activities…');
+  addLog('?? Starting import of ' + allActivities.length + ' activitiesâ€¦');
   
   var updateExisting = (mode === 'all' || mode === 'update-only');
   if (mode === 'all') {
@@ -1126,8 +1126,8 @@ async function startImport(mode) {
   for (var i = 0; i < allActivities.length; i += BATCH) {
     var batch = allActivities.slice(i, i + BATCH);
     var batchNum = Math.floor(i / BATCH) + 1;
-    lbl.textContent = 'Batch ' + batchNum + ' / ' + totalBatches + '…';
-    addLog('?? Sending batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' rows)…', '#fff3e0');
+    lbl.textContent = 'Batch ' + batchNum + ' / ' + totalBatches + 'â€¦';
+    addLog('?? Sending batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' rows)â€¦', '#fff3e0');
 
     try {
       var res = await fetch(BACKEND_URL + '/bulk-import', {
@@ -1206,7 +1206,7 @@ async function startImport(mode) {
     addLog('?? Recalculation failed: ' + e.message, '#ef6c00');
   }
 
-  activeBtn.innerHTML = '? Done — ' + success + ' processed';
+  activeBtn.innerHTML = '? Done â€” ' + success + ' processed';
   
   // Re-enable all buttons after 2 seconds
   setTimeout(function() {
@@ -1287,7 +1287,7 @@ function resetUpload() {
 }
 
 // ---------------------------------------------------------------
-// TAB 2 — GENERATE SQL FILE
+// TAB 2 â€” GENERATE SQL FILE
 // ---------------------------------------------------------------
 var sqlRows = [];
 var generatedSQL = '';
@@ -1305,7 +1305,7 @@ document.getElementById('sql-file-input').addEventListener('change', function(e)
 
 async function handleSQLFile(file) {
   if (!file.name.endsWith('.csv')) { alert('Please upload a .csv file only.'); return; }
-  document.getElementById('sql-dz-text').textContent = '? Reading ' + file.name + '…';
+  document.getElementById('sql-dz-text').textContent = '? Reading ' + file.name + 'â€¦';
   document.getElementById('sql-dz-sub').textContent = '';
 
   var text = await file.text();
@@ -1317,7 +1317,7 @@ async function handleSQLFile(file) {
 
   var raw = isRawFormat(parsed.headers);
   document.getElementById('sql-dz-text').textContent = '? ' + file.name;
-  document.getElementById('sql-dz-sub').textContent = parsed.rows.length + ' rows parsed — generating SQL…';
+  document.getElementById('sql-dz-sub').textContent = parsed.rows.length + ' rows parsed â€” generating SQLâ€¦';
 
   sqlRows = [];
   var valid = 0, invalid = 0;
@@ -1363,7 +1363,7 @@ async function handleSQLFile(file) {
   document.getElementById('sql-preview-body').innerHTML = preview.map(function(r, idx) {
     var km = (r.distance_meters / 1000).toFixed(2) + ' km';
     var dur = fmtSecs(r.moving_time_seconds);
-    var d = r.activity_date ? r.activity_date.split('T')[0] : '—';
+    var d = r.activity_date ? r.activity_date.split('T')[0] : 'â€”';
     return '<tr>'
       + '<td style="color:#9CA3AF">' + (idx+1) + '</td>'
       + '<td style="font-family:monospace;font-size:11px">' + r.strava_activity_id + '</td>'
@@ -1373,12 +1373,12 @@ async function handleSQLFile(file) {
       + '<td>' + d + '</td>'
       + '<td>' + km + '</td>'
       + '<td>' + dur + '</td>'
-      + '<td>' + (r.steps || '—') + '</td>'
+      + '<td>' + (r.steps || 'â€”') + '</td>'
       + '</tr>';
   }).join('');
 
   if (sqlRows.length > 30) {
-    document.getElementById('sql-preview-body').innerHTML += '<tr><td colspan="9" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">…and ' + (sqlRows.length-30) + ' more rows in SQL file</td></tr>';
+    document.getElementById('sql-preview-body').innerHTML += '<tr><td colspan="9" style="text-align:center;padding:12px;color:#9CA3AF;font-size:12px">â€¦and ' + (sqlRows.length-30) + ' more rows in SQL file</td></tr>';
   }
 
   document.getElementById('sql-preview-label').textContent = 'Preview (first 30 of ' + sqlRows.length + ' rows)';
@@ -1398,7 +1398,7 @@ function generateSQL(rows) {
   var today = new Date().toISOString().split('T')[0];
   var lines = [];
   lines.push('-- =====================================================');
-  lines.push('-- Arcgate Walkathon 2026 — Activity Import');
+  lines.push('-- Arcgate Walkathon 2026 â€” Activity Import');
   lines.push('-- Generated: ' + today);
   lines.push('-- Total rows: ' + rows.length);
   lines.push('-- ON CONFLICT DO NOTHING = duplicates auto-skipped');
@@ -1543,9 +1543,9 @@ async function searchActivityForDistance() {
     
     // Fill fields
     document.getElementById('dist-athlete-name').textContent = name;
-    document.getElementById('dist-act-name').textContent = loadedActivity.activity_name || '—';
+    document.getElementById('dist-act-name').textContent = loadedActivity.activity_name || 'â€”';
     
-    var dateStr = '—';
+    var dateStr = 'â€”';
     if (loadedActivity.activity_date_time_ist) {
       var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
       dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
@@ -1687,9 +1687,9 @@ async function searchActivityForFlag() {
     
     // Fill fields
     document.getElementById('flag-athlete-name').textContent = name;
-    document.getElementById('flag-act-name').textContent = loadedActivity.activity_name || '—';
+    document.getElementById('flag-act-name').textContent = loadedActivity.activity_name || 'â€”';
     
-    var dateStr = '—';
+    var dateStr = 'â€”';
     if (loadedActivity.activity_date_time_ist) {
       var parts = loadedActivity.activity_date_time_ist.split(/[T ]/);
       dateStr = parts[0] + ' ' + (parts[1] || '').substring(0, 8);
@@ -1991,9 +1991,9 @@ async function handleDistBulkCSV(files) {
         var newDistKm = parseFloat(r.new_distance_km);
         var dbAct = dbActivities[actId];
         
-        var athleteName = '—';
-        var actName = '—';
-        var oldDistStr = '—';
+        var athleteName = 'â€”';
+        var actName = 'â€”';
+        var oldDistStr = 'â€”';
         var statusText = 'Ready';
         var statusColor = '#059669';
         var isValid = true;
@@ -2010,11 +2010,11 @@ async function handleDistBulkCSV(files) {
           isValid = false;
         } else {
           athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-          actName = dbAct.activity_name || '—';
+          actName = dbAct.activity_name || 'â€”';
           oldDistStr = (dbAct.distance_meters / 1000).toFixed(2) + ' km';
         }
         
-        var newDistStr = isNaN(newDistKm) ? '—' : newDistKm.toFixed(2) + ' km';
+        var newDistStr = isNaN(newDistKm) ? 'â€”' : newDistKm.toFixed(2) + ' km';
         
         var tr = document.createElement('tr');
         tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
@@ -2207,9 +2207,9 @@ async function handleFlagBulkCSV(files) {
         var csvReason = (r.reason || '').trim();
         var dbAct = dbActivities[actId];
         
-        var athleteName = '—';
-        var actName = '—';
-        var oldStatusStr = '—';
+        var athleteName = 'â€”';
+        var actName = 'â€”';
+        var oldStatusStr = 'â€”';
         var statusText = 'Ready';
         var statusColor = '#059669';
         var isValid = true;
@@ -2232,12 +2232,12 @@ async function handleFlagBulkCSV(files) {
           isValid = false;
         } else {
           athleteName = registrationNames[dbAct.strava_athlete_id.toString()] || ('Athlete #' + dbAct.strava_athlete_id);
-          actName = dbAct.activity_name || '—';
+          actName = dbAct.activity_name || 'â€”';
           var wasFlagged = dbAct.is_flagged === true || dbAct.is_flagged === 'true';
-          oldStatusStr = wasFlagged ? `Flagged ?? (${dbAct.flag_reason || 'No Reason'})` : 'Clear ?';
+          oldStatusStr = wasFlagged ? `<span style="color:#DC2626;"><i class="ti ti-flag"></i> Flagged (${dbAct.flag_reason || 'No Reason'})</span>` : `<span style="color:#059669;"><i class="ti ti-circle-check"></i> Clear</span>`;
         }
         
-        var proposedStatusStr = (csvAction === 'flag') ? `Flagged ?? (${csvReason})` : 'Clear ?';
+        var proposedStatusStr = (csvAction === 'flag') ? `<span style="color:#DC2626;"><i class="ti ti-flag"></i> Flagged (${csvReason})</span>` : `<span style="color:#059669;"><i class="ti ti-circle-check"></i> Clear</span>`;
         
         var tr = document.createElement('tr');
         tr.style.backgroundColor = isValid ? 'transparent' : 'rgba(220, 38, 38, 0.05)';
