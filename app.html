@@ -270,7 +270,7 @@
       </button>
     </div>
 
-    <!-- Middle: Date Switcher & Logo -->
+    <!-- Middle: Date Switcher -->
     <div class="hdr-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 2;">
       <!-- Date Switcher Pill -->
       <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 4px 14px; display: flex; align-items: center; gap: 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #fff; text-transform: uppercase;">
@@ -278,20 +278,17 @@
         <span id="hdr-today-date">—</span>
         <span onclick="shiftDashboardDate(1)" style="cursor: pointer; opacity: 0.6; padding: 2px 4px; transition: opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6">❯</span>
       </div>
-      <!-- Logo Branding -->
-      <div style="font-size: 15px; font-weight: 300; letter-spacing: 4px; color: rgba(255, 255, 255, 0.7); margin-top: 4px; text-transform: uppercase; font-family: 'Poppins', sans-serif;">WHOOP</div>
     </div>
 
-    <!-- Right: Goal Completion Battery -->
+    <!-- Right: Clear Cache (Trash Bin) Button -->
     <div class="hdr-right" style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1;">
-      <div id="hdr-battery-wrap" onclick="clearPWACache(this)" title="Clear cache / PWA Status" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-        <span id="hdr-battery-pct" style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); font-family: var(--font);">70%</span>
-        <div style="border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 4px; width: 22px; height: 13px; padding: 1px; display: flex; align-items: center; position: relative; box-sizing: border-box;">
-          <div id="hdr-battery-bar" style="background: #22c55e; height: 100%; width: 70%; border-radius: 1px; transition: width 0.3s ease, background-color 0.3s ease;"></div>
-          <!-- Battery nipple -->
-          <div style="position: absolute; right: -3px; top: 3px; width: 1.5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 0 1px 1px 0;"></div>
-        </div>
-      </div>
+      <button class="hdr-btn" onclick="clearPWACache(this)" title="Clear cache">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+          <path d="M3 6h18"/>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+        </svg>
+      </button>
     </div>
 
   </div>
