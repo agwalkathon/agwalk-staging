@@ -182,7 +182,24 @@ function renderUserAvatar(name, photo, hdrId, youId) {
     initStr = (name || 'AG').substring(0, 2).toUpperCase();
   }
   
-  var avStyle = 'background: linear-gradient(135deg, #38bdf8 0%, #4ade80 100%); color: #0f172a; font-weight: 700; font-family: var(--font); text-shadow: none;';
+  var grads = [
+    { c1: '#38bdf8', c2: '#4ade80' },
+    { c1: '#c084fc', c2: '#f472b6' },
+    { c1: '#fb923c', c2: '#facc15' },
+    { c1: '#818cf8', c2: '#22d3ee' },
+    { c1: '#34d399', c2: '#a3e635' },
+    { c1: '#fb7185', c2: '#a78bfa' },
+    { c1: '#2dd4bf', c2: '#60a5fa' }
+  ];
+  var hash = 0;
+  var str = name || '';
+  for (var i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  var idx = Math.abs(hash) % grads.length;
+  var g = grads[idx];
+  
+  var avStyle = 'background: linear-gradient(135deg, ' + g.c1 + ' 0%, ' + g.c2 + ' 100%); color: #0f172a; font-weight: 700; font-family: var(--font); text-shadow: none;';
   
   var hdrEl = document.getElementById(hdrId);
   if (hdrEl) {
