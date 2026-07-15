@@ -3468,3 +3468,285 @@ window.renderStreakDrawerDetails = function() {
 
   contentEl.innerHTML = html;
 };
+
+window.renderParticipantProfile = async function(athleteId) {
+  var contentEl = document.getElementById('participant-profile-content');
+  if (!contentEl) return;
+
+  try {
+    var [regRes, actsRes, pastRes] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&select=full_name,email,gender,shift,leaderboard_team,profile_photo,emp_code', { headers: HDR }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + athleteId + '&event_id=eq.' + EVENT_ROW.id + '&is_deleted=eq.false&order=activity_date.desc', { headers: HDR }).then(r => r.json()),
+      fetch(SUPABASE_URL + '/rest/v1/registration?strava_athlete_id=eq.' + athleteId + '&event_id=neq.' + EVENT_ROW.id + '&select=event_name,leaderboard_team', { headers: HDR }).then(r => r.json())
+    ]);
+
+    var reg = regRes[0];
+    if (!reg) {
+      contentEl.innerHTML = '<p style="color:#ef4444; text-align:center; padding:20px;">Profile not found.</p>';
+      return;
+    }
+
+    var validActs = actsRes.filter(function(a) { return !a.is_flagged; });
+    var totalDistM = validActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
+    var currentKm = totalDistM / 1000;
+
+    // 1. Profile Avatar & Name Header
+    var photoUrl = reg.profile_photo || '';
+    var initials = (reg.full_name || 'P').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    var avatarHtml = photoUrl 
+      ? '<img src="' + photoUrl + '" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2.5px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">'
+      : '<div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; border: 2.5px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + initials + '</div>';
+
+    var html = '';
+    html += '<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 8px;">' +
+           '  ' + avatarHtml +
+           '  <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 10px; font-family: var(--font);">' + esc(reg.full_name) + '</div>' +
+           '  <div style="font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px;">' + (reg.leaderboard_team || 'No Team') + ' · ' + (reg.shift || 'General') + '</div>' +
+           '</div>';
+
+    // 2. Medal Prediction Section
+    var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
+    var bronzeLimit = rules.bronze_medal_distance_meters || 100000;
+    var silverLimit = rules.silver_medal_distance_meters || 200000;
+    var goldLimit = rules.gold_medal_distance_meters || 300000;
+
+    var daysRemaining = 1;
+    if (EVENT_ROW && EVENT_ROW.end_date) {
+      var diff = new Date(EVENT_ROW.end_date) - new Date();
+      daysRemaining = Math.max(1, Math.ceil(diff / 86400000));
+    }
+
+    var sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0,0,0,0);
+    var last7DaysActs = validActs.filter(function(a) {
+      return new Date(a.activity_date) >= sevenDaysAgo;
+    });
+    var last7DaysDistKM = last7DaysActs.reduce(function(s,a){return s + (a.distance_meters || 0);}, 0) / 1000;
+    var avg7DayPace = last7DaysDistKM / 7;
+
+    var dayKm = {};
+    validActs.forEach(function(a) {
+      var km = (a.distance_meters || 0) / 1000;
+      var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+      if (d) dayKm[d] = (dayKm[d] || 0) + km;
+    });
+    var activeDaysCount = Object.keys(dayKm).length || 1;
+    var avgActivePace = currentKm / activeDaysCount;
+    var assumedPace = Math.max(avg7DayPace, avgActivePace);
+    if (assumedPace < 0.5) assumedPace = 1.0;
+
+    var projectedDistance = currentKm + (assumedPace * daysRemaining);
+
+    var projectedMedal = 'None';
+    var projectedEmoji = '⚪';
+    var projectedColor = '#9ca3af';
+    if (projectedDistance >= (goldLimit / 1000)) {
+      projectedMedal = 'GOLD';
+      projectedEmoji = '🥇';
+      projectedColor = '#f59e0b';
+    } else if (projectedDistance >= (silverLimit / 1000)) {
+      projectedMedal = 'SILVER';
+      projectedEmoji = '🥈';
+      projectedColor = '#9ca3af';
+    } else if (projectedDistance >= (bronzeLimit / 1000)) {
+      projectedMedal = 'BRONZE';
+      projectedEmoji = '🥉';
+      projectedColor = '#c57f35';
+    }
+
+    var remainingSilver = Math.max(0, (silverLimit / 1000) - currentKm);
+    var remainingGold = Math.max(0, (goldLimit / 1000) - currentKm);
+    var neededPaceSilver = remainingSilver / daysRemaining;
+    var neededPaceGold = remainingGold / daysRemaining;
+
+    var paceColorSilver = neededPaceSilver <= assumedPace ? '#22c55e' : '#f97316';
+    var paceColorGold = neededPaceGold <= assumedPace ? '#22c55e' : '#f97316';
+
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">MEDAL PREDICTION</div>' +
+           '  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);">' +
+           '    <div>' +
+           '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600;">PROJECTED FINISH</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: ' + projectedColor + '; margin-top: 2px;">' + projectedEmoji + ' ' + projectedMedal + '</div>' +
+           '    </div>' +
+           '    <div style="text-align: right;">' +
+           '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600;">PROJECTED DISTANCE</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;">' + projectedDistance.toFixed(1) + ' km</div>' +
+           '    </div>' +
+           '  </div>' +
+           '  <div style="display: flex; flex-direction: column; gap: 8px;">' +
+           '    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">' +
+           '      <span style="color: rgba(255,255,255,0.6);">Needed for Silver (200k):</span>' +
+           '      <span style="font-weight: 700; color: ' + paceColorSilver + ';">' + (neededPaceSilver > 0 ? neededPaceSilver.toFixed(1) + ' km/day' : 'Lock ✔') + '</span>' +
+           '    </div>' +
+           '    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">' +
+           '      <span style="color: rgba(255,255,255,0.6);">Needed for Gold (300k):</span>' +
+           '      <span style="font-weight: 700; color: ' + paceColorGold + ';">' + (neededPaceGold > 0 ? neededPaceGold.toFixed(1) + ' km/day' : 'Lock ✔') + '</span>' +
+           '    </div>' +
+           '  </div>' +
+           '</div>';
+
+    // 3. Activity Metrics Grid
+    var totalMovingSec = validActs.reduce(function(s, a) { return s + (a.moving_time_seconds || 0); }, 0);
+    var avgPaceStr = '—';
+    if (totalMovingSec > 0 && totalDistM > 0) {
+      var paceMinKm = (totalMovingSec / 60) / (totalDistM / 1000);
+      var mins = Math.floor(paceMinKm);
+      var secs = Math.round((paceMinKm - mins) * 60);
+      if (secs === 60) { mins++; secs = 0; }
+      avgPaceStr = mins + ':' + (secs < 10 ? '0' : '') + secs + ' /km';
+    }
+    var hours = Math.floor(totalMovingSec / 3600);
+    var minutes = Math.floor((totalMovingSec % 3600) / 60);
+    var timeStr = hours + 'h ' + minutes + 'm';
+    var totalElevation = validActs.reduce(function(s, a) { return s + (a.elevation_gain || 0); }, 0);
+
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">ACTIVITY METRICS</div>' +
+           '  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' +
+           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Distance</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + currentKm.toFixed(1) + ' km</div>' +
+           '    </div>' +
+           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Avg Pace</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #22c55e; margin-top: 4px;">' + avgPaceStr + '</div>' +
+           '    </div>' +
+           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Moving Time</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">' + timeStr + '</div>' +
+           '    </div>' +
+           '    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; text-align: center;">' +
+           '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Total Elevation</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #8b5cf6; margin-top: 4px;">' + totalElevation.toFixed(0) + ' m</div>' +
+           '    </div>' +
+           '  </div>' +
+           '</div>';
+
+    // 4. Points breakdown
+    var fullPts = calcFullPts(actsRes, reg.gender, reg.shift);
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">POINTS BREAKDOWN</div>' +
+           '  <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px;">' + esc(EVENT_ROW.name) + '</div>' +
+           '  <div style="display: flex; flex-direction: column; gap: 8px;">' +
+           '    <div style="display: flex; justify-content: space-between; font-size: 12.5px;">' +
+           '      <span style="color: rgba(255,255,255,0.5);">Base Points:</span>' +
+           '      <span style="font-weight: 600; color: #fff;">' + (fullPts.distPts || 0).toFixed(1) + '</span>' +
+           '    </div>' +
+           '    <div style="display: flex; justify-content: space-between; font-size: 12.5px;">' +
+           '      <span style="color: rgba(255,255,255,0.5);">Bonus Points:</span>' +
+           '      <span style="font-weight: 600; color: #fff;">' + (fullPts.bonusPts || 0).toFixed(1) + '</span>' +
+           '    </div>' +
+           '    <div style="display: flex; justify-content: space-between; font-size: 12.5px;">' +
+           '      <span style="color: rgba(255,255,255,0.5);">Challenge Points:</span>' +
+           '      <span style="font-weight: 600; color: #fff;">' + (fullPts.challengePts || 0).toFixed(1) + '</span>' +
+           '    </div>' +
+           '    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 8px; margin-top: 4px;">' +
+           '      <span style="color: #fff;">Total Points:</span>' +
+           '      <span style="color: var(--brand);">' + (fullPts.total || 0).toFixed(1) + '</span>' +
+           '    </div>' +
+           '  </div>' +
+           '</div>';
+
+    // 5. Last 7 Days Activities & Bar Graph
+    var chartDays = [];
+    var maxVal = 1;
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var dStr = d.toISOString().split('T')[0];
+      var label = d.toLocaleDateString('en-IN', { weekday: 'short' })[0];
+      var km = 0;
+      validActs.forEach(function(a) {
+        var aDate = a.activity_date ? a.activity_date.split('T')[0] : null;
+        if (aDate === dStr) km += (a.distance_meters || 0) / 1000;
+      });
+      if (km > maxVal) maxVal = km;
+      chartDays.push({ label: label, val: km, str: dStr });
+    }
+
+    var svgHtml = '<svg viewBox="0 0 300 90" style="width: 100%; height: 90px; overflow: visible;">';
+    chartDays.forEach(function(cd, idx) {
+      var x = 15 + idx * 40;
+      var barH = (cd.val / maxVal) * 55;
+      var y = 70 - barH;
+      svgHtml += '<rect x="' + x + '" y="15" width="16" height="55" rx="4" fill="rgba(255,255,255,0.03)" />';
+      if (barH > 0) {
+        svgHtml += '<rect x="' + x + '" y="' + y + '" width="16" height="' + barH + '" rx="4" fill="url(#p-char-grad)" />';
+      }
+      svgHtml += '<text x="' + (x + 8) + '" y="84" fill="rgba(255,255,255,0.4)" font-size="9" font-weight="700" text-anchor="middle">' + cd.label + '</text>';
+      if (cd.val > 0) {
+        svgHtml += '<text x="' + (x + 8) + '" y="' + (y - 3) + '" fill="#fff" font-size="8" font-weight="700" text-anchor="middle">' + cd.val.toFixed(1) + '</text>';
+      }
+    });
+    svgHtml += '<defs><linearGradient id="p-char-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ea580c" /><stop offset="100%" stop-color="#f97316" /></linearGradient></defs>';
+    svgHtml += '</svg>';
+
+    var last7Acts = validActs.filter(function(a) {
+      return new Date(a.activity_date) >= sevenDaysAgo;
+    });
+
+    var actsListHtml = '';
+    if (last7Acts.length > 0) {
+      last7Acts.forEach(function(act) {
+        var actDist = (act.distance_meters || 0) / 1000;
+        var actDate = new Date(act.activity_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        var actPace = '—';
+        if (act.moving_time_seconds && act.distance_meters) {
+          var paceMin = (act.moving_time_seconds / 60) / (act.distance_meters / 1000);
+          var m = Math.floor(paceMin);
+          var s = Math.round((paceMin - m) * 60);
+          if (s === 60) { m++; s = 0; }
+          actPace = m + ':' + (s < 10 ? '0' : '') + s + ' /km';
+        }
+        var actTitle = act.description || (act.sport_type || 'Activity');
+        actsListHtml += '<div onclick="openActivityDetail(\'' + (act.strava_activity_id || act.id) + '\', null, ' + !!act.strava_activity_id + ')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.02)\'">' +
+                       '  <div style="text-align: left;">' +
+                       '    <div style="font-size: 13px; font-weight: 700; color: #fff;">' + esc(actTitle) + '</div>' +
+                       '    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">' + actDate + ' · ' + actPace + '</div>' +
+                       '  </div>' +
+                       '  <div style="display: flex; align-items: center; gap: 8px;">' +
+                       '    <div style="font-size: 14px; font-weight: 800; color: var(--brand);">' + actDist.toFixed(1) + ' km</div>' +
+                       '    <span style="color: rgba(255,255,255,0.2); font-size: 12px;">➔</span>' +
+                       '  </div>' +
+                       '</div>';
+      });
+    } else {
+      actsListHtml = '<p style="color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; padding: 10px 0; margin: 0;">No activities logged in the last 7 days</p>';
+    }
+
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">LAST 7 DAYS ACTIVITIES</div>' +
+           '  ' + svgHtml +
+           '  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">' +
+                actsListHtml +
+           '  </div>' +
+           '</div>';
+
+    // 6. Past Events Participated
+    var pastHtml = '';
+    if (pastRes && pastRes.length > 0) {
+      pastRes.forEach(function(p) {
+        pastHtml += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">' +
+                   '  <div style="font-size: 13px; font-weight: 600; color: #fff;">' + esc(p.event_name) + '</div>' +
+                   '  <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + esc(p.leaderboard_team || 'No Team') + '</div>' +
+                   '</div>';
+      });
+    } else {
+      pastHtml = '<p style="color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; padding: 10px 0; margin: 0;">No past events found</p>';
+    }
+
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
+           '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">PAST EVENTS PARTICIPATED</div>' +
+           '  <div style="display: flex; flex-direction: column; margin-top: 4px;">' +
+                pastHtml +
+           '  </div>' +
+           '</div>';
+
+    contentEl.innerHTML = html;
+  } catch (err) {
+    console.error('renderParticipantProfile error:', err);
+    contentEl.innerHTML = '<p style="color:#ef4444; text-align:center; padding:20px;">Failed to load profile details.</p>';
+  }
+};
