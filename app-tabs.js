@@ -3328,24 +3328,20 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Today's Date in Header (Whoop-Style Date Format & Shifting Support)
-window.currentHdrDate = new Date();
-function updateHdrDateDisplay() {
-  try {
-    var d = window.currentHdrDate;
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// Today's Date in Header
+(function(){
+  try{
+    var d = new Date();
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     var daysArr = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var formattedDate = daysArr[d.getDay()].toUpperCase() + ', ' + months[d.getMonth()].toUpperCase() + ' ' + d.getDate();
+    var monthName = months[d.getMonth()];
+    var day = d.getDate();
+    var year = d.getFullYear();
+    var formattedDate = daysArr[d.getDay()] + ' ' + monthName + ' ' + day + ', ' + year;
     var dateEl = document.getElementById('hdr-today-date');
-    if (dateEl) dateEl.textContent = formattedDate;
-  } catch(e) {}
-}
-function shiftDashboardDate(days) {
-  window.currentHdrDate.setDate(window.currentHdrDate.getDate() + days);
-  updateHdrDateDisplay();
-}
-window.shiftDashboardDate = shiftDashboardDate;
-updateHdrDateDisplay();
+    if(dateEl) dateEl.textContent = formattedDate;
+  }catch(e){}
+})();
 
 // Boot Main Application
 if (document.readyState === 'loading') {
