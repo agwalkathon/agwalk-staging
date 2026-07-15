@@ -145,18 +145,34 @@
     // 1. Update the Event Logo or Event Display Name
     var host = document.getElementById('medal-rings');
     var blk = host ? (host.closest('.hero-rings-block') || host.parentNode) : null;
-    if (blk) {
-      // remove any previous text logo to avoid duplicates on double render
-      var oldTxt = blk.querySelector('#app-logo-text');
-      if (oldTxt) oldTxt.remove();
-    }
     var im = blk ? blk.querySelector('#app-logo') : null;
+    var logoWrap = im ? im.parentNode : null;
+    if (logoWrap) {
+      var oldTxt = logoWrap.querySelector('#app-logo-text');
+      if (oldTxt) oldTxt.remove();
+      var oldTxt2 = blk.querySelector('#app-logo-text');
+      if (oldTxt2) oldTxt2.remove();
+    }
 
-    if (ev.rules_config && ev.rules_config.logo_url) {
+    function renderWhoopTextLogo() {
+      if (logoWrap) {
+        var oldTxt = logoWrap.querySelector('#app-logo-text');
+        if (oldTxt) oldTxt.remove();
+        var txtEl = document.createElement('div');
+        txtEl.id = 'app-logo-text';
+        txtEl.textContent = (ev.rules_config && ev.rules_config.display_name) ? ev.rules_config.display_name : ev.name;
+        txtEl.style.cssText = "font-family:var(--font); font-size:24px; font-weight:800; color:#ffffff; text-align:center; text-transform:uppercase; letter-spacing:1.5px;";
+        logoWrap.appendChild(txtEl);
+      }
+    }
+
+    var hasLogo = ev.rules_config && ev.rules_config.logo_url;
+    if (hasLogo) {
       if (im) {
         im.style.display = 'block';
         im.onerror = function() {
-          this.src = 'logo-white.png';
+          im.style.display = 'none';
+          renderWhoopTextLogo();
         };
         var separator = ev.rules_config.logo_url.indexOf('?') !== -1 ? '&' : '?';
         im.src = ev.rules_config.logo_url + separator + 'cb=' + Date.now();
@@ -165,33 +181,9 @@
         im.style.width = 'auto';
         im.style.filter = (ev.rules_config.logo_filter === 'invert') ? 'invert(1) hue-rotate(180deg)' : '';
       }
-    } else if (ev.rules_config && ev.rules_config.display_name) {
-      if (im) im.style.display = 'none';
-      if (host) {
-        var txtEl = document.createElement('div');
-        txtEl.id = 'app-logo-text';
-        txtEl.textContent = ev.rules_config.display_name;
-        txtEl.style.cssText = "font-family:'Poppins', sans-serif; font-size:22px; font-weight:400; color:#ffffff; text-align:center; margin-bottom:14px; margin-top:2px; letter-spacing:0.5px; opacity:0.95;";
-        host.parentNode.insertBefore(txtEl, host);
-      }
     } else {
-      if (im) {
-        im.style.display = 'block';
-        var cachedBr = null;
-        try { cachedBr = JSON.parse(localStorage.getItem('ag_branding_cache')); } catch(e){}
-        var brLogo = (cachedBr && cachedBr.logo_url) ? cachedBr.logo_url : 'logo-white.png';
-        im.onerror = function() {
-          this.src = 'logo-white.png';
-        };
-        if (brLogo !== 'logo-white.png') {
-          var sep = brLogo.indexOf('?') !== -1 ? '&' : '?';
-          im.src = brLogo + sep + 'cb=' + Date.now();
-        } else {
-          im.src = 'logo-white.png';
-        }
-        im.style.height = '26px';
-        im.style.width = 'auto';
-      }
+      if (im) im.style.display = 'none';
+      renderWhoopTextLogo();
     }
     // Cache active event config for other modules
     try { localStorage.setItem('ag_active_event_cache', JSON.stringify(ev)); } catch(e){}
