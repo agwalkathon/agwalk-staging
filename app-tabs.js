@@ -552,7 +552,7 @@ function renderTodayActivities(acts) {
       endTimeStr = formatTime12h(endTime);
     }
 
-    html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:#22262f; border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'#2a2f3b\'" onmouseleave="this.style.background=\'#22262f\'">' +
+    html += '<div class="today-act-row" onclick="if (typeof openActivityDetail === \'html\' || typeof openActivityDetail === \'function\') openActivityDetail(\'' + (a.strava_activity_id || a.id) + '\', event)" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
               '<div style="display:flex; align-items:center; gap:16px;">' +
                 '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; gap:8px; padding:6px 16px; border-radius:12px; min-width:92px; height:38px; box-sizing:border-box; color:#fff; font-weight:500; font-size:17px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
                   sportIcon +
