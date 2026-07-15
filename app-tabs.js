@@ -2979,6 +2979,24 @@ function closePBsDrawer() {
 }
 window.closePBsDrawer = closePBsDrawer;
 
+function openMedalInsightsDrawer() {
+  var el = document.getElementById('medal-insights-drawer');
+  if (el) {
+    el.style.display = 'block';
+    el.classList.add('open');
+  }
+  if (typeof renderMedalInsights === 'function') {
+    renderMedalInsights();
+  }
+}
+window.openMedalInsightsDrawer = openMedalInsightsDrawer;
+
+function closeMedalInsightsDrawer() {
+  var el = document.getElementById('medal-insights-drawer');
+  if (el) el.classList.remove('open');
+}
+window.closeMedalInsightsDrawer = closeMedalInsightsDrawer;
+
 function clearPWACache(btn) {
   if (btn) {
     btn.style.color = '#10b981';
