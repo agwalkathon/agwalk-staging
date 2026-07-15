@@ -1501,6 +1501,44 @@ function evq() {
   return "&event_id=eq." + EV_ID;
 }
 
+// Full Page Loader Utilities
+function initFullPageLoader() {
+  if (document.getElementById('full-page-loader')) return;
+  var style = document.createElement('style');
+  style.textContent = `
+    .full-page-loader {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 17, 23, 0.75); backdrop-filter: blur(4px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; color: #fff; font-family: 'Poppins', sans-serif;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+    }
+    .full-page-loader.show { opacity: 1; pointer-events: auto; }
+    .loader-spinner {
+      width: 44px; height: 44px; border: 4px solid rgba(255, 255, 255, 0.15);
+      border-left-color: #E8622A; border-radius: 50%;
+      animation: fp-spin 0.85s linear infinite; margin-bottom: 14px;
+    }
+    @keyframes fp-spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 14px; font-weight: 500; letter-spacing: 0.5px; }
+  `;
+  document.head.appendChild(style);
+  var loader = document.createElement('div');
+  loader.id = 'full-page-loader';
+  loader.className = 'full-page-loader';
+  loader.innerHTML = '<div class="loader-spinner"></div><div class="loader-text" id="fp-loader-text">Loading Event Data...</div>';
+  document.body.appendChild(loader);
+}
+function showFullPageLoader(text) {
+  initFullPageLoader();
+  if (text) document.getElementById('fp-loader-text').textContent = text;
+  document.getElementById('full-page-loader').classList.add('show');
+}
+function hideFullPageLoader() {
+  var loader = document.getElementById('full-page-loader');
+  if (loader) loader.classList.remove('show');
+}
+
 async function loadEventSelector() {
   var sel = document.getElementById('ev-select');
   if (!sel) return;
@@ -1524,29 +1562,35 @@ async function loadEventSelector() {
     sel.value = EV_ID;
     localStorage.setItem('wk_admin_selected_event_id', EV_ID);
     
-    sel.addEventListener('change', function() {
+    sel.addEventListener('change', async function() {
       EV_ID = parseInt(this.value);
       localStorage.setItem('wk_admin_selected_event_id', EV_ID);
-      
-      // Update registration map and datalist for autocomplete
-      loadRegistrations();
-      
-      // Clear data and require manual filter action to avoid heavy load
-      var placeholder = document.getElementById('placeholder');
-      var results = document.getElementById('results');
-      if (placeholder) placeholder.style.display = 'block';
-      if (results) results.style.display = 'none';
-      
-      var flaggedBody = document.getElementById('flagged-body');
-      if (flaggedBody) {
-        flaggedBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:var(--text-muted);">Event changed. Please configure filters and search to load data.</td></tr>';
-      }
+      showFullPageLoader('Updating Event Context...');
+      try {
+        // Update registration map and datalist for autocomplete
+        await loadRegistrations();
+        
+        // Clear data and require manual filter action to avoid heavy load
+        var placeholder = document.getElementById('placeholder');
+        var results = document.getElementById('results');
+        if (placeholder) placeholder.style.display = 'block';
+        if (results) results.style.display = 'none';
+        
+        var flaggedBody = document.getElementById('flagged-body');
+        if (flaggedBody) {
+          flaggedBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:var(--text-muted);">Event changed. Please configure filters and search to load data.</td></tr>';
+        }
 
-      // Refresh Flag Reasons tab + dropdowns for the newly selected event
-      if (typeof loadFlagReasons === 'function' && document.getElementById('rules-container') && document.getElementById('rules-container').style.display !== 'none') {
-        loadFlagReasons();
+        // Refresh Flag Reasons tab + dropdowns for the newly selected event
+        if (typeof loadFlagReasons === 'function' && document.getElementById('rules-container') && document.getElementById('rules-container').style.display !== 'none') {
+          await loadFlagReasons();
+        }
+        if (typeof populateFlagReasonDropdowns === 'function') await populateFlagReasonDropdowns();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setTimeout(hideFullPageLoader, 300);
       }
-      if (typeof populateFlagReasonDropdowns === 'function') populateFlagReasonDropdowns();
     });
   } catch (err) {
     console.error('Failed to load event selector:', err);
