@@ -1064,6 +1064,35 @@ async function load(isBackgroundRefresh) {
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>' +
           '</div>' +
         '</div>';
+
+        // Update header battery goal percentage dynamically
+        (function() {
+          var todayStart = new Date();
+          todayStart.setHours(0,0,0,0);
+          var todayEnd = new Date();
+          todayEnd.setHours(23,59,59,999);
+          var todayActs = validActs.filter(function(a) {
+            var ad = new Date(a.activity_date);
+            return ad >= todayStart && ad <= todayEnd;
+          });
+          var todayDistM = todayActs.reduce(function(s,a) { return s + (a.distance_meters || 0); }, 0);
+          var dailyGoalM = (EVENT_ROW && EVENT_ROW.rules_config && EVENT_ROW.rules_config.daily_distance_goal_meters) ? EVENT_ROW.rules_config.daily_distance_goal_meters : 5000;
+          var pctVal = Math.min(100, Math.round((todayDistM / dailyGoalM) * 100));
+          if (isNaN(pctVal)) pctVal = 0;
+          var pctEl = document.getElementById('hdr-battery-pct');
+          var barEl = document.getElementById('hdr-battery-bar');
+          if (pctEl) pctEl.textContent = pctVal + '%';
+          if (barEl) {
+            barEl.style.width = pctVal + '%';
+            if (pctVal >= 50) {
+              barEl.style.backgroundColor = '#22c55e';
+            } else if (pctVal >= 20) {
+              barEl.style.backgroundColor = '#f59e0b';
+            } else {
+              barEl.style.backgroundColor = '#ef4444';
+            }
+          }
+        })();
       })();
 
       var typeCounts = {};
