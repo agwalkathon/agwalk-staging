@@ -1815,6 +1815,9 @@ async function load(isBackgroundRefresh) {
       baseDate = new Date(evEnd + 'T12:00:00');
     }
 
+    var activeMilestones = resolveEventMilestones(EVENT_ROW, reg.gender);
+    var usePoints = (activeMilestones.bronze.metric === 'points');
+
     var days7=[],labels7=[];
     // per-day km for the last 7 days (Phase 2b)
     var dayKm={};
@@ -1827,23 +1830,40 @@ async function load(isBackgroundRefresh) {
       var dstr=localDateStr(dd);
       var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       var isToday = !isEventEnded && di===0;
-      days7.push({str:dstr,active:!!activeDays[dstr],isToday:isToday,km:dayKm[dstr]||0,label:dayNames[dd.getDay()].charAt(0),dayNum:dd.getDate()});
+      var dKm = dayKm[dstr]||0;
+      var dVal = dKm;
+      if (usePoints) {
+        if (fullPts && fullPts.dayBreakdown && fullPts.dayBreakdown[dstr]) {
+          var db = fullPts.dayBreakdown[dstr];
+          dVal = (db.distPts || 0) + (db.bonusPts || 0) + (db.challenges || []).reduce(function(s, ch) { return s + (ch.pts || 0); }, 0);
+        } else {
+          dVal = 0;
+        }
+      }
+      days7.push({str:dstr,active:!!activeDays[dstr],isToday:isToday,km:dKm,val:dVal,label:dayNames[dd.getDay()].charAt(0),dayNum:dd.getDate()});
       labels7.push(isToday ? 'Today' : dayNames[dd.getDay()]);
     }
-    // daily km target: pace for next unearned medal, else keep current average
+    // daily target: pace for next unearned medal, else keep current average
     var _daysLeftH=Math.max(1,daysLeft||1);
     var _nextThreshH=myPts<bronzeThresh?bronzeThresh:myPts<silverThresh?silverThresh:myPts<goldThresh?goldThresh:0;
     var _daysElapsedH=Math.max(1,(now-new Date((EVENT_ROW&&EVENT_ROW.start_date||'2026-06-01')+'T00:00:00+05:30'))/86400000);
-    var _targetKmH=_nextThreshH>0?(_nextThreshH-myPts)/_daysLeftH:(fullPts.km/_daysElapsedH);
-    _targetKmH=Math.max(1,Math.min(25,_targetKmH));
-    // km-proportional week bars with goal checkmarks
+    var _targetKmH = 0;
+    if (usePoints) {
+      _targetKmH = _nextThreshH > 0 ? (_nextThreshH - myPts) / _daysLeftH : (fullPts.total / _daysElapsedH);
+      _targetKmH = Math.max(1, Math.min(100, _targetKmH));
+    } else {
+      _targetKmH = _nextThreshH > 0 ? (_nextThreshH - myPts) / _daysLeftH : (fullPts.km / _daysElapsedH);
+      _targetKmH = Math.max(1, Math.min(25, _targetKmH));
+    }
+    // val-proportional week bars with goal checkmarks
     (function(){
-      var maxKm=Math.max(_targetKmH,days7.reduce(function(m,d){return Math.max(m,d.km);},0),1);
+      var maxVal=Math.max(_targetKmH,days7.reduce(function(m,d){return Math.max(m,d.val);},0),1);
+      var unit = usePoints ? 'pts' : 'km';
       safeSetHtml('streak-bars', days7.map(function(d){
-        var h=Math.max(6,Math.round((d.km/maxKm)*100));
-        var met=d.km>=_targetKmH;
+        var h=Math.max(6,Math.round((d.val/maxVal)*100));
+        var met=d.val>=_targetKmH;
         var cls=d.isToday?'dim':d.active?'on':'off';
-        return '<div class="sbarw"><em>'+(met?'\u2713':'')+'</em><div class="sbar '+cls+'" style="height:'+h+'%" title="'+d.km.toFixed(1)+' km"></div></div>';
+        return '<div class="sbarw"><em>'+(met?'\u2713':'')+'</em><div class="sbar '+cls+'" style="height:'+h+'%" title="'+d.val.toFixed(1)+' ' + unit + '"></div></div>';
       }).join(''));
       var bw=document.getElementById('streak-bars');
       if(bw)bw.classList.add('km-bars');
@@ -1863,9 +1883,18 @@ async function load(isBackgroundRefresh) {
         var _ix=_peers.findIndex(function(p){return String(p.athlete_id)===String(athleteId);});
         if(_ix>=0)_rankH=_ix+1;
       }
+      var todayVal = 0;
+      if (usePoints) {
+        if (fullPts && fullPts.dayBreakdown && fullPts.dayBreakdown[todayLocal]) {
+          var db = fullPts.dayBreakdown[todayLocal];
+          todayVal = (db.distPts || 0) + (db.bonusPts || 0) + (db.challenges || []).reduce(function(s, ch) { return s + (ch.pts || 0); }, 0);
+        }
+      } else {
+        todayVal = dayKm[todayLocal] || 0;
+      }
       if(typeof window.renderDashHybridExtras==='function'){
         window.renderDashHybridExtras({
-          days:days7,targetKm:_targetKmH,todayKm:dayKm[todayLocal]||0,
+          days:days7,targetKm:_targetKmH,todayKm:dayKm[todayLocal]||0,todayVal:todayVal,usePoints:usePoints,
           points:myPts,streak:streak,streakLive:streakIsLive,rank:_rankH
         });
       }
@@ -2620,8 +2649,10 @@ window.renderHeroArc = function(myPts, medals, eventRow) {
    Called from the streak section with per-day km data already computed. */
 window.renderDashHybridExtras = function(opts) {
   var NS = 'http://www.w3.org/2000/svg';
-  var days = opts.days || [];          // [{str,label,dayNum,km,isToday}]
+  var days = opts.days || [];          // [{str,label,dayNum,km,val,isToday}]
   var targetKm = Math.max(0.5, opts.targetKm || 0);
+  var usePoints = !!opts.usePoints;
+  var unit = usePoints ? 'pts' : 'km';
 
   // ── 7-day mini-ring strip ──
   var strip = document.getElementById('day-strip');
@@ -2643,7 +2674,7 @@ window.renderDashHybridExtras = function(opts) {
       bg.setAttribute('class', 'day-ring-bg');
       bg.setAttribute('cx', '10'); bg.setAttribute('cy', '10'); bg.setAttribute('r', '8');
       svg.appendChild(bg);
-      var frac = Math.max(0, Math.min(1, d.km / targetKm));
+      var frac = Math.max(0, Math.min(1, d.val / targetKm));
       if (frac > 0.005) {
         var fgc = document.createElementNS(NS, 'circle');
         fgc.setAttribute('class', 'day-ring-fg');
@@ -2655,7 +2686,7 @@ window.renderDashHybridExtras = function(opts) {
         svg.appendChild(fgc);
       }
       cell.appendChild(dw); cell.appendChild(dn); cell.appendChild(svg);
-      cell.title = d.km.toFixed(1) + ' / ' + targetKm.toFixed(1) + ' km';
+      cell.title = d.val.toFixed(1) + ' / ' + targetKm.toFixed(1) + ' ' + unit;
       if (d.km > 0) {
         cell.style.cursor = 'pointer';
         cell.onclick = function() {
@@ -2705,7 +2736,11 @@ window.renderDashHybridExtras = function(opts) {
       c.appendChild(v); c.appendChild(k);
       chips.appendChild(c);
     }
-    chip(opts.todayKm.toFixed(1), 'km today', 'brand');
+    if (usePoints) {
+      chip(opts.todayVal.toFixed(1), 'points today', 'brand');
+    } else {
+      chip(opts.todayKm.toFixed(1), 'km today', 'brand');
+    }
     var scoreUnit = typeof getEventScoreUnit === 'function' ? getEventScoreUnit() : 'points';
     chip(Math.round(opts.points).toLocaleString('en-IN'), scoreUnit, '');
     chip(opts.streak + (opts.streakLive && opts.streak > 0 ? '\uD83D\uDD25' : ''), 'day streak', 'green');
