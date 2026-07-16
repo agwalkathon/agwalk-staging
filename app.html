@@ -179,7 +179,7 @@
       <img
         src="logo-chevron.png"
         alt="Walkathon"
-        style="width:min(140px,40vw); filter:brightness(0) invert(1);
+        style="width:min(95px,28vw); filter:brightness(0) invert(1);
                animation:splashPulse 1.8s ease-in-out infinite;"
       >
     </div>
@@ -189,6 +189,10 @@
       <div class="splash-dot" style="animation-delay:0.3s"></div>
     </div>
     <div id="splash-text" style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;font-family:var(--font);margin-top:-8px;text-align:center;display:none;"></div>
+  </div>
+  <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.35);font-family:var(--font);letter-spacing:0.5px;">
+    <span>By Arcgatians</span>
+    <span style="color:#ef4444;font-size:14px;display:flex;align-items:center;justify-content:center;">❤️</span>
   </div>
 </div>
 
@@ -405,20 +409,20 @@
     </div>
     <div class="gold-stats" style="padding:0; margin-bottom:0;">
       <div class="gold-stat">
-        <div class="gold-stat-val" id="s-pts-dist" style="color:var(--blue)">—</div>
-        <div class="gold-stat-lbl">Distance</div>
+        <div class="gold-stat-val" id="s-pts-dist" style="color:#ffffff;">—</div>
+        <div class="gold-stat-lbl"><span style="display:inline-block; width:6px; height:6px; background:#60a5fa; border-radius:50%; margin-right:5px; vertical-align:middle;"></span>Distance</div>
       </div>
       <div class="gold-stat">
-        <div class="gold-stat-val" id="s-pts-milestone" style="color:var(--gold)">—</div>
-        <div class="gold-stat-lbl">Milestone Bonus</div>
+        <div class="gold-stat-val" id="s-pts-milestone" style="color:#ffffff;">—</div>
+        <div class="gold-stat-lbl"><span style="display:inline-block; width:6px; height:6px; background:#fbbf24; border-radius:50%; margin-right:5px; vertical-align:middle;"></span>Milestones</div>
       </div>
       <div class="gold-stat">
-        <div class="gold-stat-val" id="s-pts-challenge" style="color:var(--purple)">—</div>
-        <div class="gold-stat-lbl">Challenge Bonus</div>
+        <div class="gold-stat-val" id="s-pts-challenge" style="color:#ffffff;">—</div>
+        <div class="gold-stat-lbl"><span style="display:inline-block; width:6px; height:6px; background:#a78bfa; border-radius:50%; margin-right:5px; vertical-align:middle;"></span>Challenges</div>
       </div>
       <div class="gold-stat">
-        <div class="gold-stat-val" id="s-pts-total" style="color:var(--brand)">—</div>
-        <div class="gold-stat-lbl">Total Points</div>
+        <div class="gold-stat-val" id="s-pts-total" style="color:var(--brand); text-shadow:0 0 12px rgba(232,98,42,0.2);">—</div>
+        <div class="gold-stat-lbl"><span style="display:inline-block; width:6px; height:6px; background:var(--brand); border-radius:50%; margin-right:5px; vertical-align:middle;"></span>Total</div>
       </div>
     </div>
   </div>
@@ -435,24 +439,24 @@
     </div>
     <div id="mystats-grid-container" style="padding:0;">
       <div class="stat-card-item" id="stat-item-activities">
-        <div class="stat-card-icon" style="background:rgba(232,98,42,0.12);">
+        <div class="stat-card-icon" style="background:rgba(232,98,42,0.06); border:1px solid rgba(232,98,42,0.15);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <div class="stat-card-val" id="s-acts">—</div>
+        <div class="stat-card-val" id="s-acts" style="color:var(--brand);">—</div>
         <div class="stat-card-label">Activities</div>
       </div>
       <div class="stat-card-item" id="stat-item-distance">
-        <div class="stat-card-icon" style="background:rgba(34,197,94,0.12);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+        <div class="stat-card-icon" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
         </div>
-        <div class="stat-card-val" id="s-dist">—</div>
+        <div class="stat-card-val" id="s-dist" style="color:#ffffff;">—</div>
         <div class="stat-card-label">km Distance</div>
       </div>
       <div class="stat-card-item" id="stat-item-movingtime">
-        <div class="stat-card-icon" style="background:rgba(96,165,250,0.12);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="stat-card-icon" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
-        <div class="stat-card-val" id="s-movetime-dash">—</div>
+        <div class="stat-card-val" id="s-movetime-dash" style="color:#ffffff;">—</div>
         <div class="stat-card-label">Moving Time</div>
       </div>
     </div>
