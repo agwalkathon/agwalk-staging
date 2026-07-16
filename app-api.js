@@ -1853,23 +1853,19 @@ async function load(isBackgroundRefresh) {
         }).join(' ');
       }
 
-      function getChallengeEmoji(name) {
+      function getChallengeIconClass(name) {
         var n = (name || '').toLowerCase();
-        if (n.indexOf('strava') > -1) return '🧡';
-        if (n.indexOf('walk') > -1) return '🚶';
-        if (n.indexOf('run') > -1) return '🏃';
-        if (n.indexOf('ride') > -1 || n.indexOf('cycle') > -1 || n.indexOf('bike') > -1) return '🚴';
-        if (n.indexOf('hike') > -1 || n.indexOf('climb') > -1) return '🥾';
-        if (n.indexOf('sunchaser') > -1 || n.indexOf('sun') > -1 || n.indexOf('morning') > -1) return '🌅';
-        if (n.indexOf('night') > -1 || n.indexOf('evening') > -1) return '🌙';
-        if (n.indexOf('environment') > -1 || n.indexOf('nature') > -1 || n.indexOf('green') > -1) return '🌱';
-        if (n.indexOf('wednesday') > -1 || n.indexOf('friday') > -1 || n.indexOf('day') > -1) return '📅';
-        if (n.indexOf('weekend') > -1 || n.indexOf('saturday') > -1 || n.indexOf('sunday') > -1) return '🏖️';
-        if (n.indexOf('gold') > -1) return '🥇';
-        if (n.indexOf('silver') > -1) return '🥈';
-        if (n.indexOf('bronze') > -1) return '🥉';
-        if (n.indexOf('title') > -1 || n.indexOf('champion') > -1) return '🏆';
-        return '🎯';
+        if (n.indexOf('strava') > -1) return 'ti ti-brand-strava';
+        if (n.indexOf('walk') > -1) return 'ti ti-walk';
+        if (n.indexOf('run') > -1) return 'ti ti-run';
+        if (n.indexOf('ride') > -1 || n.indexOf('cycle') > -1 || n.indexOf('bike') > -1) return 'ti ti-bike';
+        if (n.indexOf('hike') > -1 || n.indexOf('climb') > -1) return 'ti ti-mountain';
+        if (n.indexOf('sunchaser') > -1 || n.indexOf('sun') > -1 || n.indexOf('morning') > -1) return 'ti ti-sun';
+        if (n.indexOf('night') > -1 || n.indexOf('evening') > -1) return 'ti ti-moon';
+        if (n.indexOf('environment') > -1 || n.indexOf('nature') > -1 || n.indexOf('green') > -1) return 'ti ti-leaf';
+        if (n.indexOf('wednesday') > -1 || n.indexOf('friday') > -1 || n.indexOf('day') > -1) return 'ti ti-calendar';
+        if (n.indexOf('weekend') > -1 || n.indexOf('saturday') > -1 || n.indexOf('sunday') > -1) return 'ti ti-beach';
+        return 'ti ti-target';
       }
 
       function renderDashboardChallenges(items){
@@ -1885,10 +1881,11 @@ async function load(isBackgroundRefresh) {
         items.forEach(function(ch){
           var pillColor = ch.earned ? 'var(--green)' : ch.missed ? 'rgba(255,255,255,0.15)' : 'var(--brand)';
           var statusLabel = ch.earned ? 'EARNED' : ch.missed ? 'MISSED' : 'ACTIVE';
+          var iconCls = getChallengeIconClass(ch.name);
           html += '<div class="today-act-row" onclick="openChallengesDrawer();" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.2s; cursor:pointer;" onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseleave="this.style.background=\'rgba(255,255,255,0.03)\'">' +
                     '<div style="display:flex; align-items:center; gap:14px; min-width:0;">' +
-                      '<div style="background:' + pillColor + '; display:flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:8px; min-width:44px; height:30px; box-sizing:border-box; color:#fff; font-weight:700; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">' +
-                        ch.emoji +
+                      '<div style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; border-radius:20px; width:34px; height:34px; box-sizing:border-box; color:#fff; flex-shrink:0;">' +
+                        '<i class="' + iconCls + '" style="font-size:16px; color:#fff;"></i>' +
                       '</div>' +
                       '<div style="font-size:13px; font-weight:700; color:#fff; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;">' + esc(ch.name) + '</div>' +
                     '</div>' +
@@ -1918,24 +1915,28 @@ async function load(isBackgroundRefresh) {
         var missed=!earned&&ch.end_date&&ch.end_date<today2;
         var statusCls=earned?'won':missed?'missed':'avail';
         var statusIcon=earned?'\u2713':missed?'\u2715':'!';
-        dashItems.push({name:toTitleCase(ch.name), emoji:getChallengeEmoji(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
+        dashItems.push({name:toTitleCase(ch.name), earned:earned, missed:missed, pts: Math.round(earned?displayPts:ch.bonus_points)});
         
         var cardDiv=document.createElement('div');
         cardDiv.className='ch-card ' + statusCls;
         
-        var displayName = getChallengeEmoji(ch.name) + ' ' + toTitleCase(ch.name);
+        var displayName = toTitleCase(ch.name);
+        var iconCls = getChallengeIconClass(ch.name);
         var statusBarHtml = earned
           ? '<span>&#10003; Achieved</span><span>+' + Math.round(displayPts) + ' pts earned</span>'
           : missed
             ? '<span>&#10007; Not completed</span><span>Deadline passed</span>'
             : '<span>! Available</span><span>+' + Math.round(ch.bonus_points) + ' pts possible</span>';
         cardDiv.innerHTML = `
-          <div class="ch-card-header">
-            <div class="ch-dot ${statusCls}">${statusIcon}</div>
+          <div class="ch-card-header" style="display:flex; align-items:center; gap:14px;">
+            <div style="background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; border-radius:20px; width:34px; height:34px; box-sizing:border-box; color:#fff; flex-shrink:0;">
+              <i class="${iconCls}" style="font-size:16px; color:#fff;"></i>
+            </div>
             <div class="ch-card-title-wrap">
               <div class="ch-title">${esc(displayName)}</div>
               <div class="ch-sub">${ch.start_date === ch.end_date ? ch.start_date : ch.start_date + ' \u2013 ' + ch.end_date} &middot; <span class="ch-pts ${statusCls}">+${Math.round(earned ? displayPts : ch.bonus_points)} pts</span></div>
             </div>
+            <div class="ch-dot ${statusCls}">${statusIcon}</div>
           </div>
           <div class="ch-status-bar ${statusCls}">${statusBarHtml}</div>
         `;
@@ -3079,11 +3080,20 @@ window.loadGoogleFont = function(fontName) {
 window.toggleCertMenu = function(e) { togglePastCertMenu(e, 1); };
 window.downloadCertAction = function(type, eventName) { downloadPastCertAction(type, 1); };
 
-window.renderMedalInsights = function() {
+window.renderMedalInsights = async function() {
   var contentEl = document.getElementById('medal-insights-content');
   if (!contentEl) return;
 
   var myActs = window._myActsGlobal || [];
+  if (myActs.length === 0 && currentSession && currentSession.athleteId) {
+    try {
+      myActs = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + currentSession.athleteId + '&is_deleted=eq.false&order=activity_date.desc', { headers: HDR }).then(r => r.json());
+      window._myActsGlobal = myActs;
+    } catch(e) {
+      console.error('Medal acts fetch fallback error:', e);
+    }
+  }
+
   var validActs = myActs.filter(function(a) { return !a.is_flagged; });
 
   var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
@@ -3098,7 +3108,7 @@ window.renderMedalInsights = function() {
   var dayKm = {};
   validActs.forEach(function(a) {
     var km = (a.distance_meters || 0) / 1000;
-    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
     if (d) dayKm[d] = (dayKm[d] || 0) + km;
   });
   
@@ -3114,7 +3124,7 @@ window.renderMedalInsights = function() {
   // Calculate active streak
   var activeDays = {};
   validActs.forEach(function(a) {
-    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
     if (d) activeDays[d] = true;
   });
   var sortedActive = Object.keys(activeDays).sort();
@@ -3129,10 +3139,10 @@ window.renderMedalInsights = function() {
   });
 
   // Days left calculation
-  var daysRemaining = 1;
+  var daysRemaining = 0;
   if (EVENT_ROW && EVENT_ROW.end_date) {
     var diff = new Date(EVENT_ROW.end_date) - new Date();
-    daysRemaining = Math.max(1, Math.ceil(diff / 86400000));
+    daysRemaining = Math.max(0, Math.ceil(diff / 86400000));
   }
 
   // Calculate 7-day average pace
@@ -3173,11 +3183,21 @@ window.renderMedalInsights = function() {
   // Needed daily paces
   var remainingSilver = Math.max(0, (silverLimit / 1000) - currentKm);
   var remainingGold = Math.max(0, (goldLimit / 1000) - currentKm);
-  var neededPaceSilver = remainingSilver / daysRemaining;
-  var neededPaceGold = remainingGold / daysRemaining;
+  var neededPaceSilver = daysRemaining > 0 ? (remainingSilver / daysRemaining) : 0;
+  var neededPaceGold = daysRemaining > 0 ? (remainingGold / daysRemaining) : 0;
 
   var paceColorSilver = neededPaceSilver <= assumedPace ? '#22c55e' : '#f97316';
   var paceColorGold = neededPaceGold <= assumedPace ? '#22c55e' : '#f97316';
+
+  var neededPaceSilverStr = 'Achieved! ✔';
+  if (remainingSilver > 0) {
+    neededPaceSilverStr = daysRemaining > 0 ? neededPaceSilver.toFixed(2) + ' km/day' : 'Ended ❌';
+  }
+  
+  var neededPaceGoldStr = 'Achieved! ✔';
+  if (remainingGold > 0) {
+    neededPaceGoldStr = daysRemaining > 0 ? neededPaceGold.toFixed(2) + ' km/day' : 'Ended ❌';
+  }
 
   // Last 10 days chart
   var chartDays = [];
@@ -3239,7 +3259,7 @@ window.renderMedalInsights = function() {
          '      </div>' +
          '    </div>' +
          '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + (neededPaceSilver > 0 ? neededPaceSilver.toFixed(2) + ' km/day' : 'Achieved! ✔') + '</div>' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + neededPaceSilverStr + '</div>' +
          '    </div>' +
          '  </div>' +
          '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
@@ -3251,7 +3271,7 @@ window.renderMedalInsights = function() {
          '      </div>' +
          '    </div>' +
          '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + (neededPaceGold > 0 ? neededPaceGold.toFixed(2) + ' km/day' : 'Achieved! ✔') + '</div>' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + neededPaceGoldStr + '</div>' +
          '    </div>' +
          '  </div>' +
          '</div>';
@@ -3277,17 +3297,26 @@ window.renderMedalInsights = function() {
   contentEl.innerHTML = html;
 };
 
-window.renderStreakDrawerDetails = function() {
+window.renderStreakDrawerDetails = async function() {
   var contentEl = document.getElementById('streak-drawer-content');
   if (!contentEl) return;
 
   var myActs = window._myActsGlobal || [];
+  if (myActs.length === 0 && currentSession && currentSession.athleteId) {
+    try {
+      myActs = await fetch(SUPABASE_URL + '/rest/v1/activities?strava_athlete_id=eq.' + currentSession.athleteId + '&is_deleted=eq.false&order=activity_date.desc', { headers: HDR }).then(r => r.json());
+      window._myActsGlobal = myActs;
+    } catch(e) {
+      console.error('Streak acts fetch fallback error:', e);
+    }
+  }
+
   var validActs = myActs.filter(function(a) { return !a.is_flagged; });
 
-  // Calculate active days
+  // Calculate active days using getActDate
   var activeDays = {};
   validActs.forEach(function(a) {
-    var d = a.activity_date ? a.activity_date.split('T')[0] : null;
+    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date_time_ist ? a.activity_date_time_ist.split(/[T ]/)[0] : (a.activity_date ? a.activity_date.split('T')[0] : null));
     if (d) activeDays[d] = true;
   });
   var sortedActive = Object.keys(activeDays).sort();
@@ -3295,8 +3324,12 @@ window.renderStreakDrawerDetails = function() {
   // Calculate current streak
   var curStreak = 0;
   var streakStartStr = '—';
-  var todayLocal = new Date().toISOString().split('T')[0];
-  var yesterdayLocal = new Date(new Date().getTime() - 86400000).toISOString().split('T')[0];
+  
+  var todayLocal = new Date().toLocaleDateString('sv-SE');
+  var yesterdayObj = new Date();
+  yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+  var yesterdayLocal = yesterdayObj.toLocaleDateString('sv-SE');
+  
   var lastActive = sortedActive[sortedActive.length - 1];
 
   var streakIsLive = false;
@@ -3494,9 +3527,10 @@ window.renderParticipantProfile = async function(athleteId) {
     // 1. Profile Avatar & Name Header
     var photoUrl = reg.profile_photo || '';
     var initials = (reg.full_name || 'P').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    var avatarBg = typeof getUniqueAvatarGradient === 'function' ? getUniqueAvatarGradient(reg.full_name) : 'linear-gradient(135deg, #f97316, #ea580c)';
     var avatarHtml = photoUrl 
       ? '<img src="' + photoUrl + '" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2.5px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">'
-      : '<div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; border: 2.5px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + initials + '</div>';
+      : '<div style="width: 72px; height: 72px; border-radius: 50%; background: ' + avatarBg + '; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; border: 2.5px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + initials + '</div>';
 
     var html = '';
     html += '<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 8px;">' +
