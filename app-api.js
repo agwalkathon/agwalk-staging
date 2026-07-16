@@ -18,9 +18,9 @@ async function fetchAll(url) {
 function resolveEventMilestones(eventRow, gender) {
   var gKey = (gender || '').toLowerCase() === 'female' ? 'female' : 'male';
   var defaults = {
-    bronze: { label: 'Bronze', thresh: (eventRow && eventRow.type === 'cycling') ? 250 : 125 },
-    silver: { label: 'Silver', thresh: (eventRow && eventRow.type === 'cycling') ? 500 : 200 },
-    gold: { label: 'Gold', thresh: (eventRow && eventRow.type === 'cycling') ? 750 : 300 }
+    bronze: { label: 'Bronze', thresh: (eventRow && eventRow.type === 'cycling') ? 250 : 125, metric: 'distance' },
+    silver: { label: 'Silver', thresh: (eventRow && eventRow.type === 'cycling') ? 500 : 200, metric: 'distance' },
+    gold: { label: 'Gold', thresh: (eventRow && eventRow.type === 'cycling') ? 750 : 300, metric: 'distance' }
   };
   
   if (eventRow && eventRow.rules_config && eventRow.rules_config.dashboard && Array.isArray(eventRow.rules_config.dashboard.rings)) {
@@ -31,18 +31,115 @@ function resolveEventMilestones(eventRow, gender) {
     
     if (bronzeRing) {
       var val = (gKey === 'female') ? (bronzeRing.goal_female !== undefined ? bronzeRing.goal_female : bronzeRing.goal) : (bronzeRing.goal_male !== undefined ? bronzeRing.goal_male : bronzeRing.goal);
-      defaults.bronze = { label: bronzeRing.label || 'Bronze', thresh: parseFloat(val) || defaults.bronze.thresh };
+      defaults.bronze = { label: bronzeRing.label || 'Bronze', thresh: parseFloat(val) || defaults.bronze.thresh, metric: bronzeRing.metric || 'distance' };
     }
     if (silverRing) {
       var val = (gKey === 'female') ? (silverRing.goal_female !== undefined ? silverRing.goal_female : silverRing.goal) : (silverRing.goal_male !== undefined ? silverRing.goal_male : silverRing.goal);
-      defaults.silver = { label: silverRing.label || 'Silver', thresh: parseFloat(val) || defaults.silver.thresh };
+      defaults.silver = { label: silverRing.label || 'Silver', thresh: parseFloat(val) || defaults.silver.thresh, metric: silverRing.metric || 'distance' };
     }
     if (goldRing) {
       var val = (gKey === 'female') ? (goldRing.goal_female !== undefined ? goldRing.goal_female : goldRing.goal) : (goldRing.goal_male !== undefined ? goldRing.goal_male : goldRing.goal);
-      defaults.gold = { label: goldRing.label || 'Gold', thresh: parseFloat(val) || defaults.gold.thresh };
+      defaults.gold = { label: goldRing.label || 'Gold', thresh: parseFloat(val) || defaults.gold.thresh, metric: goldRing.metric || 'distance' };
     }
   }
   return defaults;
+}
+
+function calculateMedalPrediction(validActs, gender, shift) {
+  var activeMilestones = resolveEventMilestones(EVENT_ROW, gender);
+  var bronzeLimit = activeMilestones.bronze.thresh;
+  var silverLimit = activeMilestones.silver.thresh;
+  var goldLimit = activeMilestones.gold.thresh;
+  var usePoints = (activeMilestones.bronze.metric === 'points');
+  var unit = usePoints ? 'pts' : 'km';
+
+  var currentVal = 0;
+  if (usePoints) {
+    var fullP = calcFullPts(validActs, gender, shift);
+    currentVal = fullP.total;
+  } else {
+    var totalDistM = validActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
+    currentVal = totalDistM / 1000;
+  }
+
+  // Days remaining
+  var daysRemaining = 0;
+  if (EVENT_ROW && EVENT_ROW.end_date) {
+    var diff = new Date(EVENT_ROW.end_date) - new Date();
+    daysRemaining = Math.max(0, Math.ceil(diff / 86400000));
+  }
+
+  // Assumed daily pace/score
+  var assumedPace = 1.0;
+  if (usePoints) {
+    var eventStart = new Date(EVENT_ROW.start_date || new Date());
+    var daysElapsed = Math.max(1, Math.ceil((new Date() - eventStart) / 86400000));
+    assumedPace = currentVal / daysElapsed;
+  } else {
+    var sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0,0,0,0);
+    var last7DaysActs = validActs.filter(function(a) {
+      return new Date(a.activity_date) >= sevenDaysAgo;
+    });
+    var last7DaysDistKM = last7DaysActs.reduce(function(s,a){return s + (a.distance_meters || 0);}, 0) / 1000;
+    var avg7DayPace = last7DaysDistKM / 7;
+
+    var dayKm = {};
+    validActs.forEach(function(a) {
+      var km = (a.distance_meters || 0) / 1000;
+      var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
+      if (d) dayKm[d] = (dayKm[d] || 0) + km;
+    });
+    var activeDaysCount = Object.keys(dayKm).length || 1;
+    var avgActivePace = currentVal / activeDaysCount;
+    assumedPace = Math.max(avg7DayPace, avgActivePace);
+  }
+  if (assumedPace < 0.5) assumedPace = 1.0;
+
+  var projectedVal = currentVal + (assumedPace * daysRemaining);
+
+  // Projections
+  var projectedMedal = 'None';
+  var projectedEmoji = '⚪';
+  var projectedColor = '#9ca3af';
+  if (projectedVal >= goldLimit) {
+    projectedMedal = 'GOLD';
+    projectedEmoji = '🥇';
+    projectedColor = '#f59e0b';
+  } else if (projectedVal >= silverLimit) {
+    projectedMedal = 'SILVER';
+    projectedEmoji = '🥈';
+    projectedColor = '#9ca3af';
+  } else if (projectedVal >= bronzeLimit) {
+    projectedMedal = 'BRONZE';
+    projectedEmoji = '🥉';
+    projectedColor = '#c57f35';
+  }
+
+  // Targets
+  var remainingSilver = Math.max(0, silverLimit - currentVal);
+  var remainingGold = Math.max(0, goldLimit - currentVal);
+  var neededPaceSilver = daysRemaining > 0 ? (remainingSilver / daysRemaining) : 0;
+  var neededPaceGold = daysRemaining > 0 ? (remainingGold / daysRemaining) : 0;
+
+  return {
+    currentVal: currentVal,
+    projectedVal: projectedVal,
+    projectedMedal: projectedMedal,
+    projectedEmoji: projectedEmoji,
+    projectedColor: projectedColor,
+    remainingSilver: remainingSilver,
+    remainingGold: remainingGold,
+    neededPaceSilver: neededPaceSilver,
+    neededPaceGold: neededPaceGold,
+    daysRemaining: daysRemaining,
+    assumedPace: assumedPace,
+    unit: unit,
+    bronzeLimit: bronzeLimit,
+    silverLimit: silverLimit,
+    goldLimit: goldLimit
+  };
 }
 
 async function fetchAllParallel(url) {
@@ -3097,14 +3194,10 @@ window.renderMedalInsights = async function() {
   }
 
   var validActs = myActs.filter(function(a) { return !a.is_flagged; });
+  var gender = currentSession ? currentSession.gender : 'male';
+  var shift = currentSession ? currentSession.shift : 'day';
 
-  var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
-  var bronzeLimit = rules.bronze_medal_distance_meters || 100000;
-  var silverLimit = rules.silver_medal_distance_meters || 200000;
-  var goldLimit = rules.gold_medal_distance_meters || 300000;
-
-  var totalDistM = validActs.reduce(function(s, a) { return s + (a.distance_meters || 0); }, 0);
-  var currentKm = totalDistM / 1000;
+  var pred = calculateMedalPrediction(validActs, gender, shift);
 
   // Find max single day distance
   var dayKm = {};
@@ -3140,66 +3233,95 @@ window.renderMedalInsights = async function() {
     prevD = d;
   });
 
-  // Days left calculation
-  var daysRemaining = 0;
-  if (EVENT_ROW && EVENT_ROW.end_date) {
-    var diff = new Date(EVENT_ROW.end_date) - new Date();
-    daysRemaining = Math.max(0, Math.ceil(diff / 86400000));
-  }
-
-  // Calculate 7-day average pace
-  var sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  sevenDaysAgo.setHours(0,0,0,0);
-  var last7DaysActs = validActs.filter(function(a) {
-    return new Date(a.activity_date) >= sevenDaysAgo;
-  });
-  var last7DaysDistKM = last7DaysActs.reduce(function(s,a){return s + (a.distance_meters || 0);}, 0) / 1000;
-  var avg7DayPace = last7DaysDistKM / 7;
-
-  var activeDaysCount = Object.keys(dayKm).length || 1;
-  var avgActivePace = currentKm / activeDaysCount;
-  var assumedPace = Math.max(avg7DayPace, avgActivePace);
-  if (assumedPace < 0.5) assumedPace = 1.0;
-
-  var projectedDistance = currentKm + (assumedPace * daysRemaining);
-
-  // Projections
-  var projectedMedal = 'None';
-  var projectedEmoji = '⚪';
-  var projectedColor = '#9ca3af';
-  if (projectedDistance >= (goldLimit / 1000)) {
-    projectedMedal = 'GOLD';
-    projectedEmoji = '🥇';
-    projectedColor = '#f59e0b';
-  } else if (projectedDistance >= (silverLimit / 1000)) {
-    projectedMedal = 'SILVER';
-    projectedEmoji = '🥈';
-    projectedColor = '#9ca3af';
-  } else if (projectedDistance >= (bronzeLimit / 1000)) {
-    projectedMedal = 'BRONZE';
-    projectedEmoji = '🥉';
-    projectedColor = '#c57f35';
-  }
-
-  // Needed daily paces
-  var remainingSilver = Math.max(0, (silverLimit / 1000) - currentKm);
-  var remainingGold = Math.max(0, (goldLimit / 1000) - currentKm);
-  var neededPaceSilver = daysRemaining > 0 ? (remainingSilver / daysRemaining) : 0;
-  var neededPaceGold = daysRemaining > 0 ? (remainingGold / daysRemaining) : 0;
-
-  var paceColorSilver = neededPaceSilver <= assumedPace ? '#22c55e' : '#f97316';
-  var paceColorGold = neededPaceGold <= assumedPace ? '#22c55e' : '#f97316';
-
   var neededPaceSilverStr = 'Achieved! ✔';
-  if (remainingSilver > 0) {
-    neededPaceSilverStr = daysRemaining > 0 ? neededPaceSilver.toFixed(2) + ' km/day' : 'Ended ❌';
+  if (pred.remainingSilver > 0) {
+    neededPaceSilverStr = pred.daysRemaining > 0 ? pred.neededPaceSilver.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
   }
   
   var neededPaceGoldStr = 'Achieved! ✔';
-  if (remainingGold > 0) {
-    neededPaceGoldStr = daysRemaining > 0 ? neededPaceGold.toFixed(2) + ' km/day' : 'Ended ❌';
+  if (pred.remainingGold > 0) {
+    neededPaceGoldStr = pred.daysRemaining > 0 ? pred.neededPaceGold.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
   }
+
+  var paceColorSilver = pred.neededPaceSilver <= pred.assumedPace ? '#22c55e' : '#f97316';
+  var paceColorGold = pred.neededPaceGold <= pred.assumedPace ? '#22c55e' : '#f97316';
+
+  // Last 10 days chart
+  var chartDays = [];
+  for (var i = 9; i >= 0; i--) {
+    var dObj = new Date();
+    dObj.setDate(dObj.getDate() - i);
+    var dStr = dObj.toISOString().split('T')[0];
+    chartDays.push({
+      dateStr: dStr,
+      label: dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+      km: dayKm[dStr] || 0
+    });
+  }
+
+  var maxVal = Math.max.apply(null, chartDays.map(function(d){return d.km;})) || 5;
+  
+  var svgHtml = '<svg viewBox="0 0 340 160" style="width: 100%; height: auto; font-family: var(--font);">';
+  svgHtml += '<line x1="30" y1="20" x2="330" y2="20" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
+  svgHtml += '<line x1="30" y1="70" x2="330" y2="70" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
+  svgHtml += '<line x1="30" y1="120" x2="330" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>';
+  svgHtml += '<text x="22" y="24" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + maxVal.toFixed(1) + '</text>';
+  svgHtml += '<text x="22" y="74" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + (maxVal/2).toFixed(1) + '</text>';
+  svgHtml += '<text x="22" y="124" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">0</text>';
+  
+  chartDays.forEach(function(day, index) {
+    var x = 36 + (index * 29);
+    var barHeight = Math.round(day.km * (100 / maxVal));
+    var y = 120 - barHeight;
+    svgHtml += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="16" height="' + Math.max(2, barHeight) + '" rx="4" fill="' + (day.km > 0 ? 'url(#bar-grad)' : 'rgba(255,255,255,0.05)') + '" style="transition: all 0.3s ease; cursor: pointer;" title="' + day.label + ': ' + day.km.toFixed(1) + ' km"/>';
+    if (index % 2 === 0) {
+      svgHtml += '<text x="' + (x + 8) + '" y="' + 138 + '" fill="rgba(255,255,255,0.4)" font-size="8.5" text-anchor="middle">' + day.label + '</text>';
+    }
+  });
+  svgHtml += '<defs><linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--brand)"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>';
+  svgHtml += '</svg>';
+
+  var html = '';
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
+         '  <div style="font-size: 26px; font-weight: 800; color: ' + pred.projectedColor + '; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
+              pred.projectedEmoji + ' ' + pred.projectedMedal +
+         '  </div>' +
+         '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
+         '    Projected Event Score: <strong style="color: #fff;">' + pred.projectedVal.toFixed(1) + ' ' + pred.unit + '</strong>' +
+         '  </div>' +
+         '  <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic;">' +
+         '    Based on your average of ' + pred.assumedPace.toFixed(1) + ' ' + pred.unit + '/day over ' + pred.daysRemaining + ' remaining days.' +
+         '  </div>' +
+         '</div>';
+
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">Daily Target (' + pred.daysRemaining + ' Days Left)</div>' +
+         '  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04);">' +
+         '    <div style="display: flex; align-items: center; gap: 8px;">' +
+         '      <span style="font-size: 16px;">🥈</span>' +
+         '      <div style="text-align: left;">' +
+         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">SILVER MEDAL (' + pred.silverLimit + ' ' + pred.unit + ')</div>' +
+         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingSilver.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
+         '      </div>' +
+         '    </div>' +
+         '    <div style="text-align: right;">' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + neededPaceSilverStr + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
+         '    <div style="display: flex; align-items: center; gap: 8px;">' +
+         '      <span style="font-size: 16px;">🥇</span>' +
+         '      <div style="text-align: left;">' +
+         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">GOLD MEDAL (' + pred.goldLimit + ' ' + pred.unit + ')</div>' +
+         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingGold.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
+         '      </div>' +
+         '    </div>' +
+         '    <div style="text-align: right;">' +
+         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + neededPaceGoldStr + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         '</div>';
 
   // Last 10 days chart
   var chartDays = [];
@@ -3542,84 +3664,31 @@ window.renderParticipantProfile = async function(athleteId) {
            '</div>';
 
     // 2. Medal Prediction Section
-    var rules = (EVENT_ROW && EVENT_ROW.rules_config) ? EVENT_ROW.rules_config : {};
-    var bronzeLimit = rules.bronze_medal_distance_meters || 100000;
-    var silverLimit = rules.silver_medal_distance_meters || 200000;
-    var goldLimit = rules.gold_medal_distance_meters || 300000;
+    var pred = calculateMedalPrediction(validActs, reg.gender, reg.shift || 'day');
 
-    var daysRemaining = 1;
-    if (EVENT_ROW && EVENT_ROW.end_date) {
-      var diff = new Date(EVENT_ROW.end_date) - new Date();
-      daysRemaining = Math.max(1, Math.ceil(diff / 86400000));
-    }
-
-    var sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    sevenDaysAgo.setHours(0,0,0,0);
-    var last7DaysActs = validActs.filter(function(a) {
-      return new Date(a.activity_date) >= sevenDaysAgo;
-    });
-    var last7DaysDistKM = last7DaysActs.reduce(function(s,a){return s + (a.distance_meters || 0);}, 0) / 1000;
-    var avg7DayPace = last7DaysDistKM / 7;
-
-    var dayKm = {};
-    validActs.forEach(function(a) {
-      var km = (a.distance_meters || 0) / 1000;
-      var d = a.activity_date ? a.activity_date.split('T')[0] : null;
-      if (d) dayKm[d] = (dayKm[d] || 0) + km;
-    });
-    var activeDaysCount = Object.keys(dayKm).length || 1;
-    var avgActivePace = currentKm / activeDaysCount;
-    var assumedPace = Math.max(avg7DayPace, avgActivePace);
-    if (assumedPace < 0.5) assumedPace = 1.0;
-
-    var projectedDistance = currentKm + (assumedPace * daysRemaining);
-
-    var projectedMedal = 'None';
-    var projectedEmoji = '⚪';
-    var projectedColor = '#9ca3af';
-    if (projectedDistance >= (goldLimit / 1000)) {
-      projectedMedal = 'GOLD';
-      projectedEmoji = '🥇';
-      projectedColor = '#f59e0b';
-    } else if (projectedDistance >= (silverLimit / 1000)) {
-      projectedMedal = 'SILVER';
-      projectedEmoji = '🥈';
-      projectedColor = '#9ca3af';
-    } else if (projectedDistance >= (bronzeLimit / 1000)) {
-      projectedMedal = 'BRONZE';
-      projectedEmoji = '🥉';
-      projectedColor = '#c57f35';
-    }
-
-    var remainingSilver = Math.max(0, (silverLimit / 1000) - currentKm);
-    var remainingGold = Math.max(0, (goldLimit / 1000) - currentKm);
-    var neededPaceSilver = remainingSilver / daysRemaining;
-    var neededPaceGold = remainingGold / daysRemaining;
-
-    var paceColorSilver = neededPaceSilver <= assumedPace ? '#22c55e' : '#f97316';
-    var paceColorGold = neededPaceGold <= assumedPace ? '#22c55e' : '#f97316';
+    var paceColorSilver = pred.neededPaceSilver <= pred.assumedPace ? '#22c55e' : '#f97316';
+    var paceColorGold = pred.neededPaceGold <= pred.assumedPace ? '#22c55e' : '#f97316';
 
     html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">' +
            '  <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">MEDAL PREDICTION</div>' +
            '  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);">' +
            '    <div>' +
            '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600;">PROJECTED FINISH</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: ' + projectedColor + '; margin-top: 2px;">' + projectedEmoji + ' ' + projectedMedal + '</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: ' + pred.projectedColor + '; margin-top: 2px;">' + pred.projectedEmoji + ' ' + pred.projectedMedal + '</div>' +
            '    </div>' +
            '    <div style="text-align: right;">' +
-           '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600;">PROJECTED DISTANCE</div>' +
-           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;">' + projectedDistance.toFixed(1) + ' km</div>' +
+           '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600;">PROJECTED SCORE</div>' +
+           '      <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;">' + pred.projectedVal.toFixed(1) + ' ' + pred.unit + '</div>' +
            '    </div>' +
            '  </div>' +
            '  <div style="display: flex; flex-direction: column; gap: 8px;">' +
            '    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">' +
-           '      <span style="color: rgba(255,255,255,0.6);">Needed for Silver (200k):</span>' +
-           '      <span style="font-weight: 700; color: ' + paceColorSilver + ';">' + (neededPaceSilver > 0 ? neededPaceSilver.toFixed(1) + ' km/day' : 'Lock ✔') + '</span>' +
+           '      <span style="color: rgba(255,255,255,0.6);">Needed for Silver (' + pred.silverLimit + ' ' + pred.unit + '):</span>' +
+           '      <span style="font-weight: 700; color: ' + paceColorSilver + ';">' + (pred.remainingSilver > 0 ? (pred.daysRemaining > 0 ? pred.neededPaceSilver.toFixed(1) + ' ' + pred.unit + '/day' : 'Ended ❌') : 'Lock ✔') + '</span>' +
            '    </div>' +
            '    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">' +
-           '      <span style="color: rgba(255,255,255,0.6);">Needed for Gold (300k):</span>' +
-           '      <span style="font-weight: 700; color: ' + paceColorGold + ';">' + (neededPaceGold > 0 ? neededPaceGold.toFixed(1) + ' km/day' : 'Lock ✔') + '</span>' +
+           '      <span style="color: rgba(255,255,255,0.6);">Needed for Gold (' + pred.goldLimit + ' ' + pred.unit + '):</span>' +
+           '      <span style="font-weight: 700; color: ' + paceColorGold + ';">' + (pred.remainingGold > 0 ? (pred.daysRemaining > 0 ? pred.neededPaceGold.toFixed(1) + ' ' + pred.unit + '/day' : 'Ended ❌') : 'Lock ✔') + '</span>' +
            '    </div>' +
            '  </div>' +
            '</div>';
