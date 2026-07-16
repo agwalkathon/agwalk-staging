@@ -751,7 +751,7 @@ async function load(isBackgroundRefresh) {
       },500);
 
       var fullP=calcFullPts(validA,reg.gender,reg.shift);
-      var myPtsNow=fullP.total;
+      var myPtsNow=typeof fullP.km === 'number' ? fullP.km : fullP.total;
       var daysElapsed=Math.max(1,(nowD-EVENT_START)/86400000);
       var daysLeft=Math.max(0,Math.ceil((EVENT_END-nowD)/86400000));
       var avgPtDay=myPtsNow/daysElapsed;
@@ -1227,13 +1227,15 @@ async function load(isBackgroundRefresh) {
     var myPts = fullPts.total;
     var sptEl = document.getElementById('s-pts-display');if(sptEl)sptEl.textContent=myPts.toFixed(2);
 
+    var myMedalPts = typeof fullPts.km === 'number' ? fullPts.km : myPts;
+
     // Medal Progress Rings
     var CIRC=270.2;
     _ringAnimationData = [];
     [{id:'br',thresh:bronzeThresh,lbl:bronzeLabel},{id:'si',thresh:silverThresh,lbl:silverLabel},{id:'go',thresh:goldThresh,lbl:goldLabel}].forEach(function(m){
-      var done=myPts>=m.thresh;
-      var rawPct=(myPts/m.thresh)*100;
-      var needed=Math.max(0,m.thresh-myPts);
+      var done=myMedalPts>=m.thresh;
+      var rawPct=(myMedalPts/m.thresh)*100;
+      var needed=Math.max(0,m.thresh-myMedalPts);
       var displayPct=done?100:Math.min(99,Math.floor(rawPct));
       var arcPct=done?100:Math.min(96,rawPct);
       var offset=CIRC-(CIRC*arcPct/100);
@@ -1262,14 +1264,14 @@ async function load(isBackgroundRefresh) {
     triggerRingAnimation();
     try {
       if (typeof window.renderHeroArc === 'function') {
-        window.renderHeroArc(myPts, [
+        window.renderHeroArc(myMedalPts, [
           { lbl: bronzeLabel, thresh: bronzeThresh, color: '#F4A84A' },
           { lbl: silverLabel, thresh: silverThresh, color: '#C8D8E8' },
           { lbl: goldLabel, thresh: goldThresh, color: '#FFD000' }
         ], EVENT_ROW);
       }
       if (typeof window.renderMedalShelf === 'function') {
-        window.renderMedalShelf(myPts, [
+        window.renderMedalShelf(myMedalPts, [
           { lbl: bronzeLabel, thresh: bronzeThresh, ic: '🥉', color: '#F4A84A' },
           { lbl: silverLabel, thresh: silverThresh, ic: '🥈', color: '#C8D8E8' },
           { lbl: goldLabel, thresh: goldThresh, ic: '🥇', color: '#FFD000' }
@@ -3342,7 +3344,7 @@ window.renderStreakDrawerDetails = async function() {
     curStreak = 1;
     while (true) {
       var prev = new Date(current.getTime() - 86400000);
-      var prevStr = prev.toISOString().split('T')[0];
+      var prevStr = prev.toLocaleDateString('sv-SE');
       if (sortedActive.indexOf(prevStr) !== -1) {
         current = prev;
         curStreak++;
@@ -3403,7 +3405,7 @@ window.renderStreakDrawerDetails = async function() {
   var weekDaysLabels = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   for (var i = 0; i < 7; i++) {
     var d = new Date(monday.getTime() + (i * 86400000));
-    var dStr = d.toISOString().split('T')[0];
+    var dStr = d.toLocaleDateString('sv-SE');
     var isActive = sortedActive.indexOf(dStr) !== -1;
     weekDays.push({
       label: weekDaysLabels[i],
