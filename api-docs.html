@@ -995,6 +995,39 @@ WHERE strava_activity_id = 19055574519;</code></pre>
 
           <h3>July 2026</h3>
           <ul>
+            <li><strong>Splash Screen Reductions & Branding (July 16, 2026)</strong>:
+              <br>• Reduced Walkathon chevron logo size for a cleaner native feel, and added "By Arcgatians ❤️" brand footer at the bottom of the splash screens in both <code>app.html</code> and <code>index.html</code>.
+            </li>
+            <li><strong>Arc Medal Prediction Fixes (July 16, 2026)</strong>:
+              <br>• Corrected calculation logic inside <code>renderMedalInsights</code> so that ended events show <code>0</code> days remaining, preventing infinite/NaN pace targets, and properly displaying "Ended ❌" status if not achieved.
+            </li>
+            <li><strong>Activity Streak Details Fallback (July 16, 2026)</strong>:
+              <br>• Implemented direct database fetch fallback inside <code>renderStreakDrawerDetails</code> to dynamically load activities if global cache is empty, alongside timezone-aligned streak check logic.
+            </li>
+            <li><strong>Flat Challenge Badges & Icons (July 16, 2026)</strong>:
+              <br>• Replaced dynamic emoji challenge tags with modern, flat grey background pills (<code>rgba(255,255,255,0.06)</code>) and crisp white Tabler icons mapping sport types (walk, run, cycle, etc.) on the Dashboard and Challenges tabs.
+            </li>
+            <li><strong>Unique Avatar Gradients (July 16, 2026)</strong>:
+              <br>• Replaced hardcoded static orange gradients on initials-only avatars with unique, hash-generated gradient colors so that every participant profile is visually distinct.
+            </li>
+            <li><strong>Color-Reduced Dashboard Cards (July 16, 2026)</strong>:
+              <br>• Redesigned the "My Points" and "My Stats" dashboard cards, styling values in clean white with tiny colored indicator dots to limit the interface to a maximum of 3-4 primary colors.
+            </li>
+            <li><strong>Dynamic Activity Metrics (Pace vs. Speed) (July 15, 2026)</strong>:
+              <br>• Added smart activity classification to calculate and display speed in <code>km/h</code> for cycling/rides, and pace in minutes per kilometer (<code>/km</code>) for walking/running.
+              <br>• Dynamically adjusts the metrics headers and averages depending on the participant's primary sport type.
+            </li>
+            <li><strong>Premium Time-Period Filtering (July 15, 2026)</strong>:
+              <br>• Introduced sub-tab filters (Week, Month, 3 Months, Yearly) to the participant profile details.
+              <br>• Re-calculates and renders historical stats, dynamic SVG bar graphs (with custom group boundaries), and activity listings in real time across the selected duration.
+            </li>
+            <li><strong>Native Swipe-to-Go-Back Gesture (July 15, 2026)</strong>:
+              <br>• Implemented horizontal swipe touch gesture recognition (duration < 400ms, vertical displacement < 65px) across all detail modals.
+              <br>• Automatically binds swipe actions to the corresponding modal's back button, enabling frictionless navigation on mobile.
+            </li>
+            <li><strong>Interactive Drawer Navigation Hooks (July 15, 2026)</strong>:
+              <br>• Made the medals progress arc, active days chip, day streak badge, and 7-day mini-ring date cells clickable to open details directly.
+            </li>
             <li><strong>Whoop-Inspired Matte UI Theme</strong>:
               <br>• Replaced transparent styling and backdrop blurs with a solid, high-contrast matte color scheme.
               <br>• Updated root variables: Main background (<code>#12161A</code>), Primary Card (<code>#1E2328</code>), Secondary Surface (<code>#272D34</code>).
