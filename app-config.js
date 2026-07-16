@@ -292,6 +292,28 @@ function getActDate(a) {
   }
   return '';
 }
+function getUniqueAvatarGradient(str) {
+  var gradients = [
+    'linear-gradient(135deg, #f97316, #ea580c)', // Orange
+    'linear-gradient(135deg, #a855f7, #7c3aed)', // Purple
+    'linear-gradient(135deg, #3b82f6, #2563eb)', // Blue
+    'linear-gradient(135deg, #10b981, #059669)', // Green
+    'linear-gradient(135deg, #ec4899, #db2777)', // Red/Pink
+    'linear-gradient(135deg, #6366f1, #4f46e5)', // Indigo
+    'linear-gradient(135deg, #14b8a6, #0d9488)', // Teal
+    'linear-gradient(135deg, #f43f5e, #e11d48)', // Rose
+    'linear-gradient(135deg, #f59e0b, #d97706)', // Amber
+    'linear-gradient(135deg, #8b5cf6, #6d28d9)'  // Violet
+  ];
+  
+  var hash = 0;
+  var s = String(str || 'Participant');
+  for (var i = 0; i < s.length; i++) {
+    hash = s.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  var index = Math.abs(hash) % gradients.length;
+  return gradients[index];
+}
 function fmtTime(d, startTime) {
   if (!d) return '';
   if (startTime === null || startTime === undefined || startTime === '') return '';
