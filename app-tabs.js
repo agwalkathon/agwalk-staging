@@ -1273,11 +1273,12 @@ function renderPodium(rows) {
     var rank = ranks[idx];
     var isMe = String(r.p.strava_athlete_id) === String(meId);
     var teamName = (r.p.leaderboard_team || '').replace(/^Team\s+/i, '');
+    var avatarBg = typeof getUniqueAvatarGradient === 'function' ? getUniqueAvatarGradient(r.p.full_name) : 'linear-gradient(135deg, #f97316, #ea580c)';
     var firstName = String(r.p.full_name || '').trim().split(/\s+/)[0];
     return (
       '<div class="podium-card rank-' + rank + (isMe ? ' active' : '') + '" data-rank="' + rank + '">' +
         '<div class="podium-badge">' + crowns[idx] + '</div>' +
-        '<div class="podium-avatar">' + esc(initials(r.p.full_name)) + '</div>' +
+        '<div class="podium-avatar" style="background: ' + avatarBg + ' !important;">' + esc(initials(r.p.full_name)) + '</div>' +
         '<div class="podium-name">' + esc(firstName || '—') + (isMe ? ' (You)' : '') + '</div>' +
         (teamName ? '<div class="podium-team">' + esc(teamName) + '</div>' : '') +
         '<div class="podium-pts">' + r.pts.total.toFixed(lbScoringMode()==='raw'?lbMetricMeta().dec:1) + ' ' + (lbScoringMode()==='raw' ? lbMetricMeta().short.toLowerCase() : 'pts') + '</div>' +
