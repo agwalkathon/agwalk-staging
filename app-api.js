@@ -3056,6 +3056,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
       var isStat = certStatLabel(p.type) !== null;
       var textVal = p.key;
       if (p.type === 'participant_name') textVal = name;
+      else if (p.type === 'medal_title') textVal = certStatValue(p.type, certData);
       else if (isStat) textVal = certStatValue(p.type, certData);
       else if (p.type === 'custom') textVal = p.custom_val || '';
 
@@ -3119,6 +3120,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
       } else {
         var textVal = p.key;
         if (p.type === 'participant_name') textVal = name;
+        else if (p.type === 'medal_title') textVal = certStatValue(p.type, certData);
         else if (p.type === 'custom') textVal = p.custom_val || '';
         ctx.fillStyle = p.color || '#000000';
         ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + fontSize + 'px "' + family + '", "Georgia", sans-serif';
@@ -3182,7 +3184,8 @@ window.downloadPastCertAction = function(type, pastEventId) {
             var img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
-              ctx.drawImage(img, w * p.x - size / 2, h * p.y - size / 2, size, size);
+              var sH = Math.round(size * (img.naturalHeight / img.naturalWidth));
+              ctx.drawImage(img, w * p.x - size / 2, h * p.y - sH / 2, size, sH);
               resolve();
             };
             img.onerror = function() {
@@ -3238,7 +3241,6 @@ function certStatLabel(type) {
   if (type === 'distance') return 'DISTANCE';
   if (type === 'rank') return 'RANK';
   if (type === 'points') return 'POINTS';
-  if (type === 'medal_title') return 'MEDAL';
   return null;
 }
 
