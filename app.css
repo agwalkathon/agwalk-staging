@@ -514,6 +514,7 @@
       width: 25%;
       flex-shrink: 0;
       display: block !important;
+      will-change: transform;
       box-sizing: border-box;
       overflow-y: auto;
       height: 100%;
