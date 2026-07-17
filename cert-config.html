@@ -999,7 +999,9 @@ function hideFullPageLoader() {
         }
 
         if (loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-          ctx.drawImage(loadedImg, bx, by, boxSize, boxSize);
+          var sH = Math.round(boxSize * (loadedImg.naturalHeight / loadedImg.naturalWidth));
+          var byActual = iy - (sH / 2);
+          ctx.drawImage(loadedImg, bx, byActual, boxSize, sH);
         } else {
           ctx.fillStyle = '#94a3b8';
           ctx.font = '10px sans-serif';
