@@ -3271,12 +3271,19 @@ window.renderMedalInsights = async function() {
 
   var allEarned = pred.currentVal >= pred.goldLimit;
 
-  // Last 10 days chart
+  // Last 10 days chart from event last date (if ended)
+  var baseDate = new Date();
+  var evEnd = EVENT_ROW ? EVENT_ROW.end_date : null;
+  var todayLocal = new Date().toLocaleDateString('sv-SE');
+  if (evEnd && todayLocal > evEnd) {
+    baseDate = new Date(evEnd + 'T12:00:00');
+  }
+
   var chartDays = [];
   for (var i = 9; i >= 0; i--) {
-    var dObj = new Date();
+    var dObj = new Date(baseDate.getTime());
     dObj.setDate(dObj.getDate() - i);
-    var dStr = dObj.toISOString().split('T')[0];
+    var dStr = dObj.toLocaleDateString('sv-SE');
     chartDays.push({
       dateStr: dStr,
       label: dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
