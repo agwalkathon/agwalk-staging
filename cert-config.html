@@ -1014,7 +1014,12 @@ function hideFullPageLoader() {
       }
 
       var text = key;
-      if (type === 'custom') text = customVal || 'CEO Signature';
+      if (type === 'participant_name') text = 'Prakash Sharma';
+      else if (type === 'medal_title') text = 'Gold Medal';
+      else if (type === 'distance') text = '245.8 KM';
+      else if (type === 'points') text = '245';
+      else if (type === 'rank') text = '#12 of 350';
+      else if (type === 'custom') text = customVal || 'CEO Signature';
 
       ctx.font = (weight === 'bold' ? 'bold ' : '') + Math.round(size * scale) + 'px "' + family + '", sans-serif';
       ctx.textAlign = align;
