@@ -3955,8 +3955,8 @@ window.closeDashModal = closeDashModal;
     Object.defineProperty(window, '_ptrLoading', { get: function() { return loading; }, configurable: true });
   } catch(e) {}
   var activeContainer = null;
-  var maxPull = 120; // max Y offset in pixels
-  var triggerPull = 75; // trigger refresh at 75px
+  var maxPull = 180; // max Y offset in pixels
+  var triggerPull = 90; // trigger refresh at 75px
 
   function getActiveScrollContainer() {
     return document.querySelector('.content.active');
@@ -4017,8 +4017,7 @@ window.closeDashModal = closeDashModal;
         if (e.cancelable) e.preventDefault();
         ptr.classList.add('visible');
         
-        var pullDistance = Math.min(maxPull, diffY);
-        var yOffset = Math.pow(pullDistance, 0.85) * 1.5;
+        var yOffset = Math.min(150, diffY * 0.8);
         
         // Translate the active container down!
         if (activeContainer) {
@@ -4079,11 +4078,11 @@ window.closeDashModal = closeDashModal;
       ptr.classList.add('loading');
       
       // Settle loader into active state
-      ptr.style.transform = 'translate3d(-50%, 15px, 0)';
+      ptr.style.transform = 'translate3d(-50%, 30px, 0)';
       
       // Settle container down slightly while loading
       if (activeContainer) {
-        activeContainer.style.transform = 'translate3d(0, 50px, 0)';
+        activeContainer.style.transform = 'translate3d(0, 75px, 0)';
       }
 
       // Hide arrow, show spinner
