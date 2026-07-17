@@ -567,10 +567,37 @@ function hideFullPageLoader() {
   window.handleCertTemplateUpload = function(event) {
     var file = event.target.files[0];
     if (!file) return;
+    showFullPageLoader('Uploading template file...');
     var reader = new FileReader();
-    reader.onload = function() {
-      document.getElementById('cert-template-url').value = reader.result;
-      updateCertPreviewCanvas();
+    reader.onload = async function() {
+      try {
+        var r = await fetch(BACKEND + '/admin/upload-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token')
+          },
+          body: JSON.stringify({ 
+            data: reader.result,
+            name: file.name
+          })
+        });
+        var res = await r.json();
+        if (res.success && res.url) {
+          document.getElementById('cert-template-url').value = res.url;
+          updateCertPreviewCanvas(true);
+        } else {
+          console.warn('Upload failed, using local base64 fallback:', res.error);
+          document.getElementById('cert-template-url').value = reader.result;
+          updateCertPreviewCanvas(true);
+        }
+      } catch (err) {
+        console.warn('File upload failed, using local base64 fallback:', err);
+        document.getElementById('cert-template-url').value = reader.result;
+        updateCertPreviewCanvas(true);
+      } finally {
+        hideFullPageLoader();
+      }
     };
     reader.readAsDataURL(file);
   };
