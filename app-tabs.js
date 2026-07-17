@@ -3990,8 +3990,10 @@ window.closeDashModal = closeDashModal;
       activeContainer = container;
       if (activeContainer) {
         activeContainer.classList.remove('ptr-transitioning');
+        activeContainer.style.transition = 'none';
       }
       ptr.classList.remove('transitioning');
+      ptr.style.transition = 'none';
     }
   }
 
@@ -4070,8 +4072,10 @@ window.closeDashModal = closeDashModal;
 
     if (activeContainer) {
       activeContainer.classList.add('ptr-transitioning');
+      activeContainer.style.transition = '';
     }
     ptr.classList.add('transitioning');
+    ptr.style.transition = '';
 
     if (currentOffset >= (triggerPull - 60)) {
       loading = true;
@@ -4100,8 +4104,12 @@ window.closeDashModal = closeDashModal;
         finishPTR();
       });
     } else {
+      ptr.classList.add('transitioning');
+      ptr.style.transition = '';
       ptr.style.transform = 'translate3d(-50%, -60px, 0)';
       if (activeContainer) {
+        activeContainer.classList.add('ptr-transitioning');
+        activeContainer.style.transition = '';
         activeContainer.style.transform = 'translate3d(0, 0, 0)';
       }
       setTimeout(function() {
@@ -4113,8 +4121,12 @@ window.closeDashModal = closeDashModal;
   function finishPTR() {
     loading = false;
     ptr.classList.remove('loading');
+    ptr.classList.add('transitioning');
+    ptr.style.transition = '';
     ptr.style.transform = 'translate3d(-50%, -60px, 0)';
     if (activeContainer) {
+      activeContainer.classList.add('ptr-transitioning');
+      activeContainer.style.transition = '';
       activeContainer.style.transform = 'translate3d(0, 0, 0)';
     }
     setTimeout(function() {
@@ -4138,7 +4150,12 @@ window.closeDashModal = closeDashModal;
 
   document.addEventListener('touchmove', function(e) {
     if (pulling && e.touches.length === 1) {
-      handleMove(e.touches[0].pageX, e.touches[0].pageY, e);
+      var y = e.touches[0].pageY;
+      var diffY = y - startY;
+      if (diffY > 0 && e.cancelable) {
+        e.preventDefault();
+      }
+      handleMove(e.touches[0].pageX, y, e);
     }
   }, { passive: false });
 
