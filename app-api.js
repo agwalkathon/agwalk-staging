@@ -542,9 +542,39 @@ async function load(isBackgroundRefresh) {
       medalData    = _cachedMedal;
     } else {
       console.log('[Cache] Cache miss — fetching Phase 1 from Supabase...');
-      var regRes = await fetch(getRegistrationFetchUrl(s),{headers:HDR});
-      regJsonData = await regRes.json(); cacheSet('reg_'+athleteId+'_'+eventId, regJsonData);
+      // 1. Fetch registration first
+      var regRes = await fetch(getRegistrationFetchUrl(s), { headers: HDR });
+      regJsonData = await regRes.json();
+      
+      // 2. Resolve if EVENT_ROW needs to switch (in case user is registered for a different event than liveEvent)
+      var liveEventId = liveEvent ? liveEvent.id : 1;
+      var targetEventId = liveEventId;
+      if (Array.isArray(regJsonData) && regJsonData.length > 0) {
+        var hasLiveReg = regJsonData.some(function(r) { return r.event_id === liveEventId; });
+        if (!hasLiveReg) {
+          targetEventId = regJsonData[0].event_id || liveEventId;
+        }
+      }
+      
+      if (targetEventId !== liveEventId) {
+        try {
+          var evRes = await fetch(SUPABASE_URL + '/rest/v1/events?id=eq.' + targetEventId + '&limit=1', { headers: HDR });
+          var evData = await evRes.json();
+          if (Array.isArray(evData) && evData.length > 0) {
+            EVENT_ROW = evData[0];
+            eventId = EVENT_ROW.id;
+            cacheSet('event_row_' + athleteId, EVENT_ROW);
+            window._LB_EV_RULES = EVENT_ROW.rules_config || null;
+          }
+        } catch(e) {
+          console.warn('Failed to resolve custom event row:', e);
+        }
+      }
+      
+      // 3. Cache registration under correct eventId namespace
+      cacheSet('reg_' + athleteId + '_' + eventId, regJsonData);
 
+      // 4. Fetch the rest of the configurations for the resolved event
       var [myActsFetched,cfgRes,chRes,sdRes,medalRes]=await Promise.all([
         fetchAll(SUPABASE_URL+'/rest/v1/activities?event_id=eq.'+eventId+'&strava_athlete_id=eq.'+athleteId+'&is_deleted=eq.false&activity_date=gte.'+getEventUTCStart()+'&activity_date=lte.'+getEventUTCEnd()+'&order=activity_date.desc'),
         fetch(SUPABASE_URL+'/rest/v1/leaderboard_config?event_id=eq.'+eventId+'&select=config_key,config_value',{headers:HDR}),
@@ -617,8 +647,8 @@ async function load(isBackgroundRefresh) {
     var regs=regJsonData;
     var reg = Array.isArray(regs) ? (regs.find(function(r) { return r.event_id === EVENT_ROW.id; }) || regs[0] || {}) : {};
     LB_ME=reg;
-    window._lbCurrentEventId = EVENT_ROW.id;
-    window._lbRegisteredEventId = EVENT_ROW.id;
+    window._lbCurrentEventId = reg.event_id || EVENT_ROW.id;
+    window._lbRegisteredEventId = reg.event_id || EVENT_ROW.id;
     var name=reg.full_name||s.name||'Participant';
     var photo = reg.profile_photo || s.profilePhoto || '';
     renderUserAvatar(name, photo, 'hdr-avatar', 'you-avatar');
