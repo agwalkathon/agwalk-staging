@@ -3412,6 +3412,122 @@ window.renderMedalInsights = async function() {
          '  </div>' +
          '</div>';
 
+  // ===== Dynamic Advanced Metrics Extensions (WHOOP Hybrid Redesign) =====
+  var values = Object.values(dayKm);
+  var avg = values.reduce(function(s, v) { return s + v; }, 0) / (values.length || 1);
+  var variance = values.reduce(function(s, v) { return s + Math.pow(v - avg, 2); }, 0) / (values.length || 1);
+  var stdDev = Math.sqrt(variance);
+  
+  var consistencyLabel = 'Steady Walker 👟';
+  var consistencyDesc = 'Balanced and consistent daily progress.';
+  if (stdDev < 1.5 && values.length >= 3) {
+    consistencyLabel = 'Elite Metronome ⏱️';
+    consistencyDesc = 'Exceptionally consistent output day after day!';
+  } else if (stdDev > 5.5) {
+    consistencyLabel = 'Weekend Warrior ⚡';
+    consistencyDesc = 'Big workout bursts combined with rest periods.';
+  }
+
+  var forecastHtml = '';
+  if (allEarned) {
+    forecastHtml = 'All milestones reached! Chase the top podium spot. 🏆';
+  } else {
+    var nextMilestoneObj = pred.remainingSilver > 0 ? { limit: pred.silverLimit, name: 'Silver' } : { limit: pred.goldLimit, name: 'Gold' };
+    var remainingTarget = nextMilestoneObj.limit - pred.currentVal;
+    if (pred.assumedPace > 0.05) {
+      var daysToUnlock = Math.ceil(remainingTarget / pred.assumedPace);
+      var unlockDate = new Date();
+      unlockDate.setDate(unlockDate.getDate() + daysToUnlock);
+      var dateStr = unlockDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+      forecastHtml = 'Projected to unlock ' + nextMilestoneObj.name + ' on <strong>' + dateStr + '</strong> (~' + daysToUnlock + ' days).';
+    } else {
+      forecastHtml = 'Increase your daily average to unlock the next milestone.';
+    }
+  }
+
+  var lowIntensityCount = 0;
+  var modIntensityCount = 0;
+  var highIntensityCount = 0;
+  validActs.forEach(function(a) {
+    var dist = (a.distance_meters || 0) / 1000;
+    var dur = (a.moving_time_seconds || 0) / 3600;
+    var speed = dur > 0 ? (dist / dur) : 0;
+    if (speed > 7) highIntensityCount++;
+    else if (speed > 4.5) modIntensityCount++;
+    else lowIntensityCount++;
+  });
+
+  var shiftStandText = 'Benchmarking shift standing...';
+  var sumData = typeof cacheGet === 'function' ? (cacheGet('ranking_summaries', 300000) || cacheGet('ranking_summaries', 86400*365*1000)) : null;
+  if (sumData && sumData.length && currentSession) {
+    var reg = typeof regJsonData !== 'undefined' ? regJsonData : null;
+    if (reg) {
+      var gN = (reg.gender || '').toLowerCase(); var isF = gN === 'female' || gN === 'f';
+      var sN = (reg.shift || '').toLowerCase(); var isN = sN.indexOf('night') > -1;
+      var peers = sumData.filter(function(p) {
+        var pg = (p.gender || '').toLowerCase(), ps = (p.shift || '').toLowerCase();
+        return (ps.indexOf('night') > -1) === isN && (pg === 'female' || pg === 'f') === isF;
+      }).sort(function(a, b) { return (b.total_points || 0) - (a.total_points || 0); });
+      
+      var ix = peers.findIndex(function(p) { return String(p.athlete_id) === String(currentSession.athleteId); });
+      if (ix >= 0) {
+        var pct = Math.round((1 - ix / peers.length) * 100);
+        shiftStandText = 'You are outperforming <strong>' + pct + '%</strong> of your shift peers!';
+      } else {
+        shiftStandText = 'Outperforming many active participants on your shift!';
+      }
+    }
+  } else {
+    shiftStandText = 'Keep pushing to lead your shift category!';
+  }
+
+  html += '<div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 10px; margin-bottom: 12px; text-align: left;">PERFORMANCE INSIGHTS</div>';
+  
+  html += '<div style="display: flex; flex-direction: column; gap: 12px;">' +
+         // 1. Forecast
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px;">' +
+         '    <div style="font-size: 24px; flex-shrink:0;">📅</div>' +
+         '    <div style="text-align: left;">' +
+         '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Unlock Forecast</div>' +
+         '      <div style="font-size: 12.5px; color: #fff; margin-top: 2px;">' + forecastHtml + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         // 2. Consistency
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px;">' +
+         '    <div style="font-size: 24px; flex-shrink:0;">📈</div>' +
+         '    <div style="text-align: left;">' +
+         '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Consistency Profile</div>' +
+         '      <div style="font-size: 13px; font-weight: 800; color: var(--brand); margin-top: 2px;">' + consistencyLabel + '</div>' +
+         '      <div style="font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px;">' + consistencyDesc + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         // 3. Peer standing
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px;">' +
+         '    <div style="font-size: 24px; flex-shrink:0;">👥</div>' +
+         '    <div style="text-align: left;">' +
+         '      <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Shift Standing</div>' +
+         '      <div style="font-size: 12.5px; color: #fff; margin-top: 2px;">' + shiftStandText + '</div>' +
+         '    </div>' +
+         '  </div>' +
+         // 4. Workout Intensity
+         '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">' +
+         '    <div style="display: flex; justify-content: space-between; align-items: center;">' +
+         '      <span style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase;">Workout Intensity Profile</span>' +
+         '      <span style="font-size: 11px; color: rgba(255,255,255,0.6);">' + validActs.length + ' sessions</span>' +
+         '    </div>' +
+         '    <div style="display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 4px;">' +
+         '      <div style="flex: ' + Math.max(1, highIntensityCount) + '; background: #ec4899;"></div>' +
+         '      <div style="flex: ' + Math.max(1, modIntensityCount) + '; background: var(--brand);"></div>' +
+         '      <div style="flex: ' + Math.max(1, lowIntensityCount) + '; background: #3b82f6;"></div>' +
+         '    </div>' +
+         '    <div style="display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px;">' +
+         '      <span style="display: flex; align-items: center; gap: 4px;"><i style="width: 6px; height: 6px; border-radius: 50%; background: #ec4899; display: inline-block;"></i> High (' + highIntensityCount + ')</span>' +
+         '      <span style="display: flex; align-items: center; gap: 4px;"><i style="width: 6px; height: 6px; border-radius: 50%; background: var(--brand); display: inline-block;"></i> Moderate (' + modIntensityCount + ')</span>' +
+         '      <span style="display: flex; align-items: center; gap: 4px;"><i style="width: 6px; height: 6px; border-radius: 50%; background: #3b82f6; display: inline-block;"></i> Low (' + lowIntensityCount + ')</span>' +
+         '    </div>' +
+         '  </div>' +
+         '</div>';
+
   contentEl.innerHTML = html;
 };
 
