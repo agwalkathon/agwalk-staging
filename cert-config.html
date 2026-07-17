@@ -466,6 +466,7 @@ function hideFullPageLoader() {
         var align = row.querySelector('.cert-p-align').value;
         var family = row.querySelector('.cert-p-font').value || 'Poppins';
         var imgUrlEl = row.querySelector('.cert-p-imgurl');
+        var rotation = parseFloat(row.querySelector('.cert-p-rotation').value) || 0;
         if (key) {
           var transpEl = row.querySelector('.cert-p-transparent');
           certPlaceholders.push({
@@ -480,7 +481,8 @@ function hideFullPageLoader() {
             color: color,
             font_style: weight,
             align: align,
-            font_family: family
+            font_family: family,
+            rotation: rotation
           });
         }
       });
@@ -658,7 +660,7 @@ function hideFullPageLoader() {
         '<div class="fld" style="margin:0"><label style="font-size:11px;">Size</label><input type="number" class="cert-p-size" value="' + p.font_size + '" min="8" max="999" oninput="updateCertPreviewCanvas()"></div>' +
         '<div class="fld" style="margin:0"><label style="font-size:11px;">Color</label><input type="color" class="cert-p-color" value="' + (p.color || '#000000') + '" style="height:32px; padding:2px;" oninput="updateCertPreviewCanvas(); var s=this.closest(\'.cert-placeholder-row\').querySelector(\'.cert-row-swatch\'); if(s) s.style.background=this.value;"></div>' +
       '</div>' +
-      '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
+      '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">' +
         '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Weight</label>' +
           '<select class="cert-p-weight" onchange="updateCertPreviewCanvas();">' +
             '<option value="bold"' + (p.font_style === 'bold' ? ' selected' : '') + '>Bold</option>' +
@@ -671,6 +673,9 @@ function hideFullPageLoader() {
             '<option value="center"' + (p.align === 'center' ? ' selected' : '') + '>Center</option>' +
             '<option value="right"' + (p.align === 'right' ? ' selected' : '') + '>Right</option>' +
           '</select>' +
+        '</div>' +
+        '<div class="fld" style="margin:0"><label style="font-size:11px;">Rotation (deg)</label>' +
+          '<input type="number" class="cert-p-rotation" value="' + (p.rotation || 0) + '" min="-360" max="360" step="1" oninput="updateCertPreviewCanvas()">' +
         '</div>' +
       '</div>' +
       '<div class="fld" style="margin:0"><label style="font-size:11px;">Font Family (Google Fonts)</label>' +
@@ -1026,6 +1031,9 @@ function hideFullPageLoader() {
       else if (type === 'rank') text = '#12 of 350';
       else if (type === 'custom') text = customVal || 'CEO Signature';
 
+      var rotEl = row.querySelector('.cert-p-rotation');
+      var rotation = rotEl ? (parseFloat(rotEl.value) || 0) : 0;
+
       ctx.font = (weight === 'bold' ? 'bold ' : '') + Math.round(size * displayScale) + 'px "' + family + '", sans-serif';
       ctx.textAlign = align;
       ctx.textBaseline = 'middle';
@@ -1037,10 +1045,14 @@ function hideFullPageLoader() {
       var px = x * w;
       var py = y * h;
 
-      var tx = px;
-      if (align === 'center') tx = px - (textWidth / 2);
-      else if (align === 'right') tx = px - textWidth;
-      var ty = py - (textHeight / 2);
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate((rotation * Math.PI) / 180);
+
+      var tx = 0;
+      if (align === 'center') tx = -(textWidth / 2);
+      else if (align === 'right') tx = -textWidth;
+      var ty = -(textHeight / 2);
 
       if (!_certCleanRender) {
         var isTransp = transpEl ? transpEl.checked : false;
@@ -1059,18 +1071,19 @@ function hideFullPageLoader() {
           ctx.fill();
           
           ctx.beginPath();
-          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.arc(0, 0, 3, 0, Math.PI * 2);
           ctx.fillStyle = '#3b82f6';
           ctx.fill();
         }
       }
 
       ctx.fillStyle = color;
-      ctx.fillText(text, px, py);
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
 
       _certHitBoxes.push({
         row: row,
-        x: tx - 4, y: ty - 4, w: textWidth + 8, h: textHeight + 8,
+        x: px + tx - 4, y: py + ty - 4, w: textWidth + 8, h: textHeight + 8,
         anchorX: px, anchorY: py
       });
     });
