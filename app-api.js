@@ -88,7 +88,7 @@ function calculateMedalPrediction(validActs, gender, shift) {
     var dayKm = {};
     validActs.forEach(function(a) {
       var km = (a.distance_meters || 0) / 1000;
-      var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
+      var d = (typeof getActDate === 'function' ? getActDate(a) : '') || (a.activity_date ? a.activity_date.split('T')[0] : null);
       if (d) dayKm[d] = (dayKm[d] || 0) + km;
     });
     var activeDaysCount = Object.keys(dayKm).length || 1;
@@ -3239,7 +3239,7 @@ window.renderMedalInsights = async function() {
   var dayKm = {};
   validActs.forEach(function(a) {
     var km = (a.distance_meters || 0) / 1000;
-    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
+    var d = (typeof getActDate === 'function' ? getActDate(a) : '') || (a.activity_date ? a.activity_date.split('T')[0] : null);
     if (d) dayKm[d] = (dayKm[d] || 0) + km;
   });
   
@@ -3255,7 +3255,7 @@ window.renderMedalInsights = async function() {
   // Calculate active streak
   var activeDays = {};
   validActs.forEach(function(a) {
-    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date ? a.activity_date.split('T')[0] : null);
+    var d = (typeof getActDate === 'function' ? getActDate(a) : '') || (a.activity_date ? a.activity_date.split('T')[0] : null);
     if (d) activeDays[d] = true;
   });
   var sortedActive = Object.keys(activeDays).sort();
@@ -3814,7 +3814,7 @@ window.renderStreakDrawerDetails = async function() {
   // Calculate active days using getActDate
   var activeDays = {};
   validActs.forEach(function(a) {
-    var d = typeof getActDate === 'function' ? getActDate(a) : (a.activity_date_time_ist ? a.activity_date_time_ist.split(/[T ]/)[0] : (a.activity_date ? a.activity_date.split('T')[0] : null));
+    var d = (typeof getActDate === 'function' ? getActDate(a) : '') || (a.activity_date_time_ist ? a.activity_date_time_ist.split(/[T ]/)[0] : (a.activity_date ? a.activity_date.split('T')[0] : null));
     if (d) activeDays[d] = true;
   });
   var sortedActive = Object.keys(activeDays).sort();
