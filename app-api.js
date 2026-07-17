@@ -1324,7 +1324,8 @@ async function load(isBackgroundRefresh) {
     var myPts = fullPts.total;
     var sptEl = document.getElementById('s-pts-display');if(sptEl)sptEl.textContent=myPts.toFixed(2);
 
-    var myMedalPts = typeof fullPts.km === 'number' ? fullPts.km : myPts;
+    var usePoints = (activeMilestones.bronze.metric === 'points');
+    var myMedalPts = usePoints ? myPts : (typeof fullPts.km === 'number' ? fullPts.km : myPts);
 
     // Medal Progress Rings
     var CIRC=270.2;
@@ -3268,18 +3269,7 @@ window.renderMedalInsights = async function() {
     prevD = d;
   });
 
-  var neededPaceSilverStr = 'Achieved! ✔';
-  if (pred.remainingSilver > 0) {
-    neededPaceSilverStr = pred.daysRemaining > 0 ? pred.neededPaceSilver.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
-  }
-  
-  var neededPaceGoldStr = 'Achieved! ✔';
-  if (pred.remainingGold > 0) {
-    neededPaceGoldStr = pred.daysRemaining > 0 ? pred.neededPaceGold.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
-  }
-
-  var paceColorSilver = pred.neededPaceSilver <= pred.assumedPace ? '#22c55e' : '#f97316';
-  var paceColorGold = pred.neededPaceGold <= pred.assumedPace ? '#22c55e' : '#f97316';
+  var allEarned = pred.currentVal >= pred.goldLimit;
 
   // Last 10 days chart
   var chartDays = [];
@@ -3317,129 +3307,93 @@ window.renderMedalInsights = async function() {
   svgHtml += '</svg>';
 
   var html = '';
-  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
-         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
-         '  <div style="font-size: 26px; font-weight: 800; color: ' + pred.projectedColor + '; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
-              pred.projectedEmoji + ' ' + pred.projectedMedal +
-         '  </div>' +
-         '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
-         '    Projected Event Score: <strong style="color: #fff;">' + pred.projectedVal.toFixed(1) + ' ' + pred.unit + '</strong>' +
-         '  </div>' +
-         '  <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic;">' +
-         '    Based on your average of ' + pred.assumedPace.toFixed(1) + ' ' + pred.unit + '/day over ' + pred.daysRemaining + ' remaining days.' +
-         '  </div>' +
-         '</div>';
-
-  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
-         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">Daily Target (' + pred.daysRemaining + ' Days Left)</div>' +
-         '  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04);">' +
-         '    <div style="display: flex; align-items: center; gap: 8px;">' +
-         '      <span style="font-size: 16px;">🥈</span>' +
-         '      <div style="text-align: left;">' +
-         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">SILVER MEDAL (' + pred.silverLimit + ' ' + pred.unit + ')</div>' +
-         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingSilver.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
-         '      </div>' +
-         '    </div>' +
-         '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + neededPaceSilverStr + '</div>' +
-         '    </div>' +
-         '  </div>' +
-         '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
-         '    <div style="display: flex; align-items: center; gap: 8px;">' +
-         '      <span style="font-size: 16px;">🥇</span>' +
-         '      <div style="text-align: left;">' +
-         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">GOLD MEDAL (' + pred.goldLimit + ' ' + pred.unit + ')</div>' +
-         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingGold.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
-         '      </div>' +
-         '    </div>' +
-         '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + neededPaceGoldStr + '</div>' +
-         '    </div>' +
-         '  </div>' +
-         '</div>';
-
-  // Last 10 days chart
-  var chartDays = [];
-  for (var i = 9; i >= 0; i--) {
-    var dObj = new Date();
-    dObj.setDate(dObj.getDate() - i);
-    var dStr = dObj.toISOString().split('T')[0];
-    chartDays.push({
-      dateStr: dStr,
-      label: dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      km: dayKm[dStr] || 0
-    });
+  
+  // 1. Projected Finish Card
+  if (allEarned) {
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+           '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
+           '  <div style="font-size: 26px; font-weight: 800; color: #f59e0b; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
+                '🏆 ALL MEDALS EARNED!' +
+           '  </div>' +
+           '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
+           '    Current Event Score: <strong style="color: #fff;">' + pred.currentVal.toFixed(1) + ' ' + pred.unit + '</strong>' +
+           '  </div>' +
+           '  <div style="font-size: 11px; color: #22c55e; margin-top: 4px; font-weight: 600;">' +
+           '    Outstanding! Every milestone threshold has been unlocked.' +
+           '  </div>' +
+           '</div>';
+  } else {
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+           '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
+           '  <div style="font-size: 26px; font-weight: 800; color: ' + pred.projectedColor + '; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
+                pred.projectedEmoji + ' ' + pred.projectedMedal +
+           '  </div>' +
+           '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
+           '    Projected Event Score: <strong style="color: #fff;">' + pred.projectedVal.toFixed(1) + ' ' + pred.unit + '</strong>' +
+           '  </div>' +
+           '  <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic;">' +
+           '    Based on your average of ' + pred.assumedPace.toFixed(1) + ' ' + pred.unit + '/day over ' + pred.daysRemaining + ' remaining days.' +
+           '  </div>' +
+           '</div>';
   }
 
-  var maxVal = Math.max.apply(null, chartDays.map(function(d){return d.km;})) || 5;
-  
-  var svgHtml = '<svg viewBox="0 0 340 160" style="width: 100%; height: auto; font-family: var(--font);">';
-  svgHtml += '<line x1="30" y1="20" x2="330" y2="20" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
-  svgHtml += '<line x1="30" y1="70" x2="330" y2="70" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>';
-  svgHtml += '<line x1="30" y1="120" x2="330" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>';
-  svgHtml += '<text x="22" y="24" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + maxVal.toFixed(1) + '</text>';
-  svgHtml += '<text x="22" y="74" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">' + (maxVal/2).toFixed(1) + '</text>';
-  svgHtml += '<text x="22" y="124" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="end">0</text>';
-  
-  chartDays.forEach(function(day, index) {
-    var x = 36 + (index * 29);
-    var barHeight = Math.round(day.km * (100 / maxVal));
-    var y = 120 - barHeight;
-    svgHtml += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="16" height="' + Math.max(2, barHeight) + '" rx="4" fill="' + (day.km > 0 ? 'url(#bar-grad)' : 'rgba(255,255,255,0.05)') + '" style="transition: all 0.3s ease; cursor: pointer;" title="' + day.label + ': ' + day.km.toFixed(1) + ' km"/>';
-    if (index % 2 === 0) {
-      svgHtml += '<text x="' + (x + 8) + '" y="' + 138 + '" fill="rgba(255,255,255,0.4)" font-size="8.5" text-anchor="middle">' + day.label + '</text>';
+  // 2. Target Card or celebration card
+  if (allEarned) {
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+           '  <div style="font-size: 32px; margin-bottom: 8px;">🏆</div>' +
+           '  <div style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px;">All Achievements Unlocked!</div>' +
+           '  <div style="font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5;">You have conquered all milestone levels. Keep walking to claim your spot on the top of the leaderboard!</div>' +
+           '</div>';
+  } else {
+    var neededPaceSilverStr = 'Achieved! ✔';
+    if (pred.remainingSilver > 0) {
+      neededPaceSilverStr = pred.daysRemaining > 0 ? pred.neededPaceSilver.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
     }
-  });
-  svgHtml += '<defs><linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--brand)"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>';
-  svgHtml += '</svg>';
+    
+    var neededPaceGoldStr = 'Achieved! ✔';
+    if (pred.remainingGold > 0) {
+      neededPaceGoldStr = pred.daysRemaining > 0 ? pred.neededPaceGold.toFixed(2) + ' ' + pred.unit + '/day' : 'Ended ❌';
+    }
 
-  var html = '';
-  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
-         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px;">PROJECTED FINISH</div>' +
-         '  <div style="font-size: 26px; font-weight: 800; color: ' + projectedColor + '; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">' +
-              projectedEmoji + ' ' + projectedMedal +
-         '  </div>' +
-         '  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px;">' +
-         '    Projected Event Distance: <strong style="color: #fff;">' + projectedDistance.toFixed(1) + ' km</strong>' +
-         '  </div>' +
-         '  <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic;">' +
-         '    Based on your average pace of ' + assumedPace.toFixed(1) + ' km/day over ' + daysRemaining + ' remaining days.' +
-         '  </div>' +
-         '</div>';
+    var paceColorSilver = pred.neededPaceSilver <= pred.assumedPace ? '#22c55e' : '#f97316';
+    var paceColorGold = pred.neededPaceGold <= pred.assumedPace ? '#22c55e' : '#f97316';
 
-  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
-         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">Daily Target Pace (' + daysRemaining + ' Days Left)</div>' +
-         '  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04);">' +
-         '    <div style="display: flex; align-items: center; gap: 8px;">' +
-         '      <span style="font-size: 16px;">🥈</span>' +
-         '      <div style="text-align: left;">' +
-         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">SILVER MEDAL (200 km)</div>' +
-         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + remainingSilver.toFixed(1) + ' km remaining</div>' +
-         '      </div>' +
-         '    </div>' +
-         '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + neededPaceSilverStr + '</div>' +
-         '    </div>' +
-         '  </div>' +
-         '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
-         '    <div style="display: flex; align-items: center; gap: 8px;">' +
-         '      <span style="font-size: 16px;">🥇</span>' +
-         '      <div style="text-align: left;">' +
-         '        <div style="font-size: 13px; font-weight: 700; color: #fff;">GOLD MEDAL (300 km)</div>' +
-         '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + remainingGold.toFixed(1) + ' km remaining</div>' +
-         '      </div>' +
-         '    </div>' +
-         '    <div style="text-align: right;">' +
-         '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + neededPaceGoldStr + '</div>' +
-         '    </div>' +
-         '  </div>' +
-         '</div>';
+    html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+           '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">Daily Target (' + pred.daysRemaining + ' Days Left)</div>' +
+           '  <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04);">' +
+           '    <div style="display: flex; align-items: center; gap: 8px;">' +
+           '      <span style="font-size: 16px;">🥈</span>' +
+           '      <div style="text-align: left;">' +
+           '        <div style="font-size: 13px; font-weight: 700; color: #fff;">SILVER MEDAL (' + pred.silverLimit + ' ' + pred.unit + ')</div>' +
+           '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingSilver.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
+           '      </div>' +
+           '    </div>' +
+           '    <div style="text-align: right;">' +
+           '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorSilver + ';">' + neededPaceSilverStr + '</div>' +
+           '    </div>' +
+           '  </div>' +
+           '  <div style="display: flex; align-items: center; justify-content: space-between;">' +
+           '    <div style="display: flex; align-items: center; gap: 8px;">' +
+           '      <span style="font-size: 16px;">🥇</span>' +
+           '      <div style="text-align: left;">' +
+           '        <div style="font-size: 13px; font-weight: 700; color: #fff;">GOLD MEDAL (' + pred.goldLimit + ' ' + pred.unit + ')</div>' +
+           '        <div style="font-size: 11px; color: rgba(255,255,255,0.4);">' + pred.remainingGold.toFixed(1) + ' ' + pred.unit + ' remaining</div>' +
+           '      </div>' +
+           '    </div>' +
+           '    <div style="text-align: right;">' +
+           '      <div style="font-size: 14.5px; font-weight: 800; color: ' + paceColorGold + ';">' + neededPaceGoldStr + '</div>' +
+           '    </div>' +
+           '  </div>' +
+           '</div>';
+  }
 
+  // 3. Last 10 Days Chart
   html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
          '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; text-align: left;">LAST 10 DAYS DISTANCE</div>' +
             svgHtml +
          '</div>';
 
+  // 4. Streak & Best Day Chips
   html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' +
          '  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; text-align: center;">' +
          '    <div style="font-size: 20px; margin-bottom: 4px;">🔥</div>' +
