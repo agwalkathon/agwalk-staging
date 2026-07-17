@@ -402,7 +402,33 @@ function hideFullPageLoader() {
     }
   }
 
-  async function upsertConfigValue(key, val, eventId) {
+  function xhrRequestWithProgress(url, method, headers, body, onProgress) {
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url, true);
+      if (headers) {
+        Object.keys(headers).forEach(function(k) {
+          xhr.setRequestHeader(k, headers[k]);
+        });
+      }
+      if (xhr.upload && onProgress) {
+        xhr.upload.addEventListener('progress', onProgress);
+      }
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.responseText);
+        } else {
+          reject(new Error('HTTP ' + xhr.status + ': ' + xhr.responseText));
+        }
+      };
+      xhr.onerror = function() {
+        reject(new Error('Network error during save upload'));
+      };
+      xhr.send(body);
+    });
+  }
+
+  async function upsertConfigValue(key, val, eventId, onProgress) {
     // Check if row already exists
     var r = await fetch(SB_URL + '/rest/v1/leaderboard_config?event_id=eq.' + eventId + '&config_key=eq.' + key + '&select=id', { headers: HDR });
     var rows = await r.json();
@@ -416,24 +442,20 @@ function hideFullPageLoader() {
     
     var url = SB_URL + '/rest/v1/leaderboard_config';
     var method = 'POST';
-    var headers = Object.assign({}, HDR, { Prefer: 'return=representation' });
+    var headers = Object.assign({}, HDR, {
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation'
+    });
     
     if (Array.isArray(rows) && rows.length > 0) {
       url += '?id=eq.' + rows[0].id;
       method = 'PATCH';
-      headers = HDR;
+      headers = Object.assign({}, HDR, {
+        'Content-Type': 'application/json'
+      });
     }
     
-    var res = await fetch(url, {
-      method: method,
-      headers: headers,
-      body: JSON.stringify(body)
-    });
-    
-    if (!res.ok) {
-      var txt = await res.text();
-      throw new Error('Save sub-config failed for key ' + key + ': ' + txt);
-    }
+    await xhrRequestWithProgress(url, method, headers, JSON.stringify(body), onProgress);
   }
 
   async function saveCertConfig() {
@@ -444,6 +466,8 @@ function hideFullPageLoader() {
     err.textContent = '';
     saved.classList.remove('show');
     btn.disabled = true;
+
+    showFullPageLoader('Preparing certificate layout...');
 
     try {
       var certPlaceholders = [];
@@ -492,7 +516,14 @@ function hideFullPageLoader() {
         enabled: document.getElementById('cert-enabled').checked
       };
 
-      await upsertConfigValue('certificate_config', certConfigVal, activeEventId);
+      showFullPageLoader('Saving Design... 0%');
+
+      await upsertConfigValue('certificate_config', certConfigVal, activeEventId, function(e) {
+        if (e.lengthComputable) {
+          var pct = Math.round((e.loaded / e.total) * 100);
+          showFullPageLoader('Saving Design... ' + pct + '%');
+        }
+      });
       
       saved.classList.add('show');
       setTimeout(function() { saved.classList.remove('show'); }, 3000);
@@ -500,6 +531,7 @@ function hideFullPageLoader() {
       err.textContent = 'Save failed: ' + e.message;
     } finally {
       btn.disabled = false;
+      setTimeout(hideFullPageLoader, 400);
     }
   }
 
