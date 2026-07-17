@@ -3250,11 +3250,7 @@ function certStatValue(type, certData) {
     return '#' + certData.rank + (certData.totalParticipants ? ' of ' + certData.totalParticipants : '');
   }
   if (type === 'medal_title') {
-    var mName = String(certData.medal || '').replace(' Medal', '');
-    if (mName === 'Gold') return '\ud83e\udd47 Gold';
-    if (mName === 'Silver') return '\ud83e\udd48 Silver';
-    if (mName === 'Bronze') return '\ud83e\udd49 Bronze';
-    return mName || '-';
+    return certData.medal || 'Participant';
   }
   return '';
 }
@@ -3268,6 +3264,7 @@ function formatOrdinalRank(n) {
 
 window.loadGoogleFont = function(fontName) {
   if (!fontName) return;
+  if (fontName === 'Arcane Nine') return; // Locally installed custom font
   var fontId = 'gf-' + fontName.toLowerCase().replace(/\s+/g, '-');
   if (document.getElementById(fontId)) return;
   
