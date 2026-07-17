@@ -514,19 +514,19 @@ function renderTodayActivities(acts) {
     var sportTitle = (a.sport_type || 'Workout').toUpperCase();
 
     if (sport === 'run') {
-      pillColor = '#008cee'; // Vibrant electric blue
+      pillColor = '#f97316'; // Electric Fire Orange
       sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'RUNNING';
     } else if (sport === 'walk') {
-      pillColor = '#ab47bc'; // Purple
+      pillColor = '#10b981'; // Fresh Emerald Green
       sportIcon = '<i class="fa-solid fa-walking" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'WALKING';
     } else if (sport === 'ride' || sport === 'cycling') {
-      pillColor = '#ff9100'; // Orange
+      pillColor = '#6366f1'; // High-Octane Indigo Blue
       sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'CYCLING';
     } else if (sport === 'hike') {
-      pillColor = '#10b981'; // Green
+      pillColor = '#f59e0b'; // Outdoor Trail Amber
       sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:15px;"></i>';
       sportTitle = 'HIKING';
     }
@@ -1130,7 +1130,7 @@ function renderRows(rows, prevRanks) {
       '<div class="rank-col ' + rankColCls + '" style="display:flex;flex-direction:column;align-items:center;">' + rankIcon + deltaHtml + '</div>' +
       '<div class="row-body">' +
         '<div class="row-left">' +
-          '<span class="row-name participant-profile-link" style="cursor:pointer; text-decoration:underline; font-weight:700;" onclick="event.stopPropagation(); openParticipantProfile(\'' + athId + '\')">' + esc(r.p.full_name || '—') + '</span>' + (isMe ? '<span class="you-chip">You</span>' : '') +
+          '<span class="row-name participant-profile-link" style="cursor:pointer; font-weight:700; transition:color 0.15s ease;" onclick="event.stopPropagation(); openParticipantProfile(\'' + athId + '\')">' + esc(r.p.full_name || '—') + '</span>' + (isMe ? '<span class="you-chip">You</span>' : '') +
           (teamName ? '<span style="font-size:12px;color:var(--label);margin-top:2px;display:block;">' + esc(teamName) + '</span>' : '') +
         '</div>' +
         '<div class="row-right" style="display:flex;align-items:center;gap:6px;">' +
@@ -3462,162 +3462,6 @@ function closeReactionsDetail() {
 
 // Premium Pull-to-Refresh & Infinite Scroll Controller
 (function() {
-  var startX = 0;
-  var startY = 0;
-  var pullOffset = 0;
-  var isPulling = false;
-  var isRefreshing = false;
-  var threshold = 75; // px
-  
-  var indicator = document.getElementById('pull-refresh-indicator');
-  var circle = indicator ? indicator.querySelector('.pull-refresh-circle') : null;
-  var spinnerCircle = indicator ? indicator.querySelector('.pull-refresh-spinner circle') : null;
-  
-  function getActiveScrollContainer() {
-    return document.getElementById('tab-' + _currentTab);
-  }
-  
-  function isAnyModalOpen() {
-    var actModal = document.getElementById('activity-detail-modal');
-    var profModal = document.getElementById('profile-detail-modal');
-    var highModal = document.getElementById('highlight-detail-modal');
-    var rxModal = document.getElementById('reactions-detail-modal');
-    var dashModal = document.getElementById('dash-details-modal');
-    return (actModal && actModal.classList.contains('open')) ||
-           (profModal && profModal.classList.contains('open')) ||
-           (highModal && highModal.classList.contains('open')) ||
-           (rxModal && rxModal.classList.contains('open')) ||
-           (dashModal && dashModal.classList.contains('open'));
-  }
-
-  window.addEventListener('touchstart', function(e) {
-    if (e.touches.length !== 1 || isRefreshing || isAnyModalOpen()) return;
-    
-    var container = getActiveScrollContainer();
-    if (!container || container.scrollTop > 0) return;
-    
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    isPulling = true;
-    
-    if (indicator) {
-      indicator.style.transition = 'none';
-      indicator.classList.add('visible');
-    }
-  }, { passive: true });
-
-  window.addEventListener('touchmove', function(e) {
-    if (!isPulling || e.touches.length !== 1 || isRefreshing) return;
-    
-    var currentX = e.touches[0].clientX;
-    var currentY = e.touches[0].clientY;
-    var deltaX = Math.abs(currentX - startX);
-    var deltaY = currentY - startY;
-    
-    // If swipe is primarily horizontal, cancel pull-to-refresh
-    if (deltaX > deltaY && deltaX > 8) {
-      isPulling = false;
-      if (indicator) {
-        indicator.style.transition = 'transform 0.2s ease-out';
-        indicator.style.transform = 'translate(-50%, -100px) scale(0.3)';
-        indicator.classList.remove('visible');
-      }
-      return;
-    }
-    
-    if (deltaY <= 0) {
-      pullOffset = 0;
-      if (indicator) {
-        indicator.style.transform = 'translate(-50%, -100px) scale(0.3)';
-        indicator.classList.remove('visible');
-      }
-      return;
-    }
-    
-    // Logarithmic spring physics
-    pullOffset = Math.pow(deltaY, 0.82);
-    if (pullOffset > 130) pullOffset = 130;
-    
-    var progress = Math.min(1, pullOffset / threshold);
-    
-    if (indicator) {
-      var translateY = -100 + (pullOffset * 1.5);
-      if (translateY > 40) translateY = 40; 
-      
-      var scale = 0.3 + (progress * 0.7);
-      indicator.style.transform = 'translate(-50%, ' + translateY + 'px) scale(' + scale + ')';
-      
-      if (spinnerCircle) {
-        var circumference = 62.8;
-        var offset = circumference - (progress * circumference);
-        spinnerCircle.style.strokeDashoffset = offset;
-      }
-      
-      var spinner = indicator.querySelector('.pull-refresh-spinner');
-      if (spinner) {
-        spinner.style.transform = 'rotate(' + (pullOffset * 2.5) + 'deg)';
-      }
-      
-      if (pullOffset >= threshold && !indicator._hasVibrated) {
-        if (navigator.vibrate) navigator.vibrate(10);
-        indicator._hasVibrated = true;
-      } else if (pullOffset < threshold) {
-        indicator._hasVibrated = false;
-      }
-    }
-    
-    var container = getActiveScrollContainer();
-    if (container && container.scrollTop === 0 && e.cancelable) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  window.addEventListener('touchend', function() {
-    if (!isPulling) return;
-    isPulling = false;
-    
-    if (indicator) {
-      indicator._hasVibrated = false;
-    }
-    
-    if (pullOffset >= threshold) {
-      isRefreshing = true;
-      pullOffset = 0;
-      
-      if (indicator) {
-        indicator.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        indicator.style.transform = 'translate(-50%, 20px) scale(1)';
-        indicator.classList.add('refreshing');
-        if (spinnerCircle) {
-          spinnerCircle.style.strokeDashoffset = 0;
-        }
-      }
-      
-      if (typeof load === 'function') {
-        load(true).then(resetPullIndicator).catch(resetPullIndicator);
-      } else {
-        setTimeout(resetPullIndicator, 1500);
-      }
-    } else {
-      resetPullIndicator();
-    }
-  }, { passive: true });
-
-  function resetPullIndicator() {
-    isRefreshing = false;
-    pullOffset = 0;
-    if (indicator) {
-      indicator.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease';
-      indicator.style.transform = 'translate(-50%, -100px) scale(0.3)';
-      indicator.classList.remove('refreshing');
-      setTimeout(function() {
-        indicator.classList.remove('visible');
-      }, 300);
-    }
-  }
-  
-  window.resetPullIndicator = resetPullIndicator;
-  
   // --- IntersectionObserver Infinite Scroll ---
   var observer = null;
   var isObserving = false;
@@ -3632,7 +3476,7 @@ function closeReactionsDetail() {
     
     observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
-        if (entry.isIntersecting && !isPulling && !isRefreshing) {
+        if (entry.isIntersecting && !window._ptrPulling && !window._ptrLoading) {
           if (_feedData.length > _feedVisibleCount) {
             console.log('[InfiniteScroll] Loading next 30 items...');
             showMoreAnnouncements();
@@ -4088,10 +3932,18 @@ window.closeDashModal = closeDashModal;
   var circle = ptr.querySelector('.ptr-spinner-circle');
   var svg = ptr.querySelector('.ptr-spinner-svg');
 
+  var startX = 0;
   var startY = 0;
+  var currentX = 0;
   var currentY = 0;
   var pulling = false;
   var loading = false;
+  var isSwipeBackOrHorizontal = false;
+
+  try {
+    Object.defineProperty(window, '_ptrPulling', { get: function() { return pulling; }, configurable: true });
+    Object.defineProperty(window, '_ptrLoading', { get: function() { return loading; }, configurable: true });
+  } catch(e) {}
   var activeContainer = null;
   var maxPull = 120; // max Y offset in pixels
   var triggerPull = 75; // trigger refresh at 75px
@@ -4115,39 +3967,51 @@ window.closeDashModal = closeDashModal;
     }
   }
 
-  function handleStart(yVal) {
+  function handleStart(xVal, yVal) {
     if (loading) return;
     var container = getActiveScrollContainer();
     if (!container) return;
     
     if (container.scrollTop <= 0) {
+      startX = xVal;
       startY = yVal;
-      currentY = yVal;
       pulling = true;
+      isSwipeBackOrHorizontal = false;
       activeContainer = container;
       ptr.classList.remove('transitioning');
     }
   }
 
-  function handleMove(yVal, e) {
-    if (!pulling || loading) return;
+  function handleMove(xVal, yVal, e) {
+    if (!pulling || loading || isSwipeBackOrHorizontal) return;
     
-    var diff = yVal - startY;
-    if (diff > 0) {
-      if (e.cancelable) e.preventDefault();
-      
-      var pullDistance = Math.min(maxPull, diff);
-      var yOffset = Math.pow(pullDistance, 0.85) * 1.5;
+    var diffX = Math.abs(xVal - startX);
+    var diffY = yVal - startY;
+    
+    if (diffX > 10 && diffX > diffY) {
+      isSwipeBackOrHorizontal = true;
+      pulling = false;
+      ptr.classList.remove('visible');
+      ptr.style.transform = 'translate3d(-50%, -60px, 0)';
+      return;
+    }
+    
+    if (diffY > 0) {
+      if (diffY > 15) {
+        if (e.cancelable) e.preventDefault();
+        ptr.classList.add('visible');
+        
+        var pullDistance = Math.min(maxPull, diffY);
+        var yOffset = Math.pow(pullDistance, 0.85) * 1.5;
+        ptr.style.transform = 'translate3d(-50%, ' + (-60 + yOffset) + 'px, 0)';
 
-      ptr.classList.add('visible');
-      ptr.style.transform = 'translate3d(-50%, ' + (-60 + yOffset) + 'px, 0)';
-
-      var pct = Math.min(1, yOffset / triggerPull);
-      var rot = pct * 360;
-      svg.style.transform = 'rotate(' + rot + 'deg)';
-      
-      var offset = 60 - (pct * 45);
-      circle.style.strokeDashoffset = offset;
+        var pct = Math.min(1, yOffset / triggerPull);
+        var rot = pct * 360;
+        svg.style.transform = 'rotate(' + rot + 'deg)';
+        
+        var offset = 60 - (pct * 45);
+        circle.style.strokeDashoffset = offset;
+      }
     } else {
       ptr.classList.remove('visible');
       ptr.style.transform = 'translate3d(-50%, -60px, 0)';
@@ -4197,13 +4061,13 @@ window.closeDashModal = closeDashModal;
 
   document.addEventListener('touchstart', function(e) {
     if (e.touches.length === 1) {
-      handleStart(e.touches[0].pageY);
+      handleStart(e.touches[0].pageX, e.touches[0].pageY);
     }
   }, { passive: true });
 
   document.addEventListener('touchmove', function(e) {
     if (pulling && e.touches.length === 1) {
-      handleMove(e.touches[0].pageY, e);
+      handleMove(e.touches[0].pageX, e.touches[0].pageY, e);
     }
   }, { passive: false });
 
@@ -4216,13 +4080,13 @@ window.closeDashModal = closeDashModal;
     var container = getActiveScrollContainer();
     if (container && container.scrollTop <= 0) {
       isMouseDown = true;
-      handleStart(e.pageY);
+      handleStart(e.pageX, e.pageY);
     }
   });
 
   document.addEventListener('mousemove', function(e) {
     if (isMouseDown && pulling) {
-      handleMove(e.pageY, e);
+      handleMove(e.pageX, e.pageY, e);
     }
   });
 
@@ -4282,6 +4146,10 @@ window.closeDashModal = closeDashModal;
       var actDrawer = document.getElementById('you-panel-activities');
       var chalDrawer = document.getElementById('you-panel-challenges');
       var evModal = document.getElementById('event-details-modal-container');
+      var insightsDrawer = document.getElementById('medal-insights-drawer');
+      var streakDrawer = document.getElementById('you-panel-streak');
+      var pbsDrawer = document.getElementById('you-panel-pbs');
+      var partProfileDrawer = document.getElementById('participant-profile-drawer');
       
       if (rxModal && rxModal.classList.contains('open')) {
         if (typeof closeReactionsDetail === 'function') { closeReactionsDetail(); return true; }
@@ -4303,6 +4171,18 @@ window.closeDashModal = closeDashModal;
       }
       if (chalDrawer && chalDrawer.classList.contains('open')) {
         if (typeof closeChallengesDrawer === 'function') { closeChallengesDrawer(); return true; }
+      }
+      if (insightsDrawer && insightsDrawer.classList.contains('open')) {
+        if (typeof closeMedalInsightsDrawer === 'function') { closeMedalInsightsDrawer(); return true; }
+      }
+      if (streakDrawer && streakDrawer.classList.contains('open')) {
+        if (typeof closeStreakDrawer === 'function') { closeStreakDrawer(); return true; }
+      }
+      if (pbsDrawer && pbsDrawer.classList.contains('open')) {
+        if (typeof closePBsDrawer === 'function') { closePBsDrawer(); return true; }
+      }
+      if (partProfileDrawer && partProfileDrawer.classList.contains('open')) {
+        if (typeof closeParticipantProfile === 'function') { closeParticipantProfile(); return true; }
       }
       if (evModal && evModal.style.display === 'flex') {
         var closeBtn = document.getElementById('close-ev-details-btn');
