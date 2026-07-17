@@ -541,26 +541,34 @@ function hideFullPageLoader() {
     var file = event.target.files[0];
     if (!file) return;
     var inputUrl = event.target.closest('.cert-img-wrap').querySelector('.cert-p-imgurl');
+    showFullPageLoader('Uploading image file...');
     var rd = new FileReader();
     rd.onload = async function() {
       try {
-        var r = await fetch(BACKEND + '/admin/upload-image', {
+        var r = await fetch(BACKEND + '/admin/upload-file', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + sessionStorage.getItem('wk_admin_token')
           },
-          body: JSON.stringify({ data: rd.result })
+          body: JSON.stringify({ 
+            data: rd.result,
+            name: file.name
+          })
         });
         var d2 = await r.json();
         if (d2.success && inputUrl) {
           inputUrl.value = d2.url;
           updateCertPreviewCanvas();
-        } else if (!d2.success) {
+        } else {
+          console.warn('Image upload failed, using local base64 fallback:', d2.error);
           if (inputUrl) { inputUrl.value = rd.result; updateCertPreviewCanvas(); }
         }
       } catch(err) {
+        console.warn('Image upload failed, using local base64 fallback:', err);
         if (inputUrl) { inputUrl.value = rd.result; updateCertPreviewCanvas(); }
+      } finally {
+        hideFullPageLoader();
       }
     };
     rd.readAsDataURL(file);
