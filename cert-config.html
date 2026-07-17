@@ -1037,7 +1037,15 @@ function hideFullPageLoader() {
       else if (type === 'distance') text = '245.8 KM';
       else if (type === 'points') text = '245';
       else if (type === 'rank') text = '#12 of 350';
-      else if (type === 'custom') text = customVal || 'CEO Signature';
+      else if (type === 'custom') {
+        var rawText = customVal || 'CEO Signature';
+        rawText = rawText.replace(/@name/gi, 'Prakash Sharma');
+        rawText = rawText.replace(/@medal/gi, 'Gold Medal');
+        rawText = rawText.replace(/@distance/gi, '245.8 KM');
+        rawText = rawText.replace(/@points/gi, '245');
+        rawText = rawText.replace(/@rank/gi, '#12 of 350');
+        text = rawText;
+      }
 
       var rotEl = row.querySelector('.cert-p-rotation');
       var rotation = rotEl ? (parseFloat(rotEl.value) || 0) : 0;
