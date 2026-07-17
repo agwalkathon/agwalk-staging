@@ -3076,8 +3076,16 @@ window.downloadPastCertAction = function(type, pastEventId) {
       
       var textX = w * p.x;
       var textY = h * p.y;
-      var boxX = textX;
+      var rotation = parseFloat(p.rotation || 0) || 0;
       
+      if (rotation !== 0) {
+        ctx.translate(textX, textY);
+        ctx.rotate((rotation * Math.PI) / 180);
+        textX = 0;
+        textY = 0;
+      }
+      
+      var boxX = textX;
       if (p.align === 'center') boxX = textX - textWidth / 2;
       else if (p.align === 'right') boxX = textX - textWidth;
       
@@ -3105,6 +3113,14 @@ window.downloadPastCertAction = function(type, pastEventId) {
       ctx.save();
       ctx.textAlign = p.align || 'left';
       ctx.textBaseline = 'middle';
+
+      var rotation = parseFloat(p.rotation || 0) || 0;
+      if (rotation !== 0) {
+        ctx.translate(textX, textY);
+        ctx.rotate((rotation * Math.PI) / 180);
+        textX = 0;
+        textY = 0;
+      }
 
       if (statLbl !== null) {
         var labelSize = Math.max(10, Math.round(fontSize * 0.42));
