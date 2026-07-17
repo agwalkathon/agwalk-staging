@@ -684,6 +684,7 @@ function hideFullPageLoader() {
           '<option value="Dancing Script"' + (p.font_family === 'Dancing Script' ? ' selected' : '') + '>Dancing Script</option>' +
           '<option value="Great Vibes"' + (p.font_family === 'Great Vibes' ? ' selected' : '') + '>Great Vibes</option>' +
           '<option value="Outfit"' + (p.font_family === 'Outfit' ? ' selected' : '') + '>Outfit</option>' +
+'<option value="Arcane Nine"' + (p.font_family === 'Arcane Nine' ? ' selected' : '') + '>Arcane Nine</option>' +
         '</select>' +
       '</div>' +
       '</div>' +
@@ -1106,6 +1107,7 @@ function hideFullPageLoader() {
 
   window.loadGoogleFont = function(fontName) {
     if (!fontName) return;
+    if (fontName === 'Arcane Nine') return; // Locally installed custom font
     var fontId = 'gf-' + fontName.toLowerCase().replace(/\s+/g, '-');
     if (document.getElementById(fontId)) return;
     
