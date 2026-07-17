@@ -2313,7 +2313,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
     sec.style.display = 'block';
     card.innerHTML = '<div style="text-align:center;padding:15px;color:rgba(255,255,255,0.4);font-size:13px;">Loading past events...</div>';
 
-    var res = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(reg.email) + '&event_id=neq.' + reg.event_id + '&select=event_id,event_name,leaderboard_team,gender,shift,strava_athlete_id', { headers: HDR });
+    var res = await fetch(SUPABASE_URL + '/rest/v1/registration?email=eq.' + encodeURIComponent(reg.email) + '&select=event_id,event_name,leaderboard_team,gender,shift,strava_athlete_id', { headers: HDR });
     var otherRegs = await res.json();
     if (!Array.isArray(otherRegs) || otherRegs.length === 0) {
       card.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);font-size:13.5px;">No Past Event Performed</div>';
@@ -2470,7 +2470,9 @@ async function loadPastEventsPerformance(reg, athleteId) {
         hasEnded = true; // Hardcoded true for 2026 historical event
       }
 
-      var showDownloadBtn = hasEnded && certCfg && certCfg.enabled === true && (certCfg.template_url || certCfg.canvas_mode === 'blank');
+      var showDownloadBtn = certCfg && certCfg.enabled === true && (certCfg.template_url || certCfg.canvas_mode === 'blank');
+      var shouldShowRow = hasEnded || showDownloadBtn;
+      if (!shouldShowRow) continue;
 
       var athleteRank = null;
       var totalParticipants = rankMap[pastEventId] ? rankMap[pastEventId].length : 0;
