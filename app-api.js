@@ -2365,8 +2365,25 @@ async function loadPastEventsPerformance(reg, athleteId) {
     otherRegs.sort(function(a, b) { return a.event_id - b.event_id; });
     window.pastCertDataMap = {};
 
-    for (var i = 0; i < otherRegs.length; i++) {
-      var pReg = otherRegs[i];
+    // Filter to only visible registrations
+    var visibleRegs = [];
+    for (var j = 0; j < otherRegs.length; j++) {
+      var rReg = otherRegs[j];
+      var rEventId = rReg.event_id;
+      var rEventObj = eventMap[rEventId] || null;
+      var rCertCfg = configMap[rEventId] ? configMap[rEventId].certificate_config : null;
+      var rHasEnded = rEventObj ? (rEventObj.status === 'ended') : false;
+      if (rEventId === 1 && !rCertCfg) {
+        rCertCfg = { enabled: true, template_url: 'certificate_template_walkathon_2026.pdf' };
+      }
+      var rShowDownloadBtn = rCertCfg && rCertCfg.enabled === true && (rCertCfg.template_url || rCertCfg.canvas_mode === 'blank');
+      if (rHasEnded || rShowDownloadBtn) {
+        visibleRegs.push(rReg);
+      }
+    }
+
+    for (var i = 0; i < visibleRegs.length; i++) {
+      var pReg = visibleRegs[i];
       var pastEventId = pReg.event_id;
       var eventObj = eventMap[pastEventId] || null;
       var pastEventName = eventObj ? eventObj.name : (pReg.event_name || (pastEventId === 1 ? 'Walkathon 2026' : 'Event ' + pastEventId));
@@ -2490,7 +2507,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
         };
       }
 
-      var borderStyle = i === otherRegs.length - 1 ? 'border-bottom:none;' : '';
+      var borderStyle = i === visibleRegs.length - 1 ? 'border-bottom:none;' : '';
 
       html += '<div class="tab-you-detail-row" style="' + borderStyle + 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);overflow:visible;">' +
         '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
