@@ -4,7 +4,9 @@
 // to remember to swap by hand during a staging -> live promotion anymore.
 (function () {
   var isStaging = window.location.hostname.indexOf('staging') > -1 || window.location.pathname.indexOf('staging') > -1;
-  window.BACKEND_URL = 'https://uccapp-backend-staging.onrender.com';
+  window.BACKEND_URL = isStaging
+    ? 'https://agwalk-backend.onrender.com'
+    : 'https://walkathon-backend-hv9j.onrender.com';
 
   console.log('[env-config] backend =', window.BACKEND_URL, '(' + (isStaging ? 'staging' : 'live') + ')');
 })();
