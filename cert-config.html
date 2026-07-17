@@ -935,7 +935,7 @@ function hideFullPageLoader() {
       var isChecked = row.querySelector('input[name="active-cert-placeholder"]').checked;
       
       if (type === 'medal_image') {
-        var boxSize = Math.round(size * scale * 0.5);
+        var boxSize = Math.round(size * scale);
         var ix = x * w;
         var iy = y * h;
         
@@ -970,7 +970,7 @@ function hideFullPageLoader() {
       }
       
       if (type === 'static_image') {
-        var boxSize = Math.round(size * scale * 0.5);
+        var boxSize = Math.round(size * scale);
         var imgUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
         var ix = x * w;
         var iy = y * h;
@@ -1015,13 +1015,13 @@ function hideFullPageLoader() {
       var text = key;
       if (type === 'custom') text = customVal || 'CEO Signature';
 
-      ctx.font = (weight === 'bold' ? 'bold ' : '') + Math.round(size * scale * 0.5) + 'px "' + family + '", sans-serif';
+      ctx.font = (weight === 'bold' ? 'bold ' : '') + Math.round(size * scale) + 'px "' + family + '", sans-serif';
       ctx.textAlign = align;
       ctx.textBaseline = 'middle';
       
       var metrics = ctx.measureText(text);
       var textWidth = metrics.width;
-      var textHeight = Math.round(size * scale * 0.5);
+      var textHeight = Math.round(size * scale);
 
       var px = x * w;
       var py = y * h;
