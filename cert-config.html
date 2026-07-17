@@ -173,7 +173,7 @@ body{font-family:var(--font);background:var(--page-bg);color:var(--text-primary)
             <input type="text" id="cert-template-url" placeholder="certificate_template_walkathon_2026.pdf">
           </div>
           <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cert-template-file').click()"><i class="ti ti-upload"></i> Upload</button>
-          <input type="file" id="cert-template-file" accept="application/pdf" style="display:none;" onchange="handleCertTemplateUpload(event)">
+          <input type="file" id="cert-template-file" accept="application/pdf,image/*" style="display:none;" onchange="handleCertTemplateUpload(event)">
         </div>
         <div id="cert-blank-wrap" style="display:none; gap:8px; align-items:flex-end;">
           <div class="fld" style="margin:0; width:140px;">
@@ -820,30 +820,53 @@ function hideFullPageLoader() {
       });
     };
 
-    // Load PDF
+    // Load PDF with Image template fallback
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
       _activeCertPdfDoc = pdf;
       renderPreview(pdf);
     }).catch(function(err) {
-      console.warn('PDF load direct failed, trying fallback:', err.message);
-      if (url.indexOf('data:') === -1 && url.indexOf('http') === -1) {
-        pdfjsLib.getDocument(url).promise.then(function(pdf) {
-          _activeCertPdfDoc = pdf;
-          renderPreview(pdf);
-        }).catch(function(e) {
+      console.warn('PDF load direct failed, trying image fallback:', err.message);
+      var img = new Image();
+      img.onload = function() {
+        var containerWidth = canvas.parentElement.clientWidth - 20;
+        var scale = containerWidth / img.width;
+        if (scale > 1.5) scale = 1.5;
+        
+        var bg = document.createElement('canvas');
+        bg.width = img.width * scale;
+        bg.height = img.height * scale;
+        var bctx = bg.getContext('2d');
+        bctx.drawImage(img, 0, 0, bg.width, bg.height);
+        
+        _certBgCanvas = bg;
+        _certBgUrl = url;
+        _certPreviewScale = scale;
+        canvas.width = bg.width;
+        canvas.height = bg.height;
+        window.redrawCertPreview();
+      };
+      img.onerror = function(e) {
+        // Final fallback back to original PDF load attempt
+        if (url.indexOf('data:') === -1 && url.indexOf('http') === -1) {
+          pdfjsLib.getDocument(url).promise.then(function(pdf) {
+            _activeCertPdfDoc = pdf;
+            renderPreview(pdf);
+          }).catch(function(e) {
+            if (placeholder) {
+              placeholder.style.display = 'block';
+              placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load template: ' + esc(e.message) + '</p>';
+            }
+            if (canvas) canvas.style.display = 'none';
+          });
+        } else {
           if (placeholder) {
             placeholder.style.display = 'block';
-            placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(e.message) + '</p>';
+            placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load template: ' + esc(err.message) + '</p>';
           }
           if (canvas) canvas.style.display = 'none';
-        });
-      } else {
-        if (placeholder) {
-          placeholder.style.display = 'block';
-          placeholder.innerHTML = '<p style="color:#ef4444;">Failed to load PDF template: ' + esc(err.message) + '</p>';
         }
-        if (canvas) canvas.style.display = 'none';
-      }
+      };
+      img.src = url;
     });
   };
 
