@@ -3509,11 +3509,17 @@ body.employee-mode::after {
 .ptr-loader.loading .ptr-spinner-svg {
   animation: ptr-spin 0.8s linear infinite;
 }
-.ptr-loader.loading .ptr-spinner-circle {
-  stroke-dasharray: 60;
-  stroke-dashoffset: 15;
-  transition: stroke-dashoffset 0.15s ease;
-}
+  .ptr-loader.loading .ptr-spinner-circle {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 15;
+    transition: stroke-dashoffset 0.15s ease;
+  }
+  .ptr-arrow-wrap.ptr-flipped {
+    transform: rotate(180deg) !important;
+  }
+  .content.ptr-transitioning {
+    transition: transform 0.28s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  }
 @keyframes ptr-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
