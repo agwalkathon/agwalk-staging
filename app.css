@@ -2918,6 +2918,10 @@
     color: var(--brand);
     text-decoration: underline;
   }
+  .participant-profile-link:hover {
+    color: var(--brand);
+    text-decoration: none;
+  }
 
   .feed-card {
     cursor: pointer;
@@ -2943,7 +2947,7 @@
 
   /* Prevent browser default pull-to-refresh on scroll containers */
   .content {
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y: none;
     position: relative;
   }
 
