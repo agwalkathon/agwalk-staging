@@ -3306,9 +3306,7 @@ window.renderMedalInsights = async function() {
     var barHeight = Math.round(day.km * (100 / maxVal));
     var y = 120 - barHeight;
     svgHtml += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="16" height="' + Math.max(2, barHeight) + '" rx="4" fill="' + (day.km > 0 ? 'url(#bar-grad)' : 'rgba(255,255,255,0.05)') + '" style="transition: all 0.3s ease; cursor: pointer;" title="' + day.label + ': ' + day.km.toFixed(1) + ' km"/>';
-    if (index % 2 === 0) {
-      svgHtml += '<text x="' + (x + 8) + '" y="' + 138 + '" fill="rgba(255,255,255,0.4)" font-size="8.5" text-anchor="middle">' + day.label + '</text>';
-    }
+    svgHtml += '<text x="' + (x + 8) + '" y="' + 138 + '" fill="rgba(255,255,255,0.4)" font-size="7.5" text-anchor="middle">' + day.label + '</text>';
   });
   svgHtml += '<defs><linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--brand)"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>';
   svgHtml += '</svg>';
