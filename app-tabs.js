@@ -1415,7 +1415,7 @@ window.lbRender = lbRender;
 function lbBoot() {
   if (window.EVENT_ROW) {
     var suffix = (window.EVENT_ROW.status === 'ended' || window.EVENT_ROW.status === 'archived') ? ' — Final Results' : '';
-    var defaultId = window._lbRegisteredEventId || 2;
+    var defaultId = window._lbRegisteredEventId || (window.EVENT_ROW ? window.EVENT_ROW.id : 1);
     if (window._lbCurrentEventId === defaultId && typeof setLbTitle === 'function') {
       setLbTitle('🏆 ' + window.EVENT_ROW.name + suffix);
     }
