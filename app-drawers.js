@@ -1189,19 +1189,19 @@ function openProfileDetail(athleteId, event) {
           var sportTitle = (a.sport_type || 'Workout').toUpperCase();
 
           if (sport === 'run') {
-            pillColor = '#008cee'; // Vibrant electric blue
+            pillColor = '#f97316'; // Electric Fire Orange
             sportIcon = '<i class="fa-solid fa-running" style="color:#fff; font-size:15px;"></i>';
             sportTitle = 'RUNNING';
           } else if (sport === 'walk') {
-            pillColor = '#ab47bc'; // Purple
+            pillColor = '#10b981'; // Fresh Emerald Green
             sportIcon = '<i class="fa-solid fa-walking" style="color:#fff; font-size:15px;"></i>';
             sportTitle = 'WALKING';
           } else if (sport === 'ride' || sport === 'cycling') {
-            pillColor = '#ff9100'; // Orange
+            pillColor = '#6366f1'; // High-Octane Indigo Blue
             sportIcon = '<i class="fa-solid fa-bicycle" style="color:#fff; font-size:15px;"></i>';
             sportTitle = 'CYCLING';
           } else if (sport === 'hike') {
-            pillColor = '#10b981'; // Green
+            pillColor = '#f59e0b'; // Outdoor Trail Amber
             sportIcon = '<i class="fa-solid fa-mountain-sun" style="color:#fff; font-size:15px;"></i>';
             sportTitle = 'HIKING';
           }
