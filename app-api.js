@@ -3011,6 +3011,30 @@ window.downloadPastCertAction = function(type, pastEventId) {
           return canvas;
         });
       });
+    }).catch(function(err) {
+      console.warn('PDF load failed for participant cert download, trying image fallback:', err.message);
+      return new Promise(function(resolve, reject) {
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+          
+          // Cache clone of clean background
+          var bgClone = document.createElement('canvas');
+          bgClone.width = canvas.width;
+          bgClone.height = canvas.height;
+          bgClone.getContext('2d').drawImage(canvas, 0, 0);
+          window._certBgCache[cacheKey] = bgClone;
+          
+          resolve(canvas);
+        };
+        img.onerror = function() {
+          reject(new Error('Failed to load certificate template as PDF or Image: ' + err.message));
+        };
+        img.src = url;
+      });
     });
   }
 
