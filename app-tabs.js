@@ -3972,9 +3972,20 @@ window.closeDashModal = closeDashModal;
       }
     } catch(e) {}
     
-    if (typeof load === 'function') {
-      await load(true);
+    var reloadPage = function() {
+      window.location.reload();
+    };
+
+    if ('serviceWorker' in navigator) {
+      try {
+        var regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(function(r) { return r.unregister(); }));
+        var names = await caches.keys();
+        await Promise.all(names.map(function(name) { return caches.delete(name); }));
+      } catch(err) {}
     }
+    
+    setTimeout(reloadPage, 600);
   }
 
   function handleStart(xVal, yVal) {
