@@ -3311,6 +3311,163 @@ window.renderMedalInsights = async function() {
   svgHtml += '<defs><linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--brand)"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs>';
   svgHtml += '</svg>';
 
+  // ===== CUMULATIVE MILESTONE PROGRESSION LINE CHART =====
+  var eventStartStr = EVENT_ROW ? EVENT_ROW.start_date : null;
+  var eventEndStr = EVENT_ROW ? EVENT_ROW.end_date : null;
+  
+  var eventDays = [];
+  if (eventStartStr && eventEndStr) {
+    var startD = new Date(eventStartStr + 'T12:00:00');
+    var endD = new Date(eventEndStr + 'T12:00:00');
+    var tempD = new Date(startD.getTime());
+    while (tempD <= endD) {
+      eventDays.push(tempD.toLocaleDateString('sv-SE'));
+      tempD.setDate(tempD.getDate() + 1);
+    }
+  } else {
+    // fallback if no start/end dates
+    for (var i = 0; i < 15; i++) {
+      var tempD = new Date();
+      tempD.setDate(tempD.getDate() - 14 + i);
+      eventDays.push(tempD.toLocaleDateString('sv-SE'));
+    }
+  }
+
+  var usePoints = (pred.unit === 'pts');
+  var fullP = calcFullPts(validActs, gender, shift);
+  var dayBreakdown = fullP.dayBreakdown || {};
+
+  function getDayVal(dStr) {
+    if (!dayBreakdown[dStr]) return 0;
+    if (usePoints) {
+      var dPts = dayBreakdown[dStr].distPts || 0;
+      var bPts = dayBreakdown[dStr].bonusPts || 0;
+      var cPts = 0;
+      if (Array.isArray(dayBreakdown[dStr].challenges)) {
+        dayBreakdown[dStr].challenges.forEach(function(ch) { cPts += (ch.pts || 0); });
+      }
+      return dPts + bPts + cPts;
+    } else {
+      return dayBreakdown[dStr].km || 0;
+    }
+  }
+
+  var cumulative = [];
+  var runningSum = 0;
+  var todayStr = new Date().toLocaleDateString('sv-SE');
+  var lastPlottedIndex = -1;
+
+  for (var i = 0; i < eventDays.length; i++) {
+    runningSum += getDayVal(eventDays[i]);
+    cumulative.push(runningSum);
+    if (eventDays[i] <= todayStr) {
+      lastPlottedIndex = i;
+    }
+  }
+  if (lastPlottedIndex === -1) lastPlottedIndex = eventDays.length - 1;
+
+  var maxValCurve = Math.max(pred.goldLimit, runningSum) || 10;
+  
+  // Build SVG Line Chart
+  var curveSvg = '<svg viewBox="0 0 340 180" style="width: 100%; height: auto; font-family: var(--font);">';
+  
+  var W = 280, H = 135, paddingX = 40, paddingY = 15;
+  var N = eventDays.length;
+
+  // grid horizontal reference lines at Bronze, Silver, Gold thresholds
+  var yGold = paddingY + H - (pred.goldLimit / maxValCurve) * H;
+  var ySilver = paddingY + H - (pred.silverLimit / maxValCurve) * H;
+  var yBronze = paddingY + H - (pred.bronzeLimit / maxValCurve) * H;
+
+  // Gold reference line
+  curveSvg += '<line x1="' + paddingX + '" y1="' + yGold + '" x2="' + (paddingX + W) + '" y2="' + yGold + '" stroke="rgba(245,158,11,0.25)" stroke-width="1" stroke-dasharray="3,3"/>';
+  curveSvg += '<text x="' + (paddingX - 6) + '" y="' + (yGold + 3) + '" fill="rgba(245,158,11,0.7)" font-size="7" font-weight="700" text-anchor="end">GOLD</text>';
+  
+  // Silver reference line
+  curveSvg += '<line x1="' + paddingX + '" y1="' + ySilver + '" x2="' + (paddingX + W) + '" y2="' + ySilver + '" stroke="rgba(156,163,175,0.25)" stroke-width="1" stroke-dasharray="3,3"/>';
+  curveSvg += '<text x="' + (paddingX - 6) + '" y="' + (ySilver + 3) + '" fill="rgba(156,163,175,0.7)" font-size="7" font-weight="700" text-anchor="end">SILVER</text>';
+
+  // Bronze reference line
+  curveSvg += '<line x1="' + paddingX + '" y1="' + yBronze + '" x2="' + (paddingX + W) + '" y2="' + yBronze + '" stroke="rgba(197,127,53,0.25)" stroke-width="1" stroke-dasharray="3,3"/>';
+  curveSvg += '<text x="' + (paddingX - 6) + '" y="' + (yBronze + 3) + '" fill="rgba(197,127,53,0.7)" font-size="7" font-weight="700" text-anchor="end">BRONZE</text>';
+
+  // Baseline 0 reference
+  curveSvg += '<line x1="' + paddingX + '" y1="' + (paddingY + H) + '" x2="' + (paddingX + W) + '" y2="' + (paddingY + H) + '" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>';
+  curveSvg += '<text x="' + (paddingX - 6) + '" y="' + (paddingY + H + 3) + '" fill="rgba(255,255,255,0.4)" font-size="7" text-anchor="end">0</text>';
+
+  // Generate target dashed trajectories
+  var goldPath = 'M ' + paddingX + ' ' + (paddingY + H);
+  var silverPath = 'M ' + paddingX + ' ' + (paddingY + H);
+  var bronzePath = 'M ' + paddingX + ' ' + (paddingY + H);
+
+  for (var i = 0; i < N; i++) {
+    var x = paddingX + (i / (N - 1 || 1)) * W;
+    var yG = paddingY + H - (((i + 1) / N) * pred.goldLimit / maxValCurve) * H;
+    var yS = paddingY + H - (((i + 1) / N) * pred.silverLimit / maxValCurve) * H;
+    var yB = paddingY + H - (((i + 1) / N) * pred.bronzeLimit / maxValCurve) * H;
+    
+    goldPath += ' L ' + x + ' ' + yG;
+    silverPath += ' L ' + x + ' ' + yS;
+    bronzePath += ' L ' + x + ' ' + yB;
+  }
+  curveSvg += '<path d="' + goldPath + '" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="1" stroke-dasharray="2,2"/>';
+  curveSvg += '<path d="' + silverPath + '" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="2,2"/>';
+  curveSvg += '<path d="' + bronzePath + '" fill="none" stroke="rgba(197,127,53,0.15)" stroke-width="1" stroke-dasharray="2,2"/>';
+
+  // Actual cumulative progress path
+  var actualPath = '';
+  var areaPath = 'M ' + paddingX + ' ' + (paddingY + H);
+  for (var i = 0; i <= lastPlottedIndex; i++) {
+    var x = paddingX + (i / (N - 1 || 1)) * W;
+    var y = paddingY + H - (cumulative[i] / maxValCurve) * H;
+    if (i === 0) {
+      actualPath += 'M ' + x + ' ' + y;
+    } else {
+      actualPath += ' L ' + x + ' ' + y;
+    }
+    areaPath += ' L ' + x + ' ' + y;
+  }
+  areaPath += ' L ' + (paddingX + (lastPlottedIndex / (N - 1 || 1)) * W) + ' ' + (paddingY + H) + ' Z';
+
+  // Draw area and stroke
+  if (lastPlottedIndex >= 0) {
+    curveSvg += '<path d="' + areaPath + '" fill="url(#area-grad)" opacity="0.12"/>';
+    curveSvg += '<path d="' + actualPath + '" fill="none" stroke="url(#line-grad-curve)" stroke-width="2.5" stroke-linecap="round"/>';
+    
+    // Dot on the latest day
+    var lastX = paddingX + (lastPlottedIndex / (N - 1 || 1)) * W;
+    var lastY = paddingY + H - (cumulative[lastPlottedIndex] / maxValCurve) * H;
+    curveSvg += '<circle cx="' + lastX + '" cy="' + lastY + '" r="4" fill="var(--brand)" stroke="#fff" stroke-width="1.5" style="filter: drop-shadow(0 0 4px var(--brand));"/>';
+  }
+
+  // Draw x-axis labels (Start Date, Middle Date, End Date)
+  if (N > 1) {
+    var dStart = new Date(eventDays[0] + 'T12:00:00');
+    var dEnd = new Date(eventDays[N-1] + 'T12:00:00');
+    var dMid = new Date(eventDays[Math.floor(N/2)] + 'T12:00:00');
+    
+    var lblStart = dStart.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    var lblMid = dMid.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    var lblEnd = dEnd.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
+    curveSvg += '<text x="' + paddingX + '" y="' + (paddingY + H + 16) + '" fill="rgba(255,255,255,0.4)" font-size="7.5" text-anchor="middle">' + lblStart + '</text>';
+    curveSvg += '<text x="' + (paddingX + W/2) + '" y="' + (paddingY + H + 16) + '" fill="rgba(255,255,255,0.4)" font-size="7.5" text-anchor="middle">' + lblMid + '</text>';
+    curveSvg += '<text x="' + (paddingX + W) + '" y="' + (paddingY + H + 16) + '" fill="rgba(255,255,255,0.4)" font-size="7.5" text-anchor="middle">' + lblEnd + '</text>';
+  }
+
+  // Defs for gradients
+  curveSvg += '<defs>';
+  curveSvg += '  <linearGradient id="line-grad-curve" x1="0%" y1="0%" x2="100%" y2="0%">';
+  curveSvg += '    <stop offset="0%" stop-color="var(--brand)"/>';
+  curveSvg += '    <stop offset="100%" stop-color="#ec4899"/>';
+  curveSvg += '  </linearGradient>';
+  curveSvg += '  <linearGradient id="area-grad" x1="0%" y1="0%" x2="0%" y2="100%">';
+  curveSvg += '    <stop offset="0%" stop-color="var(--brand)" stop-opacity="1"/>';
+  curveSvg += '    <stop offset="100%" stop-color="var(--brand)" stop-opacity="0"/>';
+  curveSvg += '  </linearGradient>';
+  curveSvg += '</defs>';
+  curveSvg += '</svg>';
+
   var html = '';
   
   // 1. Projected Finish Card
@@ -3392,6 +3549,12 @@ window.renderMedalInsights = async function() {
            '</div>';
   }
 
+  // ===== Cumulative Milestone Projection Card =====
+  html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+         '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; text-align: left;">CUMULATIVE PROGRESSION VS MILESTONES</div>' +
+            curveSvg +
+         '</div>';
+
   // 3. Last 10 Days Chart
   html += '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
          '  <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; text-align: left;">LAST 10 DAYS DISTANCE</div>' +
@@ -3411,6 +3574,105 @@ window.renderMedalInsights = async function() {
          '    <div style="font-size: 16px; font-weight: 800; color: #22c55e; margin-top: 2px;">' + maxDayKm.toFixed(1) + ' km</div>' +
          '  </div>' +
          '</div>';
+
+  // ===== Smartwatch Device detection and Cardiometabolic Metrics =====
+  var smartwatchActs = validActs.filter(function(a) {
+    return a.has_heartrate === true || (a.average_heartrate && a.average_heartrate > 0);
+  });
+  
+  var hasSmartwatch = smartwatchActs.length > 0;
+  var watchHtml = '';
+  if (hasSmartwatch) {
+    var totalHr = 0, hrCount = 0, maxHr = 0;
+    var totalCalories = 0;
+    var watchDevices = {};
+    
+    smartwatchActs.forEach(function(a) {
+      if (a.average_heartrate) {
+        totalHr += a.average_heartrate;
+        hrCount++;
+      }
+      if (a.max_heartrate && a.max_heartrate > maxHr) {
+        maxHr = a.max_heartrate;
+      }
+      if (a.calories) {
+        totalCalories += a.calories;
+      }
+      var device = a.device_name || 'Smartwatch';
+      watchDevices[device] = (watchDevices[device] || 0) + 1;
+    });
+    
+    var avgHr = hrCount > 0 ? Math.round(totalHr / hrCount) : 0;
+    var maxDevice = 'Smartwatch';
+    var maxDevCount = 0;
+    Object.keys(watchDevices).forEach(function(d) {
+      if (watchDevices[d] > maxDevCount) {
+        maxDevCount = watchDevices[d];
+        maxDevice = d;
+      }
+    });
+
+    // Approximate HR zone distribution for display
+    // Zone 1: recovery, Zone 2: aerobic, Zone 3: tempo, Zone 4: threshold, Zone 5: peak
+    var z1 = 0, z2 = 0, z3 = 0, z4 = 0, z5 = 0;
+    smartwatchActs.forEach(function(a) {
+      var h = a.average_heartrate || 0;
+      if (h > 0) {
+        if (h < 114) z1++;
+        else if (h < 133) z2++;
+        else if (h < 152) z3++;
+        else if (h < 171) z4++;
+        else z5++;
+      }
+    });
+    var totalZones = z1 + z2 + z3 + z4 + z5 || 1;
+
+    watchHtml += '<div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 18px; margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">' +
+                 '  <span>SMARTWATCH PROFILE</span>' +
+                 '  <span style="font-size: 10px; font-weight: 600; color: #22c55e; background: rgba(34,197,94,0.1); padding: 2px 6px; border-radius: 8px; border: 1px solid rgba(34,197,94,0.2);">' + maxDevice + '</span>' +
+                 '</div>' +
+                 '<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">' +
+                 '  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">' +
+                 '    <div>' +
+                 '      <div style="font-size: 20px; font-weight: 800; color: #fff;">' + (avgHr || '—') + ' <span style="font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.4);">bpm</span></div>' +
+                 '      <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 4px;">Avg Heart Rate</div>' +
+                 '    </div>' +
+                 '    <div>' +
+                 '      <div style="font-size: 20px; font-weight: 800; color: #ff453a;">' + (maxHr || '—') + ' <span style="font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.4);">bpm</span></div>' +
+                 '      <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 4px;">Max Heart Rate</div>' +
+                 '    </div>' +
+                 '    <div>' +
+                 '      <div style="font-size: 20px; font-weight: 800; color: #ff9f0a;">' + (totalCalories ? Math.round(totalCalories).toLocaleString('en-IN') : '—') + ' <span style="font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.4);">kcal</span></div>' +
+                 '      <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 4px;">Active Calories</div>' +
+                 '    </div>' +
+                 '  </div>' +
+                 '  <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">' +
+                 '    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase;">CARDIO INTENSITY ZONES</div>' +
+                 '    <div style="display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 2px;">' +
+                 '      <div style="flex: ' + Math.max(1, z5) + '; background: #ff453a;" title="Zone 5: Peak"></div>' +
+                 '      <div style="flex: ' + Math.max(1, z4) + '; background: #ff9f0a;" title="Zone 4: Threshold"></div>' +
+                 '      <div style="flex: ' + Math.max(1, z3) + '; background: #ffd60a;" title="Zone 3: Tempo"></div>' +
+                 '      <div style="flex: ' + Math.max(1, z2) + '; background: #30d158;" title="Zone 2: Aerobic"></div>' +
+                 '      <div style="flex: ' + Math.max(1, z1) + '; background: #0a84ff;" title="Zone 1: Recovery"></div>' +
+                 '    </div>' +
+                 '    <div style="display: grid; grid-template-columns: repeat(5, 1fr); font-size: 8px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 2px;">' +
+                 '      <div><span style="color:#0a84ff;">●</span> Z1 (' + Math.round(z1*100/totalZones) + '%)</div>' +
+                 '      <div><span style="color:#30d158;">●</span> Z2 (' + Math.round(z2*100/totalZones) + '%)</div>' +
+                 '      <div><span style="color:#ffd60a;">●</span> Z3 (' + Math.round(z3*100/totalZones) + '%)</div>' +
+                 '      <div><span style="color:#ff9f0a;">●</span> Z4 (' + Math.round(z4*100/totalZones) + '%)</div>' +
+                 '      <div><span style="color:#ff453a;">●</span> Z5 (' + Math.round(z5*100/totalZones) + '%)</div>' +
+                 '    </div>' +
+                 '  </div>' +
+                 '</div>';
+  } else {
+    // Elegant CTA placeholder advising watch syncing
+    watchHtml += '<div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 18px; margin-bottom: 12px; text-align: left;">SMARTWATCH PROFILE</div>' +
+                 '<div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; padding: 22px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">' +
+                 '  <div style="font-size: 28px; margin-bottom: 2px;">⌚</div>' +
+                 '  <div style="font-size: 13.5px; font-weight: 700; color: rgba(255,255,255,0.85);">Smartwatch Data Unlinked</div>' +
+                 '  <div style="font-size: 11.5px; color: rgba(255,255,255,0.4); line-height: 1.4; max-width: 250px;">Connect your Garmin, Apple Watch, or Fitbit to Strava to unlock heart rate analysis, calorie metrics, and intensity zones.</div>' +
+                 '</div>';
+  }
 
   // ===== Dynamic Advanced Metrics Extensions (WHOOP Hybrid Redesign) =====
   var values = Object.values(dayKm);
@@ -3527,6 +3789,8 @@ window.renderMedalInsights = async function() {
          '    </div>' +
          '  </div>' +
          '</div>';
+
+  html += watchHtml;
 
   contentEl.innerHTML = html;
 };
