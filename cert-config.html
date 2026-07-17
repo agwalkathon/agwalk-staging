@@ -380,7 +380,10 @@ function hideFullPageLoader() {
             addCertPlaceholderRow(p);
           });
         }
-      } else {
+      }
+      
+      // Auto-upload any legacy Base64 data to storage backend on load
+      setTimeout(autoUploadLegacyBase64Data, 100); else {
         // Defaults for new event config
         document.getElementById('cert-template-url').value = '';
         document.getElementById('cert-canvas-mode').value = 'pdf';
@@ -450,6 +453,25 @@ function hideFullPageLoader() {
     saved.classList.remove('show');
     btn.disabled = true;
 
+    var tempUrlVal = document.getElementById('cert-template-url').value.trim();
+    if (tempUrlVal.startsWith('data:')) {
+      alert("Please wait for legacy template data cloud conversion to finish, or re-upload your template file using the upload button to save.");
+      btn.disabled = false;
+      return;
+    }
+    var hasBase64 = false;
+    document.querySelectorAll('.cert-placeholder-row').forEach(function(row) {
+      var imgUrlEl = row.querySelector('.cert-p-imgurl');
+      if (imgUrlEl && imgUrlEl.value.trim().startsWith('data:')) {
+        hasBase64 = true;
+      }
+    });
+    if (hasBase64) {
+      alert("Please wait for legacy element image cloud conversion to finish, or re-upload your custom images to save.");
+      btn.disabled = false;
+      return;
+    }
+
     showFullPageLoader('Saving Design... Please wait');
 
     try {
@@ -510,6 +532,70 @@ function hideFullPageLoader() {
     } finally {
       btn.disabled = false;
       setTimeout(hideFullPageLoader, 400);
+    }
+  }
+
+  async function autoUploadLegacyBase64Data() {
+    var token = sessionStorage.getItem('wk_admin_token');
+    if (!token) return;
+
+    var tempUrlEl = document.getElementById('cert-template-url');
+    if (tempUrlEl && tempUrlEl.value.startsWith('data:')) {
+      showFullPageLoader('Converting legacy template data to cloud storage...');
+      try {
+        var r = await fetch(BACKEND + '/admin/upload-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify({ 
+            data: tempUrlEl.value,
+            name: 'imported_template.pdf'
+          })
+        });
+        var res = await r.json();
+        if (res.success && res.url) {
+          tempUrlEl.value = res.url;
+          updateCertPreviewCanvas(true);
+        }
+      } catch (err) {
+        console.warn('Auto-upload legacy template failed:', err);
+      } finally {
+        hideFullPageLoader();
+      }
+    }
+
+    // Also check for any placeholder image_url
+    var rows = document.querySelectorAll('.cert-placeholder-row');
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var imgUrlEl = row.querySelector('.cert-p-imgurl');
+      if (imgUrlEl && imgUrlEl.value.startsWith('data:')) {
+        showFullPageLoader('Converting legacy image element to cloud storage...');
+        try {
+          var r = await fetch(BACKEND + '/admin/upload-file', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({ 
+              data: imgUrlEl.value,
+              name: 'imported_image.png'
+            })
+          });
+          var res = await r.json();
+          if (res.success && res.url) {
+            imgUrlEl.value = res.url;
+            updateCertPreviewCanvas();
+          }
+        } catch (err) {
+          console.warn('Auto-upload legacy element image failed:', err);
+        } finally {
+          hideFullPageLoader();
+        }
+      }
     }
   }
 
