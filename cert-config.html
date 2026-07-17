@@ -416,12 +416,17 @@ function hideFullPageLoader() {
     
     var url = SB_URL + '/rest/v1/leaderboard_config';
     var method = 'POST';
-    var headers = Object.assign({}, HDR, { Prefer: 'return=representation' });
+    var headers = Object.assign({}, HDR, {
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation'
+    });
     
     if (Array.isArray(rows) && rows.length > 0) {
       url += '?id=eq.' + rows[0].id;
       method = 'PATCH';
-      headers = HDR;
+      headers = Object.assign({}, HDR, {
+        'Content-Type': 'application/json'
+      });
     }
     
     var res = await fetch(url, {
