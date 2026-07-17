@@ -2447,12 +2447,7 @@ async function loadPastEventsPerformance(reg, athleteId) {
         }
       }
 
-      var medalBadgeHtml = '';
-      if (medalImageUrl) {
-        medalBadgeHtml = '<img src="' + medalImageUrl + '" style="width:28px;height:28px;object-fit:contain;border-radius:50%;" title="' + medalTitle + '">';
-      } else {
-        medalBadgeHtml = '<span style="font-size:22px;line-height:1;" title="' + medalTitle + '">' + medalBadge + '</span>';
-      }
+      var medalBadgeHtml = '<span style="font-size:22px;line-height:1;" title="' + medalTitle + '">' + medalBadge + '</span>';
 
       // Check if event has ended and certificate config template is set
       var hasEnded = eventObj ? (eventObj.status === 'ended') : false;
@@ -2504,8 +2499,8 @@ async function loadPastEventsPerformance(reg, athleteId) {
         '</div>' +
         '<div style="text-align:right;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;overflow:visible;">' +
           '<div style="display:flex;flex-direction:column;">' +
-            '<span style="font-size:14px;font-weight:800;color:var(--brand);">' + totalKm.toFixed(1) + ' km</span>' +
-            '<span style="font-size:10px;color:rgba(255,255,255,0.4);">' + totalPts.toFixed(0) + ' pts</span>' +
+            '<span style="font-size:14px;font-weight:800;color:var(--brand);">' + totalPts.toFixed(0) + ' pts</span>' +
+            '<span style="font-size:10px;color:rgba(255,255,255,0.4);">' + totalKm.toFixed(1) + ' km</span>' +
           '</div>' +
           medalBadgeHtml +
           (showDownloadBtn ? (
