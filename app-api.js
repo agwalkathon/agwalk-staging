@@ -3040,6 +3040,16 @@ window.downloadPastCertAction = function(type, pastEventId) {
     var w = canvas.width;
     var h = canvas.height;
 
+    var getCustomTextVal = function(p, name, certData) {
+      var raw = p.custom_val || '';
+      raw = raw.replace(/@name/gi, name);
+      raw = raw.replace(/@medal/gi, certStatValue('medal_title', certData));
+      raw = raw.replace(/@distance/gi, certStatValue('distance', certData));
+      raw = raw.replace(/@points/gi, certStatValue('points', certData));
+      raw = raw.replace(/@rank/gi, certStatValue('rank', certData));
+      return raw;
+    };
+
     var placeholders = certData.config.placeholders || [];
 
     // 1. Cover the placeholder region (PDF-template mode only; blank canvases have nothing to cover)
@@ -3053,7 +3063,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
       if (p.type === 'participant_name') textVal = name;
       else if (p.type === 'medal_title') textVal = certStatValue(p.type, certData);
       else if (isStat) textVal = certStatValue(p.type, certData);
-      else if (p.type === 'custom') textVal = p.custom_val || '';
+      else if (p.type === 'custom') textVal = getCustomTextVal(p, name, certData);
 
       var templateText = p.key || '';
 
@@ -3132,7 +3142,7 @@ window.downloadPastCertAction = function(type, pastEventId) {
         var textVal = p.key;
         if (p.type === 'participant_name') textVal = name;
         else if (p.type === 'medal_title') textVal = certStatValue(p.type, certData);
-        else if (p.type === 'custom') textVal = p.custom_val || '';
+        else if (p.type === 'custom') textVal = getCustomTextVal(p, name, certData);
         ctx.fillStyle = p.color || '#000000';
         ctx.font = (p.font_style === 'bold' ? 'bold ' : '') + fontSize + 'px "' + family + '", "Georgia", sans-serif';
         ctx.fillText(textVal, textX, textY);
